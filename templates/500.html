@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Server Error - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-6">
+                <h1 class="display-1 text-gold" style="font-size: 8rem;">500</h1>
+                <h2 class="mb-4">Server Error</h2>
+                <p class="text-muted mb-4">
+                    Sorry, something went wrong on our end. Please try again later.
+                </p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="{% url 'home' %}" class="btn btn-gold">Go Home</a>
+                    <a href="{% url 'contact' %}" class="btn btn-outline">Contact Support</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

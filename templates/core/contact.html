@@ -1,0 +1,202 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Contact Us - {{
+SITE_NAME }}{% endblock %} {% block content %}
+
+<!-- Hero Section -->
+<section class="page-hero">
+  <div class="container text-center">
+    <h1>Contact Us</h1>
+    <p class="lead">We'd love to hear from you</p>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section class="section-padding">
+  <div class="container">
+    <div class="row g-5">
+      <!-- Contact Info -->
+      <div class="col-lg-4">
+        <div class="contact-info">
+          <h4 class="mb-4">Get in Touch</h4>
+
+          <div class="contact-item">
+            <i class="bi bi-geo-alt"></i>
+            <div>
+              <h6>Address</h6>
+              <p>123 Luxury Avenue<br />Lagos, Nigeria</p>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <i class="bi bi-envelope"></i>
+            <div>
+              <h6>Email</h6>
+              <p>{{ CONTACT_EMAIL }}</p>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <i class="bi bi-telephone"></i>
+            <div>
+              <h6>Phone</h6>
+              <p>{{ CONTACT_PHONE }}</p>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <i class="bi bi-clock"></i>
+            <div>
+              <h6>Business Hours</h6>
+              <p>Monday - Saturday: 9AM - 6PM<br />Sunday: Closed</p>
+            </div>
+          </div>
+
+          <div class="social-links mt-4">
+            <h6>Follow Us</h6>
+            <div class="d-flex gap-3 mt-2">
+              <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
+              <a href="#" class="social-link"
+                ><i class="bi bi-instagram"></i
+              ></a>
+              <a href="#" class="social-link"><i class="bi bi-tiktok"></i></a>
+              <a href="#" class="social-link"><i class="bi bi-youtube"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="col-lg-8">
+        <div class="contact-form-wrapper">
+          <h4 class="mb-4">Send us a Message</h4>
+
+          <form method="post">
+            {% csrf_token %}
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Your Name *</label>
+                {{ form.name }} {% if form.name.errors %}
+                <div class="text-danger">{{ form.name.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email Address *</label>
+                {{ form.email }} {% if form.email.errors %}
+                <div class="text-danger">{{ form.email.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-12">
+                <label class="form-label">Subject *</label>
+                {{ form.subject }} {% if form.subject.errors %}
+                <div class="text-danger">{{ form.subject.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-12">
+                <label class="form-label">Message *</label>
+                {{ form.message }} {% if form.message.errors %}
+                <div class="text-danger">{{ form.message.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-gold">Send Message</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Map Section -->
+<section class="map-section">
+  <iframe
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d253682.45932584812!2d3.1191425!3d6.5483768!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8b2ae68280c1%3A0xdc9e87a367c3d9cb!2sLagos%2C%20Nigeria!5e0!3m2!1sen!2sus!4v1699999999999!5m2!1sen!2sus"
+    width="100%"
+    height="400"
+    style="border: 0"
+    allowfullscreen=""
+    loading="lazy"
+  >
+  </iframe>
+</section>
+
+{% endblock %} {% block extra_css %}
+<style>
+  .page-hero {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding: 1rem 0;
+  }
+
+  .page-hero h1 {
+    color: var(--color-white);
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .contact-info {
+    background-color: var(--color-gray-100);
+    padding: 2.5rem;
+  }
+
+  .contact-info h4 {
+    font-family: var(--font-serif);
+  }
+
+  .contact-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .contact-item i {
+    font-size: 1.25rem;
+    color: var(--color-gold);
+    margin-top: 0.25rem;
+  }
+
+  .contact-item h6 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+  }
+
+  .contact-item p {
+    color: var(--color-gray-600);
+    margin-bottom: 0;
+  }
+
+  .social-link {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--color-gray-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-gray-600);
+    transition: all var(--transition-fast);
+  }
+
+  .social-link:hover {
+    background-color: var(--color-gold);
+    border-color: var(--color-gold);
+    color: var(--color-white);
+  }
+
+  .contact-form-wrapper {
+    background-color: var(--color-gray-100);
+    padding: 2.5rem;
+  }
+
+  .contact-form-wrapper h4 {
+    font-family: var(--font-serif);
+  }
+
+  .map-section {
+    line-height: 0;
+  }
+</style>
+{% endblock %}

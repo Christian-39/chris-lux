@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FAQ - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="page-hero">
+    <div class="container text-center">
+        <h1>Frequently Asked Questions</h1>
+        <p class="lead">Find answers to common questions</p>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                {% if faq_categories %}
+                    {% for category, faqs in faq_categories.items %}
+                    <div class="faq-category mb-5">
+                        <h4 class="category-title">{{ category }}</h4>
+                        <div class="accordion" id="faq-{{ forloop.counter }}">
+                            {% for faq in faqs %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" 
+                                            type="button" 
+                                            data-bs-toggle="collapse" 
+                                            data-bs-target="#faq-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                                        {{ faq.question }}
+                                    </button>
+                                </h2>
+                                <div id="faq-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" 
+                                     class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
+                                     data-bs-parent="#faq-{{ forloop.parentloop.counter }}">
+                                    <div class="accordion-body">
+                                        {{ faq.answer|linebreaks }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <!-- Default FAQs -->
+                <div class="faq-category mb-5">
+                    <h4 class="category-title">Orders & Shipping</h4>
+                    <div class="accordion" id="faq-shipping">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq-1-1">
+                                    How long does shipping take?
+                                </button>
+                            </h2>
+                            <div id="faq-1-1" class="accordion-collapse collapse show" data-bs-parent="#faq-shipping">
+                                <div class="accordion-body">
+                                    Standard delivery takes 3-5 business days within Nigeria. Express delivery (1-2 business days) is available for select locations at an additional cost.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-1-2">
+                                    Do you offer free shipping?
+                                </button>
+                            </h2>
+                            <div id="faq-1-2" class="accordion-collapse collapse" data-bs-parent="#faq-shipping">
+                                <div class="accordion-body">
+                                    Yes! We offer free shipping on all orders over ₦50,000 within Nigeria.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-1-3">
+                                    How can I track my order?
+                                </button>
+                            </h2>
+                            <div id="faq-1-3" class="accordion-collapse collapse" data-bs-parent="#faq-shipping">
+                                <div class="accordion-body">
+                                    Once your order ships, you'll receive an email with your tracking number. You can also track your order by logging into your account and viewing your order history.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-category mb-5">
+                    <h4 class="category-title">Products & Quality</h4>
+                    <div class="accordion" id="faq-products">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-2-1">
+                                    Is your hair 100% human hair?
+                                </button>
+                            </h2>
+                            <div id="faq-2-1" class="accordion-collapse collapse" data-bs-parent="#faq-products">
+                                <div class="accordion-body">
+                                    Yes, all our hair products are made from 100% authentic human hair. We source our hair ethically and each batch is carefully inspected for quality.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-2-2">
+                                    How long does the hair last?
+                                </button>
+                            </h2>
+                            <div id="faq-2-2" class="accordion-collapse collapse" data-bs-parent="#faq-products">
+                                <div class="accordion-body">
+                                    With proper care, our hair can last 1-2 years or more. We recommend using sulfate-free products, deep conditioning regularly, and avoiding excessive heat styling.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-2-3">
+                                    Can I dye or style the hair?
+                                </button>
+                            </h2>
+                            <div id="faq-2-3" class="accordion-collapse collapse" data-bs-parent="#faq-products">
+                                <div class="accordion-body">
+                                    Yes! Our hair can be dyed, curled, straightened, and styled just like your natural hair. We recommend consulting a professional stylist for major color changes.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-category mb-5">
+                    <h4 class="category-title">Returns & Exchanges</h4>
+                    <div class="accordion" id="faq-returns">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-3-1">
+                                    What is your return policy?
+                                </button>
+                            </h2>
+                            <div id="faq-3-1" class="accordion-collapse collapse" data-bs-parent="#faq-returns">
+                                <div class="accordion-body">
+                                    We accept returns within 7 days of delivery for unopened and unused products. The product must be in its original packaging with all tags attached.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-3-2">
+                                    How do I initiate a return?
+                                </button>
+                            </h2>
+                            <div id="faq-3-2" class="accordion-collapse collapse" data-bs-parent="#faq-returns">
+                                <div class="accordion-body">
+                                    To initiate a return, please contact our customer service team at {{ CONTACT_EMAIL }} or {{ CONTACT_PHONE }}. We'll provide you with return instructions and a return authorization number.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Still Have Questions -->
+                <div class="text-center mt-5">
+                    <h4>Still have questions?</h4>
+                    <p class="text-muted">Can't find the answer you're looking for? Please contact our support team.</p>
+                    <a href="{% url 'contact' %}" class="btn btn-gold mt-3">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.page-hero {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding: 6rem 0;
+}
+
+.page-hero h1 {
+    color: var(--color-white);
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+}
+
+.faq-category {
+    margin-bottom: 3rem;
+}
+
+.category-title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-gold);
+}
+
+.accordion-item {
+    border: none;
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.accordion-button {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    font-weight: 500;
+    padding: 1.25rem 0;
+    background: none;
+    box-shadow: none;
+}
+
+.accordion-button:not(.collapsed) {
+    background: none;
+    color: var(--color-gold);
+    box-shadow: none;
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+}
+
+.accordion-button::after {
+    background-size: 1rem;
+}
+
+.accordion-body {
+    padding: 0 0 1.5rem 0;
+    color: var(--color-gray-600);
+}
+</style>
+{% endblock %}

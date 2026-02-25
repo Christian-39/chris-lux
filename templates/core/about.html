@@ -1,0 +1,236 @@
+{% extends 'base.html' %} {% load static %} {% block title %}About Us - {{
+SITE_NAME }}{% endblock %} {% block content %}
+
+<!-- Hero Section -->
+<section class="page-hero">
+  <div class="container text-center">
+    <h1>About Chris Lux & Accessories</h1>
+    <p class="lead">Premium Human Hair & Accessories</p>
+  </div>
+</section>
+
+<!-- About Content -->
+<section class="section-padding">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <img
+          src="{% static 'images/about-image.jpg' %}"
+          alt="About Chris Lux"
+          class="img-fluid"
+        />
+      </div>
+      <div class="col-lg-6">
+        <p class="section-subtitle">Our Story</p>
+        <h2 class="section-title">Redefining Beauty Through Premium Hair</h2>
+        <p>
+          Founded in Lagos, Nigeria, Chris Lux and Accessories was born from a
+          passion for helping women feel confident and beautiful. We believe
+          that every woman deserves access to high-quality, luxurious hair that
+          looks and feels natural.
+        </p>
+        <p>
+          Our journey began with a simple mission: to provide authentic,
+          ethically sourced human hair at accessible prices. Today, we're proud
+          to be one of Nigeria's leading luxury hair brands, serving customers
+          nationwide and beyond.
+        </p>
+        <div class="mt-4">
+          <a href="{% url 'shop' %}" class="btn btn-gold"
+            >Shop Our Collection</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Values Section -->
+<section class="section-padding bg-cream">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-subtitle">Our Values</p>
+      <h2 class="section-title">What We Stand For</h2>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="value-card text-center">
+          <i class="bi bi-gem"></i>
+          <h4>Quality First</h4>
+          <p>
+            We never compromise on quality. Every strand is carefully selected
+            and inspected to meet our premium standards.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="value-card text-center">
+          <i class="bi bi-heart"></i>
+          <h4>Customer Love</h4>
+          <p>
+            Our customers are at the heart of everything we do. We're committed
+            to exceptional service and satisfaction.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="value-card text-center">
+          <i class="bi bi-globe"></i>
+          <h4>Ethical Sourcing</h4>
+          <p>
+            All our hair is ethically sourced from trusted suppliers who share
+            our values of fairness and transparency.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="section-padding bg-black">
+  <div class="container">
+    <div class="row text-center g-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <span class="stat-number">10K+</span>
+          <span class="stat-label">Happy Customers</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <span class="stat-number">50+</span>
+          <span class="stat-label">Products</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <span class="stat-number">5+</span>
+          <span class="stat-label">Years Experience</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <span class="stat-number">36</span>
+          <span class="stat-label">States Covered</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Team Section -->
+<section class="section-padding">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-subtitle">Our Team</p>
+      <h2 class="section-title">Meet the People Behind Chris Lux</h2>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="team-card text-center">
+          <img
+            src="{% static 'images/team-1.jpg' %}"
+            alt="Team Member"
+            class="team-image"
+          />
+          <h4>Christiana Adeyemi</h4>
+          <p class="text-gold">Founder & CEO</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="team-card text-center">
+          <img
+            src="{% static 'images/team-2.jpg' %}"
+            alt="Team Member"
+            class="team-image"
+          />
+          <h4>Oluwaseun Bakare</h4>
+          <p class="text-gold">Operations Manager</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="team-card text-center">
+          <img
+            src="{% static 'images/team-3.jpg' %}"
+            alt="Team Member"
+            class="team-image"
+          />
+          <h4>Amara Nwosu</h4>
+          <p class="text-gold">Customer Experience</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %} {% block extra_css %}
+<style>
+  .page-hero {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding: 1rem 0;
+  }
+
+  .page-hero h1 {
+    color: var(--color-white);
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .value-card {
+    background-color: var(--color-white);
+    padding: 3rem 2rem;
+    border: 1px solid var(--color-gray-200);
+  }
+
+  .value-card i {
+    font-size: 3rem;
+    color: var(--color-gold);
+    margin-bottom: 1.5rem;
+  }
+
+  .value-card h4 {
+    font-family: var(--font-serif);
+    margin-bottom: 1rem;
+  }
+
+  .stat-item {
+    padding: 2rem;
+  }
+
+  .stat-number {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: 3rem;
+    font-weight: 600;
+    color: var(--color-gold);
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--color-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .team-card {
+    padding: 2rem;
+  }
+
+  .team-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 1.5rem;
+  }
+
+  .team-card h4 {
+    font-family: var(--font-serif);
+    margin-bottom: 0.5rem;
+  }
+</style>
+{% endblock %}

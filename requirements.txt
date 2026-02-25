@@ -1,0 +1,10 @@
+Django
+python-decouple
+psycopg2-binary
+Pillow
+paystackapi
+django-crispy-forms
+crispy-bootstrap5
+gunicorn
+whitenoise
+django-environ

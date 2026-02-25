@@ -1,0 +1,401 @@
+{% extends 'base.html' %} {% load static %} {% load humanize %}
+<!-- prettier-ignore -->
+{% block title %}Shopping Cart - {{ SITE_NAME }}{% endblock %} {% block content %}
+
+<!-- Breadcrumb -->
+<section class="breadcrumb-section">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Cart</li>
+      </ol>
+    </nav>
+    <h1 class="mt-3">Shopping Cart</h1>
+  </div>
+</section>
+
+<!-- Cart Section -->
+<section class="section-padding">
+  <div class="container">
+    {% if cart.items.exists %}
+    <div class="row g-5">
+      <!-- Cart Items -->
+      <div class="col-lg-8">
+        <div class="cart-items">
+          {% for item in cart.items.all %}
+          <div class="cart-item" data-item-id="{{ item.id }}">
+            <div class="row align-items-center">
+              <!-- Product Image -->
+              <div class="col-3 col-md-2">
+                <a href="{{ item.product.get_absolute_url }}">
+                  {% if item.product.primary_image %}
+                  <img
+                    src="{{ item.product.primary_image.image.url }}"
+                    alt="{{ item.product.name }}"
+                    class="cart-item-image"
+                  />
+                  {% else %}
+                  <img
+                    src="{% static 'images/product-placeholder.jpg' %}"
+                    alt="{{ item.product.name }}"
+                    class="cart-item-image"
+                  />
+                  {% endif %}
+                </a>
+              </div>
+
+              <!-- Product Info -->
+              <div class="col-9 col-md-4">
+                <h5 class="cart-item-name">
+                  <a href="{{ item.product.get_absolute_url }}"
+                    >{{ item.product.name }}</a
+                  >
+                </h5>
+                {% if item.variation %}
+                <p class="cart-item-variant">
+                  {{ item.variation.name }}: {{ item.variation.value }}
+                </p>
+                {% endif %}
+                <p class="cart-item-price d-md-none">
+                  ₦{{ item.unit_price|intcomma }}
+                </p>
+              </div>
+
+              <!-- Unit Price (Desktop) -->
+              <div class="col-md-2 d-none d-md-block">
+                <span class="cart-item-price"
+                  >₦{{ item.unit_price|intcomma }}</span
+                >
+              </div>
+
+              <!-- Quantity -->
+              <div class="col-6 col-md-2 mt-3 mt-md-0">
+                <div class="quantity-input">
+                  <button class="qty-btn minus" data-item-id="{{ item.id }}">
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    class="qty-input"
+                    value="{{ item.quantity }}"
+                    min="1"
+                    max="10"
+                    readonly
+                  />
+                  <button class="qty-btn plus" data-item-id="{{ item.id }}">
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <!-- Subtotal -->
+              <div class="col-4 col-md-1 mt-3 mt-md-0 text-end">
+                <span class="cart-item-subtotal"
+                  >₦{{ item.subtotal|intcomma }}</span
+                >
+              </div>
+
+              <!-- Remove -->
+              <div class="col-2 col-md-1 mt-3 mt-md-0 text-end">
+                <button
+                  class="remove-item-btn"
+                  data-item-id="{{ item.id }}"
+                  title="Remove"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Cart Actions -->
+        <div class="cart-actions mt-4">
+          <a href="{% url 'shop' %}" class="btn btn-outline">
+            <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+          </a>
+        </div>
+      </div>
+
+      <!-- Cart Summary -->
+      <div class="col-lg-4">
+        <div class="cart-summary">
+          <h4 class="summary-title">Order Summary</h4>
+
+          <!-- Coupon -->
+          <div class="coupon-section mb-4">
+            <form action="{% url 'apply_coupon' %}" method="post">
+              {% csrf_token %}
+              <div class="input-group">
+                <input
+                  type="text"
+                  name="coupon_code"
+                  class="form-control"
+                  placeholder="Enter coupon code"
+                  value="{{ cart.coupon.code|default:'' }}"
+                />
+                <button type="submit" class="btn btn-black">Apply</button>
+              </div>
+            </form>
+            {% if cart.coupon %}
+            <div class="applied-coupon mt-2">
+              <span class="text-success"
+                ><i class="bi bi-check-circle"></i> {{ cart.coupon.code }}
+                applied</span
+              >
+              <a href="{% url 'remove_coupon' %}" class="text-danger ms-2"
+                ><small>Remove</small></a
+              >
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Summary Details -->
+          <div class="summary-details">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span id="cart-subtotal">₦{{ cart.subtotal|intcomma }}</span>
+            </div>
+            {% if cart.discount_amount > 0 %}
+            <div class="summary-row discount">
+              <span>Discount</span>
+              <span>-₦{{ cart.discount_amount|intcomma }}</span>
+            </div>
+            {% endif %}
+            <div class="summary-row">
+              <span>Shipping</span>
+              <span>
+                {% if cart.shipping_cost == 0 %}
+                <span class="text-success">Free</span>
+                {% else %} ₦{{ cart.shipping_cost|intcomma }} {% endif %}
+              </span>
+            </div>
+            {% if cart.shipping_cost == 0 %}
+            <div class="free-shipping-note">
+              <i class="bi bi-check-circle-fill text-success"></i> You qualify
+              for free shipping!
+            </div>
+            {% else %}
+            <div class="free-shipping-note">
+              Add ₦{{ FREE_SHIPPING_THRESHOLD|add:"-"|add:cart.subtotal }} more
+              for free shipping
+            </div>
+            {% endif %}
+            <div class="summary-row total">
+              <span>Total</span>
+              <span id="cart-total">₦{{ cart.total|intcomma }}</span>
+            </div>
+          </div>
+
+          <!-- Checkout Button -->
+          <a href="{% url 'checkout' %}" class="btn btn-gold w-100 mt-4">
+            Proceed to Checkout<i class="bi bi-arrow-right ms-2"></i>
+          </a>
+
+          <!-- Payment Icons -->
+          <div class="payment-icons mt-3 text-center">
+            <small class="text-muted">Secure checkout with</small>
+            <div class="mt-2">
+              <img
+                src="{% static 'images/paystack-logo.png' %}"
+                alt="Paystack"
+                height="30"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <!-- Empty Cart -->
+    <div class="empty-cart text-center py-5">
+      <i
+        class="bi bi-bag-x"
+        style="font-size: 5rem; color: var(--color-gray-300)"
+      ></i>
+      <h3 class="mt-4">Your cart is empty</h3>
+      <p class="text-muted">
+        Looks like you haven't added anything to your cart yet.
+      </p>
+      <a href="{% url 'shop' %}" class="btn btn-gold mt-3">
+        <i class="bi bi-shop me-2"></i>Start Shopping
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %} {% block extra_css %}
+<style>
+  .cart-item {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--color-gray-200);
+  }
+
+  .cart-item-image {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  .cart-item-name {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .cart-item-name a {
+    color: var(--color-black);
+  }
+
+  .cart-item-name a:hover {
+    color: var(--color-gold);
+  }
+
+  .cart-item-variant {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+    margin-bottom: 0;
+  }
+
+  .cart-item-price {
+    font-weight: 500;
+  }
+
+  .cart-item-subtotal {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  .remove-item-btn {
+    background: none;
+    border: none;
+    color: var(--color-gray-400);
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+  }
+
+  .remove-item-btn:hover {
+    color: #dc3545;
+  }
+
+  .cart-summary {
+    background-color: var(--color-gray-100);
+    padding: 2rem;
+  }
+
+  .summary-title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .summary-details {
+    border-top: 1px solid var(--color-gray-300);
+    border-bottom: 1px solid var(--color-gray-300);
+    padding: 1rem 0;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+  }
+
+  .summary-row.discount {
+    color: #28a745;
+  }
+
+  .summary-row.total {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+    border-top: 1px solid var(--color-gray-300);
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+  }
+
+  .free-shipping-note {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+    margin-top: 0.5rem;
+  }
+
+  .applied-coupon {
+    font-size: 0.875rem;
+  }
+
+  .empty-cart {
+    padding: 4rem 0;
+  }
+</style>
+{% endblock %} {% block extra_js %}
+<script>
+  // Update cart item quantity
+  document.querySelectorAll(".qty-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const itemId = this.dataset.itemId;
+      const input = this.parentElement.querySelector(".qty-input");
+      let quantity = parseInt(input.value);
+
+      if (this.classList.contains("minus")) {
+        if (quantity > 1) quantity--;
+      } else {
+        if (quantity < 10) quantity++;
+      }
+
+      updateCartItem(itemId, quantity);
+    });
+  });
+
+  // Remove item from cart
+  document.querySelectorAll(".remove-item-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      if (confirm("Are you sure you want to remove this item?")) {
+        const itemId = this.dataset.itemId;
+        removeCartItem(itemId);
+      }
+    });
+  });
+
+  function updateCartItem(itemId, quantity) {
+    const formData = new FormData();
+    formData.append("item_id", itemId);
+    formData.append("quantity", quantity);
+    formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+
+    fetch('{% url "update_cart_item" %}', {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          location.reload();
+        }
+      });
+  }
+
+  function removeCartItem(itemId) {
+    const formData = new FormData();
+    formData.append("item_id", itemId);
+    formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+
+    fetch('{% url "remove_from_cart" %}', {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          location.reload();
+        }
+      });
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - {{ order.order_number }}</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .email-header {
+            background-color: #000000;
+            padding: 30px;
+            text-align: center;
+        }
+        .email-header h1 {
+            color: #C5A059;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            margin: 0;
+            font-size: 28px;
+        }
+        .email-header p {
+            color: #ffffff;
+            margin: 10px 0 0;
+        }
+        .email-body {
+            padding: 30px;
+        }
+        .order-info {
+            background-color: #f8f8f8;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .order-info h2 {
+            color: #000000;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            margin-top: 0;
+        }
+        .order-number {
+            font-size: 24px;
+            color: #C5A059;
+            font-weight: bold;
+        }
+        .order-items {
+            margin-bottom: 20px;
+        }
+        .order-items h3 {
+            color: #000000;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            border-bottom: 2px solid #C5A059;
+            padding-bottom: 10px;
+        }
+        .item {
+            padding: 15px 0;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .item:last-child {
+            border-bottom: none;
+        }
+        .item-name {
+            font-weight: 600;
+        }
+        .item-variant {
+            color: #666;
+            font-size: 14px;
+        }
+        .order-total {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 20px;
+            text-align: right;
+        }
+        .order-total strong {
+            color: #C5A059;
+            font-size: 20px;
+        }
+        .shipping-info {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f8f8;
+        }
+        .shipping-info h3 {
+            color: #000000;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            margin-top: 0;
+        }
+        .email-footer {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+        }
+        .email-footer a {
+            color: #C5A059;
+        }
+        .social-links {
+            margin-top: 20px;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #C5A059;
+            text-decoration: none;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #C5A059;
+            color: #ffffff;
+            padding: 12px 30px;
+            text-decoration: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <!-- Header -->
+        <div class="email-header">
+            <h1>Chris <span style="color: #C5A059;">Lux</span></h1>
+            <p>Thank You for Your Order!</p>
+        </div>
+        
+        <!-- Body -->
+        <div class="email-body">
+            <p>Hi {{ order.first_name }},</p>
+            <p>Thank you for shopping with Chris Lux! We're excited to let you know that we've received your order and are processing it now.</p>
+            
+            <!-- Order Info -->
+            <div class="order-info">
+                <h2>Order Details</h2>
+                <p><strong>Order Number:</strong> <span class="order-number">{{ order.order_number }}</span></p>
+                <p><strong>Order Date:</strong> {{ order.created_at|date:"F d, Y" }}</p>
+                <p><strong>Payment Method:</strong> Paystack</p>
+            </div>
+            
+            <!-- Order Items -->
+            <div class="order-items">
+                <h3>Items Ordered</h3>
+                {% for item in order.items.all %}
+                <div class="item">
+                    <div class="item-name">{{ item.product_name }}</div>
+                    {% if item.variation_name %}
+                    <div class="item-variant">{{ item.variation_name }}</div>
+                    {% endif %}
+                    <div>Quantity: {{ item.quantity }} × ₦{{ item.unit_price }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Order Total -->
+            <div class="order-total">
+                <div>Subtotal: ₦{{ order.subtotal }}</div>
+                {% if order.discount_amount > 0 %}
+                <div>Discount: -₦{{ order.discount_amount }}</div>
+                {% endif %}
+                <div>Shipping: {% if order.shipping_cost == 0 %}Free{% else %}₦{{ order.shipping_cost }}{% endif %}</div>
+                <div style="margin-top: 10px;">
+                    <strong>Total: ₦{{ order.total }}</strong>
+                </div>
+            </div>
+            
+            <!-- Shipping Info -->
+            <div class="shipping-info">
+                <h3>Shipping Address</h3>
+                <p>
+                    {{ order.full_name }}<br>
+                    {{ order.address }}<br>
+                    {{ order.city }}, {{ order.state }}<br>
+                    {{ order.country }}{% if order.postal_code %} {{ order.postal_code }}{% endif %}
+                </p>
+            </div>
+            
+            <p style="text-align: center;">
+                <a href="{{ site_url }}{% url 'order_detail' order.order_number %}" class="btn">View Order</a>
+            </p>
+            
+            <p>We'll send you another email with tracking information once your order ships.</p>
+            
+            <p>If you have any questions about your order, please contact us at:<br>
+            Email: info@chrislux.com<br>
+            Phone: +234 800 000 0000</p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="email-footer">
+            <p><strong>Chris Lux and Accessories</strong></p>
+            <p>Premium Human Hair & Accessories</p>
+            <div class="social-links">
+                <a href="#">Facebook</a>
+                <a href="#">Instagram</a>
+                <a href="#">TikTok</a>
+            </div>
+            <p style="margin-top: 20px; font-size: 12px;">
+                © {% now "Y" %} Chris Lux and Accessories. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

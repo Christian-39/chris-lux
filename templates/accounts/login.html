@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="auth-card">
+                    <div class="text-center mb-4">
+                        <h2 class="auth-title">Welcome Back</h2>
+                        <p class="text-muted">Sign in to your account</p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                            <div class="text-danger">{{ form.username.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                            <div class="text-danger">{{ form.password.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors.0 }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="remember">
+                                <label class="form-check-label" for="remember">Remember me</label>
+                            </div>
+                            <a href="#" class="text-gold">Forgot password?</a>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-gold w-100">Sign In</button>
+                    </form>
+                    
+                    <div class="auth-footer text-center mt-4">
+                        <p class="mb-0">Don't have an account? <a href="{% url 'register' %}" class="text-gold">Create one</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.auth-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    padding: 3rem;
+}
+
+.auth-title {
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+}
+
+.auth-footer {
+    border-top: 1px solid var(--color-gray-200);
+    padding-top: 1.5rem;
+}
+</style>
+{% endblock %}

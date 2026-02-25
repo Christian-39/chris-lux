@@ -1,0 +1,83 @@
+{% load static %} {% load humanize %}
+<div class="product-card">
+  <div class="product-image-wrapper">
+    {% if product.primary_image %}
+    <img
+      src="{{ product.primary_image.image.url }}"
+      alt="{{ product.name }}"
+      class="product-image"
+    />
+    {% else %}
+    <img
+      src="{% static 'images/product-placeholder.jpg' %}"
+      alt="{{ product.name }}"
+      class="product-image"
+    />
+    {% endif %}
+
+    <!-- Badges -->
+    {% if product.is_new %}
+    <span class="product-badge">New</span>
+    {% elif product.discount_percentage > 0 %}
+    <span class="product-badge sale">-{{ product.discount_percentage }}%</span>
+    {% elif product.is_best_seller %}
+    <span class="product-badge">Best Seller</span>
+    {% endif %}
+
+    <!-- Product Actions -->
+    <div class="product-actions">
+      <button
+        class="product-action-btn wishlist-btn"
+        data-product-id="{{ product.id }}"
+        title="Add to Wishlist"
+      >
+        <i class="bi bi-heart"></i>
+      </button>
+      <a
+        href="{{ product.get_absolute_url }}"
+        class="product-action-btn"
+        title="Quick View"
+      >
+        <i class="bi bi-eye"></i>
+      </a>
+      <button
+        class="product-action-btn add-to-cart-btn"
+        data-product-id="{{ product.id }}"
+        data-has-variations="{{ product.has_variations|yesno:'true,false' }}"
+        title="Add to Cart"
+      >
+        <i class="bi bi-bag"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="product-info">
+    <p class="product-category">{{ product.category.name }}</p>
+    <h3 class="product-name">
+      <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+    </h3>
+    <div class="product-price">
+      <span class="price-current">₦{{ product.price|intcomma }}</span>
+      {% if product.compare_at_price %}
+      <span class="price-original"
+        >₦{{ product.compare_at_price |intcomma}}</span
+      >
+      {% endif %}
+    </div>
+
+    <!-- Rating -->
+    {% if product.review_count > 0 %}
+    <div class="mt-2">
+      <small class="text-gold">
+        <!-- prettier-ignore -->
+        {% for i in "12345" %} {% if forloop.counter <= product.average_rating %}
+        <i class="bi bi-star-fill"></i>
+        {% else %}
+        <i class="bi bi-star"></i>
+        {% endif %} {% endfor %}
+      </small>
+      <small class="text-muted">({{ product.review_count }})</small>
+    </div>
+    {% endif %}
+  </div>
+</div>

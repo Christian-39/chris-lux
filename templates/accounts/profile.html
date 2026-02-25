@@ -1,0 +1,251 @@
+{% extends 'base.html' %} {% load static %} {% load humanize %}
+<!-- prettier-ignore -->
+{% block title %}My Profile - {{ SITE_NAME }}{% endblock %} {% block content %}
+
+<!-- Breadcrumb -->
+<section class="breadcrumb-section">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">My Profile</li>
+      </ol>
+    </nav>
+    <h1 class="mt-3">My Profile</h1>
+  </div>
+</section>
+
+<!-- Profile Section -->
+<section class="section-padding">
+  <div class="container">
+    <div class="row g-5">
+      <!-- Sidebar -->
+      <div class="col-lg-3">
+        <div class="profile-sidebar">
+          <div class="profile-avatar text-center mb-4">
+            {% if user.profile_image %}
+            <img
+              src="{{ user.profile_image.url }}"
+              alt="{{ user.first_name }}"
+              class="avatar-image"
+            />
+            {% else %}
+            <div class="avatar-placeholder">
+              <i class="bi bi-person"></i>
+            </div>
+            {% endif %}
+            <h5 class="mt-3 mb-1">{{ user.get_full_name }}</h5>
+            <p class="text-muted">{{ user.email }}</p>
+          </div>
+
+          <nav class="profile-nav">
+            <a href="{% url 'profile' %}" class="active">
+              <i class="bi bi-person"></i> Profile
+            </a>
+            <a href="{% url 'order_history' %}">
+              <i class="bi bi-bag"></i> Orders
+            </a>
+            <a href="{% url 'wishlist' %}">
+              <i class="bi bi-heart"></i> Wishlist
+            </a>
+            <a href="{% url 'change_password' %}">
+              <i class="bi bi-lock"></i> Change Password
+            </a>
+            <a href="{% url 'logout' %}">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-lg-9">
+        <div class="profile-content">
+          <h4 class="mb-4">Personal Information</h4>
+
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">First Name</label>
+                {{ form.first_name }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Last Name</label>
+                {{ form.last_name }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email Address</label>
+                {{ form.email }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Phone Number</label>
+                {{ form.phone }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Date of Birth</label>
+                {{ form.date_of_birth }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Profile Image</label>
+                {{ form.profile_image }}
+              </div>
+            </div>
+
+            <h4 class="mt-5 mb-4">Address Information</h4>
+
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Street Address</label>
+                {{ form.address }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">City</label>
+                {{ form.city }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">State</label>
+                {{ form.state }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Country</label>
+                {{ form.country }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Postal Code</label>
+                {{ form.postal_code }}
+              </div>
+            </div>
+
+            <h4 class="mt-5 mb-4">Preferences</h4>
+
+            <div class="row g-3">
+              <div class="col-12">
+                <div class="form-check">
+                  {{ form.email_notifications }}
+                  <label class="form-check-label"
+                    >Receive email notifications</label
+                  >
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  {{ form.sms_notifications }}
+                  <label class="form-check-label"
+                    >Receive SMS notifications</label
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <button type="submit" class="btn btn-gold">Save Changes</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Recent Orders -->
+        {% if recent_orders %}
+        <div class="profile-content mt-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">Recent Orders</h4>
+            <a href="{% url 'order_history' %}" class="text-gold">View All</a>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Date</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in recent_orders %}
+                <tr>
+                  <td>{{ order.order_number }}</td>
+                  <td>{{ order.created_at|date:"M d, Y" }}</td>
+                  <td>₦{{ order.total|intcomma }}</td>
+                  <td>
+                    <span
+                      class="badge bg-{% if order.status == 'delivered' %}success{% elif order.status == 'cancelled' %}danger{% else %}warning{% endif %}"
+                    >
+                      {{ order.get_status_display }}
+                    </span>
+                  </td>
+                  <td>
+                    <a
+                      href="{% url 'order_detail' order.order_number %}"
+                      class="text-gold"
+                      >View</a
+                    >
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %} {% block extra_css %}
+<style>
+  .profile-sidebar {
+    background-color: var(--color-gray-100);
+    padding: 2rem;
+  }
+
+  .avatar-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .avatar-placeholder {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: var(--color-gray-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: var(--color-gray-500);
+    margin: 0 auto;
+  }
+
+  .profile-nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    color: var(--color-gray-700);
+    transition: all var(--transition-fast);
+  }
+
+  .profile-nav a:hover,
+  .profile-nav a.active {
+    background-color: var(--color-white);
+    color: var(--color-gold);
+  }
+
+  .profile-content {
+    background-color: var(--color-gray-100);
+    padding: 2rem;
+  }
+
+  .profile-content h4 {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+  }
+</style>
+{% endblock %}

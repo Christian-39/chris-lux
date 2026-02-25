@@ -1,0 +1,247 @@
+{% extends 'base.html' %} {% load static %} {% load humanize %}
+
+<!-- prettier-ignore -->
+{% block title %}My Wishlist - {{ SITE_NAME }}{% endblock %} {% block content %}
+
+<!-- Breadcrumb -->
+<section class="breadcrumb-section">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item">
+          <a href="{% url 'profile' %}">My Account</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Wishlist</li>
+      </ol>
+    </nav>
+    <h1 class="mt-3">My Wishlist</h1>
+  </div>
+</section>
+
+<!-- Wishlist Section -->
+<section class="section-padding">
+  <div class="container">
+    <div class="row g-5">
+      <!-- Sidebar -->
+      <div class="col-lg-3">
+        <div class="profile-sidebar">
+          <div class="profile-avatar text-center mb-4">
+            {% if user.profile_image %}
+            <img
+              src="{{ user.profile_image.url }}"
+              alt="{{ user.first_name }}"
+              class="avatar-image"
+            />
+            {% else %}
+            <div class="avatar-placeholder">
+              <i class="bi bi-person"></i>
+            </div>
+            {% endif %}
+            <h5 class="mt-3 mb-1">{{ user.get_full_name }}</h5>
+            <p class="text-muted">{{ user.email }}</p>
+          </div>
+
+          <nav class="profile-nav">
+            <a href="{% url 'profile' %}">
+              <i class="bi bi-person"></i> Profile
+            </a>
+            <a href="{% url 'order_history' %}">
+              <i class="bi bi-bag"></i> Orders
+            </a>
+            <a href="{% url 'wishlist' %}" class="active">
+              <i class="bi bi-heart"></i> Wishlist
+            </a>
+            <a href="{% url 'change_password' %}">
+              <i class="bi bi-lock"></i> Change Password
+            </a>
+            <a href="{% url 'logout' %}">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-lg-9">
+        <div class="profile-content">
+          <h4 class="mb-4">My Wishlist ({{ wishlist_items|length }})</h4>
+
+          {% if wishlist_items %}
+          <div class="row g-4">
+            {% for item in wishlist_items %}
+            <div class="col-md-6">
+              <div class="wishlist-item" data-wishlist-id="{{ item.id }}">
+                <div class="row g-3">
+                  <div class="col-4">
+                    <a href="{{ item.product.get_absolute_url }}">
+                      {% if item.product.primary_image %}
+                      <img
+                        src="{{ item.product.primary_image.image.url }}"
+                        alt="{{ item.product.name }}"
+                        class="wishlist-image"
+                      />
+                      {% else %}
+                      <img
+                        src="{% static 'images/product-placeholder.jpg' %}"
+                        alt="{{ item.product.name }}"
+                        class="wishlist-image"
+                      />
+                      {% endif %}
+                    </a>
+                  </div>
+                  <div class="col-8">
+                    <div class="wishlist-details">
+                      <p class="product-category">
+                        {{ item.product.category.name }}
+                      </p>
+                      <h5 class="product-name">
+                        <a href="{{ item.product.get_absolute_url }}"
+                          >{{ item.product.name }}</a
+                        >
+                      </h5>
+                      <p class="product-price">
+                        ₦{{ item.product.price|intcomma }}
+                      </p>
+
+                      <div class="wishlist-actions">
+                        <button
+                          class="btn btn-sm btn-gold add-to-cart-btn"
+                          data-product-id="{{ item.product.id }}"
+                          data-has-variations="{{ item.product.has_variations|yesno:'true,false' }}"
+                        >
+                          <i class="bi bi-bag me-1"></i>Add to Cart
+                        </button>
+                        <button
+                          class="btn btn-sm btn-outline remove-wishlist-btn"
+                          data-product-id="{{ item.product.id }}"
+                        >
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty-state text-center py-5">
+            <i
+              class="bi bi-heart"
+              style="font-size: 4rem; color: var(--color-gray-300)"
+            ></i>
+            <h5 class="mt-4">Your wishlist is empty</h5>
+            <p class="text-muted">Save items you love to your wishlist.</p>
+            <a href="{% url 'shop' %}" class="btn btn-gold mt-3"
+              >Start Shopping</a
+            >
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %} {% block extra_css %}
+<style>
+  .wishlist-item {
+    background-color: var(--color-white);
+    padding: 1rem;
+    border: 1px solid var(--color-gray-200);
+  }
+
+  .wishlist-image {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  .wishlist-details {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .wishlist-details .product-category {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-gray-400);
+    margin-bottom: 0.25rem;
+  }
+
+  .wishlist-details .product-name {
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .wishlist-details .product-name a {
+    color: var(--color-black);
+  }
+
+  .wishlist-details .product-name a:hover {
+    color: var(--color-gold);
+  }
+
+  .wishlist-details .product-price {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-gold);
+    margin-bottom: 1rem;
+  }
+
+  .wishlist-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .empty-state {
+    padding: 3rem;
+    background-color: var(--color-gray-100);
+  }
+</style>
+{% endblock %} {% block extra_js %}
+<script>
+  // Remove from wishlist
+  document.querySelectorAll(".remove-wishlist-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const productId = this.dataset.productId;
+      const wishlistItem = this.closest(".wishlist-item");
+
+      const formData = new FormData();
+      formData.append("product_id", productId);
+      formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+
+      fetch('{% url "toggle_wishlist" %}', {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            wishlistItem.remove();
+            showNotification(data.message, "success");
+
+            // Update count
+            const countEl = document.querySelector("h4.mb-4");
+            const currentCount = parseInt(countEl.textContent.match(/\d+/)[0]);
+            countEl.textContent = `My Wishlist (${currentCount - 1})`;
+
+            // Reload if empty
+            if (currentCount === 1) {
+              location.reload();
+            }
+          }
+        });
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,492 @@
+{% extends 'base.html' %} {% load static %} {% load humanize %}
+<!-- prettier-ignore -->
+{% block title %}{{ SITE_NAME }} - {{ SITE_TAGLINE }}{% endblock %} {% block content %}
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <img
+    src="{% static 'images/hero-hair.jpg' %}"
+    alt="Luxury Hair"
+    class="hero-image"
+  />
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="hero-content">
+          <p class="hero-subtitle">Premium Quality</p>
+          <h1 class="hero-title">Luxury Human Hair That Transforms</h1>
+          <p class="hero-description">
+            Discover our collection of premium human hair wigs, bundles, and
+            accessories crafted for the modern woman who demands excellence.
+          </p>
+          <div class="d-flex gap-3 flex-wrap">
+            <a href="{% url 'shop' %}" class="btn btn-gold">Shop Now</a>
+            <a href="{% url 'about' %}" class="btn btn-outline btn-white"
+              >Learn More</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Categories -->
+<section class="section-padding">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-subtitle">Explore</p>
+      <h2 class="section-title">Shop by Category</h2>
+    </div>
+
+    <div class="row g-4">
+      {% for category in featured_categories %}
+      <div class="col-6 col-lg-3">
+        <a
+          href="{% url 'category_detail' category.slug %}"
+          class="category-card d-block"
+        >
+          {% if category.image %}
+          <img
+            src="{{ category.image.url }}"
+            alt="{{ category.name }}"
+            class="category-image"
+          />
+          {% else %}
+          <img
+            src="{% static 'images/category-placeholder.jpg' %}"
+            alt="{{ category.name }}"
+            class="category-image"
+          />
+          {% endif %}
+          <div class="category-overlay">
+            <h3 class="category-name">{{ category.name }}</h3>
+            <span class="category-count"
+              >{{ category.product_count }} Products</span
+            >
+          </div>
+        </a>
+      </div>
+      {% empty %}
+      <!-- Default categories if none in database -->
+      <div class="col-6 col-lg-3">
+        <a href="{% url 'shop' %}?category=wigs" class="category-card d-block">
+          <img
+            src="{% static 'images/category-wigs.jpg' %}"
+            alt="Human Hair Wigs"
+            class="category-image"
+          />
+          <div class="category-overlay">
+            <h3 class="category-name">Human Hair Wigs</h3>
+            <span class="category-count">Shop Now</span>
+          </div>
+        </a>
+      </div>
+      <div class="col-6 col-lg-3">
+        <a
+          href="{% url 'shop' %}?category=bundles"
+          class="category-card d-block"
+        >
+          <img
+            src="{% static 'images/category-bundles.jpg' %}"
+            alt="Hair Bundles"
+            class="category-image"
+          />
+          <div class="category-overlay">
+            <h3 class="category-name">Hair Bundles</h3>
+            <span class="category-count">Shop Now</span>
+          </div>
+        </a>
+      </div>
+      <div class="col-6 col-lg-3">
+        <a
+          href="{% url 'shop' %}?category=frontals"
+          class="category-card d-block"
+        >
+          <img
+            src="{% static 'images/category-frontals.jpg' %}"
+            alt="Frontals"
+            class="category-image"
+          />
+          <div class="category-overlay">
+            <h3 class="category-name">Frontals</h3>
+            <span class="category-count">Shop Now</span>
+          </div>
+        </a>
+      </div>
+      <div class="col-6 col-lg-3">
+        <a
+          href="{% url 'shop' %}?category=accessories"
+          class="category-card d-block"
+        >
+          <img
+            src="{% static 'images/category-accessories.jpg' %}"
+            alt="Accessories"
+            class="category-image"
+          />
+          <div class="category-overlay">
+            <h3 class="category-name">Accessories</h3>
+            <span class="category-count">Shop Now</span>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Best Sellers -->
+<section class="section-padding bg-cream">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-subtitle">Top Picks</p>
+      <h2 class="section-title">Best Sellers</h2>
+      <p class="section-description">
+        Our most loved products, chosen by customers like you
+      </p>
+    </div>
+
+    <div class="row g-4">
+      {% for product in best_sellers %}
+      <div class="col-6 col-lg-3">
+        {% include 'includes/product_card.html' with product=product %}
+      </div>
+      {% empty %}
+      <!-- Placeholder products -->
+      {% for i in "1234" %}
+      <div class="col-6 col-lg-3">
+        <div class="product-card">
+          <div class="product-image-wrapper">
+            <img
+              src="{% static 'images/product-placeholder.jpg' %}"
+              alt="Product"
+              class="product-image"
+            />
+            <span class="product-badge">Best Seller</span>
+            <div class="product-actions">
+              <button class="product-action-btn" title="Add to Wishlist">
+                <i class="bi bi-heart"></i>
+              </button>
+              <button class="product-action-btn" title="Quick View">
+                <i class="bi bi-eye"></i>
+              </button>
+              <button class="product-action-btn" title="Add to Cart">
+                <i class="bi bi-bag"></i>
+              </button>
+            </div>
+          </div>
+          <div class="product-info">
+            <p class="product-category">Human Hair Wig</p>
+            <h3 class="product-name">
+              <a href="#">Brazilian Body Wave Wig</a>
+            </h3>
+            <div class="product-price">
+              <span class="price-current">₦85,000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %} {% endfor %}
+    </div>
+
+    <div class="text-center mt-5">
+      <a href="{% url 'shop' %}?sort=popular" class="btn btn-outline"
+        >View All Best Sellers</a
+      >
+    </div>
+  </div>
+</section>
+
+<!-- New Arrivals -->
+<section class="section-padding">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-subtitle">Just In</p>
+      <h2 class="section-title">New Arrivals</h2>
+      <p class="section-description">
+        The latest additions to our luxury collection
+      </p>
+    </div>
+
+    <div class="row g-4">
+      {% for product in new_arrivals %}
+      <div class="col-6 col-lg-3">
+        {% include 'includes/product_card.html' with product=product %}
+      </div>
+      {% empty %}
+      <!-- Placeholder products -->
+      {% for i in "1234" %}
+      <div class="col-6 col-lg-3">
+        <div class="product-card">
+          <div class="product-image-wrapper">
+            <img
+              src="{% static 'images/product-placeholder.jpg' %}"
+              alt="Product"
+              class="product-image"
+            />
+            <span class="product-badge">New</span>
+            <div class="product-actions">
+              <button class="product-action-btn" title="Add to Wishlist">
+                <i class="bi bi-heart"></i>
+              </button>
+              <button class="product-action-btn" title="Quick View">
+                <i class="bi bi-eye"></i>
+              </button>
+              <button class="product-action-btn" title="Add to Cart">
+                <i class="bi bi-bag"></i>
+              </button>
+            </div>
+          </div>
+          <div class="product-info">
+            <p class="product-category">Hair Bundle</p>
+            <h3 class="product-name">
+              <a href="#">Peruvian Straight Bundle</a>
+            </h3>
+            <div class="product-price">
+              <span class="price-current">₦45,000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %} {% endfor %}
+    </div>
+
+    <div class="text-center mt-5">
+      <a href="{% url 'shop' %}?sort=newest" class="btn btn-outline"
+        >View All New Arrivals</a
+      >
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="section-padding bg-black">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-subtitle">Our Promise</p>
+      <h2 class="section-title" style="color: white">Why Choose Chris Lux</h2>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="text-center">
+          <i class="bi bi-gem text-gold" style="font-size: 3rem"></i>
+          <h4 class="mt-4 mb-3" style="color: white">Premium Quality</h4>
+          <p style="color: var(--color-gray-400)">
+            100% authentic human hair, ethically sourced and carefully selected
+            for the finest quality.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="text-center">
+          <i class="bi bi-truck text-gold" style="font-size: 3rem"></i>
+          <h4 class="mt-4 mb-3" style="color: white">Fast Shipping</h4>
+          <p style="color: var(--color-gray-400)">
+            Nationwide delivery within 3-5 business days. Free shipping on
+            orders over ₦50,000.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="text-center">
+          <i class="bi bi-shield-check text-gold" style="font-size: 3rem"></i>
+          <h4 class="mt-4 mb-3" style="color: white">Secure Payment</h4>
+          <p style="color: var(--color-gray-400)">
+            Pay securely with Paystack. Your payment information is always
+            protected.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="text-center">
+          <i class="bi bi-headset text-gold" style="font-size: 3rem"></i>
+          <h4 class="mt-4 mb-3" style="color: white">24/7 Support</h4>
+          <p style="color: var(--color-gray-400)">
+            Our dedicated team is always ready to help you with any questions or
+            concerns.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section-padding bg-cream">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-subtitle">Testimonials</p>
+      <h2 class="section-title">What Our Customers Say</h2>
+    </div>
+
+    <div class="row g-4">
+      {% for testimonial in testimonials %}
+      <div class="col-md-6 col-lg-4">
+        <div class="testimonial-card">
+          <div class="testimonial-rating">
+            {% for i in testimonial.rating_stars %}
+            <i class="bi bi-star-fill"></i>
+            {% endfor %}
+          </div>
+          <p class="testimonial-content">"{{ testimonial.content }}"</p>
+          <h4 class="testimonial-author">{{ testimonial.name }}</h4>
+          {% if testimonial.location %}
+          <p class="testimonial-location">{{ testimonial.location }}</p>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <!-- Default testimonials -->
+      <div class="col-md-6 col-lg-4">
+        <div class="testimonial-card">
+          <div class="testimonial-rating">
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+          </div>
+          <p class="testimonial-content">
+            "The quality of the hair is absolutely amazing! I've been wearing my
+            wig for 3 months now and it still looks brand new."
+          </p>
+          <h4 class="testimonial-author">Amara Johnson</h4>
+          <p class="testimonial-location">Lagos, Nigeria</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="testimonial-card">
+          <div class="testimonial-rating">
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+          </div>
+          <p class="testimonial-content">
+            "Fast delivery and excellent customer service. The bundles are so
+            soft and tangle-free. Chris Lux is now my go-to!"
+          </p>
+          <h4 class="testimonial-author">Chioma Okafor</h4>
+          <p class="testimonial-location">Abuja, Nigeria</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="testimonial-card">
+          <div class="testimonial-rating">
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+          </div>
+          <p class="testimonial-content">
+            "I've tried many hair brands but Chris Lux stands out. The frontal
+            blends perfectly and the lace is undetectable!"
+          </p>
+          <h4 class="testimonial-author">Fatima Bello</h4>
+          <p class="testimonial-location">Port Harcourt, Nigeria</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Instagram Preview -->
+<section class="section-padding-sm">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-subtitle">@chrisluxhair</p>
+      <h2 class="section-title">Follow Us on Instagram</h2>
+    </div>
+
+    <div class="row g-2">
+      {% for i in "123456" %}
+      <div class="col-4 col-lg-2">
+        <a
+          href="#"
+          class="d-block position-relative overflow-hidden"
+          style="aspect-ratio: 1"
+        >
+          <img
+            src="{% static 'images/instagram-placeholder.jpg' %}"
+            alt="Instagram"
+            class="w-100 h-100 object-fit-cover"
+            style="transition: transform 0.3s"
+          />
+          <div
+            class="position-absolute inset-0 d-flex align-items-center justify-content-center"
+            style="
+              background: rgba(0, 0, 0, 0.5);
+              opacity: 0;
+              transition: opacity 0.3s;
+            "
+          >
+            <i class="bi bi-instagram text-white" style="font-size: 2rem"></i>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter -->
+<section class="newsletter-section">
+  <div class="container">
+    <div class="row justify-content-center text-center">
+      <div class="col-lg-6">
+        <h2 class="newsletter-title">Join the Chris Lux Family</h2>
+        <p class="newsletter-description">
+          Subscribe to receive exclusive offers, new arrival updates, and hair
+          care tips.
+        </p>
+        <form class="newsletter-form" id="newsletter-form">
+          {% csrf_token %}
+          <input
+            type="email"
+            name="email"
+            class="newsletter-input"
+            placeholder="Enter your email address"
+            required
+          />
+          <button type="submit" class="btn btn-gold">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %} {% block extra_js %}
+<script>
+  // Newsletter form submission
+  document
+    .getElementById("newsletter-form")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+      const form = this;
+      const formData = new FormData(form);
+
+      fetch('{% url "newsletter_subscribe" %}', {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          alert(data.message);
+          if (data.success) {
+            form.reset();
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("An error occurred. Please try again.");
+        });
+    });
+</script>
+{% endblock %}

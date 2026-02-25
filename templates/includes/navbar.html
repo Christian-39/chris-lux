@@ -1,0 +1,324 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container">
+    <!-- Brand -->
+    <a class="navbar-brand" href="{% url 'home' %}">
+      <img
+        src="{% static 'images/chris-lux-logo.svg' %}"
+        alt="Chris Lux and Accessories Logo"
+        class="d-inline-block align-top navbar-logo"
+      />
+    </a>
+
+    <!-- Mobile Toggle -->
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navigation Links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item">
+          <a
+            class="nav-link {% if request.path == '/' %}active{% endif %}"
+            href="{% url 'home' %}"
+            >Home</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link {% if '/products/' in request.path %}active{% endif %}"
+            href="{% url 'shop' %}"
+            >Shop</a
+          >
+        </li>
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+          >
+            Categories
+          </a>
+          <ul class="dropdown-menu">
+            {% for category in nav_categories %}
+            <li>
+              <a
+                class="dropdown-item"
+                href="{% url 'category_detail' category.slug %}"
+                >{{ category.name }}</a
+              >
+            </li>
+            {% endfor %}
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <a class="dropdown-item" href="{% url 'shop' %}">All Products</a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link {% if '/about/' in request.path %}active{% endif %}"
+            href="{% url 'about' %}"
+            >About</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link {% if '/contact/' in request.path %}active{% endif %}"
+            href="{% url 'contact' %}"
+            >Contact</a
+          >
+        </li>
+      </ul>
+
+      <!-- Icons -->
+      <div class="nav-icons">
+        <!-- Search Dropdown -->
+        <div class="dropdown search-dropdown">
+          <a
+            href="#"
+            class="nav-icon"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="bi bi-search"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-end search-menu p-3">
+            <form action="/products/" method="get" class="search-form">
+              <div class="input-group">
+                <input
+                  type="text"
+                  name="q"
+                  class="form-control"
+                  placeholder="Search products..."
+                  autocomplete="off"
+                />
+                <button class="btn btn-gold" type="submit">
+                  <i class="bi bi-search"></i>
+                </button>
+              </div>
+            </form>
+            <!-- Quick Search Results -->
+            <div class="search-results mt-2 d-none">
+              <div class="search-results-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account -->
+        {% if user.is_authenticated %}
+        <div class="dropdown">
+          <a href="#" class="nav-icon" data-bs-toggle="dropdown">
+            <i class="bi bi-person"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <a class="dropdown-item" href="{% url 'profile' %}">My Profile</a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="{% url 'order_history' %}"
+                >Order History</a
+              >
+            </li>
+            <li>
+              <a class="dropdown-item" href="{% url 'wishlist' %}">Wishlist</a>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+            </li>
+          </ul>
+        </div>
+        {% else %}
+        <a href="{% url 'login' %}" class="nav-icon" title="Login">
+          <i class="bi bi-person"></i>
+        </a>
+        {% endif %}
+
+        <!-- Wishlist -->
+        <a href="{% url 'wishlist' %}" class="nav-icon" title="Wishlist">
+          <i class="bi bi-heart"></i>
+          <span class="wishlist-count">{{ global_wishlist_count }}</span>
+        </a>
+
+        <!-- Cart -->
+        <a href="{% url 'cart' %}" class="nav-icon" title="Cart">
+          <i class="bi bi-cart"></i>
+          {% if cart_count > 0 %}
+          <span class="cart-count">{{ cart_count }}</span>
+          {% endif %}
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<style>
+  .navbar-logo {
+    height: 70px; /* Adjust this height based on your design */
+    width: auto; /* Maintains aspect ratio */
+    object-fit: contain;
+    transition: transform 0.3s ease;
+  }
+
+  /* Optional: Subtle hover effect for luxury feel */
+  .navbar-brand:hover .navbar-logo {
+    transform: scale(1.05);
+  }
+
+  /* Mobile Adjustment */
+  @media (max-width: 768px) {
+    .navbar-logo {
+      height: 30px; /* Slightly smaller for mobile screens */
+    }
+  }
+  /* Search Dropdown Styles */
+  .search-dropdown .dropdown-menu {
+    min-width: 350px;
+    border: 1px solid var(--color-gray-200);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .search-form .form-control {
+    border-right: none;
+  }
+
+  .search-form .btn {
+    border-left: none;
+    padding: 0.5rem 1rem;
+  }
+
+  .search-results {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid var(--color-gray-200);
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .search-result-item:hover {
+    background-color: var(--color-gray-100);
+  }
+
+  .search-result-item img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+  }
+
+  .search-result-item .result-info {
+    flex: 1;
+  }
+
+  .search-result-item .result-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--color-black);
+  }
+
+  .search-result-item .result-price {
+    font-size: 0.8125rem;
+    color: var(--color-gold);
+  }
+
+  .search-no-results {
+    padding: 20px;
+    text-align: center;
+    color: var(--color-gray-500);
+  }
+
+  @media (max-width: 575.98px) {
+    .search-dropdown .dropdown-menu {
+      min-width: 280px;
+      right: -50px !important;
+    }
+  }
+</style>
+
+<script>
+  // Live search functionality
+  document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.querySelector('.search-form input[name="q"]');
+    const searchResults = document.querySelector(".search-results");
+    const searchResultsList = document.querySelector(".search-results-list");
+
+    if (searchInput) {
+      let searchTimeout;
+
+      searchInput.addEventListener("input", function () {
+        clearTimeout(searchTimeout);
+        const query = this.value.trim();
+
+        if (query.length < 2) {
+          searchResults.classList.add("d-none");
+          return;
+        }
+
+        searchTimeout = setTimeout(() => {
+          performSearch(query);
+        }, 300);
+      });
+
+      // Hide results when clicking outside
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest(".search-dropdown")) {
+          searchResults.classList.add("d-none");
+        }
+      });
+    }
+
+    function performSearch(query) {
+      fetch(`/products/?q=${encodeURIComponent(query)}`, {
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          displaySearchResults(data.products);
+        })
+        .catch((error) => {
+          console.error("Search error:", error);
+        });
+    }
+
+    function displaySearchResults(products) {
+      if (!products || products.length === 0) {
+        searchResultsList.innerHTML =
+          '<div class="search-no-results">No products found</div>';
+        searchResults.classList.remove("d-none");
+        return;
+      }
+
+      searchResultsList.innerHTML = products
+        .map(
+          (product) => `
+            <a href="${product.url}" class="search-result-item text-decoration-none">
+                <img src="${product.image || "/static/images/product-placeholder.jpg"}" alt="${product.name}">
+                <div class="result-info">
+                    <div class="result-name">${product.name}</div>
+                    <div class="result-price">₦${product.price}</div>
+                </div>
+            </a>
+        `,
+        )
+        .join("");
+
+      searchResults.classList.remove("d-none");
+    }
+  });
+</script>
