@@ -9,15 +9,15 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
 
-# Database - PostgreSQL
+# Database - mysql
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
+        'USER': config('DB_USER', 'root'),
         'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', default='41945'),
+        'HOST': config('DB_HOST', 'localhost'),
+        'PORT': config('DB_PORT', default='3306'),
     }
 }
 
