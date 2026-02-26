@@ -1,14 +1,13 @@
 import os
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chris_lux.base')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chris_lux.settings.production')
 django.setup()
 
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-# Change these to what you want your login to be
 username = os.environ.get("ADMIN_USERNAME", "chrislux")
 email = os.environ.get("ADMIN_EMAIL", "chrislux@gmail.com")
 password = os.environ.get("ADMIN_PASSWORD", "0000000000")

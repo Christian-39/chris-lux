@@ -1,6 +1,6 @@
 Django
 python-decouple
-psycopg2-binary
+mysqlclient
 Pillow
 paystackapi
 django-crispy-forms
