@@ -3,6 +3,8 @@ Development settings for Chris Lux project.
 """
 
 from .base import *
+from decouple import config
+import dj_database_url
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -12,7 +14,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
 # Database
 DATABASES =  {
     'default': dj_database_url.config(
-        default=f"sqlite3:///{BASE_DIR / 'db.sqlite3'}",
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
         ssl_require=False
     )
