@@ -6,6 +6,7 @@
     import environ
     from decouple import config
 
+
     env = environ.Env()
     environ.Env.read_env()
 
