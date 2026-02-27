@@ -5,6 +5,10 @@ Development settings for Chris Lux project.
 from .base import *
 from decouple import config
 import dj_database_url
+import environ
+
+env = environ.Env()
+environ.Env.read_env()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
