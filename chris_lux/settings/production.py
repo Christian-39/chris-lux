@@ -3,7 +3,7 @@ Production settings for Chris Lux project.
 """
 
 from .base import *
-
+import dj_database_url
 from decouple import config
 
 
@@ -66,3 +66,4 @@ LOGGING = {
 ADMINS = [
     ('Admin', config('ADMIN_EMAIL', default='admin@chrislux.com')),
 ]
+
