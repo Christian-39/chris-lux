@@ -28,7 +28,8 @@ DATABASES = {
 
 # Static files - production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
+# This tells Django where to send uploaded files
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Security Settings
 SECURE_SSL_REDIRECT = True
