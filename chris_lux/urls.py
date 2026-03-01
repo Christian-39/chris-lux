@@ -9,6 +9,8 @@ from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from django.contrib.sitemaps.views import sitemap
 from chris_lux.core.sitemaps import StaticViewSitemap, ProductSitemap
+import re
+from django.views.static import serve
 
 sitemaps = {
     'static': StaticViewSitemap,
@@ -34,5 +36,13 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# This is the "Force Serve" block for Render
+if not settings.DEBUG:
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    ]
+else:
+    # Standard local development serving
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
