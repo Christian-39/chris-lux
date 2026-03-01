@@ -1,0 +1,56 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ category.name }} - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<section class="breadcrumb-section bg-light py-3">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'shop' %}">Shop</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<section class="section-padding py-5">
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col-12 text-center">
+        <h1 class="display-4 fw-bold">{{ category.name }}</h1>
+        <p class="text-muted">Showing all products in {{ category.name }}</p>
+        <hr class="w-25 mx-auto">
+      </div>
+    </div>
+
+    <div class="row g-4">
+      {% if products %}
+        {% for product in products %}
+          <div class="col-6 col-md-4 col-lg-3">
+            {% include 'includes/product_card.html' with product=product %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="col-12 text-center py-5">
+          <i class="bi bi-bag-x display-1 text-gray-300"></i>
+          <p class="mt-3">No products found in this category.</p>
+          <a href="{% url 'shop' %}" class="btn btn-gold">Back to Shop</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .breadcrumb-item a { color: var(--color-gold); text-decoration: none; }
+  .section-padding { min-height: 60vh; }
+  .btn-gold { background-color: #D4AF37; color: white; border-radius: 0; }
+  .btn-gold:hover { background-color: #B8860B; color: white; }
+</style>
+{% endblock %}
