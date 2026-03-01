@@ -33,6 +33,6 @@ urlpatterns = [
     path('500/', TemplateView.as_view(template_name='500.html')),
 ]
 
-if settings.DEBUG or not settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

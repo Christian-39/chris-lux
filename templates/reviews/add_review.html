@@ -1,0 +1,20 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Add Review - {{
+product.name }}{% endblock %} {% block content %}
+<section class="section-padding py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card shadow-sm border-0 p-4">
+          <h2 class="mb-4">Review {{ product.name }}</h2>
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %} {{ form.as_p }}
+            <button type="submit" class="btn btn-gold w-100">
+              Submit Review
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

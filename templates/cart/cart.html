@@ -97,7 +97,7 @@
               </div>
 
               <!-- Remove -->
-              <div class="col-2 col-md-1 mt-3 mt-md-0 text-end">
+              <div class="col-2 col-md-1 mt-3 mt-md-0 text-end ms-3 ms-md-auto">
                 <button
                   class="remove-item-btn"
                   data-item-id="{{ item.id }}"
@@ -229,6 +229,74 @@
 
 {% endblock %} {% block extra_css %}
 <style>
+  /* Container: Creates a unified border/pill shape */
+  .quantity-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--color-gray-300, #ddd);
+    border-radius: 4px; /* Change to 50px if you want a pill shape */
+    background: #fff;
+    overflow: hidden;
+    max-width: 130px; /* Prevents it from getting too wide on mobile */
+    height: 40px;
+  }
+
+  /* Buttons: Stylized + and - symbols */
+  .qty-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-black, #1a1a1a);
+    width: 40px;
+    height: 100%;
+    cursor: pointer;
+    font-size: 1.25rem;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+    user-select: none;
+  }
+
+  .qty-btn:hover {
+    background-color: var(--color-gray-100, #f8f9fa);
+    color: var(--color-gold, #c5a059);
+  }
+
+  .qty-btn:active {
+    background-color: var(--color-gray-200, #e9ecef);
+  }
+
+  /* The Number Input Field */
+  input.qty-input {
+    width: 30px;
+    border: none;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-black, #1a1a1a);
+    background: transparent;
+    -moz-appearance: textfield; /* Removes spin arrows in Firefox */
+  }
+
+  /* Removes spin arrows in Chrome, Safari, Edge */
+  input.qty-input::-webkit-outer-spin-button,
+  input.qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Mobile Tweak: Ensure it doesn't look tiny on phones */
+  @media (max-width: 767px) {
+    .quantity-input {
+      max-width: 100%; /* Take full width of the col-6 */
+      height: 45px;
+    }
+  }
+
   .cart-item {
     padding: 1.5rem 0;
     border-bottom: 1px solid var(--color-gray-200);

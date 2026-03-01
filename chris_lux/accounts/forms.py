@@ -59,6 +59,14 @@ class UserRegistrationForm(UserCreationForm):
         model = User
         fields = ['first_name', 'last_name', 'email', 'phone', 'password1', 'password2']
 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        # Automatically set the username to the email address
+        user.username = self.cleaned_data["email"]
+        if commit:
+            user.save()
+        return user
+
 
 class UserLoginForm(AuthenticationForm):
     """User login form."""
