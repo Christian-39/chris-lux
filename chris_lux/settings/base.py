@@ -66,6 +66,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'chris_lux.cart.context_processors.cart_context',
                 'chris_lux.accounts.context_processors.wishlist_count',
+                'chris_lux.products.context_processors.nav_categories',
                 'chris_lux.core.context_processors.site_settings',
             ],
         },

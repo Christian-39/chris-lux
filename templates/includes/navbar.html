@@ -49,11 +49,8 @@
           <ul class="dropdown-menu">
             {% for category in nav_categories %}
             <li>
-              <a
-                class="dropdown-item"
-                href="{% url 'category_detail' category.slug %}"
-                >{{ category.name }}</a
-              >
+              <!-- prettier-ignore -->
+              <a class="dropdown-item" href="{% url 'category_detail' category.slug %}">{{ category.name }}</a>
             </li>
             {% endfor %}
             <li><hr class="dropdown-divider" /></li>
@@ -176,7 +173,7 @@
   /* Mobile Adjustment */
   @media (max-width: 768px) {
     .navbar-logo {
-      height: 30px; /* Slightly smaller for mobile screens */
+      height: 50px; /* Slightly smaller for mobile screens */
     }
   }
   /* Search Dropdown Styles */
@@ -243,8 +240,7 @@
 
   @media (max-width: 575.98px) {
     .search-dropdown .dropdown-menu {
-      min-width: 280px;
-      right: -50px !important;
+      left: 0.1rem;
     }
   }
 </style>

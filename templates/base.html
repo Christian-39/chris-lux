@@ -2,49 +2,39 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
+    <!-- prettier-ignore -->
+    <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="{% block meta_description %}{{ SITE_TAGLINE }} - Premium Human Hair Wigs, Bundles, Frontals, Closures & Accessories{% endblock %}"
-    />
-    <meta
-      name="keywords"
-      content="human hair, wigs, bundles, frontal, closure, hair accessories, luxury hair, Chris Lux"
-    />
+    <!-- prettier-ignore -->
+    <meta name="description" content="{% block meta_description %}{{ SITE_TAGLINE }} - Premium Human Hair Wigs, Bundles, Frontals, Closures & Accessories{% endblock %}"/>
+    <!-- prettier-ignore -->
+    <meta name="keywords" content="human hair, wigs, bundles, frontal, closure, hair accessories, luxury hair, Chris Lux"/>
 
     <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
 
     <!-- Favicon -->
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="{% static 'images/favicon.ico' %}"
-    />
+    <!-- prettier-ignore -->
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}"/>
 
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    <!-- prettier-ignore -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <!-- prettier-ignore -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <!-- prettier-ignore -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 
     <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <!-- prettier-ignore -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
 
     <!-- Bootstrap Icons -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
-    />
+    <!-- prettier-ignore -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 
     <!-- Custom CSS -->
-
-    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <!-- prettier-ignore -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
 
     {% block extra_css %}{% endblock %}
   </head>
@@ -56,17 +46,11 @@
     {% if messages %}
     <div class="message-container">
       {% for message in messages %}
-      <div
-        class="alert alert-{{ message.tags }} alert-dismissible fade show"
-        role="alert"
-      >
+      <!-- prettier-ignore -->
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
         {{ message }}
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="alert"
-          aria-label="Close"
-        ></button>
+        <!-- prettier-ignore -->
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
       {% endfor %}
     </div>
@@ -79,14 +63,117 @@
     {% include 'includes/footer.html' %}
 
     <!-- WhatsApp Floating Button -->
-    <a
-      href="https://wa.me/{{ WHATSAPP_NUMBER }}"
-      class="whatsapp-float"
-      target="_blank"
-      rel="noopener"
-    >
-      <i class="bi bi-whatsapp"></i>
-    </a>
+    <!-- prettier-ignore -->
+    <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" class="whatsapp-float" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i></a>
+
+    <style>
+      html,
+      body {
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+      @media (max-width: 767.98px) {
+        .whatsapp-float {
+          position: fixed;
+          bottom: 2rem;
+          right: 2rem;
+          width: 45px;
+          height: 45px;
+          background-color: #25d366;
+          color: var(--color-white);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.65rem;
+          box-shadow: var(--shadow-lg);
+          z-index: 1000;
+          transition: all var(--transition-normal);
+        }
+
+        .hero-section {
+          position: relative;
+          min-height: 70vh; /* Reduced height for mobile to prevent weird scrolling */
+          display: flex;
+          align-items: center;
+          background-color: var(--color-black);
+          overflow: hidden;
+          padding: 2rem 1rem; /* Added side padding for mobile safety */
+        }
+
+        .hero-image {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          opacity: 0.5; /* Slightly darker for better text readability on small screens */
+        }
+
+        .hero-content {
+          position: relative;
+          z-index: 2;
+          color: var(--color-white);
+          width: 100%;
+          text-align: center; /* Center text on mobile for a cleaner look */
+        }
+
+        .hero-subtitle {
+          font-family: var(--font-sans);
+          font-size: 0.75rem; /* Slightly smaller for mobile */
+          font-weight: 500;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: var(--color-gold);
+          margin-bottom: 1rem;
+        }
+
+        .hero-title {
+          font-size: 2.25rem; /* Drastically reduced to prevent word-break issues */
+          font-weight: 600;
+          color: var(--color-white);
+          margin-bottom: 1.25rem;
+          line-height: 1.2;
+        }
+
+        .hero-description {
+          font-size: 1rem;
+          color: var(--color-gray-300);
+          margin-bottom: 2rem;
+          max-width: 100%; /* Use full width on mobile */
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .hero-content .d-flex {
+          width: 100%;
+          margin-top: 1rem;
+        }
+
+        .hero-content .btn {
+          /* Make buttons easy to tap on mobile (44px+ height) */
+          width: 100%;
+          max-width: 150px; /* Prevents buttons from getting too long on large phones */
+          text-transform: uppercase;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          font-size: 0.7rem;
+          transition: all 0.3s ease;
+        }
+
+        .btn-gold {
+          background-color: var(--color-gold);
+          color: var(--color-white);
+          border: none;
+        }
+
+        .btn-white {
+          border: 1px solid var(--color-white);
+          color: var(--color-black);
+        }
+      }
+    </style>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

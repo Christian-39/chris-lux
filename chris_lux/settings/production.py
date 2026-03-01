@@ -16,12 +16,15 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
 # Database - MySQL
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
+        # 1. On Render: Uses the high-speed DATABASE_URL
+        # 2. Locally: If no URL is found, it creates/uses local db.sqlite3
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
-        ssl_require=True
+        conn_health_checks=True,
+        # Only require SSL if we aren't using SQLite (SQLite doesn't support SSL)
+        ssl_require=config('DATABASE_URL', default='').startswith('postgres')
     )
 }
-
 
 # Static files - production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

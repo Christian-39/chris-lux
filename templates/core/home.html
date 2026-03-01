@@ -403,7 +403,7 @@
     </div>
 
     <div class="row g-2">
-      {% for i in "123456" %}
+      {% for i in "123" %}
       <div class="col-4 col-lg-2">
         <a
           href="#"
@@ -459,7 +459,20 @@
   </div>
 </section>
 
+<style>
+  @media (max-width: 767.98px) {
+    .newsletter-section .btn-gold {
+      width: 100%;
+      min-width: 70px; /* Prevents buttons from getting too long on large phones */
+      font-weight: 400;
+      font-size: 0.7rem;
+      padding: 1rem 1rem;
+      text-align: center;
+    }
+  }
+</style>
 {% endblock %} {% block extra_js %}
+
 <script>
   // Newsletter form submission
   document

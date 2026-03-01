@@ -164,6 +164,7 @@ img {
     border-radius: 0;
     transition: all var(--transition-normal);
     border: 1px solid transparent;
+    text-align: center;
 }
 
 .btn-primary {
@@ -885,13 +886,7 @@ img {
         text-align: center;
     }
 
-    .whatsapp-float {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
-        bottom: 1rem;
-        right: 1rem;
-    }
+
 }
 
 /* ==================== ANIMATIONS ==================== */
@@ -1047,12 +1042,6 @@ img {
     color: var(--color-gray-500);
 }
 
-@media (max-width: 575.98px) {
-    .search-dropdown .dropdown-menu {
-        min-width: 280px;
-        right: -50px !important;
-    }
-}
 
 /* ==================== PROFILE SIDEBAR ==================== */
 .profile-sidebar {
