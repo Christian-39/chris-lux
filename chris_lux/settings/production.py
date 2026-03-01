@@ -5,6 +5,7 @@ Production settings for Chris Lux project.
 from .base import *
 import dj_database_url
 from decouple import config
+import os
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -12,7 +13,12 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
 
-
+# Cloudinary Config (Get these from your Cloudinary Dashboard)
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
+}
 # Database - MySQL
 DATABASES = {
     'default': dj_database_url.config(
