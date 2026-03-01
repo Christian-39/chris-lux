@@ -68,9 +68,8 @@
     <!-- Rating -->
     {% if product.review_count > 0 %}
     <div class="mt-2">
-      <small class="text-gold">
-        <!-- prettier-ignore -->
-        {% for i in "12345" %} {% if forloop.counter <= product.average_rating %}
+      <!-- prettier-ignore -->
+      <small class="text-gold"> {% for i in "12345" %} {% if forloop.counter <= product.average_rating %}
         <i class="bi bi-star-fill"></i>
         {% else %}
         <i class="bi bi-star"></i>
