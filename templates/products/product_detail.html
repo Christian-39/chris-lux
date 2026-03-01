@@ -84,17 +84,17 @@
           {% if product.review_count > 0 %}
           <div class="product-rating mb-3">
             <span class="text-gold">
-              {% for i in "12345" %} {% if forloop.counter <=
-              product.average_rating %}
+              <!-- prettier-ignore -->
+              {% for i in "12345" %} {% if forloop.counter <= product.average_rating %}
               <i class="bi bi-star-fill"></i>
               {% else %}
               <i class="bi bi-star"></i>
               {% endif %} {% endfor %}
             </span>
-            <span class="text-muted ms-2"
-              >{{ product.average_rating }} ({{ product.review_count }}
-              reviews)</span
-            >
+            <!-- prettier-ignore -->
+            <span class="text-muted ms-2" >
+              <!-- prettier-ignore -->
+              {{ product.average_rating }} ({{ product.review_count }} reviews)</span>
           </div>
           {% endif %}
 
