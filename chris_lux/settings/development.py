@@ -16,11 +16,7 @@ environ.Env.read_env()
 DEBUG = True
 
 # Cloudinary Config (Get these from your Cloudinary Dashboard)
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
-}
+
 # Database
 DATABASES = {
     'default': dj_database_url.config(

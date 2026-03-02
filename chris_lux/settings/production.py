@@ -30,11 +30,7 @@ AWS_S3_VERIFY = True
 MEDIA_URL = 'https://s3.us-east-005.backblazeb2.com/chrislux/'
 
 # Cloudinary Config (Get these from your Cloudinary Dashboard)
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
-} 
+
 # Database - MySQL
 DATABASES = {
     'default': dj_database_url.config(
