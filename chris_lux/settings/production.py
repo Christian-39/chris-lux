@@ -5,7 +5,12 @@ Production settings for Chris Lux project.
 from .base import *
 import dj_database_url
 from decouple import config
+import environ
 import os
+
+
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
