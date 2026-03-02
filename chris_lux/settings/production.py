@@ -45,7 +45,7 @@ STORAGES = {
 }
 
 # Media files URL
-MEDIA_URL = f'{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/'
+MEDIA_URL = f'{https://s3.us-east-005.backblazeb2.com"}/{chris-lux}/'
 
 # Cloudinary Config (Get these from your Cloudinary Dashboard)
 
