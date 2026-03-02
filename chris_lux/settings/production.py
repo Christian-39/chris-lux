@@ -28,7 +28,7 @@ AWS_B2_REGION_NAME = os.environ.get('B2_REGION_NAME')
 # Tell Django to use S3 for Media files
 
 AWS_DEFAULT_ACL = None
-AWS_S3_FILE_OVERWRITE = False
+AWS_B2_FILE_OVERWRITE = False
 
 # Django 4.2+ Storage Configuration
 STORAGES = {

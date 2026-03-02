@@ -15,8 +15,6 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# Cloudinary Config (Get these from your Cloudinary Dashboard)
-
 # Database
 DATABASES = {
     'default': dj_database_url.config(
