@@ -1,0 +1,138 @@
+{% extends 'base.html' %} {% load static %} {% load humanize %}
+<!-- prettier-ignore -->
+{% block title %}Order {{ order.order_number }} - {{ SITE_NAME }}{% endblock %}
+
+<!-- prettier-ignore -->
+{% block content %}
+<section class="breadcrumb-section">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item">
+          <a href="{% url 'account_dashboard' %}">My Account</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          Order #{{ order.order_number }}
+        </li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<section class="section-padding">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-8">
+        <div
+          class="order-header d-flex justify-content-between align-items-center mb-4"
+        >
+          <div>
+            <h1 class="product-title mb-1">Order #{{ order.order_number }}</h1>
+            <p class="text-muted">
+              Placed on {{ order.created_at|date:"F d, Y" }}
+            </p>
+          </div>
+          <div class="text-end">
+            <span class="badge rounded-0 p-2 bg-gold text-white">
+              {{ order.get_status_display|default:"PROCESSING"|upper }}
+            </span>
+          </div>
+        </div>
+
+        <div class="order-items-card border p-4">
+          <h5 class="variation-label mb-4">Package Contents</h5>
+
+          {% for item in order.items.all %}
+          <div
+            class="d-flex align-items-center mb-4 pb-4 {% if not forloop.last %}border-bottom{% endif %}"
+          >
+            <div
+              class="item-image me-4"
+              style="
+                width: 100px;
+                height: 100px;
+                background: var(--color-gray-100);
+              "
+            >
+              {% if item.product.primary_image %}
+              <img
+                src="{{ item.product.primary_image.image.url }}"
+                alt="{{ item.product.name }}"
+                class="img-fluid w-100 h-100 object-fit-cover"
+              />
+              {% else %}
+              <img
+                src="{% static 'images/product-placeholder.jpg' %}"
+                class="img-fluid"
+              />
+              {% endif %}
+            </div>
+            <div class="item-details flex-fill">
+              <h6 class="mb-1 fw-bold">{{ item.product.name }}</h6>
+              <p class="small text-muted mb-0">Quantity: {{ item.quantity }}</p>
+              {% if item.variation %}
+              <p class="small text-muted mb-0">
+                Variation: {{ item.variation }}
+              </p>
+              {% endif %}
+            </div>
+            <div class="item-price text-end">
+              <span class="fw-bold"
+                >₦{{ item.get_total_item_price|intcomma }}</span
+              >
+            </div>
+          </div>
+          {% empty %}
+          <p>No items found for this order.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="write-review-card mb-4">
+          <h5 class="mb-3">Shipping Details</h5>
+          <div class="meta-item">
+            <span class="meta-label">Recipient:</span>
+            <span class="meta-value d-block">{{ order.full_name }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Delivery Address:</span>
+            <span class="meta-value d-block">{{ order.address }}</span>
+            <span class="meta-value d-block"
+              >{{ order.city }}, {{ order.state }}</span
+            >
+          </div>
+        </div>
+
+        <div class="write-review-card shadow-sm border-gold">
+          <h5 class="mb-4">Order Summary</h5>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Subtotal</span>
+            <span>₦{{ order.get_subtotal|default:order.total|intcomma }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Shipping</span>
+            <span
+              >{% if order.shipping_price == 0 %}FREE{% else %}₦{{
+              order.shipping_price|default:"0"|intcomma }}{% endif %}</span
+            >
+          </div>
+          <hr />
+          <div class="d-flex justify-content-between mb-4">
+            <span class="h5 fw-bold">Total</span>
+            <span class="h5 fw-bold text-black"
+              >₦{{ order.total|intcomma }}</span
+            >
+          </div>
+
+          <button onclick="window.print()" class="btn btn-outline w-100 mb-2">
+            <i class="bi bi-printer me-2"></i> Print Receipt
+          </button>
+          <a href="{% url 'shop' %}" class="btn btn-gold w-100">Shop More</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
