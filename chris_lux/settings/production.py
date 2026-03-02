@@ -21,12 +21,9 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
 AWS_ACCESS_KEY_ID = os.environ.get('B2_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('B2_APPLICATION_KEY')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('B2_BUCKET_NAME')
-AWS_S3_ENDPOINT_URL = f'https://{env("B2_ENDPOINT")}' # Use your specific endpoint
-
-# Settings to make files public and handle naming
-AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = 'public-read'
-AWS_S3_VERIFY = True
+AWS_S3_ENDPOINT_URL = 'https://s3.us-east-005.backblazeb2.com'
+AWS_STORAGE_BUCKET_NAME = 'chris-lux'
+AWS_S3_REGION_NAME = 'us-east-005'
 
 # Tell Django to use S3 for Media files
 
