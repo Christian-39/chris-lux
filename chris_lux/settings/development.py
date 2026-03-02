@@ -31,8 +31,18 @@ DATABASES = {
 } 
 
 # Static files - development
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "bucket_name": AWS_STORAGE_BUCKET_NAME,
+            "endpoint_url": AWS_B2_ENDPOINT_URL,
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage", # Keep static files local or use WhiteNoise
+    },
+}
 # Media files - development
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
