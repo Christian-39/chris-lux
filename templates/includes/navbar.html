@@ -111,7 +111,7 @@
 
         <!-- Account -->
         {% if user.is_authenticated %}
-        <div class="dropdown">
+        <div class="dropdown profile-dropdown">
           <a href="#" class="nav-icon" data-bs-toggle="dropdown">
             <i class="bi bi-person"></i>
           </a>
@@ -241,6 +241,10 @@
   @media (max-width: 575.98px) {
     .search-dropdown .dropdown-menu {
       left: 0.1rem;
+    }
+    .profile-dropdown .dropdown-menu {
+      left: 6.5rem;
+      top: -9rem;
     }
   }
 </style>
