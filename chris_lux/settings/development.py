@@ -31,14 +31,10 @@ DATABASES = {
 # Static files - development
 STORAGES = {
     "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        "OPTIONS": {
-            "bucket_name": "chris-lux",
-            "endpoint_url": "https://s3.us-east-005.backblazeb2.com",
-        },
+        "BACKEND": "django.core.files.storage.FileSystemStorage", 
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage", # Keep static files local or use WhiteNoise
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 # Media files - development
