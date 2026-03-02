@@ -13,12 +13,28 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
 
+AWS_ACCESS_KEY_ID = os.environ.get('B2_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('B2_APPLICATION_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('B2_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = 'https://s3.us-east-005.backblazeb2.com' # Use your specific endpoint
+
+# Settings to make files public and handle naming
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = 'public-read'
+AWS_S3_VERIFY = True
+
+# Tell Django to use S3 for Media files
+
+
+# URL for your images
+MEDIA_URL = 'https://s3.us-east-005.backblazeb2.com/chrislux/'
+
 # Cloudinary Config (Get these from your Cloudinary Dashboard)
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
-}
+} 
 # Database - MySQL
 DATABASES = {
     'default': dj_database_url.config(

@@ -32,11 +32,11 @@ DATABASES = {
         # Only require SSL if we aren't using SQLite (SQLite doesn't support SSL)
         ssl_require=config('DATABASE_URL', default='').startswith('postgres')
     )
-}
+} 
 
 # Static files - development
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 # Media files - development
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

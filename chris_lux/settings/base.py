@@ -23,6 +23,7 @@ DJANGO_APPS = [
     'django.contrib.humanize',
     'django.contrib.sitemaps',
     'cloudinary',
+    'storages',
 ]
 
 THIRD_PARTY_APPS = [
