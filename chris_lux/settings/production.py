@@ -35,8 +35,8 @@ STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
         "OPTIONS": {
-            "bucket_name": B2_BUCKET_NAME,
-            "endpoint_url": B2_ENDPOINT_URL,
+            "bucket_name": "chris-lux",
+            "endpoint_url": "https://s3.us-east-005.backblazeb2.com",
         },
     },
     "staticfiles": {
