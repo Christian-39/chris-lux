@@ -30,9 +30,13 @@ AWS_S3_VERIFY = True
 
 # Tell Django to use S3 for Media files
 
+# Force path-style URLs for Backblaze B2
+AWS_S3_ADDRESSING_STYLE = "path"
 
+# Ensure this matches the region in your Backblaze dashboard
+AWS_S3_REGION_NAME = "us-east-005"
 # URL for your images
-MEDIA_URL = 'https://s3.us-east-005.backblazeb2.com/chrislux/'
+MEDIA_URL = 'https://s3.us-east-005.backblazeb2.com/chris-lux/'
 
 # Cloudinary Config (Get these from your Cloudinary Dashboard)
 
