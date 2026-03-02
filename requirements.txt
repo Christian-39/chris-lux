@@ -10,3 +10,4 @@ django-environ
 dj-database-url
 psycopg2-binary
 boto3
+django-storages
