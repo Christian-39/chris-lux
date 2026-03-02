@@ -78,7 +78,7 @@
               {% endif %}
             </div>
             <div class="item-price text-end">
-              <span class="fw-bold">₦{{ order.subtotal|intcomma }}</span>
+              <span class="fw-bold">₦{{ item.product.price|intcomma }}</span>
             </div>
           </div>
           {% empty %}
