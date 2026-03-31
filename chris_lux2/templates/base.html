@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{% if request.user.is_authenticated and request.user.dark_mode %}dark{% else %}light{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- SEO Meta Tags -->
+    <title>{% block title %}{{ site_settings.site_name|default:"Chris-Lux" }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{{ site_settings.site_description|default:"Premium Hair Extensions & Wigs" }}{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}{{ site_settings.site_keywords|default:"hair, wigs, bundles, extensions" }}{% endblock %}">
+    <meta name="author" content="Chris-Lux">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% block og_title %}{{ site_settings.site_name }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ site_settings.site_description }}{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    <!-- Favicon -->
+    {% if site_settings.favicon %}
+    <link rel="icon" type="image/x-icon" href="{{ site_settings.favicon.url }}">
+    {% else %}
+    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
+    {% endif %}
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/main.css">
+    
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Analytics -->
+    {% if site_settings.google_analytics_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ site_settings.google_analytics_id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ site_settings.google_analytics_id }}');
+    </script>
+    {% endif %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <div class="container">
+                <p class="header-promo">Free shipping on orders over {{ site_settings.currency_symbol }}{{ site_settings.free_shipping_threshold|default:"150" }}</p>
+                <div class="header-links">
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'users:profile' %}"><i class="fas fa-user"></i> My Account</a>
+                        <a href="{% url 'users:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    {% else %}
+                        <a href="{% url 'users:login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+                        <a href="{% url 'users:register' %}"><i class="fas fa-user-plus"></i> Register</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="header-main">
+            <div class="container">
+                <!-- Logo -->
+                <a href="{% url 'core:home' %}" class="logo">
+                    {% if site_settings.logo %}
+                        <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_name }}">
+                    {% else %}
+                        <svg viewBox="0 0 200 50" class="logo-svg">
+                            <text x="10" y="35" font-family="Playfair Display" font-size="28" font-weight="700" fill="currentColor">Chris-Lux</text>
+                        </svg>
+                    {% endif %}
+                </a>
+                
+                <!-- Search -->
+                <div class="search-bar">
+                    <form action="{% url 'core:search' %}" method="get">
+                        <input type="text" name="q" placeholder="Search products..." autocomplete="off" id="search-input">
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                    <div class="search-suggestions" id="search-suggestions"></div>
+                </div>
+                
+                <!-- Header Actions -->
+                <div class="header-actions">
+                    <!-- Notifications -->
+                    {% if request.user.is_authenticated %}
+                    <div class="notification-dropdown">
+                        <button class="notification-btn" id="notification-btn">
+                            <i class="fas fa-bell"></i>
+                            {% if unread_notifications_count > 0 %}
+                            <span class="badge">{{ unread_notifications_count }}</span>
+                            {% endif %}
+                        </button>
+                        <div class="notification-menu" id="notification-menu">
+                            <div class="notification-header">
+                                <h4>Notifications</h4>
+                                {% if unread_notifications_count > 0 %}
+                                <a href="{% url 'notifications:mark_all_as_read' %}">Mark all read</a>
+                                {% endif %}
+                            </div>
+                            <div class="notification-list">
+                                {% for notification in recent_notifications %}
+                                <a href="{% if notification.order %}{% url 'orders:order_detail' notification.order.id %}{% else %}{% url 'notifications:notification_list' %}{% endif %}" 
+                                   class="notification-item {% if not notification.is_read %}unread{% endif %}">
+                                    <div class="notification-icon {{ notification.color_class }}">
+                                        <i class="fas fa-{{ notification.icon_class }}"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="notification-title">{{ notification.title }}</p>
+                                        <p class="notification-message">{{ notification.message|truncatechars:60 }}</p>
+                                        <span class="notification-time">{{ notification.created_at|timesince }} ago</span>
+                                    </div>
+                                </a>
+                                {% empty %}
+                                <div class="notification-empty">
+                                    <i class="fas fa-bell-slash"></i>
+                                    <p>No notifications yet</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="notification-footer">
+                                <a href="{% url 'notifications:notification_list' %}">View All</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Wishlist -->
+                    <a href="{% url 'products:wishlist' %}" class="header-action">
+                        <i class="fas fa-heart"></i>
+                    </a>
+                    
+                    <!-- Cart -->
+                    <a href="{% url 'orders:cart' %}" class="header-action cart-action">
+                        <i class="fas fa-shopping-bag"></i>
+                        {% if cart_items_count > 0 %}
+                        <span class="badge">{{ cart_items_count }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <div class="container">
+                <button class="mobile-menu-btn" id="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <ul class="nav-menu" id="nav-menu">
+                    <li><a href="{% url 'core:home' %}">Home</a></li>
+                    <li class="has-dropdown">
+                        <a href="{% url 'products:product_list' %}">Shop <i class="fas fa-chevron-down"></i></a>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-grid">
+                                <div class="dropdown-column">
+                                    <h4>By Type</h4>
+                                    <a href="{% url 'products:product_list' %}?type=wig">Wigs</a>
+                                    <a href="{% url 'products:product_list' %}?type=bundle">Bundles</a>
+                                    <a href="{% url 'products:product_list' %}?type=closure">Closures</a>
+                                    <a href="{% url 'products:product_list' %}?type=frontal">Frontals</a>
+                                    <a href="{% url 'products:product_list' %}?type=accessory">Accessories</a>
+                                </div>
+                                <div class="dropdown-column">
+                                    <h4>By Texture</h4>
+                                    <a href="{% url 'products:product_list' %}?texture=straight">Straight</a>
+                                    <a href="{% url 'products:product_list' %}?texture=body_wave">Body Wave</a>
+                                    <a href="{% url 'products:product_list' %}?texture=deep_wave">Deep Wave</a>
+                                    <a href="{% url 'products:product_list' %}?texture=curly">Curly</a>
+                                    <a href="{% url 'products:product_list' %}?texture=kinky_curly">Kinky Curly</a>
+                                </div>
+                                <div class="dropdown-column">
+                                    <h4>Collections</h4>
+                                    <a href="{% url 'products:new_arrivals' %}">New Arrivals</a>
+                                    <a href="{% url 'products:bestsellers' %}">Bestsellers</a>
+                                    <a href="{% url 'products:featured' %}">Featured</a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li><a href="{% url 'core:about' %}">About</a></li>
+                    <li><a href="{% url 'core:hair_care' %}">Hair Care</a></li>
+                    <li><a href="{% url 'core:faq' %}">FAQ</a></li>
+                    <li><a href="{% url 'core:contact' %}">Contact</a></li>
+                </ul>
+                
+                {% if request.user.is_staff %}
+                <a href="{% url 'dashboard:home' %}" class="admin-link">
+                    <i class="fas fa-cog"></i> Admin
+                </a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+    
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+        <a href="{% url 'core:home' %}" class="mobile-nav-item {% if request.path == '/' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="{% url 'products:product_list' %}" class="mobile-nav-item {% if 'products' in request.path %}active{% endif %}">
+            <i class="fas fa-store"></i>
+            <span>Shop</span>
+        </a>
+        <a href="{% url 'orders:cart' %}" class="mobile-nav-item {% if 'cart' in request.path %}active{% endif %}">
+            <i class="fas fa-shopping-bag"></i>
+            {% if cart_items_count > 0 %}
+            <span class="badge">{{ cart_items_count }}</span>
+            {% endif %}
+            <span>Cart</span>
+        </a>
+        <a href="{% url 'users:profile' %}" class="mobile-nav-item {% if 'users' in request.path %}active{% endif %}">
+            <i class="fas fa-user"></i>
+            <span>Account</span>
+        </a>
+    </nav>
+    
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="message message-{{ message.tags }}">
+            <div class="message-content">
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+            </div>
+            <button class="message-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>About Chris-Lux</h4>
+                    <p>{{ site_settings.site_description|default:"Premium quality hair extensions and wigs. We offer the finest virgin hair products to help you achieve your desired look." }}</p>
+                    <div class="social-links">
+                        {% if site_settings.facebook_url %}
+                        <a href="{{ site_settings.facebook_url }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        {% endif %}
+                        {% if site_settings.instagram_url %}
+                        <a href="{{ site_settings.instagram_url }}" target="_blank"><i class="fab fa-instagram"></i></a>
+                        {% endif %}
+                        {% if site_settings.twitter_url %}
+                        <a href="{{ site_settings.twitter_url }}" target="_blank"><i class="fab fa-twitter"></i></a>
+                        {% endif %}
+                        {% if site_settings.youtube_url %}
+                        <a href="{{ site_settings.youtube_url }}" target="_blank"><i class="fab fa-youtube"></i></a>
+                        {% endif %}
+                        {% if site_settings.tiktok_url %}
+                        <a href="{{ site_settings.tiktok_url }}" target="_blank"><i class="fab fa-tiktok"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="{% url 'products:product_list' %}">Shop All</a></li>
+                        <li><a href="{% url 'products:new_arrivals' %}">New Arrivals</a></li>
+                        <li><a href="{% url 'products:bestsellers' %}">Bestsellers</a></li>
+                        <li><a href="{% url 'core:about' %}">About Us</a></li>
+                        <li><a href="{% url 'core:contact' %}">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Customer Service</h4>
+                    <ul>
+                        <li><a href="{% url 'core:shipping_info' %}">Shipping Info</a></li>
+                        <li><a href="{% url 'core:returns_policy' %}">Returns Policy</a></li>
+                        <li><a href="{% url 'core:size_guide' %}">Size Guide</a></li>
+                        <li><a href="{% url 'core:faq' %}">FAQ</a></li>
+                        <li><a href="{% url 'core:privacy_policy' %}">Privacy Policy</a></li>
+                        <li><a href="{% url 'core:terms_of_service' %}">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Newsletter</h4>
+                    <p>Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p>
+                    <form action="{% url 'core:subscribe_newsletter' %}" method="post" class="newsletter-form">
+                        {% csrf_token %}
+                        <input type="email" name="email" placeholder="Enter your email" required>
+                        <button type="submit"><i class="fas fa-arrow-right"></i></button>
+                    </form>
+                    <div class="contact-info">
+                        {% if site_settings.support_phone %}
+                        <p><i class="fas fa-phone"></i> {{ site_settings.support_phone }}</p>
+                        {% endif %}
+                        <p><i class="fas fa-envelope"></i> {{ site_settings.contact_email|default:"support@chris-lux.com" }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; {% now "Y" %} {{ site_settings.site_name|default:"Chris-Lux" }}. All rights reserved.</p>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-amex"></i>
+                    <i class="fab fa-cc-paypal"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="/static/js/main.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

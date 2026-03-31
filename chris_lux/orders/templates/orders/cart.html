@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart - {{ site_settings.site_name|default:"Chris-Lux" }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 3rem 0; text-align: center;">
+    <div class="container">
+        <h1 style="font-size: 2rem; margin-bottom: 0.5rem; color: white;">Shopping Cart</h1>
+        <p style="opacity: 0.9;">Review your items and proceed to checkout</p>
+    </div>
+</section>
+
+<!-- Cart Section -->
+<section class="section">
+    <div class="container">
+        {% if cart_items %}
+        <div class="cart-layout" style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+            <!-- Cart Items -->
+            <div class="cart-items">
+                <div class="card" style="overflow: visible;">
+                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center;">
+                        <h2 style="font-size: 1.25rem;">Cart Items ({{ cart_items|length }})</h2>
+                        <a href="{% url 'orders:clear_cart' %}" class="btn btn-sm btn-secondary" onclick="return confirm('Are you sure you want to clear your cart?')">
+                            <i class="fas fa-trash"></i> Clear Cart
+                        </a>
+                    </div>
+                    
+                    <div class="cart-items-list">
+                        {% for item in cart_items %}
+                        <div class="cart-item" style="display: grid; grid-template-columns: 100px 1fr auto auto; gap: 1.5rem; padding: 1.5rem; border-bottom: 1px solid var(--gray-200); align-items: center;">
+                            <!-- Product Image -->
+                            <div class="cart-item-image" style="width: 100px; height: 100px; border-radius: var(--radius-md); overflow: hidden;">
+                                {% if item.product.primary_image %}
+                                <img src="{{ item.product.primary_image.image.url }}" alt="{{ item.product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% else %}
+                                <img src="/static/images/placeholder.jpg" alt="{{ item.product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Product Info -->
+                            <div class="cart-item-info">
+                                <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">
+                                    <a href="{% url 'products:product_detail' item.product.slug %}">{{ item.product.name }}</a>
+                                </h3>
+                                <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.5rem;">
+                                    {{ item.product.get_product_type_display }}
+                                </p>
+                                <p style="color: var(--primary); font-weight: 600;">
+                                    {{ site_settings.currency_symbol|default:"$" }}{{ item.product.price }}
+                                </p>
+                            </div>
+                            
+                            <!-- Quantity -->
+                            <div class="cart-item-quantity">
+                                <form action="{% url 'orders:update_cart_item' item.id %}" method="post" class="quantity-wrapper" style="display: flex; align-items: center; border: 2px solid var(--gray-200); border-radius: var(--radius-md); overflow: hidden;">
+                                    {% csrf_token %}
+                                    <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}" class="quantity-decrease" style="width: 36px; height: 36px; background: var(--gray-100); border: none;" {% if item.quantity <= 1 %}disabled{% endif %}>
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="text" value="{{ item.quantity }}" readonly style="width: 50px; text-align: center; border: none; padding: 0; font-weight: 600;">
+                                    <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}" class="quantity-increase" style="width: 36px; height: 36px; background: var(--gray-100); border: none;" {% if item.product.track_inventory and item.quantity >= item.product.stock_quantity %}disabled{% endif %}>
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <!-- Price & Remove -->
+                            <div class="cart-item-actions" style="text-align: right;">
+                                <p style="font-size: 1.125rem; font-weight: 700; margin-bottom: 0.5rem;">
+                                    {{ site_settings.currency_symbol|default:"$" }}{{ item.get_subtotal }}
+                                </p>
+                                <a href="{% url 'orders:remove_from_cart' item.id %}" class="btn btn-sm btn-secondary" onclick="return confirm('Remove this item from cart?')" style="color: var(--error);">
+                                    <i class="fas fa-trash"></i> Remove
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem;">
+                    <a href="{% url 'products:product_list' %}" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i> Continue Shopping
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Cart Summary -->
+            <div class="cart-summary">
+                <div class="card" style="position: sticky; top: 100px;">
+                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--gray-200);">
+                        <h2 style="font-size: 1.25rem;">Order Summary</h2>
+                    </div>
+                    
+                    <div style="padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                            <span style="color: var(--gray-600);">Subtotal</span>
+                            <span style="font-weight: 500;">{{ site_settings.currency_symbol|default:"$" }}{{ cart.get_total }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                            <span style="color: var(--gray-600);">Shipping</span>
+                            <span style="color: var(--gray-500);">Calculated at checkout</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                            <span style="color: var(--gray-600);">Tax</span>
+                            <span style="color: var(--gray-500);">Calculated at checkout</span>
+                        </div>
+                        
+                        <div style="border-top: 1px solid var(--gray-200); margin: 1rem 0; padding-top: 1rem; display: flex; justify-content: space-between;">
+                            <span style="font-size: 1.125rem; font-weight: 600;">Estimated Total</span>
+                            <span style="font-size: 1.25rem; font-weight: 700; color: var(--primary);">{{ site_settings.currency_symbol|default:"$" }}{{ cart.get_total }}</span>
+                        </div>
+                        
+                        <a href="{% url 'orders:checkout' %}" class="btn btn-primary btn-lg btn-block" style="margin-bottom: 1rem;">
+                            <i class="fas fa-lock"></i> Proceed to Checkout
+                        </a>
+                        
+                        <div style="text-align: center;">
+                            <i class="fas fa-shield-alt" style="color: var(--success); margin-right: 0.5rem;"></i>
+                            <span style="font-size: 0.875rem; color: var(--gray-600);">Secure checkout</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-cart" style="text-align: center; padding: 4rem 2rem;">
+            <div style="width: 150px; height: 150px; background: var(--gray-100); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+                <i class="fas fa-shopping-bag" style="font-size: 4rem; color: var(--gray-300);"></i>
+            </div>
+            <h2 style="margin-bottom: 1rem;">Your Cart is Empty</h2>
+            <p style="color: var(--gray-600); margin-bottom: 2rem;">Looks like you haven't added anything to your cart yet.</p>
+            <a href="{% url 'products:product_list' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-store"></i> Start Shopping
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

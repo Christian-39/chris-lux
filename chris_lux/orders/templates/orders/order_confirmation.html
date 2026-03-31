@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmed - {{ site_settings.site_name|default:"Chris-Lux" }}{% endblock %}
+
+{% block content %}
+<section class="section" style="min-height: calc(100vh - 300px); display: flex; align-items: center;">
+    <div class="container">
+        <div class="confirmation-card" style="max-width: 800px; margin: 0 auto; text-align: center;">
+            <div class="success-icon" style="width: 120px; height: 120px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+                <i class="fas fa-check" style="font-size: 4rem; color: var(--success);"></i>
+            </div>
+            
+            <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Order Placed Successfully!</h1>
+            <p style="color: var(--gray-600); font-size: 1.125rem; margin-bottom: 2rem;">
+                Thank you for your order. Your order number is <strong style="color: var(--primary);">{{ order.order_number }}</strong>
+            </p>
+            
+            <div class="order-details" style="background: var(--gray-50); padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem; text-align: left;">
+                <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem; text-align: center;">Order Details</h2>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <h4 style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.25rem;">Order Number</h4>
+                        <p style="font-weight: 600;">{{ order.order_number }}</p>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.25rem;">Order Date</h4>
+                        <p style="font-weight: 600;">{{ order.created_at|date:"F d, Y" }}</p>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.25rem;">Order Status</h4>
+                        <p style="font-weight: 600; color: var(--warning);">
+                            <i class="fas fa-clock"></i> {{ order.get_status_display }}
+                        </p>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.25rem;">Total Amount</h4>
+                        <p style="font-weight: 600; color: var(--primary); font-size: 1.125rem;">{{ site_settings.currency_symbol|default:"$" }}{{ order.total_amount }}</p>
+                    </div>
+                </div>
+                
+                <div style="border-top: 1px solid var(--gray-200); padding-top: 1.5rem;">
+                    <h4 style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.5rem;">Shipping Address</h4>
+                    <p>{{ order.shipping_address }}</p>
+                    <p>{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_postal_code }}</p>
+                    <p>{{ order.shipping_country }}</p>
+                </div>
+            </div>
+            
+            <div class="payment-info" style="background: rgba(107, 33, 168, 0.05); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1rem;"><i class="fas fa-info-circle" style="color: var(--primary);"></i> Next Steps</h3>
+                <p style="color: var(--gray-600); margin-bottom: 1rem;">
+                    Please complete your payment by bank transfer and upload your receipt.
+                </p>
+                <a href="{% url 'payments:upload_receipt' order.id %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-upload"></i> Upload Payment Receipt
+                </a>
+            </div>
+            
+            <div class="action-buttons" style="display: flex; gap: 1rem; justify-content: center;">
+                <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-outline btn-lg">
+                    <i class="fas fa-eye"></i> View Order
+                </a>
+                <a href="{% url 'products:product_list' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-shopping-bag"></i> Continue Shopping
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

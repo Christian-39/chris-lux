@@ -1,0 +1,402 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - {{ site_settings.site_name|default:"Chris-Lux" }}{% endblock %}
+
+{% block meta_description %}{{ product.short_description|default:product.description|truncatechars:160 }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<section class="breadcrumb-section" style="background: var(--gray-100); padding: 1rem 0;">
+    <div class="container">
+        <nav style="font-size: 0.875rem;">
+            <a href="{% url 'core:home' %}">Home</a>
+            <i class="fas fa-chevron-right" style="margin: 0 0.5rem; color: var(--gray-400);"></i>
+            <a href="{% url 'products:product_list' %}">Shop</a>
+            <i class="fas fa-chevron-right" style="margin: 0 0.5rem; color: var(--gray-400);"></i>
+            {% if product.category %}
+            <a href="{% url 'products:category_detail' product.category.slug %}">{{ product.category.name }}</a>
+            <i class="fas fa-chevron-right" style="margin: 0 0.5rem; color: var(--gray-400);"></i>
+            {% endif %}
+            <span style="color: var(--gray-600);">{{ product.name }}</span>
+        </nav>
+    </div>
+</section>
+
+<!-- Product Detail -->
+<section class="section">
+    <div class="container">
+        <div class="product-detail" style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;">
+            <!-- Product Images -->
+            <div class="product-gallery">
+                <div class="gallery-main" style="position: relative; margin-bottom: 1rem; border-radius: var(--radius-lg); overflow: hidden; background: var(--gray-100);">
+                    {% if product.primary_image %}
+                    <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}" class="gallery-main-image" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+                    {% else %}
+                    <img src="/static/images/placeholder.jpg" alt="{{ product.name }}" class="gallery-main-image" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+                    {% endif %}
+                    
+                    {% if product.has_sale %}
+                    <span class="card-badge sale" style="position: absolute; top: 1rem; left: 1rem;">-{{ product.discount_percentage }}%</span>
+                    {% endif %}
+                </div>
+                
+                <!-- Thumbnails -->
+                {% if product.images.count > 1 or product.videos.exists %}
+                <div class="gallery-thumbnails" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    {% for image in product.images.all %}
+                    <div class="gallery-thumbnail {% if forloop.first %}active{% endif %}" data-image="{{ image.image.url }}" style="width: 80px; height: 80px; border-radius: var(--radius-md); overflow: hidden; cursor: pointer; border: 2px solid {% if forloop.first %}var(--primary){% else %}transparent{% endif %}; transition: all var(--transition-fast);">
+                        <img src="{{ image.image.url }}" alt="{{ product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    {% endfor %}
+                    
+                    {% for video in product.videos.all %}
+                    <div class="gallery-video-thumb" data-video="{{ video.video.url }}" style="width: 80px; height: 80px; border-radius: var(--radius-md); overflow: hidden; cursor: pointer; border: 2px solid transparent; background: var(--gray-900); display: flex; align-items: center; justify-content: center; color: white; transition: all var(--transition-fast);">
+                        <i class="fas fa-play-circle" style="font-size: 1.5rem;"></i>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Video Container -->
+                <div class="gallery-video-container" style="display: none; margin-top: 1rem;"></div>
+            </div>
+            
+            <!-- Product Info -->
+            <div class="product-info">
+                <div class="product-header" style="margin-bottom: 1.5rem;">
+                    <p style="color: var(--primary); font-weight: 500; font-size: 0.875rem; text-transform: uppercase; margin-bottom: 0.5rem;">
+                        {{ product.get_product_type_display }}
+                    </p>
+                    <h1 style="font-size: 2rem; margin-bottom: 1rem;">{{ product.name }}</h1>
+                    
+                    <!-- Rating -->
+                    {% if review_count > 0 %}
+                    <div class="product-rating" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                        <div style="color: var(--accent);">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= average_rating %}
+                                <i class="fas fa-star"></i>
+                                {% else %}
+                                <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span style="color: var(--gray-500);">({{ review_count }} reviews)</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Price -->
+                    <div class="product-price" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <span style="font-size: 2rem; font-weight: 700; color: var(--primary);">
+                            {{ site_settings.currency_symbol|default:"$" }}{{ product.price }}
+                        </span>
+                        {% if product.has_sale %}
+                        <span style="font-size: 1.25rem; color: var(--gray-400); text-decoration: line-through;">
+                            {{ site_settings.currency_symbol|default:"$" }}{{ product.compare_at_price }}
+                        </span>
+                        <span style="background: var(--error); color: white; padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.875rem;">
+                            Save {{ site_settings.currency_symbol|default:"$" }}{{ product.compare_at_price|subtract:product.price }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Stock Status -->
+                    <div class="stock-status" style="margin-bottom: 1rem;">
+                        {% if product.is_in_stock %}
+                        <span style="color: var(--success);">
+                            <i class="fas fa-check-circle"></i> In Stock
+                            {% if product.track_inventory %}
+                            ({{ product.stock_quantity }} available)
+                            {% endif %}
+                        </span>
+                        {% else %}
+                        <span style="color: var(--error);">
+                            <i class="fas fa-times-circle"></i> Out of Stock
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Short Description -->
+                {% if product.short_description %}
+                <p style="color: var(--gray-600); margin-bottom: 1.5rem; line-height: 1.7;">
+                    {{ product.short_description }}
+                </p>
+                {% endif %}
+                
+                <!-- Specifications -->
+                <div class="product-specs" style="background: var(--gray-50); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                        {% if product.hair_texture %}
+                        <div>
+                            <span style="color: var(--gray-500); font-size: 0.875rem;">Texture:</span>
+                            <p style="font-weight: 500;">{{ product.get_hair_texture_display }}</p>
+                        </div>
+                        {% endif %}
+                        {% if product.hair_origin %}
+                        <div>
+                            <span style="color: var(--gray-500); font-size: 0.875rem;">Origin:</span>
+                            <p style="font-weight: 500;">{{ product.get_hair_origin_display }}</p>
+                        </div>
+                        {% endif %}
+                        {% if product.length %}
+                        <div>
+                            <span style="color: var(--gray-500); font-size: 0.875rem;">Length:</span>
+                            <p style="font-weight: 500;">{{ product.length }}"</p>
+                        </div>
+                        {% endif %}
+                        {% if product.sku %}
+                        <div>
+                            <span style="color: var(--gray-500); font-size: 0.875rem;">SKU:</span>
+                            <p style="font-weight: 500;">{{ product.sku }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Add to Cart -->
+                {% if product.is_in_stock %}
+                <form action="{% url 'orders:add_to_cart' product.slug %}" method="post" style="margin-bottom: 1.5rem;">
+                    {% csrf_token %}
+                    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+                        <div class="quantity-wrapper" style="display: flex; align-items: center; border: 2px solid var(--gray-200); border-radius: var(--radius-md); overflow: hidden;">
+                            <button type="button" class="quantity-decrease" style="width: 44px; height: 44px; background: var(--gray-100); border: none;">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" name="quantity" value="1" min="1" max="{% if product.track_inventory %}{{ product.stock_quantity }}{% else %}99{% endif %}" class="quantity-input" style="width: 60px; text-align: center; border: none; padding: 0;">
+                            <button type="button" class="quantity-increase" style="width: 44px; height: 44px; background: var(--gray-100); border: none;">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg" style="flex: 1;">
+                            <i class="fas fa-shopping-bag"></i> Add to Cart
+                        </button>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit" name="next" value="{% url 'orders:checkout' %}" class="btn btn-accent btn-block">
+                            <i class="fas fa-bolt"></i> Buy Now
+                        </button>
+                        
+                        {% if request.user.is_authenticated %}
+                        <a href="{% url 'products:toggle_wishlist' product.slug %}" class="btn btn-outline" style="width: 50px;">
+                            <i class="fas fa-heart {% if in_wishlist %}text-danger{% endif %}"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+                {% else %}
+                <div class="out-of-stock" style="background: var(--gray-100); padding: 1.5rem; border-radius: var(--radius-lg); text-align: center; margin-bottom: 1.5rem;">
+                    <i class="fas fa-box-open" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
+                    <h3>Out of Stock</h3>
+                    <p style="color: var(--gray-600);">This product is currently unavailable.</p>
+                </div>
+                {% endif %}
+                
+                <!-- Shipping Info -->
+                <div class="shipping-info" style="display: flex; gap: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-shipping-fast" style="color: var(--primary);"></i>
+                        <span style="font-size: 0.875rem;">Free shipping over {{ site_settings.currency_symbol|default:"$" }}{{ site_settings.free_shipping_threshold|default:"150" }}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-undo" style="color: var(--primary);"></i>
+                        <span style="font-size: 0.875rem;">30-day returns</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Product Tabs -->
+        <div class="product-tabs" style="margin-top: 3rem;" data-tabs>
+            <div class="tabs-header" style="display: flex; border-bottom: 2px solid var(--gray-200); margin-bottom: 2rem;">
+                <button class="tab-btn active" data-tab="description" style="padding: 1rem 2rem; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all var(--transition-fast);">
+                    Description
+                </button>
+                <button class="tab-btn" data-tab="reviews" style="padding: 1rem 2rem; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all var(--transition-fast);">
+                    Reviews ({{ review_count }})
+                </button>
+                <button class="tab-btn" data-tab="shipping" style="padding: 1rem 2rem; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all var(--transition-fast);">
+                    Shipping & Returns
+                </button>
+            </div>
+            
+            <div class="tabs-content">
+                <!-- Description Tab -->
+                <div class="tab-panel active" data-tab-panel="description">
+                    <div style="max-width: 800px;">
+                        {{ product.description|linebreaks }}
+                    </div>
+                </div>
+                
+                <!-- Reviews Tab -->
+                <div class="tab-panel" data-tab-panel="reviews" style="display: none;">
+                    <div class="reviews-section">
+                        {% if reviews %}
+                        <div class="reviews-list" style="margin-bottom: 2rem;">
+                            {% for review in reviews %}
+                            <div class="review-item" style="padding: 1.5rem; border-bottom: 1px solid var(--gray-200);">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                            {{ review.user.first_name|first|default:review.user.username|first }}
+                                        </div>
+                                        <div>
+                                            <h4 style="font-weight: 600;">{{ review.user.first_name|default:review.user.username }}</h4>
+                                            <div style="color: var(--accent);">
+                                                {% for i in "12345" %}
+                                                    {% if forloop.counter <= review.rating %}
+                                                    <i class="fas fa-star"></i>
+                                                    {% else %}
+                                                    <i class="far fa-star"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span style="color: var(--gray-500); font-size: 0.875rem;">{{ review.created_at|date:"M d, Y" }}</span>
+                                </div>
+                                {% if review.title %}
+                                <h5 style="font-weight: 600; margin-bottom: 0.5rem;">{{ review.title }}</h5>
+                                {% endif %}
+                                <p style="color: var(--gray-600);">{{ review.comment }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="no-reviews" style="text-align: center; padding: 3rem;">
+                            <i class="fas fa-comment-alt" style="font-size: 3rem; color: var(--gray-300); margin-bottom: 1rem;"></i>
+                            <h3>No Reviews Yet</h3>
+                            <p style="color: var(--gray-600);">Be the first to review this product!</p>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Add Review Form -->
+                        {% if request.user.is_authenticated and can_review %}
+                        <div class="add-review" style="background: var(--gray-50); padding: 2rem; border-radius: var(--radius-lg);">
+                            <h3 style="margin-bottom: 1.5rem;">Write a Review</h3>
+                            <form action="{% url 'products:add_review' product.slug %}" method="post">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label style="display: block; margin-bottom: 0.5rem;">Rating</label>
+                                    <div class="rating-input" style="display: flex; gap: 0.5rem;">
+                                        {% for i in "54321" %}
+                                        <label style="cursor: pointer; font-size: 1.5rem; color: var(--gray-300); transition: color var(--transition-fast);">
+                                            <input type="radio" name="rating" value="{{ i }}" style="display: none;">
+                                            <i class="fas fa-star"></i>
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="review-title" style="display: block; margin-bottom: 0.5rem;">Title (optional)</label>
+                                    <input type="text" id="review-title" name="title" class="form-control" placeholder="Summarize your experience">
+                                </div>
+                                <div class="form-group">
+                                    <label for="review-comment" style="display: block; margin-bottom: 0.5rem;">Your Review</label>
+                                    <textarea id="review-comment" name="comment" class="form-control" rows="4" placeholder="Share your thoughts about this product" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Submit Review
+                                </button>
+                            </form>
+                        </div>
+                        {% elif request.user.is_authenticated %}
+                        <div class="review-notice" style="background: var(--gray-50); padding: 1.5rem; border-radius: var(--radius-lg); text-align: center;">
+                            <p style="color: var(--gray-600);">Only verified purchasers can write reviews.</p>
+                        </div>
+                        {% else %}
+                        <div class="review-notice" style="background: var(--gray-50); padding: 1.5rem; border-radius: var(--radius-lg); text-align: center;">
+                            <p style="color: var(--gray-600);">Please <a href="{% url 'users:login' %}" style="color: var(--primary);">login</a> to write a review.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Shipping Tab -->
+                <div class="tab-panel" data-tab-panel="shipping" style="display: none;">
+                    <div style="max-width: 800px;">
+                        <h3 style="margin-bottom: 1rem;">Shipping Information</h3>
+                        <p style="color: var(--gray-600); margin-bottom: 1.5rem;">
+                            We offer fast and reliable shipping to all locations. Orders are typically processed within 1-2 business days.
+                        </p>
+                        
+                        <div style="background: var(--gray-50); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 1.5rem;">
+                            <h4 style="margin-bottom: 1rem;">Shipping Options</h4>
+                            <table style="width: 100%;">
+                                <tr style="border-bottom: 1px solid var(--gray-200);">
+                                    <td style="padding: 0.75rem 0; font-weight: 500;">Standard Shipping</td>
+                                    <td style="padding: 0.75rem 0;">5-7 business days</td>
+                                    <td style="padding: 0.75rem 0; text-align: right;">{{ site_settings.currency_symbol|default:"$" }}{{ site_settings.standard_shipping_cost|default:"15.00" }}</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--gray-200);">
+                                    <td style="padding: 0.75rem 0; font-weight: 500;">Express Shipping</td>
+                                    <td style="padding: 0.75rem 0;">2-3 business days</td>
+                                    <td style="padding: 0.75rem 0; text-align: right;">{{ site_settings.currency_symbol|default:"$" }}{{ site_settings.express_shipping_cost|default:"25.00" }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0.75rem 0; font-weight: 500;">Overnight Shipping</td>
+                                    <td style="padding: 0.75rem 0;">1 business day</td>
+                                    <td style="padding: 0.75rem 0; text-align: right;">{{ site_settings.currency_symbol|default:"$" }}{{ site_settings.overnight_shipping_cost|default:"50.00" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <h3 style="margin-bottom: 1rem;">Returns Policy</h3>
+                        <p style="color: var(--gray-600);">
+                            We accept returns within 30 days of delivery. Items must be unused and in original packaging. 
+                            Please contact our customer service team to initiate a return.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Related Products -->
+        {% if related_products %}
+        <div class="related-products" style="margin-top: 4rem;">
+            <h2 style="text-align: center; margin-bottom: 2rem;">You May Also Like</h2>
+            <div class="product-grid" style="grid-template-columns: repeat(4, 1fr);">
+                {% for product in related_products %}
+                <div class="card">
+                    <div class="card-image">
+                        {% if product.primary_image %}
+                        <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                        <img src="/static/images/placeholder.jpg" alt="{{ product.name }}">
+                        {% endif %}
+                        <div class="card-actions">
+                            <a href="{% url 'products:product_detail' product.slug %}" class="card-action-btn" title="Quick View">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">
+                            <a href="{% url 'products:product_detail' product.slug %}">{{ product.name }}</a>
+                        </h3>
+                        <div class="card-price">
+                            <span class="card-price-current">{{ site_settings.currency_symbol|default:"$" }}{{ product.price }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+.tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary) !important;
+}
+.rating-input label:hover,
+.rating-input label:hover ~ label,
+.rating-input input:checked ~ label {
+    color: var(--accent);
+}
+</style>
+{% endblock %}

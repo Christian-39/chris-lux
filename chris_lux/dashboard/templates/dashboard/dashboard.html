@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - {{ site_settings.site_name|default:"Chris-Lux" }}{% endblock %}
+
+{% block content %}
+<!-- Admin Header -->
+<section class="admin-header" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 2rem 0;">
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem; color: white;">Admin Dashboard</h1>
+                <p style="opacity: 0.9;">Welcome back, {{ request.user.first_name|default:request.user.username }}</p>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <a href="{% url 'admin:index' %}" class="btn btn-outline" style="border-color: white; color: white;">
+                    <i class="fas fa-cog"></i> Django Admin
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Dashboard Content -->
+<section class="section" style="background: var(--gray-50);">
+    <div class="container">
+        <!-- Stats Cards -->
+        <div class="stats-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+            <div class="stat-card" style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div style="width: 50px; height: 50px; background: rgba(107, 33, 168, 0.1); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.5rem;">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <span style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 0.25rem 0.5rem; border-radius: var(--radius-full); font-size: 0.75rem;">
+                        <i class="fas fa-arrow-up"></i> +12%
+                    </span>
+                </div>
+                <h3 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem;">{{ site_settings.currency_symbol|default:"$" }}{{ total_sales|floatformat:2 }}</h3>
+                <p style="color: var(--gray-500); font-size: 0.875rem;">Total Sales</p>
+            </div>
+            
+            <div class="stat-card" style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div style="width: 50px; height: 50px; background: rgba(59, 130, 246, 0.1); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--info); font-size: 1.5rem;">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <span style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 0.25rem 0.5rem; border-radius: var(--radius-full); font-size: 0.75rem;">
+                        <i class="fas fa-arrow-up"></i> +8%
+                    </span>
+                </div>
+                <h3 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem;">{{ total_orders }}</h3>
+                <p style="color: var(--gray-500); font-size: 0.875rem;">Total Orders</p>
+            </div>
+            
+            <div class="stat-card" style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div style="width: 50px; height: 50px; background: rgba(245, 158, 11, 0.1); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--warning); font-size: 1.5rem;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <span style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 0.25rem 0.5rem; border-radius: var(--radius-full); font-size: 0.75rem;">
+                        <i class="fas fa-arrow-up"></i> +15%
+                    </span>
+                </div>
+                <h3 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem;">{{ total_customers }}</h3>
+                <p style="color: var(--gray-500); font-size: 0.875rem;">Total Customers</p>
+            </div>
+            
+            <div class="stat-card" style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div style="width: 50px; height: 50px; background: rgba(239, 68, 68, 0.1); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--error); font-size: 1.5rem;">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    {% if low_stock_count > 0 %}
+                    <span style="background: rgba(239, 68, 68, 0.1); color: var(--error); padding: 0.25rem 0.5rem; border-radius: var(--radius-full); font-size: 0.75rem;">
+                        <i class="fas fa-exclamation"></i> Alert
+                    </span>
+                    {% endif %}
+                </div>
+                <h3 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem;">{{ low_stock_count }}</h3>
+                <p style="color: var(--gray-500); font-size: 0.875rem;">Low Stock Items</p>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; margin-bottom: 2rem;">
+            <a href="{% url 'dashboard:orders' %}" class="quick-action" style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-sm); transition: all var(--transition-fast);">
+                <div style="width: 50px; height: 50px; background: rgba(107, 33, 168, 0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--primary); font-size: 1.25rem;">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <span style="font-weight: 500;">Orders</span>
+            </a>
+            
+            <a href="{% url 'dashboard:products' %}" class="quick-action" style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-sm); transition: all var(--transition-fast);">
+                <div style="width: 50px; height: 50px; background: rgba(59, 130, 246, 0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--info); font-size: 1.25rem;">
+                    <i class="fas fa-box"></i>
+                </div>
+                <span style="font-weight: 500;">Products</span>
+            </a>
+            
+            <a href="{% url 'dashboard:customers' %}" class="quick-action" style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-sm); transition: all var(--transition-fast);">
+                <div style="width: 50px; height: 50px; background: rgba(245, 158, 11, 0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--warning); font-size: 1.25rem;">
+                    <i class="fas fa-users"></i>
+                </div>
+                <span style="font-weight: 500;">Customers</span>
+            </a>
+            
+            <a href="{% url 'payments:pending_receipts' %}" class="quick-action" style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-sm); transition: all var(--transition-fast);">
+                <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--success); font-size: 1.25rem;">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <span style="font-weight: 500;">Receipts</span>
+                {% if pending_receipts_count > 0 %}
+                <span style="background: var(--error); color: white; padding: 0.125rem 0.5rem; border-radius: var(--radius-full); font-size: 0.75rem; margin-left: 0.5rem;">{{ pending_receipts_count }}</span>
+                {% endif %}
+            </a>
+            
+            <a href="{% url 'dashboard:analytics' %}" class="quick-action" style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-sm); transition: all var(--transition-fast);">
+                <div style="width: 50px; height: 50px; background: rgba(139, 92, 246, 0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: #8B5CF6; font-size: 1.25rem;">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <span style="font-weight: 500;">Analytics</span>
+            </a>
+            
+            <a href="{% url 'settings:site_settings' %}" class="quick-action" style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-sm); transition: all var(--transition-fast);">
+                <div style="width: 50px; height: 50px; background: rgba(107, 114, 128, 0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--gray-500); font-size: 1.25rem;">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <span style="font-weight: 500;">Settings</span>
+            </a>
+        </div>
+        
+        <!-- Recent Orders & Pending Receipts -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+            <!-- Recent Orders -->
+            <div class="card">
+                <div style="padding: 1.5rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="font-size: 1.125rem;"><i class="fas fa-shopping-bag" style="color: var(--primary); margin-right: 0.5rem;"></i> Recent Orders</h2>
+                    <a href="{% url 'dashboard:orders' %}" style="color: var(--primary); font-size: 0.875rem;">View All</a>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%;">
+                        <thead>
+                            <tr style="background: var(--gray-50);">
+                                <th style="padding: 1rem; text-align: left; font-weight: 600;">Order #</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 600;">Customer</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 600;">Date</th>
+                                <th style="padding: 1rem; text-align: left; font-weight: 600;">Status</th>
+                                <th style="padding: 1rem; text-align: right; font-weight: 600;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr style="border-bottom: 1px solid var(--gray-100);">
+                                <td style="padding: 1rem;">
+                                    <a href="{% url 'dashboard:order_detail' order.id %}" style="color: var(--primary); font-weight: 500;">{{ order.order_number }}</a>
+                                </td>
+                                <td style="padding: 1rem;">{{ order.user.get_full_name|default:order.user.username }}</td>
+                                <td style="padding: 1rem; color: var(--gray-500);">{{ order.created_at|date:"M d, Y" }}</td>
+                                <td style="padding: 1rem;">
+                                    <span class="status-badge status-{{ order.status }}" style="padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 500;">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </td>
+                                <td style="padding: 1rem; text-align: right; font-weight: 600;">{{ site_settings.currency_symbol|default:"$" }}{{ order.total_amount }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" style="padding: 2rem; text-align: center; color: var(--gray-500);">No orders yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Pending Receipts -->
+            <div class="card">
+                <div style="padding: 1.5rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="font-size: 1.125rem;"><i class="fas fa-receipt" style="color: var(--warning); margin-right: 0.5rem;"></i> Pending Receipts</h2>
+                    <a href="{% url 'payments:pending_receipts' %}" style="color: var(--primary); font-size: 0.875rem;">View All</a>
+                </div>
+                <div style="padding: 1rem;">
+                    {% for receipt in pending_receipts %}
+                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid var(--gray-100);">
+                        <div style="width: 40px; height: 40px; background: rgba(245, 158, 11, 0.1); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; color: var(--warning);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <p style="font-weight: 500; font-size: 0.875rem;">{{ receipt.order.order_number }}</p>
+                            <p style="color: var(--gray-500); font-size: 0.75rem;">{{ receipt.user.get_full_name|default:receipt.user.username }}</p>
+                        </div>
+                        <a href="{% url 'payments:pending_receipts' %}" class="btn btn-sm btn-primary">Review</a>
+                    </div>
+                    {% empty %}
+                    <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                        <i class="fas fa-check-circle" style="font-size: 2rem; color: var(--success); margin-bottom: 0.5rem;"></i>
+                        <p>No pending receipts</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.status-pending_payment { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+.status-payment_uploaded { background: rgba(59, 130, 246, 0.1); color: var(--info); }
+.status-verified { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+.status-processing { background: rgba(107, 33, 168, 0.1); color: var(--primary); }
+.status-shipped { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
+.status-delivered { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+.status-cancelled { background: rgba(239, 68, 68, 0.1); color: var(--error); }
+
+.quick-action:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+</style>
+{% endblock %}

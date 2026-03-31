@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}Shop - {{ site_settings.site_name|default:"Chris-Lux" }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 4rem 0; text-align: center;">
+    <div class="container">
+        <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; color: white;">Shop All Products</h1>
+        <p style="opacity: 0.9;">Discover our premium collection of hair products</p>
+    </div>
+</section>
+
+<!-- Products Section -->
+<section class="section">
+    <div class="container">
+        <div class="shop-layout" style="display: grid; grid-template-columns: 280px 1fr; gap: 2rem;">
+            <!-- Sidebar Filters -->
+            <aside class="shop-sidebar">
+                <div class="filter-section" style="background: white; padding: 1.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--primary);">
+                        <i class="fas fa-filter"></i> Filters
+                    </h3>
+                    
+                    <form method="get" id="filter-form">
+                        <!-- Search -->
+                        <div class="filter-group" style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 500; margin-bottom: 0.5rem;">Search</label>
+                            <input type="text" name="search" value="{{ search }}" placeholder="Search products..." class="form-control" style="width: 100%;">
+                        </div>
+                        
+                        <!-- Categories -->
+                        <div class="filter-group" style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 500; margin-bottom: 0.5rem;">Category</label>
+                            <select name="category" class="form-control" style="width: 100%;" onchange="this.form.submit()">
+                                <option value="">All Categories</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.slug }}" {% if current_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Product Type -->
+                        <div class="filter-group" style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 500; margin-bottom: 0.5rem;">Product Type</label>
+                            <select name="type" class="form-control" style="width: 100%;" onchange="this.form.submit()">
+                                <option value="">All Types</option>
+                                {% for type_value, type_label in product_types %}
+                                <option value="{{ type_value }}" {% if request.GET.type == type_value %}selected{% endif %}>{{ type_label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Hair Texture -->
+                        <div class="filter-group" style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 500; margin-bottom: 0.5rem;">Hair Texture</label>
+                            <select name="texture" class="form-control" style="width: 100%;" onchange="this.form.submit()">
+                                <option value="">All Textures</option>
+                                {% for texture_value, texture_label in hair_textures %}
+                                <option value="{{ texture_value }}" {% if request.GET.texture == texture_value %}selected{% endif %}>{{ texture_label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Price Range -->
+                        <div class="filter-group" style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 500; margin-bottom: 0.5rem;">Price Range</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="number" name="min_price" value="{{ request.GET.min_price }}" placeholder="Min" class="form-control" style="width: 50%;">
+                                <input type="number" name="max_price" value="{{ request.GET.max_price }}" placeholder="Max" class="form-control" style="width: 50%;">
+                            </div>
+                        </div>
+                        
+                        <!-- Sort -->
+                        <div class="filter-group" style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 500; margin-bottom: 0.5rem;">Sort By</label>
+                            <select name="sort" class="form-control" style="width: 100%;" onchange="this.form.submit()">
+                                <option value="-created_at" {% if request.GET.sort == '-created_at' or not request.GET.sort %}selected{% endif %}>Newest First</option>
+                                <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                                <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                                <option value="name_asc" {% if request.GET.sort == 'name_asc' %}selected{% endif %}>Name: A-Z</option>
+                                <option value="name_desc" {% if request.GET.sort == 'name_desc' %}selected{% endif %}>Name: Z-A</option>
+                                <option value="popular" {% if request.GET.sort == 'popular' %}selected{% endif %}>Most Popular</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                        <a href="{% url 'products:product_list' %}" class="btn btn-secondary btn-block" style="margin-top: 0.5rem;">
+                            <i class="fas fa-times"></i> Clear Filters
+                        </a>
+                    </form>
+                </div>
+            </aside>
+            
+            <!-- Products Grid -->
+            <div class="shop-content">
+                <!-- Results Header -->
+                <div class="results-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding: 1rem; background: var(--gray-50); border-radius: var(--radius-md);">
+                    <p style="margin: 0; color: var(--gray-600);">
+                        Showing <strong>{{ products|length }}</strong> products
+                    </p>
+                    
+                    {% if query_params %}
+                    <div class="active-filters" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        {% if request.GET.category %}
+                        <span class="filter-tag" style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.875rem;">
+                            Category <a href="?{% for key, value in request.GET.items %}{% if key != 'category' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" style="color: white; margin-left: 0.5rem;"><i class="fas fa-times"></i></a>
+                        </span>
+                        {% endif %}
+                        {% if request.GET.type %}
+                        <span class="filter-tag" style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.875rem;">
+                            Type <a href="?{% for key, value in request.GET.items %}{% if key != 'type' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" style="color: white; margin-left: 0.5rem;"><i class="fas fa-times"></i></a>
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if products %}
+                <div class="product-grid">
+                    {% for product in products %}
+                    <div class="card">
+                        <div class="card-image">
+                            {% if product.primary_image %}
+                            <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                            <img src="/static/images/placeholder.jpg" alt="{{ product.name }}">
+                            {% endif %}
+                            
+                            {% if product.has_sale %}
+                            <span class="card-badge sale">-{{ product.discount_percentage }}%</span>
+                            {% elif product.is_new_arrival %}
+                            <span class="card-badge new">New</span>
+                            {% elif product.is_bestseller %}
+                            <span class="card-badge" style="background: var(--accent);">Bestseller</span>
+                            {% endif %}
+                            
+                            <div class="card-actions">
+                                {% if request.user.is_authenticated %}
+                                <a href="{% url 'products:toggle_wishlist' product.slug %}" class="card-action-btn" title="Add to Wishlist">
+                                    <i class="fas fa-heart"></i>
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'products:product_detail' product.slug %}" class="card-action-btn" title="Quick View">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">
+                                <a href="{% url 'products:product_detail' product.slug %}">{{ product.name }}</a>
+                            </h3>
+                            <p style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.5rem;">
+                                {{ product.get_product_type_display }}
+                                {% if product.hair_texture %}| {{ product.get_hair_texture_display }}{% endif %}
+                            </p>
+                            <div class="card-price">
+                                <span class="card-price-current">{{ site_settings.currency_symbol|default:"$" }}{{ product.price }}</span>
+                                {% if product.has_sale %}
+                                <span class="card-price-original">{{ site_settings.currency_symbol|default:"$" }}{{ product.compare_at_price }}</span>
+                                {% endif %}
+                            </div>
+                            {% if not product.is_in_stock %}
+                            <p style="color: var(--error); font-size: 0.875rem; margin-top: 0.5rem;">
+                                <i class="fas fa-times-circle"></i> Out of Stock
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <nav class="pagination" style="margin-top: 3rem; display: flex; justify-content: center;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        {% if page_obj.has_previous %}
+                        <a href="?page=1{% if query_params %}&{{ query_params }}{% endif %}" class="btn btn-secondary" style="min-width: 40px;">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                        <a href="?page={{ page_obj.previous_page_number }}{% if query_params %}&{{ query_params }}{% endif %}" class="btn btn-secondary" style="min-width: 40px;">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <span class="btn btn-primary" style="min-width: 40px;">{{ num }}</span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page={{ num }}{% if query_params %}&{{ query_params }}{% endif %}" class="btn btn-secondary" style="min-width: 40px;">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if query_params %}&{{ query_params }}{% endif %}" class="btn btn-secondary" style="min-width: 40px;">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% if query_params %}&{{ query_params }}{% endif %}" class="btn btn-secondary" style="min-width: 40px;">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </nav>
+                {% endif %}
+                
+                {% else %}
+                <div class="empty-state" style="text-align: center; padding: 4rem 2rem;">
+                    <div style="width: 120px; height: 120px; background: var(--gray-100); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                        <i class="fas fa-search" style="font-size: 3rem; color: var(--gray-400);"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.5rem;">No Products Found</h3>
+                    <p style="color: var(--gray-600); margin-bottom: 1.5rem;">Try adjusting your filters or search criteria.</p>
+                    <a href="{% url 'products:product_list' %}" class="btn btn-primary">
+                        <i class="fas fa-times"></i> Clear All Filters
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Payment Receipt - {{ site_settings.site_name|default:"Chris-Lux" }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 3rem 0; text-align: center;">
+    <div class="container">
+        <h1 style="font-size: 2rem; margin-bottom: 0.5rem; color: white;">Upload Payment Receipt</h1>
+        <p style="opacity: 0.9;">Order #{{ order.order_number }}</p>
+    </div>
+</section>
+
+<!-- Upload Section -->
+<section class="section">
+    <div class="container">
+        <div class="upload-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 1000px; margin: 0 auto;">
+            <!-- Bank Details -->
+            <div class="bank-details">
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--gray-200);">
+                        <h2 style="font-size: 1.125rem;"><i class="fas fa-university" style="color: var(--primary); margin-right: 0.5rem;"></i> Bank Transfer Details</h2>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div class="order-summary" style="background: var(--gray-50); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+                            <p style="color: var(--gray-600); margin-bottom: 0.5rem;">Amount to Pay:</p>
+                            <p style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">{{ site_settings.currency_symbol|default:"$" }}{{ order.total_amount }}</p>
+                        </div>
+                        
+                        {% if bank_accounts %}
+                            {% for bank in bank_accounts %}
+                            <div class="bank-account" style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--gray-200);">
+                                <h3 style="font-size: 1rem; margin-bottom: 1rem;">{{ bank.bank_name }}</h3>
+                                <div style="display: grid; gap: 0.75rem;">
+                                    <div>
+                                        <span style="color: var(--gray-500); font-size: 0.875rem;">Account Name:</span>
+                                        <p style="font-weight: 500;">{{ bank.account_name }}</p>
+                                    </div>
+                                    <div>
+                                        <span style="color: var(--gray-500); font-size: 0.875rem;">Account Number:</span>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <p style="font-weight: 500; font-family: monospace;">{{ bank.account_number }}</p>
+                                            <button type="button" onclick="copyToClipboard('{{ bank.account_number }}')" style="color: var(--primary);" title="Copy">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {% if bank.routing_number %}
+                                    <div>
+                                        <span style="color: var(--gray-500); font-size: 0.875rem;">Routing Number:</span>
+                                        <p style="font-weight: 500; font-family: monospace;">{{ bank.routing_number }}</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                            <p>Bank details will be provided shortly.</p>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="payment-instructions" style="background: rgba(59, 130, 246, 0.05); padding: 1rem; border-radius: var(--radius-md); border-left: 4px solid var(--info);">
+                            <h4 style="font-size: 0.875rem; margin-bottom: 0.5rem;"><i class="fas fa-info-circle"></i> Instructions</h4>
+                            <ol style="font-size: 0.875rem; color: var(--gray-600); padding-left: 1.25rem;">
+                                <li>Transfer the exact amount shown above</li>
+                                <li>Take a screenshot or photo of your receipt</li>
+                                <li>Upload the receipt using the form</li>
+                                <li>We'll verify your payment within 24 hours</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Upload Form -->
+            <div class="upload-form">
+                <div class="card">
+                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--gray-200);">
+                        <h2 style="font-size: 1.125rem;"><i class="fas fa-upload" style="color: var(--primary); margin-right: 0.5rem;"></i> Upload Receipt</h2>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <form method="post" action="{% url 'payments:upload_receipt' order.id %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <div class="form-group">
+                                <label for="receipt_file" class="form-label">Receipt File *</label>
+                                <div class="file-upload" style="border: 2px dashed var(--gray-300); border-radius: var(--radius-lg); padding: 2rem; text-align: center; transition: all var(--transition-fast);">
+                                    <input type="file" id="receipt_file" name="receipt_file" accept="image/*,.pdf" required style="display: none;" onchange="previewFile(this)">
+                                    <label for="receipt_file" style="cursor: pointer;">
+                                        <div class="upload-icon" style="width: 60px; height: 60px; background: rgba(107, 33, 168, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--primary); font-size: 1.5rem;">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                        </div>
+                                        <p style="font-weight: 500; margin-bottom: 0.5rem;">Click to upload or drag and drop</p>
+                                        <p style="color: var(--gray-500); font-size: 0.875rem;">PNG, JPG, or PDF (max 10MB)</p>
+                                    </label>
+                                    <div id="file-preview" style="margin-top: 1rem; display: none;">
+                                        <img id="preview-image" style="max-width: 200px; max-height: 200px; border-radius: var(--radius-md);">
+                                        <p id="file-name" style="margin-top: 0.5rem; font-size: 0.875rem;"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="amount_paid" class="form-label">Amount Paid *</label>
+                                    <input type="number" id="amount_paid" name="amount_paid" step="0.01" class="form-control" placeholder="0.00" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="payment_date" class="form-label">Payment Date *</label>
+                                    <input type="date" id="payment_date" name="payment_date" class="form-control" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="reference_number" class="form-label">Reference/Transaction Number</label>
+                                <input type="text" id="reference_number" name="reference_number" class="form-control" placeholder="Enter transaction reference">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bank_name" class="form-label">Bank Name</label>
+                                <input type="text" id="bank_name" name="bank_name" class="form-control" placeholder="Enter bank name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="sender_name" class="form-label">Sender Name</label>
+                                <input type="text" id="sender_name" name="sender_name" class="form-control" placeholder="Name on bank account">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="notes" class="form-label">Additional Notes</label>
+                                <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Any additional information..."></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg btn-block">
+                                <i class="fas fa-upload"></i> Upload Receipt
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function previewFile(input) {
+    const preview = document.getElementById('file-preview');
+    const previewImage = document.getElementById('preview-image');
+    const fileName = document.getElementById('file-name');
+    
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        fileName.textContent = file.name;
+        preview.style.display = 'block';
+        
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewImage.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            previewImage.style.display = 'none';
+            fileName.innerHTML = '<i class="fas fa-file-pdf" style="color: var(--error); font-size: 2rem;"></i><br>' + file.name;
+        }
+    }
+}
+
+// Set today's date as default
+document.getElementById('payment_date').valueAsDate = new Date();
+</script>
+{% endblock %}
