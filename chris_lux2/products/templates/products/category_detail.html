@@ -1,0 +1,303 @@
+{% extends 'base.html' %} {% block title %}{{ category.name }} - {{
+site_settings.site_name|default:"Chris-Lux" }}{% endblock %} {% block content %}
+<!-- Category Hero -->
+<div
+  style="
+    background: linear-gradient(
+      135deg,
+      rgba(107, 33, 168, 0.05) 0%,
+      rgba(139, 92, 246, 0.05) 100%
+    );
+    padding: 4rem 0;
+    margin-bottom: 3rem;
+  "
+>
+  <div class="container" style="text-align: center">
+    <h1
+      style="
+        font-size: 2.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      "
+    >
+      {{ category.name }}
+    </h1>
+    {% if category.description %}
+    <p
+      style="
+        color: var(--gray-500);
+        font-size: 1.125rem;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+      "
+    >
+      {{ category.description }}
+    </p>
+    {% endif %}
+    <div
+      style="margin-top: 1.5rem; color: var(--gray-400); font-size: 0.875rem"
+    >
+      {{ products.paginator.count }} product{{
+      products.paginator.count|pluralize }} found
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div style="display: grid; grid-template-columns: 260px 1fr; gap: 3rem">
+    <!-- Sidebar Filters -->
+    <aside>
+      <div class="card" style="position: sticky; top: 2rem">
+        <div style="padding: 1.5rem; border-bottom: 1px solid var(--gray-200)">
+          <h3 style="font-size: 1.125rem; font-weight: 600">Categories</h3>
+        </div>
+        <nav style="padding: 0.75rem 0">
+          {% for cat in categories %}
+          <a
+            href="{% url 'products:category_detail' cat.slug %}"
+            style="display: block; padding: 0.75rem 1.5rem; text-decoration: none; font-size: 0.9375rem; transition: all 0.2s; {% if cat == category %}background: rgba(107, 33, 168, 0.1); color: var(--primary); font-weight: 500; border-right: 3px solid var(--primary);{% else %}color: var(--gray-600);{% endif %}"
+            onmouseover="
+              if (this.style.color !== 'var(--primary)')
+                this.style.color = 'var(--primary)';
+              this.style.background = 'rgba(107, 33, 168, 0.05)';
+            "
+            onmouseout="
+              if (this.style.color !== 'var(--primary)')
+                this.style.color = 'var(--gray-600)';
+              this.style.background = 'transparent';
+            "
+          >
+            {{ cat.name }}
+            <span
+              style="float: right; color: var(--gray-400); font-size: 0.875rem"
+              >{{ cat.product_count }}</span
+            >
+          </a>
+          {% endfor %}
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Product Grid -->
+    <div>
+      <!-- Sort & Filter Bar -->
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1.5rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid var(--gray-200);
+        "
+      >
+        <span style="color: var(--gray-500); font-size: 0.875rem"
+          >Showing {{ products.start_index }} - {{ products.end_index }} of {{
+          products.paginator.count }}</span
+        >
+        <select
+          style="
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            background: white;
+            font-size: 0.875rem;
+            cursor: pointer;
+          "
+        >
+          <option>Sort by: Featured</option>
+          <option>Price: Low to High</option>
+          <option>Price: High to Low</option>
+          <option>Newest First</option>
+        </select>
+      </div>
+
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+          gap: 1.5rem;
+        "
+      >
+        {% for product in products %}
+        <div
+          class="card product-card"
+          style="overflow: hidden; transition: all 0.3s"
+        >
+          <div
+            style="
+              position: relative;
+              aspect-ratio: 1;
+              overflow: hidden;
+              background: var(--gray-100);
+            "
+          >
+            {% if product.images.all %}
+            <img
+              src="{{ product.images.all.0.image.url }}"
+              alt="{{ product.name }}"
+              style="
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.5s;
+              "
+            />
+            {% endif %}
+            <a
+              href="{{ product.get_absolute_url }}"
+              style="
+                position: absolute;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(0, 0, 0, 0);
+                transition: background 0.3s;
+              "
+              class="product-link"
+            >
+              <span
+                class="btn btn-primary"
+                style="
+                  opacity: 0;
+                  transform: translateY(10px);
+                  transition: all 0.3s;
+                "
+                >View Details</span
+              >
+            </a>
+          </div>
+          <div style="padding: 1.25rem">
+            <h4
+              style="
+                font-size: 1rem;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+                color: var(--gray-800);
+              "
+            >
+              {{ product.name }}
+            </h4>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <span
+                style="
+                  color: var(--primary);
+                  font-weight: 600;
+                  font-size: 1.125rem;
+                "
+              >
+                {{ site_settings.currency_symbol|default:"$" }}{{ product.price
+                }}
+              </span>
+              <button
+                onclick="toggleWishlist('{{ product.slug }}')"
+                style="
+                  background: none;
+                  border: none;
+                  color: var(--gray-400);
+                  cursor: pointer;
+                  font-size: 1.25rem;
+                  transition: color 0.2s;
+                "
+                onmouseover="this.style.color = 'var(--danger)'"
+                onmouseout="this.style.color = 'var(--gray-400)'"
+              >
+                <i class="far fa-heart"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem">
+          <i
+            class="fas fa-box-open"
+            style="font-size: 3rem; color: var(--gray-300); margin-bottom: 1rem"
+          ></i>
+          <p style="color: var(--gray-500)">
+            No products found in this category.
+          </p>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Pagination -->
+      {% if is_paginated %}
+      <div
+        style="
+          margin-top: 3rem;
+          display: flex;
+          justify-content: center;
+          gap: 0.5rem;
+        "
+      >
+        {% if products.has_previous %}
+        <a
+          href="?page={{ products.previous_page_number }}"
+          class="btn btn-secondary"
+          style="padding: 0.625rem 1rem"
+        >
+          <i class="fas fa-chevron-left"></i>
+        </a>
+        {% endif %} {% for num in products.paginator.page_range %} {% if
+        products.number == num %}
+        <span
+          class="btn btn-primary"
+          style="padding: 0.625rem 1rem; cursor: default"
+          >{{ num }}</span
+        >
+        {% else %}
+        <a
+          href="?page={{ num }}"
+          class="btn btn-secondary"
+          style="padding: 0.625rem 1rem"
+          >{{ num }}</a
+        >
+        {% endif %} {% endfor %} {% if products.has_next %}
+        <a
+          href="?page={{ products.next_page_number }}"
+          class="btn btn-secondary"
+          style="padding: 0.625rem 1rem"
+        >
+          <i class="fas fa-chevron-right"></i>
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  }
+  .product-card:hover img {
+    transform: scale(1.08);
+  }
+  .product-card:hover .product-link {
+    background: rgba(0, 0, 0, 0.3);
+  }
+  .product-card:hover .product-link span {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+
+<script>
+  function toggleWishlist(slug) {
+    // Your wishlist toggle logic
+    console.log("Toggling wishlist for", slug);
+  }
+</script>
+{% endblock %}

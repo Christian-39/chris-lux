@@ -1,0 +1,251 @@
+{% extends 'base.html' %} {% block title %}Featured Collections - {{
+site_settings.site_name|default:"Chris-Lux" }}{% endblock %} {% block content %}
+<section class="section">
+  <div class="container">
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 3rem">
+      <h1
+        style="
+          font-size: 2.25rem;
+          font-weight: 600;
+          margin-bottom: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        "
+      >
+        Featured Collections
+      </h1>
+      <p style="color: var(--gray-500); font-size: 1.125rem">
+        Hand-picked luxury selections just for you
+      </p>
+    </div>
+
+    <!-- Product Grid -->
+    <div
+      style="
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+      "
+    >
+      {% for product in products %}
+      <div
+        class="card product-card"
+        style="overflow: hidden; transition: all 0.3s ease"
+      >
+        <!-- Image Container -->
+        <div
+          style="
+            position: relative;
+            aspect-ratio: 3/4;
+            overflow: hidden;
+            background: var(--gray-100);
+          "
+        >
+          {% if product.images.all %}
+          <img
+            src="{{ product.images.all.0.image.url }}"
+            alt="{{ product.name }}"
+            style="
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              transition: transform 0.5s ease;
+            "
+          />
+          {% else %}
+          <div
+            style="
+              width: 100%;
+              height: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: var(--gray-400);
+            "
+          >
+            <i class="fas fa-image" style="font-size: 4rem"></i>
+          </div>
+          {% endif %}
+
+          <!-- Hover Overlay -->
+          <div
+            class="product-overlay"
+            style="
+              position: absolute;
+              inset: 0;
+              background: rgba(0, 0, 0, 0.4);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 1rem;
+              opacity: 0;
+              transition: opacity 0.3s ease;
+            "
+          >
+            <a
+              href="{{ product.get_absolute_url }}"
+              class="btn btn-primary"
+              style="
+                transform: translateY(20px);
+                transition: transform 0.3s ease;
+              "
+            >
+              Quick View
+            </a>
+            <button
+              class="btn btn-secondary"
+              style="
+                transform: translateY(20px);
+                transition: transform 0.3s ease 0.1s;
+              "
+              onclick="addToCart('{{ product.id }}')"
+            >
+              <i class="fas fa-shopping-cart"></i>
+            </button>
+          </div>
+
+          <!-- Category Badge -->
+          <div style="position: absolute; top: 1rem; left: 1rem">
+            <span
+              style="
+                background: rgba(255, 255, 255, 0.95);
+                padding: 0.375rem 0.75rem;
+                border-radius: var(--radius-full);
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--gray-700);
+              "
+            >
+              {{ product.category.name }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div style="padding: 1.5rem; text-align: center">
+          <h3
+            style="
+              font-size: 1.125rem;
+              font-weight: 600;
+              margin-bottom: 0.5rem;
+              color: var(--gray-800);
+            "
+          >
+            {{ product.name }}
+          </h3>
+          <p
+            style="
+              color: var(--primary);
+              font-size: 1.25rem;
+              font-weight: 600;
+              margin-bottom: 1rem;
+            "
+          >
+            {{ site_settings.currency_symbol|default:"$" }}{{ product.price }}
+          </p>
+          <a
+            href="{{ product.get_absolute_url }}"
+            class="btn btn-outline"
+            style="
+              width: 100%;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+              font-size: 0.875rem;
+            "
+          >
+            Discover
+          </a>
+        </div>
+      </div>
+      {% empty %}
+      <div style="grid-column: 1 / -1; text-align: center; padding: 4rem">
+        <div
+          style="
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--gray-400);
+          "
+        >
+          <i class="fas fa-box-open" style="font-size: 2rem"></i>
+        </div>
+        <p style="color: var(--gray-500)">
+          No featured products available at the moment.
+        </p>
+        <a
+          href="{% url 'products:product_list' %}"
+          class="btn btn-primary"
+          style="margin-top: 1rem"
+        >
+          Browse All Products
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- View All Button -->
+    {% if products %}
+    <div style="text-align: center; margin-top: 3rem">
+      <a
+        href="{% url 'products:product_list' %}"
+        class="btn btn-primary"
+        style="padding: 0.875rem 2rem"
+      >
+        View All Products
+        <i class="fas fa-arrow-right" style="margin-left: 0.5rem"></i>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  .product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  }
+  .product-card:hover img {
+    transform: scale(1.1);
+  }
+  .product-card:hover .product-overlay {
+    opacity: 1;
+  }
+  .product-card:hover .product-overlay a,
+  .product-card:hover .product-overlay button {
+    transform: translateY(0);
+  }
+
+  /* Button Styles */
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--gray-300);
+    color: var(--gray-700);
+    padding: 0.625rem 1.5rem;
+    border-radius: var(--radius);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(107, 33, 168, 0.05);
+  }
+</style>
+
+<script>
+  function addToCart(productId) {
+    // Add your cart logic here
+    console.log("Adding product", productId, "to cart");
+  }
+</script>
+{% endblock %}

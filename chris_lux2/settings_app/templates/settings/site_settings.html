@@ -1,0 +1,1907 @@
+{% extends 'base.html' %}
+<!--prettier-ignore-->
+{% block title %}Site Settings - {{ site_settings.site_name|default:"Chris-Lux" }}{% endblock %} 
+{% block content %}
+<section class="section" style="padding: 2rem 0">
+  <div class="container" style="max-width: 1200px">
+    <!-- Header -->
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+      "
+    >
+      <div>
+        <h1
+          style="
+            font-size: 1.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+          "
+        >
+          <i
+            class="fas fa-cog"
+            style="color: var(--primary); margin-right: 0.75rem"
+          ></i
+          >Site Settings
+        </h1>
+        <p style="color: var(--gray-500); font-size: 0.9375rem; margin: 0">
+          Manage your store configuration, appearance, and preferences
+        </p>
+      </div>
+      <button
+        type="submit"
+        form="settingsForm"
+        class="btn btn-primary"
+        style="padding: 0.875rem 2rem; font-weight: 600"
+      >
+        <i class="fas fa-save" style="margin-right: 0.5rem"></i>Save All Changes
+      </button>
+    </div>
+
+    <form method="POST" id="settingsForm" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- Custom Tabs -->
+      <div class="card" style="overflow: hidden">
+        <!-- Tab Navigation -->
+        <div
+          style="
+            display: flex;
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--gray-50);
+            overflow-x: auto;
+          "
+        >
+          <button
+            type="button"
+            onclick="switchTab('basic')"
+            id="tab-basic"
+            class="tab-btn active"
+            style="
+              padding: 1rem 1.5rem;
+              border: none;
+              background: transparent;
+              font-weight: 500;
+              color: var(--gray-600);
+              cursor: pointer;
+              border-bottom: 3px solid transparent;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              white-space: nowrap;
+            "
+          >
+            <i class="fas fa-sliders-h"></i>General
+          </button>
+          <button
+            type="button"
+            onclick="switchTab('theme')"
+            id="tab-theme"
+            class="tab-btn"
+            style="
+              padding: 1rem 1.5rem;
+              border: none;
+              background: transparent;
+              font-weight: 500;
+              color: var(--gray-600);
+              cursor: pointer;
+              border-bottom: 3px solid transparent;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              white-space: nowrap;
+            "
+          >
+            <i class="fas fa-palette"></i>Visual Theme
+          </button>
+          <button
+            type="button"
+            onclick="switchTab('contact')"
+            id="tab-contact"
+            class="tab-btn"
+            style="
+              padding: 1rem 1.5rem;
+              border: none;
+              background: transparent;
+              font-weight: 500;
+              color: var(--gray-600);
+              cursor: pointer;
+              border-bottom: 3px solid transparent;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              white-space: nowrap;
+            "
+          >
+            <i class="fas fa-address-book"></i>Contact & Social
+          </button>
+          <button
+            type="button"
+            onclick="switchTab('shipping')"
+            id="tab-shipping"
+            class="tab-btn"
+            style="
+              padding: 1rem 1.5rem;
+              border: none;
+              background: transparent;
+              font-weight: 500;
+              color: var(--gray-600);
+              cursor: pointer;
+              border-bottom: 3px solid transparent;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              white-space: nowrap;
+            "
+          >
+            <i class="fas fa-truck"></i>Shipping & Tax
+          </button>
+          <button
+            type="button"
+            onclick="switchTab('notifications')"
+            id="tab-notifications"
+            class="tab-btn"
+            style="
+              padding: 1rem 1.5rem;
+              border: none;
+              background: transparent;
+              font-weight: 500;
+              color: var(--gray-600);
+              cursor: pointer;
+              border-bottom: 3px solid transparent;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              white-space: nowrap;
+            "
+          >
+            <i class="fas fa-bell"></i>Notifications
+          </button>
+          <button
+            type="button"
+            onclick="switchTab('advanced')"
+            id="tab-advanced"
+            class="tab-btn"
+            style="
+              padding: 1rem 1.5rem;
+              border: none;
+              background: transparent;
+              font-weight: 500;
+              color: var(--gray-600);
+              cursor: pointer;
+              border-bottom: 3px solid transparent;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              white-space: nowrap;
+            "
+          >
+            <i class="fas fa-tools"></i>Advanced
+          </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div style="padding: 2rem">
+          <!-- General Tab -->
+          <div id="content-basic" class="tab-content" style="display: block">
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+              "
+            >
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  Site Name <span style="color: var(--danger)">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="site_name"
+                  value="{{ settings.site_name }}"
+                  style="
+                    width: 100%;
+                    padding: 0.75rem 1rem;
+                    border: 1px solid var(--gray-200);
+                    border-radius: var(--radius);
+                    font-size: 0.9375rem;
+                    transition: all 0.2s;
+                  "
+                  onfocus="
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                  "
+                  onblur="
+                    this.style.borderColor = 'var(--gray-200)';
+                    this.style.boxShadow = 'none';
+                  "
+                />
+              </div>
+
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  Currency Symbol
+                </label>
+                <input
+                  type="text"
+                  name="currency_symbol"
+                  value="{{ settings.currency_symbol }}"
+                  style="
+                    width: 100%;
+                    padding: 0.75rem 1rem;
+                    border: 1px solid var(--gray-200);
+                    border-radius: var(--radius);
+                    font-size: 0.9375rem;
+                    transition: all 0.2s;
+                  "
+                  onfocus="
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                  "
+                  onblur="
+                    this.style.borderColor = 'var(--gray-200)';
+                    this.style.boxShadow = 'none';
+                  "
+                />
+              </div>
+
+              <div class="form-group" style="grid-column: 1 / -1">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  Site Description
+                </label>
+                <textarea
+                  name="site_description"
+                  rows="3"
+                  style="
+                    width: 100%;
+                    padding: 0.75rem 1rem;
+                    border: 1px solid var(--gray-200);
+                    border-radius: var(--radius);
+                    font-size: 0.9375rem;
+                    resize: vertical;
+                    transition: all 0.2s;
+                    font-family: inherit;
+                  "
+                  onfocus="
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                  "
+                  onblur="
+                    this.style.borderColor = 'var(--gray-200)';
+                    this.style.boxShadow = 'none';
+                  "
+                >
+{{ settings.site_description }}</textarea
+                >
+              </div>
+
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  Site Logo
+                </label>
+                <div style="display: flex; gap: 1rem; align-items: center">
+                  <input
+                    type="file"
+                    name="logo"
+                    style="
+                      flex: 1;
+                      padding: 0.5rem;
+                      border: 1px solid var(--gray-200);
+                      border-radius: var(--radius);
+                      font-size: 0.875rem;
+                    "
+                  />
+                  {% if settings.logo %}
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 0.5rem;
+                      padding: 0.5rem 1rem;
+                      background: var(--gray-50);
+                      border-radius: var(--radius);
+                    "
+                  >
+                    <i class="fas fa-image" style="color: var(--gray-400)"></i>
+                    <span style="font-size: 0.875rem; color: var(--gray-600)"
+                      >{{ settings.logo.name }}</span
+                    >
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  Favicon
+                </label>
+                <div style="display: flex; gap: 1rem; align-items: center">
+                  <input
+                    type="file"
+                    name="favicon"
+                    accept=".ico,.png"
+                    style="
+                      flex: 1;
+                      padding: 0.5rem;
+                      border: 1px solid var(--gray-200);
+                      border-radius: var(--radius);
+                      font-size: 0.875rem;
+                    "
+                  />
+                  {% if settings.favicon %}
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 0.5rem;
+                      padding: 0.5rem 1rem;
+                      background: var(--gray-50);
+                      border-radius: var(--radius);
+                    "
+                  >
+                    <i class="fas fa-star" style="color: var(--gray-400)"></i>
+                    <span style="font-size: 0.875rem; color: var(--gray-600)"
+                      >Current favicon set</span
+                    >
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visual Theme Tab -->
+          <div id="content-theme" class="tab-content" style="display: none">
+            <div
+              style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem"
+            >
+              <!-- Left: Color Pickers -->
+              <div>
+                <h3
+                  style="
+                    font-size: 1.125rem;
+                    font-weight: 600;
+                    margin-bottom: 1.5rem;
+                    color: var(--gray-800);
+                  "
+                >
+                  Brand Colors
+                </h3>
+
+                <!-- Primary Color -->
+                <div style="margin-bottom: 1.5rem">
+                  <label
+                    style="
+                      display: block;
+                      color: var(--gray-600);
+                      font-size: 0.875rem;
+                      font-weight: 500;
+                      margin-bottom: 0.75rem;
+                    "
+                  >
+                    Primary Color
+                  </label>
+                  <div style="display: flex; gap: 1rem; align-items: center">
+                    <div
+                      style="
+                        position: relative;
+                        width: 64px;
+                        height: 64px;
+                        border-radius: var(--radius);
+                        overflow: hidden;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                        flex-shrink: 0;
+                      "
+                    >
+                      <input
+                        type="color"
+                        name="primary_color"
+                        id="primaryColor"
+                        value="{{ settings.primary_color|default:'#6B21A8' }}"
+                        oninput="updateThemePreview()"
+                        style="
+                          position: absolute;
+                          inset: -20px;
+                          width: 104px;
+                          height: 104px;
+                          padding: 0;
+                          border: none;
+                          cursor: pointer;
+                        "
+                      />
+                    </div>
+                    <div style="flex: 1">
+                      <input
+                        type="text"
+                        id="primaryHex"
+                        value="{{ settings.primary_color|default:'#6B21A8' }}"
+                        oninput="updateColorFromHex('primaryColor', this.value)"
+                        style="
+                          width: 100%;
+                          padding: 0.625rem 1rem;
+                          border: 1px solid var(--gray-200);
+                          border-radius: var(--radius);
+                          font-size: 0.875rem;
+                          font-family: monospace;
+                          text-transform: uppercase;
+                        "
+                      />
+                      <p
+                        style="
+                          margin: 0.375rem 0 0 0;
+                          color: var(--gray-500);
+                          font-size: 0.8125rem;
+                        "
+                      >
+                        Buttons, links, primary actions
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Secondary Color -->
+                <div style="margin-bottom: 1.5rem">
+                  <label
+                    style="
+                      display: block;
+                      color: var(--gray-600);
+                      font-size: 0.875rem;
+                      font-weight: 500;
+                      margin-bottom: 0.75rem;
+                    "
+                  >
+                    Secondary Color
+                  </label>
+                  <div style="display: flex; gap: 1rem; align-items: center">
+                    <div
+                      style="
+                        position: relative;
+                        width: 64px;
+                        height: 64px;
+                        border-radius: var(--radius);
+                        overflow: hidden;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                        flex-shrink: 0;
+                      "
+                    >
+                      <input
+                        type="color"
+                        name="secondary_color"
+                        id="secondaryColor"
+                        value="{{ settings.secondary_color|default:'#8B5CF6' }}"
+                        oninput="updateThemePreview()"
+                        style="
+                          position: absolute;
+                          inset: -20px;
+                          width: 104px;
+                          height: 104px;
+                          padding: 0;
+                          border: none;
+                          cursor: pointer;
+                        "
+                      />
+                    </div>
+                    <div style="flex: 1">
+                      <input
+                        type="text"
+                        id="secondaryHex"
+                        value="{{ settings.secondary_color|default:'#8B5CF6' }}"
+                        oninput="
+                          updateColorFromHex('secondaryColor', this.value)
+                        "
+                        style="
+                          width: 100%;
+                          padding: 0.625rem 1rem;
+                          border: 1px solid var(--gray-200);
+                          border-radius: var(--radius);
+                          font-size: 0.875rem;
+                          font-family: monospace;
+                          text-transform: uppercase;
+                        "
+                      />
+                      <p
+                        style="
+                          margin: 0.375rem 0 0 0;
+                          color: var(--gray-500);
+                          font-size: 0.8125rem;
+                        "
+                      >
+                        Secondary buttons, accents
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Accent Color -->
+                <div style="margin-bottom: 1.5rem">
+                  <label
+                    style="
+                      display: block;
+                      color: var(--gray-600);
+                      font-size: 0.875rem;
+                      font-weight: 500;
+                      margin-bottom: 0.75rem;
+                    "
+                  >
+                    Accent Color
+                  </label>
+                  <div style="display: flex; gap: 1rem; align-items: center">
+                    <div
+                      style="
+                        position: relative;
+                        width: 64px;
+                        height: 64px;
+                        border-radius: var(--radius);
+                        overflow: hidden;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                        flex-shrink: 0;
+                      "
+                    >
+                      <input
+                        type="color"
+                        name="accent_color"
+                        id="accentColor"
+                        value="{{ settings.accent_color|default:'#F59E0B' }}"
+                        oninput="updateThemePreview()"
+                        style="
+                          position: absolute;
+                          inset: -20px;
+                          width: 104px;
+                          height: 104px;
+                          padding: 0;
+                          border: none;
+                          cursor: pointer;
+                        "
+                      />
+                    </div>
+                    <div style="flex: 1">
+                      <input
+                        type="text"
+                        id="accentHex"
+                        value="{{ settings.accent_color|default:'#F59E0B' }}"
+                        oninput="updateColorFromHex('accentColor', this.value)"
+                        style="
+                          width: 100%;
+                          padding: 0.625rem 1rem;
+                          border: 1px solid var(--gray-200);
+                          border-radius: var(--radius);
+                          font-size: 0.875rem;
+                          font-family: monospace;
+                          text-transform: uppercase;
+                        "
+                      />
+                      <p
+                        style="
+                          margin: 0.375rem 0 0 0;
+                          color: var(--gray-500);
+                          font-size: 0.8125rem;
+                        "
+                      >
+                        Highlights, warnings, badges
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Dark Mode Toggle -->
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 1.25rem;
+                    background: var(--gray-50);
+                    border-radius: var(--radius);
+                    margin-top: 1rem;
+                  "
+                >
+                  <div>
+                    <h4
+                      style="
+                        font-size: 1rem;
+                        font-weight: 600;
+                        margin-bottom: 0.25rem;
+                        color: var(--gray-800);
+                      "
+                    >
+                      Dark Mode Default
+                    </h4>
+                    <p
+                      style="
+                        margin: 0;
+                        color: var(--gray-500);
+                        font-size: 0.875rem;
+                      "
+                    >
+                      Enable dark mode by default for all visitors
+                    </p>
+                  </div>
+                  <label
+                    style="
+                      position: relative;
+                      display: inline-block;
+                      width: 52px;
+                      height: 28px;
+                    "
+                  >
+                    <input
+                      type="checkbox"
+                      name="dark_mode_default"
+                      {%
+                      if
+                      settings.dark_mode_default
+                      %}checked{%
+                      endif
+                      %}
+                      style="opacity: 0; width: 0; height: 0"
+                    />
+                    <span
+                      style="
+                        position: absolute;
+                        cursor: pointer;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: var(--gray-300);
+                        transition: 0.3s;
+                        border-radius: 28px;
+                      "
+                      class="toggle-slider"
+                    ></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Right: Live Preview -->
+              <div>
+                <h3
+                  style="
+                    font-size: 1.125rem;
+                    font-weight: 600;
+                    margin-bottom: 1.5rem;
+                    color: var(--gray-800);
+                  "
+                >
+                  <i class="fas fa-eye" style="margin-right: 0.5rem"></i>Live
+                  Preview
+                </h3>
+                <div
+                  style="
+                    padding: 1.5rem;
+                    background: var(--gray-50);
+                    border-radius: var(--radius);
+                    border: 1px solid var(--gray-200);
+                  "
+                >
+                  <!-- Preview Header -->
+                  <div
+                    style="
+                      padding: 1rem;
+                      background: white;
+                      border-radius: var(--radius);
+                      margin-bottom: 1rem;
+                      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                    "
+                  >
+                    <div
+                      style="
+                        width: 40%;
+                        height: 12px;
+                        background: var(--gray-200);
+                        border-radius: 2px;
+                        margin-bottom: 0.75rem;
+                      "
+                    ></div>
+                    <div
+                      style="
+                        width: 70%;
+                        height: 8px;
+                        background: var(--gray-100);
+                        border-radius: 2px;
+                      "
+                    ></div>
+                  </div>
+
+                  <!-- Preview Buttons -->
+                  <div
+                    style="
+                      display: flex;
+                      gap: 0.75rem;
+                      margin-bottom: 1rem;
+                      flex-wrap: wrap;
+                    "
+                  >
+                    <button
+                      type="button"
+                      id="previewPrimaryBtn"
+                      style="
+                        padding: 0.5rem 1rem;
+                        border: none;
+                        border-radius: var(--radius);
+                        color: white;
+                        font-size: 0.875rem;
+                        font-weight: 500;
+                      "
+                    >
+                      Primary
+                    </button>
+                    <button
+                      type="button"
+                      id="previewSecondaryBtn"
+                      style="
+                        padding: 0.5rem 1rem;
+                        border: none;
+                        border-radius: var(--radius);
+                        color: white;
+                        font-size: 0.875rem;
+                        font-weight: 500;
+                      "
+                    >
+                      Secondary
+                    </button>
+                    <span
+                      id="previewAccentBadge"
+                      style="
+                        padding: 0.375rem 0.75rem;
+                        border-radius: var(--radius);
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                      "
+                    >
+                      SALE
+                    </span>
+                  </div>
+
+                  <!-- Preview Link -->
+                  <div style="padding: 0.75rem">
+                    <a
+                      href="#"
+                      id="previewLink"
+                      style="
+                        text-decoration: none;
+                        font-size: 0.875rem;
+                        font-weight: 500;
+                      "
+                      >Sample link text</a
+                    >
+                  </div>
+                </div>
+
+                <!-- Preset Themes -->
+                <div style="margin-top: 1.5rem">
+                  <h4
+                    style="
+                      font-size: 0.9375rem;
+                      font-weight: 600;
+                      margin-bottom: 0.75rem;
+                      color: var(--gray-700);
+                    "
+                  >
+                    Quick Presets
+                  </h4>
+                  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap">
+                    <button
+                      type="button"
+                      onclick="applyPreset('purple')"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        padding: 0.5rem 1rem;
+                        border: 1px solid var(--gray-200);
+                        border-radius: var(--radius);
+                        background: white;
+                        cursor: pointer;
+                        font-size: 0.875rem;
+                      "
+                    >
+                      <span
+                        style="
+                          width: 16px;
+                          height: 16px;
+                          border-radius: 50%;
+                          background: linear-gradient(135deg, #6b21a8, #8b5cf6);
+                        "
+                      ></span>
+                      Purple
+                    </button>
+                    <button
+                      type="button"
+                      onclick="applyPreset('blue')"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        padding: 0.5rem 1rem;
+                        border: 1px solid var(--gray-200);
+                        border-radius: var(--radius);
+                        background: white;
+                        cursor: pointer;
+                        font-size: 0.875rem;
+                      "
+                    >
+                      <span
+                        style="
+                          width: 16px;
+                          height: 16px;
+                          border-radius: 50%;
+                          background: linear-gradient(135deg, #1e40af, #3b82f6);
+                        "
+                      ></span>
+                      Blue
+                    </button>
+                    <button
+                      type="button"
+                      onclick="applyPreset('rose')"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        padding: 0.5rem 1rem;
+                        border: 1px solid var(--gray-200);
+                        border-radius: var(--radius);
+                        background: white;
+                        cursor: pointer;
+                        font-size: 0.875rem;
+                      "
+                    >
+                      <span
+                        style="
+                          width: 16px;
+                          height: 16px;
+                          border-radius: 50%;
+                          background: linear-gradient(135deg, #be123c, #fb7185);
+                        "
+                      ></span>
+                      Rose
+                    </button>
+                    <button
+                      type="button"
+                      onclick="applyPreset('emerald')"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        padding: 0.5rem 1rem;
+                        border: 1px solid var(--gray-200);
+                        border-radius: var(--radius);
+                        background: white;
+                        cursor: pointer;
+                        font-size: 0.875rem;
+                      "
+                    >
+                      <span
+                        style="
+                          width: 16px;
+                          height: 16px;
+                          border-radius: 50%;
+                          background: linear-gradient(135deg, #065f46, #10b981);
+                        "
+                      ></span>
+                      Emerald
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Tab -->
+          <div id="content-contact" class="tab-content" style="display: none">
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+              "
+            >
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  Contact Email
+                </label>
+                <input
+                  type="email"
+                  name="contact_email"
+                  value="{{ settings.contact_email }}"
+                  style="
+                    width: 100%;
+                    padding: 0.75rem 1rem;
+                    border: 1px solid var(--gray-200);
+                    border-radius: var(--radius);
+                    font-size: 0.9375rem;
+                    transition: all 0.2s;
+                  "
+                  onfocus="
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                  "
+                  onblur="
+                    this.style.borderColor = 'var(--gray-200)';
+                    this.style.boxShadow = 'none';
+                  "
+                />
+              </div>
+
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  Phone Number
+                </label>
+                <input
+                  type="text"
+                  name="contact_phone"
+                  value="{{ settings.contact_phone }}"
+                  style="
+                    width: 100%;
+                    padding: 0.75rem 1rem;
+                    border: 1px solid var(--gray-200);
+                    border-radius: var(--radius);
+                    font-size: 0.9375rem;
+                    transition: all 0.2s;
+                  "
+                  onfocus="
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                  "
+                  onblur="
+                    this.style.borderColor = 'var(--gray-200)';
+                    this.style.boxShadow = 'none';
+                  "
+                />
+              </div>
+
+              <div class="form-group" style="grid-column: 1 / -1">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  Address
+                </label>
+                <textarea
+                  name="contact_address"
+                  rows="2"
+                  style="
+                    width: 100%;
+                    padding: 0.75rem 1rem;
+                    border: 1px solid var(--gray-200);
+                    border-radius: var(--radius);
+                    font-size: 0.9375rem;
+                    resize: vertical;
+                    transition: all 0.2s;
+                    font-family: inherit;
+                  "
+                  onfocus="
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                  "
+                  onblur="
+                    this.style.borderColor = 'var(--gray-200)';
+                    this.style.boxShadow = 'none';
+                  "
+                >
+{{ settings.contact_address }}</textarea
+                >
+              </div>
+
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  <i class="fab fa-instagram" style="margin-right: 0.5rem"></i
+                  >Instagram
+                </label>
+                <input
+                  type="text"
+                  name="instagram_url"
+                  value="{{ settings.instagram_url }}"
+                  placeholder="@username"
+                  style="
+                    width: 100%;
+                    padding: 0.75rem 1rem;
+                    border: 1px solid var(--gray-200);
+                    border-radius: var(--radius);
+                    font-size: 0.9375rem;
+                    transition: all 0.2s;
+                  "
+                  onfocus="
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                  "
+                  onblur="
+                    this.style.borderColor = 'var(--gray-200)';
+                    this.style.boxShadow = 'none';
+                  "
+                />
+              </div>
+
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  <i class="fab fa-facebook" style="margin-right: 0.5rem"></i
+                  >Facebook
+                </label>
+                <input
+                  type="text"
+                  name="facebook_url"
+                  value="{{ settings.facebook_url }}"
+                  placeholder="facebook.com/page"
+                  style="
+                    width: 100%;
+                    padding: 0.75rem 1rem;
+                    border: 1px solid var(--gray-200);
+                    border-radius: var(--radius);
+                    font-size: 0.9375rem;
+                    transition: all 0.2s;
+                  "
+                  onfocus="
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                  "
+                  onblur="
+                    this.style.borderColor = 'var(--gray-200)';
+                    this.style.boxShadow = 'none';
+                  "
+                />
+              </div>
+
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  <i class="fab fa-twitter" style="margin-right: 0.5rem"></i
+                  >Twitter / X
+                </label>
+                <input
+                  type="text"
+                  name="twitter_url"
+                  value="{{ settings.twitter_url }}"
+                  placeholder="@username"
+                  style="
+                    width: 100%;
+                    padding: 0.75rem 1rem;
+                    border: 1px solid var(--gray-200);
+                    border-radius: var(--radius);
+                    font-size: 0.9375rem;
+                    transition: all 0.2s;
+                  "
+                  onfocus="
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                  "
+                  onblur="
+                    this.style.borderColor = 'var(--gray-200)';
+                    this.style.boxShadow = 'none';
+                  "
+                />
+              </div>
+
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  <i class="fab fa-tiktok" style="margin-right: 0.5rem"></i
+                  >TikTok
+                </label>
+                <input
+                  type="text"
+                  name="tiktok_url"
+                  value="{{ settings.tiktok_url }}"
+                  placeholder="@username"
+                  style="
+                    width: 100%;
+                    padding: 0.75rem 1rem;
+                    border: 1px solid var(--gray-200);
+                    border-radius: var(--radius);
+                    font-size: 0.9375rem;
+                    transition: all 0.2s;
+                  "
+                  onfocus="
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                  "
+                  onblur="
+                    this.style.borderColor = 'var(--gray-200)';
+                    this.style.boxShadow = 'none';
+                  "
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Shipping Tab -->
+          <div id="content-shipping" class="tab-content" style="display: none">
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+              "
+            >
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  Free Shipping Threshold ($)
+                </label>
+                <div style="position: relative">
+                  <span
+                    style="
+                      position: absolute;
+                      left: 1rem;
+                      top: 50%;
+                      transform: translateY(-50%);
+                      color: var(--gray-400);
+                    "
+                    >$</span
+                  >
+                  <input
+                    type="number"
+                    name="free_shipping_threshold"
+                    value="{{ settings.free_shipping_threshold }}"
+                    style="
+                      width: 100%;
+                      padding: 0.75rem 1rem 0.75rem 2rem;
+                      border: 1px solid var(--gray-200);
+                      border-radius: var(--radius);
+                      font-size: 0.9375rem;
+                      transition: all 0.2s;
+                    "
+                    onfocus="
+                      this.style.borderColor = 'var(--primary)';
+                      this.style.boxShadow =
+                        '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                    "
+                    onblur="
+                      this.style.borderColor = 'var(--gray-200)';
+                      this.style.boxShadow = 'none';
+                    "
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  Standard Shipping Cost ($)
+                </label>
+                <div style="position: relative">
+                  <span
+                    style="
+                      position: absolute;
+                      left: 1rem;
+                      top: 50%;
+                      transform: translateY(-50%);
+                      color: var(--gray-400);
+                    "
+                    >$</span
+                  >
+                  <input
+                    type="number"
+                    name="standard_shipping_cost"
+                    value="{{ settings.standard_shipping_cost }}"
+                    style="
+                      width: 100%;
+                      padding: 0.75rem 1rem 0.75rem 2rem;
+                      border: 1px solid var(--gray-200);
+                      border-radius: var(--radius);
+                      font-size: 0.9375rem;
+                      transition: all 0.2s;
+                    "
+                    onfocus="
+                      this.style.borderColor = 'var(--primary)';
+                      this.style.boxShadow =
+                        '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                    "
+                    onblur="
+                      this.style.borderColor = 'var(--gray-200)';
+                      this.style.boxShadow = 'none';
+                    "
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  Express Shipping Cost ($)
+                </label>
+                <div style="position: relative">
+                  <span
+                    style="
+                      position: absolute;
+                      left: 1rem;
+                      top: 50%;
+                      transform: translateY(-50%);
+                      color: var(--gray-400);
+                    "
+                    >$</span
+                  >
+                  <input
+                    type="number"
+                    name="express_shipping_cost"
+                    value="{{ settings.express_shipping_cost }}"
+                    style="
+                      width: 100%;
+                      padding: 0.75rem 1rem 0.75rem 2rem;
+                      border: 1px solid var(--gray-200);
+                      border-radius: var(--radius);
+                      font-size: 0.9375rem;
+                      transition: all 0.2s;
+                    "
+                    onfocus="
+                      this.style.borderColor = 'var(--primary)';
+                      this.style.boxShadow =
+                        '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                    "
+                    onblur="
+                      this.style.borderColor = 'var(--gray-200)';
+                      this.style.boxShadow = 'none';
+                    "
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  Tax Rate (%)
+                </label>
+                <div style="position: relative">
+                  <input
+                    type="number"
+                    step="0.01"
+                    name="tax_rate"
+                    value="{{ settings.tax_rate }}"
+                    style="
+                      width: 100%;
+                      padding: 0.75rem 1rem;
+                      border: 1px solid var(--gray-200);
+                      border-radius: var(--radius);
+                      font-size: 0.9375rem;
+                      transition: all 0.2s;
+                    "
+                    onfocus="
+                      this.style.borderColor = 'var(--primary)';
+                      this.style.boxShadow =
+                        '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                    "
+                    onblur="
+                      this.style.borderColor = 'var(--gray-200)';
+                      this.style.boxShadow = 'none';
+                    "
+                  />
+                  <span
+                    style="
+                      position: absolute;
+                      right: 1rem;
+                      top: 50%;
+                      transform: translateY(-50%);
+                      color: var(--gray-400);
+                    "
+                    >%</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="
+                margin-top: 1.5rem;
+                padding: 1rem 1.25rem;
+                background: var(--gray-50);
+                border-radius: var(--radius);
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+              "
+            >
+              <i class="fas fa-info-circle" style="color: var(--info)"></i>
+              <p style="margin: 0; color: var(--gray-600); font-size: 0.875rem">
+                Changes to shipping and tax settings will apply to all new
+                orders immediately.
+              </p>
+            </div>
+          </div>
+
+          <!-- Notifications Tab -->
+          <div
+            id="content-notifications"
+            class="tab-content"
+            style="display: none"
+          >
+            <div style="display: grid; gap: 1.5rem">
+              <!-- Toggle Switch -->
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  padding: 1.25rem;
+                  background: var(--gray-50);
+                  border-radius: var(--radius);
+                "
+              >
+                <div>
+                  <h4
+                    style="
+                      font-size: 1rem;
+                      font-weight: 600;
+                      margin-bottom: 0.25rem;
+                      color: var(--gray-800);
+                    "
+                  >
+                    Notify Admin on New Orders
+                  </h4>
+                  <p
+                    style="
+                      margin: 0;
+                      color: var(--gray-500);
+                      font-size: 0.875rem;
+                    "
+                  >
+                    Receive an email notification for every new order placed
+                  </p>
+                </div>
+                <label
+                  style="
+                    position: relative;
+                    display: inline-block;
+                    width: 52px;
+                    height: 28px;
+                  "
+                >
+                  <input
+                    type="checkbox"
+                    name="notify_on_new_order"
+                    {%
+                    if
+                    settings.notify_on_new_order
+                    %}checked{%
+                    endif
+                    %}
+                    style="opacity: 0; width: 0; height: 0"
+                  />
+                  <span
+                    style="
+                      position: absolute;
+                      cursor: pointer;
+                      top: 0;
+                      left: 0;
+                      right: 0;
+                      bottom: 0;
+                      background: var(--gray-300);
+                      transition: 0.3s;
+                      border-radius: 28px;
+                    "
+                    class="toggle-slider"
+                  ></span>
+                </label>
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  padding: 1.25rem;
+                  background: var(--gray-50);
+                  border-radius: var(--radius);
+                "
+              >
+                <div>
+                  <h4
+                    style="
+                      font-size: 1rem;
+                      font-weight: 600;
+                      margin-bottom: 0.25rem;
+                      color: var(--gray-800);
+                    "
+                  >
+                    Low Stock Alerts
+                  </h4>
+                  <p
+                    style="
+                      margin: 0;
+                      color: var(--gray-500);
+                      font-size: 0.875rem;
+                    "
+                  >
+                    Get notified when products run low on inventory
+                  </p>
+                </div>
+                <label
+                  style="
+                    position: relative;
+                    display: inline-block;
+                    width: 52px;
+                    height: 28px;
+                  "
+                >
+                  <input
+                    type="checkbox"
+                    name="low_stock_alerts"
+                    {%
+                    if
+                    settings.low_stock_alerts
+                    %}checked{%
+                    endif
+                    %}
+                    style="opacity: 0; width: 0; height: 0"
+                  />
+                  <span
+                    style="
+                      position: absolute;
+                      cursor: pointer;
+                      top: 0;
+                      left: 0;
+                      right: 0;
+                      bottom: 0;
+                      background: var(--gray-300);
+                      transition: 0.3s;
+                      border-radius: 28px;
+                    "
+                    class="toggle-slider"
+                  ></span>
+                </label>
+              </div>
+
+              <div class="form-group">
+                <label
+                  style="
+                    display: block;
+                    color: var(--gray-500);
+                    font-size: 0.875rem;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                >
+                  Admin Notification Email
+                </label>
+                <input
+                  type="email"
+                  name="admin_notification_email"
+                  value="{{ settings.admin_notification_email }}"
+                  style="
+                    width: 100%;
+                    max-width: 400px;
+                    padding: 0.75rem 1rem;
+                    border: 1px solid var(--gray-200);
+                    border-radius: var(--radius);
+                    font-size: 0.9375rem;
+                    transition: all 0.2s;
+                  "
+                  onfocus="
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                  "
+                  onblur="
+                    this.style.borderColor = 'var(--gray-200)';
+                    this.style.boxShadow = 'none';
+                  "
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Advanced Tab -->
+          <div id="content-advanced" class="tab-content" style="display: none">
+            <div style="display: grid; gap: 1.5rem">
+              <!-- Maintenance Mode Warning -->
+              <div
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    rgba(245, 158, 11, 0.08) 0%,
+                    rgba(217, 119, 6, 0.08) 100%
+                  );
+                  border: 1px solid rgba(245, 158, 11, 0.3);
+                  border-radius: var(--radius);
+                  padding: 1.5rem;
+                "
+              >
+                <div style="display: flex; align-items: flex-start; gap: 1rem">
+                  <i
+                    class="fas fa-exclamation-triangle"
+                    style="
+                      color: var(--warning);
+                      font-size: 1.5rem;
+                      margin-top: 0.25rem;
+                    "
+                  ></i>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        margin-bottom: 0.75rem;
+                      "
+                    >
+                      <h4
+                        style="
+                          font-size: 1.125rem;
+                          font-weight: 600;
+                          color: var(--gray-800);
+                          margin: 0;
+                        "
+                      >
+                        Maintenance Mode
+                      </h4>
+                      <label
+                        style="
+                          position: relative;
+                          display: inline-block;
+                          width: 52px;
+                          height: 28px;
+                        "
+                      >
+                        <input
+                          type="checkbox"
+                          name="maintenance_mode"
+                          {%
+                          if
+                          settings.maintenance_mode
+                          %}checked{%
+                          endif
+                          %}
+                          style="opacity: 0; width: 0; height: 0"
+                        />
+                        <span
+                          style="
+                            position: absolute;
+                            cursor: pointer;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            background: var(--gray-300);
+                            transition: 0.3s;
+                            border-radius: 28px;
+                          "
+                          class="toggle-slider"
+                        ></span>
+                      </label>
+                    </div>
+                    <p
+                      style="
+                        margin: 0 0 1rem 0;
+                        color: var(--gray-600);
+                        font-size: 0.9375rem;
+                      "
+                    >
+                      When enabled, this will block public access to the store
+                      and display a maintenance message to visitors.
+                    </p>
+
+                    <div class="form-group">
+                      <label
+                        style="
+                          display: block;
+                          color: var(--gray-500);
+                          font-size: 0.875rem;
+                          margin-bottom: 0.5rem;
+                          font-weight: 500;
+                        "
+                      >
+                        Maintenance Message
+                      </label>
+                      <textarea
+                        name="maintenance_message"
+                        rows="3"
+                        placeholder="We'll be back soon! Our site is currently undergoing maintenance."
+                        style="
+                          width: 100%;
+                          padding: 0.75rem 1rem;
+                          border: 1px solid var(--gray-200);
+                          border-radius: var(--radius);
+                          font-size: 0.9375rem;
+                          resize: vertical;
+                          transition: all 0.2s;
+                          font-family: inherit;
+                        "
+                        onfocus="
+                          this.style.borderColor = 'var(--primary)';
+                          this.style.boxShadow =
+                            '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                        "
+                        onblur="
+                          this.style.borderColor = 'var(--gray-200)';
+                          this.style.boxShadow = 'none';
+                        "
+                      >
+{{ settings.maintenance_message }}</textarea
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Analytics -->
+              <div
+                style="
+                  padding: 1.25rem;
+                  background: var(--gray-50);
+                  border-radius: var(--radius);
+                "
+              >
+                <h4
+                  style="
+                    font-size: 1rem;
+                    font-weight: 600;
+                    margin-bottom: 1rem;
+                    color: var(--gray-800);
+                  "
+                >
+                  <i
+                    class="fas fa-chart-line"
+                    style="color: var(--primary); margin-right: 0.5rem"
+                  ></i
+                  >Analytics
+                </h4>
+                <div class="form-group">
+                  <label
+                    style="
+                      display: block;
+                      color: var(--gray-500);
+                      font-size: 0.875rem;
+                      margin-bottom: 0.5rem;
+                      font-weight: 500;
+                    "
+                  >
+                    Google Analytics ID (optional)
+                  </label>
+                  <input
+                    type="text"
+                    name="google_analytics_id"
+                    value="{{ settings.google_analytics_id }}"
+                    placeholder="G-XXXXXXXXXX"
+                    style="
+                      width: 100%;
+                      max-width: 300px;
+                      padding: 0.75rem 1rem;
+                      border: 1px solid var(--gray-200);
+                      border-radius: var(--radius);
+                      font-size: 0.9375rem;
+                      transition: all 0.2s;
+                    "
+                    onfocus="
+                      this.style.borderColor = 'var(--primary)';
+                      this.style.boxShadow =
+                        '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                    "
+                    onblur="
+                      this.style.borderColor = 'var(--gray-200)';
+                      this.style.boxShadow = 'none';
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<style>
+  .tab-btn.active {
+    color: var(--primary) !important;
+    border-bottom-color: var(--primary) !important;
+    background: white !important;
+  }
+
+  input:checked + .toggle-slider {
+    background: var(--primary) !important;
+  }
+
+  input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+  }
+
+  .toggle-slider:before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background: white;
+    transition: 0.3s;
+    border-radius: 50%;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+  }
+</style>
+
+<script>
+  function switchTab(tabName) {
+    // Hide all content
+    document.querySelectorAll(".tab-content").forEach((el) => {
+      el.style.display = "none";
+    });
+
+    // Remove active from all tabs
+    document.querySelectorAll(".tab-btn").forEach((el) => {
+      el.classList.remove("active");
+    });
+
+    // Show selected content
+    document.getElementById("content-" + tabName).style.display = "block";
+
+    // Add active to selected tab
+    document.getElementById("tab-" + tabName).classList.add("active");
+  }
+
+  // Theme preview functions
+  function updateThemePreview() {
+    const primary = document.getElementById("primaryColor").value;
+    const secondary = document.getElementById("secondaryColor").value;
+    const accent = document.getElementById("accentColor").value;
+
+    document.getElementById("primaryHex").value = primary.toUpperCase();
+    document.getElementById("secondaryHex").value = secondary.toUpperCase();
+    document.getElementById("accentHex").value = accent.toUpperCase();
+
+    document.getElementById("previewPrimaryBtn").style.background = primary;
+    document.getElementById("previewSecondaryBtn").style.background = secondary;
+    document.getElementById("previewAccentBadge").style.background =
+      accent + "20";
+    document.getElementById("previewAccentBadge").style.color = accent;
+    document.getElementById("previewLink").style.color = primary;
+  }
+
+  function updateColorFromHex(colorId, hexValue) {
+    if (/^#[0-9A-F]{6}$/i.test(hexValue)) {
+      document.getElementById(colorId).value = hexValue;
+      updateThemePreview();
+    }
+  }
+
+  function applyPreset(theme) {
+    const presets = {
+      purple: { primary: "#6B21A8", secondary: "#8B5CF6", accent: "#F59E0B" },
+      blue: { primary: "#1E40AF", secondary: "#3B82F6", accent: "#F59E0B" },
+      rose: { primary: "#BE123C", secondary: "#FB7185", accent: "#F59E0B" },
+      emerald: { primary: "#065F46", secondary: "#10B981", accent: "#F59E0B" },
+    };
+
+    const preset = presets[theme];
+    document.getElementById("primaryColor").value = preset.primary;
+    document.getElementById("secondaryColor").value = preset.secondary;
+    document.getElementById("accentColor").value = preset.accent;
+    updateThemePreview();
+  }
+
+  // Initialize theme preview on load
+  document.addEventListener("DOMContentLoaded", updateThemePreview);
+</script>
+{% endblock %}

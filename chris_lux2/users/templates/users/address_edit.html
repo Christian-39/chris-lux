@@ -1,0 +1,241 @@
+{% extends 'base.html' %} {% block title %}Shipping Address - {{
+site_settings.site_name|default:"Chris-Lux" }}{% endblock %} {% block content %}
+<section class="section">
+  <div class="container">
+    <div
+      class="profile-layout"
+      style="display: grid; grid-template-columns: 280px 1fr; gap: 2rem"
+    >
+      <!-- Sidebar -->
+      <aside class="profile-sidebar">
+        <div class="card" style="text-align: center; padding: 2rem">
+          <div
+            class="profile-avatar"
+            style="
+              width: 120px;
+              height: 120px;
+              border-radius: 50%;
+              overflow: hidden;
+              margin: 0 auto 1.5rem;
+              background: var(--primary);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-size: 3rem;
+            "
+          >
+            {% if request.user.profile_image %}
+            <img
+              src="{{ request.user.profile_image.url }}"
+              alt="{{ request.user.get_full_name }}"
+              style="width: 100%; height: 100%; object-fit: cover"
+            />
+            {% else %} {{
+            request.user.first_name|first|default:request.user.username|first }}
+            {% endif %}
+          </div>
+          <h2 style="font-size: 1.25rem; margin-bottom: 0.25rem">
+            {{ request.user.get_full_name|default:request.user.username }}
+          </h2>
+          <p style="color: var(--gray-500); font-size: 0.875rem">
+            {{ request.user.email }}
+          </p>
+
+          <div
+            style="
+              margin-top: 1.5rem;
+              padding-top: 1.5rem;
+              border-top: 1px solid var(--gray-200);
+            "
+          >
+            <nav style="display: flex; flex-direction: column; gap: 0.5rem">
+              <a
+                href="{% url 'users:profile' %}"
+                class="btn btn-secondary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-user"></i> Profile
+              </a>
+              <a
+                href="{% url 'users:order_history' %}"
+                class="btn btn-secondary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-shopping-bag"></i> My Orders
+              </a>
+              <a
+                href="{% url 'products:wishlist' %}"
+                class="btn btn-secondary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-heart"></i> Wishlist
+              </a>
+              <a
+                href="{% url 'users:profile_edit' %}"
+                class="btn btn-secondary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-edit"></i> Edit Profile
+              </a>
+              <a
+                href="{% url 'users:preferences' %}"
+                class="btn btn-secondary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-cog"></i> Settings
+              </a>
+            </nav>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="profile-content">
+        <div class="card">
+          <div
+            style="padding: 1.5rem; border-bottom: 1px solid var(--gray-200)"
+          >
+            <h2 style="font-size: 1.25rem">Shipping Address</h2>
+            <p
+              style="
+                color: var(--gray-500);
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+              "
+            >
+              Manage your delivery address for orders
+            </p>
+          </div>
+          <div style="padding: 1.5rem">
+            <form method="POST">
+              {% csrf_token %}
+
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 1.5rem;
+                "
+              >
+                {% for field in form %}
+                <div
+                  class="form-group"
+                  style="{% if field.name == 'address_line_1' or field.name == 'address' or field.name == 'street_address' %}grid-column: 1 / -1;{% endif %}"
+                >
+                  <label
+                    style="
+                      display: block;
+                      color: var(--gray-500);
+                      font-size: 0.875rem;
+                      margin-bottom: 0.5rem;
+                      font-weight: 500;
+                    "
+                  >
+                    {{ field.label }} {% if field.field.required %}<span
+                      style="color: var(--danger)"
+                      >*</span
+                    >{% endif %}
+                  </label>
+                  {{ field }} {% if field.errors %}
+                  <div
+                    style="
+                      color: var(--danger);
+                      font-size: 0.875rem;
+                      margin-top: 0.25rem;
+                    "
+                  >
+                    {{ field.errors }}
+                  </div>
+                  {% endif %}
+                </div>
+                {% endfor %}
+              </div>
+
+              <div
+                style="
+                  margin-top: 2rem;
+                  padding-top: 1.5rem;
+                  border-top: 1px solid var(--gray-200);
+                  display: flex;
+                  gap: 1rem;
+                  align-items: center;
+                "
+              >
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> Update Address
+                </button>
+                <a href="{% url 'users:profile' %}" class="btn btn-secondary">
+                  Cancel
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Address Preview Card -->
+        {% if request.user.address %}
+        <div
+          class="card"
+          style="
+            margin-top: 1.5rem;
+            background: linear-gradient(
+              135deg,
+              rgba(107, 33, 168, 0.05) 0%,
+              rgba(139, 92, 246, 0.05) 100%
+            );
+            border: 1px solid rgba(107, 33, 168, 0.1);
+          "
+        >
+          <div style="padding: 1.5rem">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+                color: var(--primary);
+              "
+            >
+              <i class="fas fa-map-marker-alt" style="font-size: 1.25rem"></i>
+              <span style="font-weight: 600">Current Address</span>
+            </div>
+            <address
+              style="
+                font-style: normal;
+                color: var(--gray-700);
+                line-height: 1.6;
+              "
+            >
+              {{ request.user.address }}<br />
+              {{ request.user.city }}, {{ request.user.state }} {{
+              request.user.postal_code }}<br />
+              {{ request.user.country }}
+            </address>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    background: white;
+  }
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(107, 33, 168, 0.1);
+  }
+</style>
+{% endblock %}

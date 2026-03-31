@@ -1,0 +1,219 @@
+{% extends 'base.html' %} {% block title %}Account Settings - {{
+site_settings.site_name|default:"Chris-Lux" }}{% endblock %} {% block content %}
+<section class="section">
+  <div class="container">
+    <div
+      class="profile-layout"
+      style="display: grid; grid-template-columns: 280px 1fr; gap: 2rem"
+    >
+      <!-- Sidebar -->
+      <aside class="profile-sidebar">
+        <div class="card" style="text-align: center; padding: 2rem">
+          <div
+            class="profile-avatar"
+            style="
+              width: 120px;
+              height: 120px;
+              border-radius: 50%;
+              overflow: hidden;
+              margin: 0 auto 1.5rem;
+              background: var(--primary);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-size: 3rem;
+            "
+          >
+            {% if request.user.profile_image %}
+            <img
+              src="{{ request.user.profile_image.url }}"
+              alt="{{ request.user.get_full_name }}"
+              style="width: 100%; height: 100%; object-fit: cover"
+            />
+            {% else %} {{
+            request.user.first_name|first|default:request.user.username|first }}
+            {% endif %}
+          </div>
+          <h2 style="font-size: 1.25rem; margin-bottom: 0.25rem">
+            {{ request.user.get_full_name|default:request.user.username }}
+          </h2>
+          <p style="color: var(--gray-500); font-size: 0.875rem">
+            {{ request.user.email }}
+          </p>
+
+          <div
+            style="
+              margin-top: 1.5rem;
+              padding-top: 1.5rem;
+              border-top: 1px solid var(--gray-200);
+            "
+          >
+            <nav style="display: flex; flex-direction: column; gap: 0.5rem">
+              <a
+                href="{% url 'users:profile' %}"
+                class="btn btn-secondary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-user"></i> Profile
+              </a>
+              <a
+                href="{% url 'users:order_history' %}"
+                class="btn btn-secondary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-shopping-bag"></i> My Orders
+              </a>
+              <a
+                href="{% url 'products:wishlist' %}"
+                class="btn btn-secondary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-heart"></i> Wishlist
+              </a>
+              <a
+                href="{% url 'users:profile_edit' %}"
+                class="btn btn-secondary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-edit"></i> Edit Profile
+              </a>
+              <a
+                href="{% url 'users:preferences' %}"
+                class="btn btn-primary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-cog"></i> Settings
+              </a>
+            </nav>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="profile-content">
+        <div class="card">
+          <div
+            style="padding: 1.5rem; border-bottom: 1px solid var(--gray-200)"
+          >
+            <h2 style="font-size: 1.25rem">Account Preferences</h2>
+            <p
+              style="
+                color: var(--gray-500);
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+              "
+            >
+              Manage your notifications and account settings
+            </p>
+          </div>
+          <div style="padding: 1.5rem">
+            <form method="POST">
+              {% csrf_token %} {% for field in form %}
+              <div
+                class="preference-item"
+                style="
+                  display: flex;
+                  align-items: flex-start;
+                  gap: 1rem;
+                  padding: 1.25rem;
+                  border: 1px solid var(--gray-100);
+                  border-radius: var(--radius);
+                  margin-bottom: 1rem;
+                  transition: all 0.2s;
+                "
+              >
+                <div
+                  class="preference-icon"
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    border-radius: var(--radius);
+                    background: rgba(107, 33, 168, 0.1);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: var(--primary);
+                    flex-shrink: 0;
+                  "
+                >
+                  <i
+                    class="fas fa-{% if 'email' in field.name %}envelope{% elif 'news' in field.name %}newspaper{% elif 'sms' in field.name %}comment{% elif 'privacy' in field.name %}shield-alt{% else %}check-circle{% endif %}"
+                  ></i>
+                </div>
+                <div style="flex: 1">
+                  <label
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 0.75rem;
+                      font-weight: 500;
+                      cursor: pointer;
+                      margin-bottom: 0.25rem;
+                    "
+                  >
+                    {{ field }}
+                    <span>{{ field.label }}</span>
+                  </label>
+                  {% if field.help_text %}
+                  <p
+                    style="
+                      color: var(--gray-500);
+                      font-size: 0.875rem;
+                      margin: 0;
+                    "
+                  >
+                    {{ field.help_text }}
+                  </p>
+                  {% endif %} {% if field.errors %}
+                  <div
+                    style="
+                      color: var(--danger);
+                      font-size: 0.875rem;
+                      margin-top: 0.25rem;
+                    "
+                  >
+                    {{ field.errors }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
+
+              <div
+                style="
+                  margin-top: 2rem;
+                  padding-top: 1.5rem;
+                  border-top: 1px solid var(--gray-200);
+                  display: flex;
+                  gap: 1rem;
+                "
+              >
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> Save Preferences
+                </button>
+                <a href="{% url 'users:profile' %}" class="btn btn-secondary">
+                  Cancel
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .preference-item:hover {
+    border-color: var(--primary);
+    background: rgba(107, 33, 168, 0.02);
+  }
+  .preference-item input[type="checkbox"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    accent-color: var(--primary);
+    cursor: pointer;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,413 @@
+{% extends 'base.html' %} {% block title %}Visual Theme - {{
+site_settings.site_name|default:"Chris-Lux" }}{% endblock %} {% block content %}
+<section class="section" style="padding: 4rem 0">
+  <div class="container" style="max-width: 600px">
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 2.5rem">
+      <h1
+        style="
+          font-size: 2rem;
+          font-weight: 600;
+          color: var(--gray-800);
+          margin-bottom: 0.5rem;
+        "
+      >
+        <i
+          class="fas fa-palette"
+          style="color: var(--primary); margin-right: 0.75rem"
+        ></i
+        >Visual Theme
+      </h1>
+      <p style="color: var(--gray-500); font-size: 1rem; margin: 0">
+        Customize your brand colors and appearance
+      </p>
+    </div>
+
+    <!-- Theme Card -->
+    <div class="card" style="padding: 2.5rem">
+      <form method="POST" id="themeForm">
+        {% csrf_token %}
+
+        <!-- Primary Color -->
+        <div style="margin-bottom: 2rem">
+          <label
+            style="
+              display: block;
+              color: var(--gray-700);
+              font-size: 0.9375rem;
+              font-weight: 600;
+              margin-bottom: 0.75rem;
+            "
+          >
+            Primary Color
+          </label>
+          <div style="display: flex; gap: 1rem; align-items: center">
+            <div
+              style="
+                position: relative;
+                width: 80px;
+                height: 80px;
+                border-radius: var(--radius);
+                overflow: hidden;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                flex-shrink: 0;
+              "
+            >
+              <input
+                type="color"
+                name="primary_color"
+                id="primaryColor"
+                value="{{ settings.primary_color|default:'#6B21A8' }}"
+                oninput="updatePreview('primary', this.value)"
+                style="
+                  position: absolute;
+                  inset: -20px;
+                  width: 120px;
+                  height: 120px;
+                  padding: 0;
+                  border: none;
+                  cursor: pointer;
+                "
+              />
+            </div>
+            <div style="flex: 1">
+              <input
+                type="text"
+                id="primaryHex"
+                value="{{ settings.primary_color|default:'#6B21A8' }}"
+                oninput="updateColorFromHex('primary', this.value)"
+                style="
+                  width: 100%;
+                  padding: 0.75rem 1rem;
+                  border: 1px solid var(--gray-200);
+                  border-radius: var(--radius);
+                  font-size: 0.9375rem;
+                  font-family: monospace;
+                  text-transform: uppercase;
+                "
+                onfocus="
+                  this.style.borderColor = 'var(--primary)';
+                  this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                "
+                onblur="
+                  this.style.borderColor = 'var(--gray-200)';
+                  this.style.boxShadow = 'none';
+                "
+              />
+              <p
+                style="
+                  margin: 0.5rem 0 0 0;
+                  color: var(--gray-500);
+                  font-size: 0.875rem;
+                "
+              >
+                Used for buttons, links, and primary actions
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary Color -->
+        <div style="margin-bottom: 2rem">
+          <label
+            style="
+              display: block;
+              color: var(--gray-700);
+              font-size: 0.9375rem;
+              font-weight: 600;
+              margin-bottom: 0.75rem;
+            "
+          >
+            Secondary Color
+          </label>
+          <div style="display: flex; gap: 1rem; align-items: center">
+            <div
+              style="
+                position: relative;
+                width: 80px;
+                height: 80px;
+                border-radius: var(--radius);
+                overflow: hidden;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                flex-shrink: 0;
+              "
+            >
+              <input
+                type="color"
+                name="secondary_color"
+                id="secondaryColor"
+                value="{{ settings.secondary_color|default:'#8B5CF6' }}"
+                oninput="updatePreview('secondary', this.value)"
+                style="
+                  position: absolute;
+                  inset: -20px;
+                  width: 120px;
+                  height: 120px;
+                  padding: 0;
+                  border: none;
+                  cursor: pointer;
+                "
+              />
+            </div>
+            <div style="flex: 1">
+              <input
+                type="text"
+                id="secondaryHex"
+                value="{{ settings.secondary_color|default:'#8B5CF6' }}"
+                oninput="updateColorFromHex('secondary', this.value)"
+                style="
+                  width: 100%;
+                  padding: 0.75rem 1rem;
+                  border: 1px solid var(--gray-200);
+                  border-radius: var(--radius);
+                  font-size: 0.9375rem;
+                  font-family: monospace;
+                  text-transform: uppercase;
+                "
+                onfocus="
+                  this.style.borderColor = 'var(--primary)';
+                  this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                "
+                onblur="
+                  this.style.borderColor = 'var(--gray-200)';
+                  this.style.boxShadow = 'none';
+                "
+              />
+              <p
+                style="
+                  margin: 0.5rem 0 0 0;
+                  color: var(--gray-500);
+                  font-size: 0.875rem;
+                "
+              >
+                Used for secondary buttons and accents
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accent Color -->
+        <div style="margin-bottom: 2.5rem">
+          <label
+            style="
+              display: block;
+              color: var(--gray-700);
+              font-size: 0.9375rem;
+              font-weight: 600;
+              margin-bottom: 0.75rem;
+            "
+          >
+            Accent Color
+          </label>
+          <div style="display: flex; gap: 1rem; align-items: center">
+            <div
+              style="
+                position: relative;
+                width: 80px;
+                height: 80px;
+                border-radius: var(--radius);
+                overflow: hidden;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                flex-shrink: 0;
+              "
+            >
+              <input
+                type="color"
+                name="accent_color"
+                id="accentColor"
+                value="{{ settings.accent_color|default:'#F59E0B' }}"
+                oninput="updatePreview('accent', this.value)"
+                style="
+                  position: absolute;
+                  inset: -20px;
+                  width: 120px;
+                  height: 120px;
+                  padding: 0;
+                  border: none;
+                  cursor: pointer;
+                "
+              />
+            </div>
+            <div style="flex: 1">
+              <input
+                type="text"
+                id="accentHex"
+                value="{{ settings.accent_color|default:'#F59E0B' }}"
+                oninput="updateColorFromHex('accent', this.value)"
+                style="
+                  width: 100%;
+                  padding: 0.75rem 1rem;
+                  border: 1px solid var(--gray-200);
+                  border-radius: var(--radius);
+                  font-size: 0.9375rem;
+                  font-family: monospace;
+                  text-transform: uppercase;
+                "
+                onfocus="
+                  this.style.borderColor = 'var(--primary)';
+                  this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+                "
+                onblur="
+                  this.style.borderColor = 'var(--gray-200)';
+                  this.style.boxShadow = 'none';
+                "
+              />
+              <p
+                style="
+                  margin: 0.5rem 0 0 0;
+                  color: var(--gray-500);
+                  font-size: 0.875rem;
+                "
+              >
+                Used for highlights, warnings, and special elements
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Preview -->
+        <div
+          style="
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+          "
+        >
+          <label
+            style="
+              display: block;
+              color: var(--gray-700);
+              font-size: 0.875rem;
+              font-weight: 600;
+              margin-bottom: 1rem;
+            "
+          >
+            <i class="fas fa-eye" style="margin-right: 0.5rem"></i>Live Preview
+          </label>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap">
+            <button
+              type="button"
+              id="previewPrimary"
+              style="
+                padding: 0.625rem 1.25rem;
+                border: none;
+                border-radius: var(--radius);
+                color: white;
+                font-weight: 500;
+                cursor: default;
+              "
+            >
+              Primary Button
+            </button>
+            <button
+              type="button"
+              id="previewSecondary"
+              style="
+                padding: 0.625rem 1.25rem;
+                border: none;
+                border-radius: var(--radius);
+                color: white;
+                font-weight: 500;
+                cursor: default;
+              "
+            >
+              Secondary
+            </button>
+            <span
+              id="previewAccent"
+              style="
+                padding: 0.625rem 1.25rem;
+                border-radius: var(--radius);
+                font-weight: 500;
+                font-size: 0.875rem;
+              "
+            >
+              Accent Badge
+            </span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display: flex; gap: 1rem">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="flex: 1; padding: 1rem; font-weight: 600; font-size: 1rem"
+          >
+            <i class="fas fa-save" style="margin-right: 0.5rem"></i>Update
+            Colors
+          </button>
+          <button
+            type="button"
+            onclick="resetDefaults()"
+            class="btn btn-secondary"
+            style="padding: 1rem 1.5rem"
+          >
+            <i class="fas fa-undo"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Reset Notice -->
+    <p
+      style="
+        text-align: center;
+        color: var(--gray-500);
+        font-size: 0.875rem;
+        margin-top: 1.5rem;
+      "
+    >
+      Changes will apply immediately across your entire store
+    </p>
+  </div>
+</section>
+
+<script>
+  // Default colors
+  const defaults = {
+    primary: "#6B21A8",
+    secondary: "#8B5CF6",
+    accent: "#F59E0B",
+  };
+
+  // Update color picker and hex input
+  function updatePreview(type, value) {
+    document.getElementById(type + "Color").value = value;
+    document.getElementById(type + "Hex").value = value.toUpperCase();
+    updateLivePreview();
+  }
+
+  // Update from hex input
+  function updateColorFromHex(type, value) {
+    // Validate hex color
+    if (/^#[0-9A-F]{6}$/i.test(value)) {
+      document.getElementById(type + "Color").value = value;
+      updateLivePreview();
+    }
+  }
+
+  // Update live preview buttons
+  function updateLivePreview() {
+    const primary = document.getElementById("primaryColor").value;
+    const secondary = document.getElementById("secondaryColor").value;
+    const accent = document.getElementById("accentColor").value;
+
+    document.getElementById("previewPrimary").style.background = primary;
+    document.getElementById("previewSecondary").style.background = secondary;
+    document.getElementById("previewAccent").style.background = accent + "20"; // 20% opacity
+    document.getElementById("previewAccent").style.color = accent;
+  }
+
+  // Reset to defaults
+  function resetDefaults() {
+    updatePreview("primary", defaults.primary);
+    updatePreview("secondary", defaults.secondary);
+    updatePreview("accent", defaults.accent);
+  }
+
+  // Initialize on load
+  document.addEventListener("DOMContentLoaded", updateLivePreview);
+</script>
+{% endblock %}

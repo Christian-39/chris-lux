@@ -1,0 +1,373 @@
+{% extends 'base.html' %} {% block title %}Order History - {{
+site_settings.site_name|default:"Chris-Lux" }}{% endblock %} {% block content %}
+<section class="section">
+  <div class="container">
+    <div
+      class="profile-layout"
+      style="display: grid; grid-template-columns: 280px 1fr; gap: 2rem"
+    >
+      <!-- Sidebar -->
+      <aside class="profile-sidebar">
+        <div class="card" style="text-align: center; padding: 2rem">
+          <div
+            class="profile-avatar"
+            style="
+              width: 120px;
+              height: 120px;
+              border-radius: 50%;
+              overflow: hidden;
+              margin: 0 auto 1.5rem;
+              background: var(--primary);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-size: 3rem;
+            "
+          >
+            {% if request.user.profile_image %}
+            <img
+              src="{{ request.user.profile_image.url }}"
+              alt="{{ request.user.get_full_name }}"
+              style="width: 100%; height: 100%; object-fit: cover"
+            />
+            {% else %} {{
+            request.user.first_name|first|default:request.user.username|first }}
+            {% endif %}
+          </div>
+          <h2 style="font-size: 1.25rem; margin-bottom: 0.25rem">
+            {{ request.user.get_full_name|default:request.user.username }}
+          </h2>
+          <p style="color: var(--gray-500); font-size: 0.875rem">
+            {{ request.user.email }}
+          </p>
+
+          <div
+            style="
+              margin-top: 1.5rem;
+              padding-top: 1.5rem;
+              border-top: 1px solid var(--gray-200);
+            "
+          >
+            <nav style="display: flex; flex-direction: column; gap: 0.5rem">
+              <a
+                href="{% url 'users:profile' %}"
+                class="btn btn-secondary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-user"></i> Profile
+              </a>
+              <a
+                href="{% url 'users:order_history' %}"
+                class="btn btn-primary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-shopping-bag"></i> My Orders
+              </a>
+              <a
+                href="{% url 'products:wishlist' %}"
+                class="btn btn-secondary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-heart"></i> Wishlist
+              </a>
+              <a
+                href="{% url 'users:profile_edit' %}"
+                class="btn btn-secondary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-edit"></i> Edit Profile
+              </a>
+              <a
+                href="{% url 'users:preferences' %}"
+                class="btn btn-secondary"
+                style="justify-content: flex-start"
+              >
+                <i class="fas fa-cog"></i> Settings
+              </a>
+            </nav>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="profile-content">
+        <div class="card">
+          <div
+            style="
+              padding: 1.5rem;
+              border-bottom: 1px solid var(--gray-200);
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div>
+              <h2 style="font-size: 1.25rem">Order History</h2>
+              <p
+                style="
+                  color: var(--gray-500);
+                  font-size: 0.875rem;
+                  margin-top: 0.25rem;
+                "
+              >
+                View and track your orders
+              </p>
+            </div>
+            <a href="{% url 'products:product_list' %}" class="btn btn-primary">
+              <i class="fas fa-shopping-bag"></i> Shop Now
+            </a>
+          </div>
+          <div style="padding: 1.5rem">
+            {% if orders %}
+            <div style="overflow-x: auto">
+              <table style="width: 100%; border-collapse: collapse">
+                <thead>
+                  <tr style="background: var(--gray-50)">
+                    <th
+                      style="
+                        padding: 1rem;
+                        text-align: left;
+                        font-weight: 600;
+                        color: var(--gray-700);
+                      "
+                    >
+                      Order #
+                    </th>
+                    <th
+                      style="
+                        padding: 1rem;
+                        text-align: left;
+                        font-weight: 600;
+                        color: var(--gray-700);
+                      "
+                    >
+                      Date
+                    </th>
+                    <th
+                      style="
+                        padding: 1rem;
+                        text-align: left;
+                        font-weight: 600;
+                        color: var(--gray-700);
+                      "
+                    >
+                      Items
+                    </th>
+                    <th
+                      style="
+                        padding: 1rem;
+                        text-align: left;
+                        font-weight: 600;
+                        color: var(--gray-700);
+                      "
+                    >
+                      Status
+                    </th>
+                    <th
+                      style="
+                        padding: 1rem;
+                        text-align: right;
+                        font-weight: 600;
+                        color: var(--gray-700);
+                      "
+                    >
+                      Total
+                    </th>
+                    <th
+                      style="
+                        padding: 1rem;
+                        text-align: center;
+                        font-weight: 600;
+                        color: var(--gray-700);
+                      "
+                    >
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for order in orders %}
+                  <tr
+                    style="
+                      border-bottom: 1px solid var(--gray-100);
+                      transition: background 0.2s;
+                    "
+                  >
+                    <td style="padding: 1rem">
+                      <a
+                        href="{% url 'orders:order_detail' order.id %}"
+                        style="
+                          color: var(--primary);
+                          font-weight: 500;
+                          text-decoration: none;
+                        "
+                      >
+                        {{ order.order_number }}
+                      </a>
+                    </td>
+                    <td style="padding: 1rem; color: var(--gray-500)">
+                      {{ order.created_at|date:"M d, Y" }}
+                    </td>
+                    <td style="padding: 1rem; color: var(--gray-600)">
+                      {{ order.items.count }} item{{ order.items.count|pluralize
+                      }}
+                    </td>
+                    <td style="padding: 1rem">
+                      <span
+                        class="status-badge status-{{ order.status }}"
+                        style="
+                          padding: 0.25rem 0.75rem;
+                          border-radius: var(--radius-full);
+                          font-size: 0.75rem;
+                          font-weight: 500;
+                        "
+                      >
+                        {{ order.get_status_display }}
+                      </span>
+                    </td>
+                    <td
+                      style="
+                        padding: 1rem;
+                        text-align: right;
+                        font-weight: 600;
+                        color: var(--gray-800);
+                      "
+                    >
+                      {{ site_settings.currency_symbol|default:"$" }}{{
+                      order.total_amount }}
+                    </td>
+                    <td style="padding: 1rem; text-align: center">
+                      <a
+                        href="{% url 'orders:order_detail' order.id %}"
+                        class="btn btn-sm btn-outline"
+                        style="padding: 0.375rem 0.75rem"
+                      >
+                        View
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if orders.has_other_pages %}
+            <div
+              style="
+                margin-top: 2rem;
+                display: flex;
+                justify-content: center;
+                gap: 0.5rem;
+              "
+            >
+              {% if orders.has_previous %}
+              <a
+                href="?page={{ orders.previous_page_number }}"
+                class="btn btn-secondary"
+                style="padding: 0.5rem 1rem"
+                >Previous</a
+              ><!--prettier-ignore-->
+              {% endif %} {% for num in orders.paginator.page_range %} {% if orders.number == num %}
+              <span
+                class="btn btn-primary"
+                style="padding: 0.5rem 1rem; cursor: default"
+                >{{ num }}</span
+              >
+              {% else %}
+              <a
+                href="?page={{ num }}"
+                class="btn btn-secondary"
+                style="padding: 0.5rem 1rem"
+                >{{ num }}</a
+              >
+              {% endif %} {% endfor %} {% if orders.has_next %}
+              <a
+                href="?page={{ orders.next_page_number }}"
+                class="btn btn-secondary"
+                style="padding: 0.5rem 1rem"
+                >Next</a
+              >
+              {% endif %}
+            </div>
+            {% endif %} {% else %}
+            <div style="text-align: center; padding: 4rem 2rem">
+              <div
+                style="
+                  width: 80px;
+                  height: 80px;
+                  border-radius: 50%;
+                  background: var(--gray-100);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin: 0 auto 1.5rem;
+                  color: var(--gray-400);
+                  font-size: 2rem;
+                "
+              >
+                <i class="fas fa-shopping-bag"></i>
+              </div>
+              <h3
+                style="
+                  font-size: 1.25rem;
+                  color: var(--gray-700);
+                  margin-bottom: 0.5rem;
+                "
+              >
+                No orders yet
+              </h3>
+              <p style="color: var(--gray-500); margin-bottom: 1.5rem">
+                Start shopping to see your orders here
+              </p>
+              <a
+                href="{% url 'products:product_list' %}"
+                class="btn btn-primary"
+              >
+                Browse Products
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .status-pending_payment {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+  }
+  .status-payment_uploaded {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info);
+  }
+  .status-verified {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+  .status-processing {
+    background: rgba(107, 33, 168, 0.1);
+    color: var(--primary);
+  }
+  .status-shipped {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+  }
+  .status-delivered {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+  .status-cancelled {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+  }
+
+  tr:hover {
+    background: var(--gray-50);
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Bank Accounts</h3>
+    <a href="{% url 'settings:add_bank_details' %}" class="btn btn-dark"
+      >+ Add New Account</a
+    >
+  </div>
+
+  <div class="row">
+    {% for bank in bank_details %}
+    <div class="col-md-6 mb-3">
+      <div
+        class="card shadow-sm {% if bank.is_default %}border-primary{% endif %}"
+      >
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <h5 class="card-title">{{ bank.bank_name }}</h5>
+            {% if bank.is_default %}<span class="badge bg-primary">Default</span
+            >{% endif %}
+          </div>
+          <p class="card-text mb-1">
+            <strong>Account:</strong> {{ bank.account_number }}
+          </p>
+          <p class="card-text mb-3">
+            <strong>Holder:</strong> {{ bank.account_name }}
+          </p>
+          <div class="btn-group btn-group-sm">
+            <a
+              href="{% url 'settings:edit_bank_details' bank.pk %}"
+              class="btn btn-outline-secondary"
+              >Edit</a
+            >
+            <a
+              href="{% url 'settings:delete_bank_details' bank.pk %}"
+              class="btn btn-outline-danger"
+              onclick="return confirm('Delete this account?');"
+              >Delete</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+      <p class="text-muted">No bank details added yet.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

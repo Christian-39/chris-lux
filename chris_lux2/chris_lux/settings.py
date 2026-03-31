@@ -6,11 +6,10 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv(BASE_DIR / '.env')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production')
 
@@ -28,6 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+
+    'storages',
     
     # Local apps
     'core',
@@ -137,8 +138,25 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
-MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+if not DEBUG:
+    # Use Backblaze B2 for Media Files only
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    
+    AWS_ACCESS_KEY_ID = os.getenv('BACKBLAZE_B2_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.getenv('BACKBLAZE_B2_APPLICATION_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.getenv('BACKBLAZE_B2_BUCKET_NAME')
+    AWS_S3_ENDPOINT_URL = os.getenv('BACKBLAZE_B2_BUCKET_ENDPOINT')
+    AWS_S3_B2_ENABLED = os.getenv('BACKBLAZE_B2_ENABLED')
+    
+    # Optional: Prevents files with the same name from being overwritten
+    AWS_S3_FILE_OVERWRITE = False 
+    
+    # Media files URL (this overrides your local MEDIA_URL in production)
+    MEDIA_URL = f'{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/'
+else:
+    # Local development settings
+    MEDIA_URL = 'media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

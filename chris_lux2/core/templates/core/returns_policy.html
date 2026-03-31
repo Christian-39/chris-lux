@@ -1,0 +1,504 @@
+{% extends 'base.html' %} {% block title %}Returns & Exchanges - {{
+site_settings.site_name|default:"Chris-Lux" }}{% endblock %} {% block content %}
+<section class="section" style="padding: 4rem 0">
+  <div class="container" style="max-width: 1000px">
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 3rem">
+      <h1
+        style="
+          font-size: 2.5rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          margin-bottom: 0.75rem;
+        "
+      >
+        Returns & Exchanges
+      </h1>
+      <p style="color: var(--gray-500); font-size: 1.125rem">
+        Our commitment to quality and your satisfaction
+      </p>
+      <div
+        style="
+          width: 60px;
+          height: 3px;
+          background: var(--primary);
+          margin: 1.5rem auto;
+        "
+      ></div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 320px; gap: 3rem">
+      <!-- Main Content -->
+      <div>
+        <!-- Return Window -->
+        <section style="margin-bottom: 2.5rem">
+          <h2
+            style="
+              font-size: 1.25rem;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.03em;
+              color: var(--gray-800);
+              padding-bottom: 0.75rem;
+              border-bottom: 2px solid var(--gray-200);
+              margin-bottom: 1.25rem;
+            "
+          >
+            <i
+              class="fas fa-calendar-alt"
+              style="color: var(--primary); margin-right: 0.75rem"
+            ></i
+            >Return Window
+          </h2>
+          <p
+            style="
+              color: var(--gray-600);
+              line-height: 1.8;
+              margin-bottom: 1rem;
+            "
+          >
+            We offer a
+            <strong style="color: var(--primary)">14-day return policy</strong>.
+            You have 14 days after receiving your item to request a return. To
+            be eligible for a return, your item must be in the same condition
+            that you received it: unworn or unused, with tags, and in its
+            original packaging.
+          </p>
+        </section>
+
+        <!-- Hygiene Warning -->
+        <section style="margin-bottom: 2.5rem">
+          <h2
+            style="
+              font-size: 1.25rem;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.03em;
+              color: var(--danger);
+              padding-bottom: 0.75rem;
+              border-bottom: 2px solid var(--danger);
+              margin-bottom: 1.25rem;
+            "
+          >
+            <i
+              class="fas fa-exclamation-triangle"
+              style="margin-right: 0.75rem"
+            ></i
+            >Hygiene & Safety Requirements
+          </h2>
+          <div
+            style="
+              background: linear-gradient(
+                135deg,
+                rgba(245, 158, 11, 0.08) 0%,
+                rgba(217, 119, 6, 0.08) 100%
+              );
+              border: 1px solid rgba(245, 158, 11, 0.3);
+              border-left: 4px solid var(--warning);
+              padding: 1.5rem;
+              border-radius: 0 var(--radius) var(--radius) 0;
+            "
+          >
+            <div style="display: flex; align-items: flex-start; gap: 1rem">
+              <i
+                class="fas fa-shield-virus"
+                style="
+                  color: var(--warning);
+                  font-size: 1.5rem;
+                  margin-top: 0.25rem;
+                "
+              ></i>
+              <div>
+                <h4
+                  style="
+                    font-size: 1rem;
+                    font-weight: 600;
+                    color: var(--warning);
+                    margin-bottom: 0.75rem;
+                  "
+                >
+                  Strict Hygiene Policy
+                </h4>
+                <p style="color: var(--gray-700); line-height: 1.6; margin: 0">
+                  Due to the nature of hair products and health regulations, we
+                  <strong style="color: var(--danger)">cannot</strong> accept
+                  returns if the security seal is broken or if the hair has been
+                  brushed, washed, dyed, or installed. All hair must be in its
+                  original bundle ties.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Return Process -->
+        <section style="margin-bottom: 2.5rem">
+          <h2
+            style="
+              font-size: 1.25rem;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.03em;
+              color: var(--gray-800);
+              padding-bottom: 0.75rem;
+              border-bottom: 2px solid var(--gray-200);
+              margin-bottom: 1.25rem;
+            "
+          >
+            <i
+              class="fas fa-exchange-alt"
+              style="color: var(--primary); margin-right: 0.75rem"
+            ></i
+            >The Return Process
+          </h2>
+          <div style="display: flex; flex-direction: column; gap: 1rem">
+            <div
+              style="
+                display: flex;
+                gap: 1rem;
+                align-items: flex-start;
+                padding: 1.25rem;
+                background: var(--gray-50);
+                border-radius: var(--radius);
+                border-left: 3px solid var(--primary);
+              "
+            >
+              <div
+                style="
+                  width: 32px;
+                  height: 32px;
+                  border-radius: 50%;
+                  background: var(--primary);
+                  color: white;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-weight: 600;
+                  font-size: 0.875rem;
+                  flex-shrink: 0;
+                "
+              >
+                1
+              </div>
+              <div>
+                <p style="color: var(--gray-600); line-height: 1.6; margin: 0">
+                  Contact us at
+                  <a
+                    href="mailto:{{ site_settings.contact_email|default:'returns@chris-lux.com' }}"
+                    style="
+                      color: var(--primary);
+                      text-decoration: none;
+                      font-weight: 500;
+                    "
+                    >{{
+                    site_settings.contact_email|default:"returns@chris-lux.com"
+                    }}</a
+                  >
+                  with your order number and reason for return.
+                </p>
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 1rem;
+                align-items: flex-start;
+                padding: 1.25rem;
+                background: var(--gray-50);
+                border-radius: var(--radius);
+                border-left: 3px solid var(--primary);
+              "
+            >
+              <div
+                style="
+                  width: 32px;
+                  height: 32px;
+                  border-radius: 50%;
+                  background: var(--primary);
+                  color: white;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-weight: 600;
+                  font-size: 0.875rem;
+                  flex-shrink: 0;
+                "
+              >
+                2
+              </div>
+              <div>
+                <p style="color: var(--gray-600); line-height: 1.6; margin: 0">
+                  If your return is accepted, we'll send you a return shipping
+                  label and detailed instructions via email.
+                </p>
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 1rem;
+                align-items: flex-start;
+                padding: 1.25rem;
+                background: var(--gray-50);
+                border-radius: var(--radius);
+                border-left: 3px solid var(--primary);
+              "
+            >
+              <div
+                style="
+                  width: 32px;
+                  height: 32px;
+                  border-radius: 50%;
+                  background: var(--primary);
+                  color: white;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-weight: 600;
+                  font-size: 0.875rem;
+                  flex-shrink: 0;
+                "
+              >
+                3
+              </div>
+              <div>
+                <p style="color: var(--gray-600); line-height: 1.6; margin: 0">
+                  Pack the item securely in its original packaging and drop it
+                  off at the designated carrier location.
+                </p>
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 1rem;
+                align-items: flex-start;
+                padding: 1.25rem;
+                background: var(--gray-50);
+                border-radius: var(--radius);
+                border-left: 3px solid var(--primary);
+              "
+            >
+              <div
+                style="
+                  width: 32px;
+                  height: 32px;
+                  border-radius: 50%;
+                  background: var(--primary);
+                  color: white;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-weight: 600;
+                  font-size: 0.875rem;
+                  flex-shrink: 0;
+                "
+              >
+                4
+              </div>
+              <div>
+                <p style="color: var(--gray-600); line-height: 1.6; margin: 0">
+                  Once received and inspected (within 3-5 business days), we
+                  will notify you of the approval or rejection of your refund.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Refunds -->
+        <section style="margin-bottom: 0">
+          <h2
+            style="
+              font-size: 1.25rem;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.03em;
+              color: var(--gray-800);
+              padding-bottom: 0.75rem;
+              border-bottom: 2px solid var(--gray-200);
+              margin-bottom: 1.25rem;
+            "
+          >
+            <i
+              class="fas fa-undo"
+              style="color: var(--primary); margin-right: 0.75rem"
+            ></i
+            >Refunds
+          </h2>
+          <p style="color: var(--gray-600); line-height: 1.8">
+            If approved, you'll be automatically refunded on your original
+            payment method within <strong>10 business days</strong>. Please
+            remember it can take some time for your bank or credit card company
+            to process and post the refund to your account.
+          </p>
+        </section>
+      </div>
+
+      <!-- Sidebar -->
+      <aside>
+        <!-- Quick Summary -->
+        <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem">
+          <h3
+            style="
+              font-size: 1.125rem;
+              font-weight: 600;
+              margin-bottom: 1.25rem;
+              color: var(--gray-800);
+            "
+          >
+            <i
+              class="fas fa-clipboard-list"
+              style="color: var(--primary); margin-right: 0.5rem"
+            ></i
+            >Quick Summary
+          </h3>
+          <ul style="list-style: none; padding: 0; margin: 0">
+            <li
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 0.875rem;
+                color: var(--gray-600);
+                font-size: 0.9375rem;
+              "
+            >
+              <i class="fas fa-check-circle" style="color: var(--success)"></i>
+              14 Day Return Window
+            </li>
+            <li
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 0.875rem;
+                color: var(--gray-600);
+                font-size: 0.9375rem;
+              "
+            >
+              <i class="fas fa-check-circle" style="color: var(--success)"></i>
+              Store Credit Options
+            </li>
+            <li
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 0.875rem;
+                color: var(--gray-600);
+                font-size: 0.9375rem;
+              "
+            >
+              <i class="fas fa-check-circle" style="color: var(--success)"></i>
+              Original Packaging Required
+            </li>
+            <li
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 0.875rem;
+                color: var(--gray-600);
+                font-size: 0.9375rem;
+              "
+            >
+              <i class="fas fa-times-circle" style="color: var(--danger)"></i>
+              No Returns on Sale Items
+            </li>
+            <li
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                color: var(--gray-600);
+                font-size: 0.9375rem;
+              "
+            >
+              <i class="fas fa-times-circle" style="color: var(--danger)"></i>
+              No Returns on Custom Wigs
+            </li>
+          </ul>
+        </div>
+
+        <!-- Exchanges -->
+        <div
+          class="card"
+          style="padding: 1.5rem; border: 2px solid var(--gray-800)"
+        >
+          <h3
+            style="
+              font-size: 1.125rem;
+              font-weight: 600;
+              margin-bottom: 0.75rem;
+              color: var(--gray-800);
+            "
+          >
+            <i class="fas fa-sync-alt" style="margin-right: 0.5rem"></i
+            >Exchanges
+          </h3>
+          <p
+            style="
+              color: var(--gray-600);
+              font-size: 0.9375rem;
+              line-height: 1.6;
+              margin-bottom: 1.25rem;
+            "
+          >
+            The fastest way to get what you want is to return the item you have,
+            and once accepted, make a separate purchase for the new item.
+          </p>
+          <a
+            href="{% url 'core:contact' %}"
+            class="btn btn-primary"
+            style="width: 100%; text-align: center; font-size: 0.875rem"
+          >
+            Start an Exchange
+          </a>
+        </div>
+
+        <!-- Contact Box -->
+        <div
+          style="
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            text-align: center;
+          "
+        >
+          <i
+            class="fas fa-question-circle"
+            style="
+              font-size: 2rem;
+              color: var(--primary);
+              margin-bottom: 0.75rem;
+            "
+          ></i>
+          <p
+            style="
+              color: var(--gray-600);
+              font-size: 0.875rem;
+              margin-bottom: 0.75rem;
+            "
+          >
+            Need help with a return?
+          </p>
+          <a
+            href="{% url 'core:contact' %}"
+            style="
+              color: var(--primary);
+              text-decoration: none;
+              font-weight: 500;
+              font-size: 0.9375rem;
+            "
+          >
+            Contact our team
+          </a>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+{% endblock %}

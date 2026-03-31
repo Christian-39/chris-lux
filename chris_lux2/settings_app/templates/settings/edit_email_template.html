@@ -1,0 +1,67 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container py-5">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'settings:email_templates' %}">Email Templates</a>
+      </li>
+      <li class="breadcrumb-item active">Edit Template</li>
+    </ol>
+  </nav>
+
+  <div class="card shadow">
+    <div class="card-header bg-white">
+      <h4 class="mb-0">Edit Template: {{ template.name }}</h4>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Subject</label>
+          <input
+            type="text"
+            name="subject"
+            class="form-control"
+            value="{{ template.subject }}"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">HTML Body</label>
+          <textarea
+            name="body_html"
+            class="form-control font-monospace"
+            rows="12"
+            style="font-size: 0.9rem"
+          >
+{{ template.body_html }}</textarea
+          >
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Plain Text Body</label>
+          <textarea name="body_text" class="form-control" rows="5">
+{{ template.body_text }}</textarea
+          >
+        </div>
+        <div class="form-check form-switch mb-4">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            name="is_active"
+            {%
+            if
+            template.is_active
+            %}checked{%
+            endif
+            %}
+          />
+          <label class="form-check-label">Template Active</label>
+        </div>
+        <button type="submit" class="btn btn-success px-5">
+          Update Template
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

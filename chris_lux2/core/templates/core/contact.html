@@ -1,0 +1,263 @@
+{% extends 'base.html' %} {% block title %}Contact Us - {{
+site_settings.site_name|default:"Chris-Lux" }}{% endblock %} {% block content %}
+<section class="section" style="padding: 4rem 0">
+  <div class="container" style="max-width: 800px">
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 3rem">
+      <h1
+        style="
+          font-size: 2.5rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          margin-bottom: 0.75rem;
+        "
+      >
+        Contact Us
+      </h1>
+      <p style="color: var(--gray-500); font-size: 1.125rem">
+        We'd love to hear from you. Send us a message and we'll respond as soon
+        as possible.
+      </p>
+      <div
+        style="
+          width: 60px;
+          height: 3px;
+          background: var(--primary);
+          margin: 1.5rem auto;
+        "
+      ></div>
+    </div>
+
+    <div class="card" style="padding: 2.5rem">
+      <form method="POST">
+        {% csrf_token %}
+
+        <!-- Name -->
+        <div style="margin-bottom: 1.5rem">
+          <label
+            style="
+              display: block;
+              color: var(--gray-500);
+              font-size: 0.875rem;
+              margin-bottom: 0.5rem;
+              font-weight: 500;
+            "
+          >
+            Full Name <span style="color: var(--danger)">*</span>
+          </label>
+          <input
+            type="text"
+            name="name"
+            required
+            style="
+              width: 100%;
+              padding: 0.875rem 1rem;
+              border: 1px solid var(--gray-200);
+              border-radius: var(--radius);
+              font-size: 0.9375rem;
+              transition: all 0.2s;
+            "
+            onfocus="
+              this.style.borderColor = 'var(--primary)';
+              this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+            "
+            onblur="
+              this.style.borderColor = 'var(--gray-200)';
+              this.style.boxShadow = 'none';
+            "
+          />
+        </div>
+
+        <!-- Email & Phone Row -->
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+          "
+        >
+          <div>
+            <label
+              style="
+                display: block;
+                color: var(--gray-500);
+                font-size: 0.875rem;
+                margin-bottom: 0.5rem;
+                font-weight: 500;
+              "
+            >
+              Email Address <span style="color: var(--danger)">*</span>
+            </label>
+            <input
+              type="email"
+              name="email"
+              required
+              style="
+                width: 100%;
+                padding: 0.875rem 1rem;
+                border: 1px solid var(--gray-200);
+                border-radius: var(--radius);
+                font-size: 0.9375rem;
+                transition: all 0.2s;
+              "
+              onfocus="
+                this.style.borderColor = 'var(--primary)';
+                this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+              "
+              onblur="
+                this.style.borderColor = 'var(--gray-200)';
+                this.style.boxShadow = 'none';
+              "
+            />
+          </div>
+          <div>
+            <label
+              style="
+                display: block;
+                color: var(--gray-500);
+                font-size: 0.875rem;
+                margin-bottom: 0.5rem;
+                font-weight: 500;
+              "
+            >
+              Phone Number
+            </label>
+            <input
+              type="text"
+              name="phone"
+              style="
+                width: 100%;
+                padding: 0.875rem 1rem;
+                border: 1px solid var(--gray-200);
+                border-radius: var(--radius);
+                font-size: 0.9375rem;
+                transition: all 0.2s;
+              "
+              onfocus="
+                this.style.borderColor = 'var(--primary)';
+                this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+              "
+              onblur="
+                this.style.borderColor = 'var(--gray-200)';
+                this.style.boxShadow = 'none';
+              "
+            />
+          </div>
+        </div>
+
+        <!-- Subject -->
+        <div style="margin-bottom: 1.5rem">
+          <label
+            style="
+              display: block;
+              color: var(--gray-500);
+              font-size: 0.875rem;
+              margin-bottom: 0.5rem;
+              font-weight: 500;
+            "
+          >
+            Subject <span style="color: var(--danger)">*</span>
+          </label>
+          <input
+            type="text"
+            name="subject"
+            required
+            style="
+              width: 100%;
+              padding: 0.875rem 1rem;
+              border: 1px solid var(--gray-200);
+              border-radius: var(--radius);
+              font-size: 0.9375rem;
+              transition: all 0.2s;
+            "
+            onfocus="
+              this.style.borderColor = 'var(--primary)';
+              this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+            "
+            onblur="
+              this.style.borderColor = 'var(--gray-200)';
+              this.style.boxShadow = 'none';
+            "
+          />
+        </div>
+
+        <!-- Message -->
+        <div style="margin-bottom: 2rem">
+          <label
+            style="
+              display: block;
+              color: var(--gray-500);
+              font-size: 0.875rem;
+              margin-bottom: 0.5rem;
+              font-weight: 500;
+            "
+          >
+            Message <span style="color: var(--danger)">*</span>
+          </label>
+          <textarea
+            name="message"
+            rows="5"
+            required
+            style="
+              width: 100%;
+              padding: 0.875rem 1rem;
+              border: 1px solid var(--gray-200);
+              border-radius: var(--radius);
+              font-size: 0.9375rem;
+              resize: vertical;
+              transition: all 0.2s;
+              font-family: inherit;
+            "
+            onfocus="
+              this.style.borderColor = 'var(--primary)';
+              this.style.boxShadow = '0 0 0 3px rgba(107, 33, 168, 0.1)';
+            "
+            onblur="
+              this.style.borderColor = 'var(--gray-200)';
+              this.style.boxShadow = 'none';
+            "
+          ></textarea>
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="btn btn-primary"
+          style="
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+          "
+        >
+          <i class="fas fa-paper-plane" style="margin-right: 0.5rem"></i>Send
+          Message
+        </button>
+      </form>
+    </div>
+
+    <!-- Alternative Contact -->
+    <div style="margin-top: 2rem; text-align: center">
+      <p
+        style="
+          color: var(--gray-500);
+          font-size: 0.9375rem;
+          margin-bottom: 0.5rem;
+        "
+      >
+        Prefer to email us directly?
+      </p>
+      <a
+        href="mailto:{{ site_settings.contact_email|default:'support@chris-lux.com' }}"
+        style="color: var(--primary); text-decoration: none; font-weight: 500"
+      >
+        {{ site_settings.contact_email|default:"support@chris-lux.com" }}
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

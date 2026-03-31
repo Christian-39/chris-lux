@@ -1,0 +1,272 @@
+{% extends 'base.html' %} {% block title %}About Us - {{
+site_settings.site_name|default:"Chris-Lux" }}{% endblock %} {% block content %}
+<section class="section" style="padding: 4rem 0">
+  <div class="container">
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 4rem">
+      <h1
+        style="
+          font-size: 2.5rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          margin-bottom: 0.75rem;
+        "
+      >
+        About Chris Lux
+      </h1>
+      <div
+        style="
+          width: 60px;
+          height: 3px;
+          background: var(--primary);
+          margin: 1.5rem auto;
+        "
+      ></div>
+    </div>
+
+    <!-- Story Section -->
+    <div
+      style="
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        margin-bottom: 4rem;
+      "
+    >
+      <!-- Image -->
+      <div style="position: relative">
+        <div
+          style="
+            position: absolute;
+            inset: 20px -20px -20px 20px;
+            background: linear-gradient(
+              135deg,
+              rgba(107, 33, 168, 0.1) 0%,
+              rgba(139, 92, 246, 0.1) 100%
+            );
+            border-radius: var(--radius);
+          "
+        ></div>
+        <img
+          src="/static/images/about-us.jpg"
+          alt="Our Story"
+          style="
+            position: relative;
+            width: 100%;
+            border-radius: var(--radius);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+          "
+        />
+      </div>
+
+      <!-- Content -->
+      <div>
+        <h2
+          style="
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--gray-800);
+          "
+        >
+          Our Story
+        </h2>
+        <p
+          style="
+            color: var(--gray-600);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+          "
+        >
+          Welcome to Chris Lux, your premier destination for premium hair and
+          beauty products. Founded with an unwavering passion for excellence, we
+          strive to provide the highest quality extensions and care products
+          that empower you to look and feel your best.
+        </p>
+        <p
+          style="color: var(--gray-600); line-height: 1.8; margin-bottom: 2rem"
+        >
+          Our mission is to empower individuals to express their unique style
+          with confidence through luxury products that last. We believe everyone
+          deserves to feel beautiful, and our carefully curated collections
+          reflect that commitment.
+        </p>
+
+        <!-- Stats -->
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--gray-200);
+          "
+        >
+          <div style="text-align: center">
+            <div
+              style="font-size: 2rem; font-weight: 700; color: var(--primary)"
+            >
+              10K+
+            </div>
+            <div style="color: var(--gray-500); font-size: 0.875rem">
+              Happy Customers
+            </div>
+          </div>
+          <div style="text-align: center">
+            <div
+              style="font-size: 2rem; font-weight: 700; color: var(--primary)"
+            >
+              50+
+            </div>
+            <div style="color: var(--gray-500); font-size: 0.875rem">
+              Premium Products
+            </div>
+          </div>
+          <div style="text-align: center">
+            <div
+              style="font-size: 2rem; font-weight: 700; color: var(--primary)"
+            >
+              5+
+            </div>
+            <div style="color: var(--gray-500); font-size: 0.875rem">
+              Years of Excellence
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Values Section -->
+    <div style="margin-bottom: 4rem">
+      <h2
+        style="
+          font-size: 1.875rem;
+          font-weight: 600;
+          text-align: center;
+          margin-bottom: 3rem;
+          color: var(--gray-800);
+        "
+      >
+        Our Values
+      </h2>
+      <div
+        style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem"
+      >
+        <div class="card" style="padding: 2rem; text-align: center">
+          <div
+            style="
+              width: 64px;
+              height: 64px;
+              border-radius: 50%;
+              background: rgba(107, 33, 168, 0.1);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 1.5rem;
+              color: var(--primary);
+              font-size: 1.5rem;
+            "
+          >
+            <i class="fas fa-gem"></i>
+          </div>
+          <h3
+            style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem"
+          >
+            Quality First
+          </h3>
+          <p style="color: var(--gray-600); line-height: 1.6; margin: 0">
+            We source only the finest materials and rigorously test every
+            product to ensure it meets our exacting standards.
+          </p>
+        </div>
+
+        <div class="card" style="padding: 2rem; text-align: center">
+          <div
+            style="
+              width: 64px;
+              height: 64px;
+              border-radius: 50%;
+              background: rgba(107, 33, 168, 0.1);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 1.5rem;
+              color: var(--primary);
+              font-size: 1.5rem;
+            "
+          >
+            <i class="fas fa-heart"></i>
+          </div>
+          <h3
+            style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem"
+          >
+            Customer Love
+          </h3>
+          <p style="color: var(--gray-600); line-height: 1.6; margin: 0">
+            Your satisfaction is our priority. Our dedicated team is always here
+            to help you find the perfect products.
+          </p>
+        </div>
+
+        <div class="card" style="padding: 2rem; text-align: center">
+          <div
+            style="
+              width: 64px;
+              height: 64px;
+              border-radius: 50%;
+              background: rgba(107, 33, 168, 0.1);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 1.5rem;
+              color: var(--primary);
+              font-size: 1.5rem;
+            "
+          >
+            <i class="fas fa-leaf"></i>
+          </div>
+          <h3
+            style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem"
+          >
+            Sustainability
+          </h3>
+          <p style="color: var(--gray-600); line-height: 1.6; margin: 0">
+            We're committed to ethical sourcing and sustainable practices that
+            respect both people and planet.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div
+      style="
+        text-align: center;
+        padding: 3rem;
+        background: linear-gradient(
+          135deg,
+          rgba(107, 33, 168, 0.05) 0%,
+          rgba(139, 92, 246, 0.05) 100%
+        );
+        border-radius: var(--radius);
+      "
+    >
+      <h3 style="font-size: 1.5rem; margin-bottom: 1rem">
+        Ready to experience luxury?
+      </h3>
+      <p style="color: var(--gray-500); margin-bottom: 1.5rem">
+        Discover our premium collection today
+      </p>
+      <a
+        href="{% url 'products:product_list' %}"
+        class="btn btn-primary"
+        style="padding: 1rem 2.5rem"
+      >
+        Shop Now <i class="fas fa-arrow-right" style="margin-left: 0.5rem"></i>
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}
