@@ -1,269 +1,471 @@
 {% extends 'base.html' %}
-
-{% block title %}{{ site_settings.site_name|default:"Chris-Lux" }} - Premium Hair Extensions & Wigs{% endblock %}
-
-{% block meta_description %}{{ site_settings.site_description|default:"Discover premium quality hair extensions, wigs, bundles, closures, and frontals. Shop the finest virgin hair products at Chris-Lux." }}{% endblock %}
-
+<!--prettier-ignore-->
+{% block title %}{{ site_settings.site_name|default:"Chris-Lux" }} - Premium Hair Extensions & Wigs{% endblock %} {% block meta_description %}{{ site_settings.site_description|default:"Discover premium quality hair extensions, wigs, bundles, closures, and frontals. Shop the finest virgin hair products at Chris-Lux." }}{% endblock %} 
 {% block content %}
 <!-- Hero Section -->
 <section class="hero">
-    <div class="container">
-        <div class="hero-content">
-            <h1 class="hero-title">Luxurious Hair for Every Occasion</h1>
-            <p class="hero-subtitle">Discover our premium collection of virgin hair extensions, wigs, and accessories. Quality that speaks elegance.</p>
-            <div class="hero-buttons">
-                <a href="{% url 'products:product_list' %}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-shopping-bag"></i> Shop Now
-                </a>
-                <a href="{% url 'products:new_arrivals' %}" class="btn btn-outline btn-lg">
-                    New Arrivals
-                </a>
-            </div>
-        </div>
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title">Luxurious Hair for Every Occasion</h1>
+      <p class="hero-subtitle">
+        Discover our premium collection of virgin hair extensions, wigs, and
+        accessories. Quality that speaks elegance.
+      </p>
+      <div class="hero-buttons">
+        <a
+          href="{% url 'products:product_list' %}"
+          class="btn btn-primary btn-lg"
+        >
+          <i class="fas fa-shopping-bag"></i> Shop Now
+        </a>
+        <a
+          href="{% url 'products:new_arrivals' %}"
+          class="btn btn-outline btn-lg"
+        >
+          New Arrivals
+        </a>
+      </div>
     </div>
-    <img src="/static/images/hero-bg.jpg" alt="Luxury Hair" class="hero-image" onerror="this.style.display='none'">
+  </div>
+  <img
+    src="/static/images/hero-hair.jpg"
+    alt="Luxury Hair"
+    class="hero-image"
+    onerror="this.style.display = 'none'"
+  />
 </section>
 
 <!-- Categories Section -->
 <section class="section bg-gray-50">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Shop by Category</h2>
-            <p class="section-subtitle">Find the perfect hair product for your style</p>
-        </div>
-        
-        <div class="banner-grid">
-            <a href="{% url 'products:product_list' %}?type=wig" class="banner-card">
-                <img src="/static/images/category-wigs.jpg" alt="Wigs" onerror="this.src='/static/images/placeholder.jpg'">
-                <div class="banner-overlay">
-                    <h3 class="banner-title">Luxury Wigs</h3>
-                    <span class="banner-link">Shop Now <i class="fas fa-arrow-right"></i></span>
-                </div>
-            </a>
-            
-            <a href="{% url 'products:product_list' %}?type=bundle" class="banner-card">
-                <img src="/static/images/category-bundles.jpg" alt="Bundles" onerror="this.src='/static/images/placeholder.jpg'">
-                <div class="banner-overlay">
-                    <h3 class="banner-title">Hair Bundles</h3>
-                    <span class="banner-link">Shop Now <i class="fas fa-arrow-right"></i></span>
-                </div>
-            </a>
-            
-            <a href="{% url 'products:product_list' %}?type=closure" class="banner-card">
-                <img src="/static/images/category-closures.jpg" alt="Closures & Frontals" onerror="this.src='/static/images/placeholder.jpg'">
-                <div class="banner-overlay">
-                    <h3 class="banner-title">Closures & Frontals</h3>
-                    <span class="banner-link">Shop Now <i class="fas fa-arrow-right"></i></span>
-                </div>
-            </a>
-        </div>
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Shop by Category</h2>
+      <p class="section-subtitle">
+        Find the perfect hair product for your style
+      </p>
     </div>
+
+    <div class="banner-grid">
+      <a href="{% url 'products:product_list' %}?type=wig" class="banner-card">
+        <img
+          src="/static/images/category-wigs.jpg"
+          alt="Wigs"
+          onerror="this.src = '/static/images/placeholder.jpg'"
+        />
+        <div class="banner-overlay">
+          <h3 class="banner-title">Luxury Wigs</h3>
+          <span class="banner-link"
+            >Shop Now <i class="fas fa-arrow-right"></i
+          ></span>
+        </div>
+      </a>
+
+      <a
+        href="{% url 'products:product_list' %}?type=bundle"
+        class="banner-card"
+      >
+        <img
+          src="/static/images/category-bundles.jpg"
+          alt="Bundles"
+          onerror="this.src = '/static/images/placeholder.jpg'"
+        />
+        <div class="banner-overlay">
+          <h3 class="banner-title">Hair Bundles</h3>
+          <span class="banner-link"
+            >Shop Now <i class="fas fa-arrow-right"></i
+          ></span>
+        </div>
+      </a>
+
+      <a
+        href="{% url 'products:product_list' %}?type=closure"
+        class="banner-card"
+      >
+        <img
+          src="/static/images/category-closures.jpg"
+          alt="Closures & Frontals"
+          onerror="this.src = '/static/images/placeholder.jpg'"
+        />
+        <div class="banner-overlay">
+          <h3 class="banner-title">Closures & Frontals</h3>
+          <span class="banner-link"
+            >Shop Now <i class="fas fa-arrow-right"></i
+          ></span>
+        </div>
+      </a>
+    </div>
+  </div>
 </section>
 
 <!-- Featured Products Section -->
 <section class="section">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Featured Products</h2>
-            <p class="section-subtitle">Our most popular hair products handpicked for you</p>
-        </div>
-        
-        {% if featured_products %}
-        <div class="product-grid">
-            {% for product in featured_products %}
-            <div class="card" data-animate="slideUp">
-                <div class="card-image">
-                    {% if product.primary_image %}
-                    <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}">
-                    {% else %}
-                    <img src="/static/images/placeholder.jpg" alt="{{ product.name }}">
-                    {% endif %}
-                    
-                    {% if product.has_sale %}
-                    <span class="card-badge sale">-{{ product.discount_percentage }}%</span>
-                    {% elif product.is_new_arrival %}
-                    <span class="card-badge new">New</span>
-                    {% endif %}
-                    
-                    <div class="card-actions">
-                        <a href="{% url 'products:toggle_wishlist' product.slug %}" class="card-action-btn" title="Add to Wishlist">
-                            <i class="fas fa-heart"></i>
-                        </a>
-                        <a href="{% url 'products:product_detail' product.slug %}" class="card-action-btn" title="Quick View">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title">{{ product.name }}</h3>
-                    <div class="card-price">
-                        <span class="card-price-current">{{ site_settings.currency_symbol|default:"$" }}{{ product.price }}</span>
-                        {% if product.has_sale %}
-                        <span class="card-price-original">{{ site_settings.currency_symbol|default:"$" }}{{ product.compare_at_price }}</span>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        
-        <div class="text-center mt-4">
-            <a href="{% url 'products:featured' %}" class="btn btn-outline btn-lg">
-                View All Featured <i class="fas fa-arrow-right"></i>
-            </a>
-        </div>
-        {% else %}
-        <div class="text-center">
-            <p class="text-gray-500">No featured products available.</p>
-        </div>
-        {% endif %}
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Featured Products</h2>
+      <p class="section-subtitle">
+        Our most popular hair products handpicked for you
+      </p>
     </div>
+
+    {% if featured_products %}
+    <div class="product-grid">
+      {% for product in featured_products %}
+      <div class="card" data-animate="slideUp">
+        <div class="card-image">
+          {% if product.primary_image %}
+          <img
+            src="{{ product.primary_image.image.url }}"
+            alt="{{ product.name }}"
+          />
+          {% else %}
+          <img src="/static/images/placeholder.jpg" alt="{{ product.name }}" />
+          {% endif %} {% if product.has_sale %}
+          <span class="card-badge sale"
+            >-{{ product.discount_percentage }}%</span
+          >
+          {% elif product.is_new_arrival %}
+          <span class="card-badge new">New</span>
+          {% endif %}
+
+          <div class="card-actions">
+            <a
+              href="{% url 'products:toggle_wishlist' product.slug %}"
+              class="card-action-btn"
+              title="Add to Wishlist"
+            >
+              <i class="fas fa-heart"></i>
+            </a>
+            <a
+              href="{% url 'products:product_detail' product.slug %}"
+              class="card-action-btn"
+              title="Quick View"
+            >
+              <i class="fas fa-eye"></i>
+            </a>
+          </div>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">{{ product.name }}</h3>
+          <div class="card-price">
+            <span class="card-price-current"
+              >{{ site_settings.currency_symbol|default:"$" }}{{ product.price
+              }}</span
+            >
+            {% if product.has_sale %}
+            <span class="card-price-original"
+              >{{ site_settings.currency_symbol|default:"$" }}{{
+              product.compare_at_price }}</span
+            >
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="{% url 'products:featured' %}" class="btn btn-outline btn-lg">
+        View All Featured <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+    {% else %}
+    <div class="text-center">
+      <p class="text-gray-500">No featured products available.</p>
+    </div>
+    {% endif %}
+  </div>
 </section>
 
 <!-- New Arrivals Section -->
 <section class="section bg-gray-50">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">New Arrivals</h2>
-            <p class="section-subtitle">Check out our latest hair collections</p>
-        </div>
-        
-        {% if new_arrivals %}
-        <div class="product-grid">
-            {% for product in new_arrivals %}
-            <div class="card" data-animate="slideUp">
-                <div class="card-image">
-                    {% if product.primary_image %}
-                    <img src="{{ product.primary_image.image.url }}" alt="{{ product.name }}">
-                    {% else %}
-                    <img src="/static/images/placeholder.jpg" alt="{{ product.name }}">
-                    {% endif %}
-                    
-                    <span class="card-badge new">New</span>
-                    
-                    <div class="card-actions">
-                        <a href="{% url 'products:toggle_wishlist' product.slug %}" class="card-action-btn" title="Add to Wishlist">
-                            <i class="fas fa-heart"></i>
-                        </a>
-                        <a href="{% url 'products:product_detail' product.slug %}" class="card-action-btn" title="Quick View">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title">{{ product.name }}</h3>
-                    <div class="card-price">
-                        <span class="card-price-current">{{ site_settings.currency_symbol|default:"$" }}{{ product.price }}</span>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        
-        <div class="text-center mt-4">
-            <a href="{% url 'products:new_arrivals' %}" class="btn btn-primary btn-lg">
-                View All New Arrivals <i class="fas fa-arrow-right"></i>
-            </a>
-        </div>
-        {% else %}
-        <div class="text-center">
-            <p class="text-gray-500">No new arrivals available.</p>
-        </div>
-        {% endif %}
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">New Arrivals</h2>
+      <p class="section-subtitle">Check out our latest hair collections</p>
     </div>
+
+    {% if new_arrivals %}
+    <div class="product-grid">
+      {% for product in new_arrivals %}
+      <div class="card" data-animate="slideUp">
+        <div class="card-image">
+          {% if product.primary_image %}
+          <img
+            src="{{ product.primary_image.image.url }}"
+            alt="{{ product.name }}"
+          />
+          {% else %}
+          <img src="/static/images/placeholder.jpg" alt="{{ product.name }}" />
+          {% endif %}
+
+          <span class="card-badge new">New</span>
+
+          <div class="card-actions">
+            <a
+              href="{% url 'products:toggle_wishlist' product.slug %}"
+              class="card-action-btn"
+              title="Add to Wishlist"
+            >
+              <i class="fas fa-heart"></i>
+            </a>
+            <a
+              href="{% url 'products:product_detail' product.slug %}"
+              class="card-action-btn"
+              title="Quick View"
+            >
+              <i class="fas fa-eye"></i>
+            </a>
+          </div>
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">{{ product.name }}</h3>
+          <div class="card-price">
+            <span class="card-price-current"
+              >{{ site_settings.currency_symbol|default:"$" }}{{ product.price
+              }}</span
+            >
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-4">
+      <a
+        href="{% url 'products:new_arrivals' %}"
+        class="btn btn-primary btn-lg"
+      >
+        View All New Arrivals <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+    {% else %}
+    <div class="text-center">
+      <p class="text-gray-500">No new arrivals available.</p>
+    </div>
+    {% endif %}
+  </div>
 </section>
 
 <!-- Features Section -->
 <section class="section">
-    <div class="container">
-        <div class="features-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem;">
-            <div class="feature-card" style="text-align: center; padding: 2rem;">
-                <div class="feature-icon" style="width: 80px; height: 80px; background: rgba(107, 33, 168, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--primary); font-size: 2rem;">
-                    <i class="fas fa-gem"></i>
-                </div>
-                <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Premium Quality</h3>
-                <p style="color: var(--gray-600);">100% virgin human hair, unprocessed and natural</p>
-            </div>
-            
-            <div class="feature-card" style="text-align: center; padding: 2rem;">
-                <div class="feature-icon" style="width: 80px; height: 80px; background: rgba(107, 33, 168, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--primary); font-size: 2rem;">
-                    <i class="fas fa-shipping-fast"></i>
-                </div>
-                <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Fast Shipping</h3>
-                <p style="color: var(--gray-600);">Free shipping on orders over $150</p>
-            </div>
-            
-            <div class="feature-card" style="text-align: center; padding: 2rem;">
-                <div class="feature-icon" style="width: 80px; height: 80px; background: rgba(107, 33, 168, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--primary); font-size: 2rem;">
-                    <i class="fas fa-undo"></i>
-                </div>
-                <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Easy Returns</h3>
-                <p style="color: var(--gray-600);">30-day hassle-free return policy</p>
-            </div>
-            
-            <div class="feature-card" style="text-align: center; padding: 2rem;">
-                <div class="feature-icon" style="width: 80px; height: 80px; background: rgba(107, 33, 168, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--primary); font-size: 2rem;">
-                    <i class="fas fa-headset"></i>
-                </div>
-                <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">24/7 Support</h3>
-                <p style="color: var(--gray-600);">Dedicated customer service team</p>
-            </div>
+  <div class="container">
+    <div
+      class="features-grid"
+      style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem"
+    >
+      <div class="feature-card" style="text-align: center; padding: 2rem">
+        <div
+          class="feature-icon"
+          style="
+            width: 80px;
+            height: 80px;
+            background: rgba(107, 33, 168, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--primary);
+            font-size: 2rem;
+          "
+        >
+          <i class="fas fa-gem"></i>
         </div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem">
+          Premium Quality
+        </h3>
+        <p style="color: var(--gray-600)">
+          100% virgin human hair, unprocessed and natural
+        </p>
+      </div>
+
+      <div class="feature-card" style="text-align: center; padding: 2rem">
+        <div
+          class="feature-icon"
+          style="
+            width: 80px;
+            height: 80px;
+            background: rgba(107, 33, 168, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--primary);
+            font-size: 2rem;
+          "
+        >
+          <i class="fas fa-shipping-fast"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem">Fast Shipping</h3>
+        <p style="color: var(--gray-600)">Free shipping on orders over $150</p>
+      </div>
+
+      <div class="feature-card" style="text-align: center; padding: 2rem">
+        <div
+          class="feature-icon"
+          style="
+            width: 80px;
+            height: 80px;
+            background: rgba(107, 33, 168, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--primary);
+            font-size: 2rem;
+          "
+        >
+          <i class="fas fa-undo"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem">Easy Returns</h3>
+        <p style="color: var(--gray-600)">30-day hassle-free return policy</p>
+      </div>
+
+      <div class="feature-card" style="text-align: center; padding: 2rem">
+        <div
+          class="feature-icon"
+          style="
+            width: 80px;
+            height: 80px;
+            background: rgba(107, 33, 168, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: var(--primary);
+            font-size: 2rem;
+          "
+        >
+          <i class="fas fa-headset"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem">24/7 Support</h3>
+        <p style="color: var(--gray-600)">Dedicated customer service team</p>
+      </div>
     </div>
+  </div>
 </section>
 
 <!-- Testimonials Section -->
 {% if testimonials %}
 <section class="section bg-gray-50">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">What Our Customers Say</h2>
-            <p class="section-subtitle">Real reviews from real customers</p>
-        </div>
-        
-        <div class="testimonials-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
-            {% for testimonial in testimonials %}
-            <div class="testimonial-card" style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
-                <div class="testimonial-rating" style="color: var(--accent); margin-bottom: 1rem;">
-                    {% for i in "12345" %}
-                        {% if forloop.counter <= testimonial.rating %}
-                        <i class="fas fa-star"></i>
-                        {% else %}
-                        <i class="far fa-star"></i>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                <p class="testimonial-content" style="font-style: italic; margin-bottom: 1.5rem; color: var(--gray-700);">"{{ testimonial.content }}"</p>
-                <div class="testimonial-author" style="display: flex; align-items: center; gap: 1rem;">
-                    {% if testimonial.image %}
-                    <img src="{{ testimonial.image.url }}" alt="{{ testimonial.name }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
-                    {% else %}
-                    <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
-                        {{ testimonial.name|first }}
-                    </div>
-                    {% endif %}
-                    <div>
-                        <h4 style="font-weight: 600;">{{ testimonial.name }}</h4>
-                        {% if testimonial.title %}
-                        <p style="font-size: 0.875rem; color: var(--gray-500);">{{ testimonial.title }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">What Our Customers Say</h2>
+      <p class="section-subtitle">Real reviews from real customers</p>
     </div>
+
+    <div
+      class="testimonials-grid"
+      style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem"
+    >
+      {% for testimonial in testimonials %}
+      <div
+        class="testimonial-card"
+        style="
+          background: white;
+          padding: 2rem;
+          border-radius: var(--radius-lg);
+          box-shadow: var(--shadow-sm);
+        "
+      >
+        <div
+          class="testimonial-rating"
+          style="color: var(--accent); margin-bottom: 1rem"
+        >
+          {% for i in "12345" %} {% if forloop.counter <= testimonial.rating %}
+          <i class="fas fa-star"></i>
+          {% else %}
+          <i class="far fa-star"></i>
+          {% endif %} {% endfor %}
+        </div>
+        <p
+          class="testimonial-content"
+          style="
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            color: var(--gray-700);
+          "
+        >
+          "{{ testimonial.content }}"
+        </p>
+        <div
+          class="testimonial-author"
+          style="display: flex; align-items: center; gap: 1rem"
+        >
+          {% if testimonial.image %}
+          <img
+            src="{{ testimonial.image.url }}"
+            alt="{{ testimonial.name }}"
+            style="
+              width: 50px;
+              height: 50px;
+              border-radius: 50%;
+              object-fit: cover;
+            "
+          />
+          {% else %}
+          <div
+            style="
+              width: 50px;
+              height: 50px;
+              border-radius: 50%;
+              background: var(--primary);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-weight: 600;
+            "
+          >
+            {{ testimonial.name|first }}
+          </div>
+          {% endif %}
+          <div>
+            <h4 style="font-weight: 600">{{ testimonial.name }}</h4>
+            {% if testimonial.title %}
+            <p style="font-size: 0.875rem; color: var(--gray-500)">
+              {{ testimonial.title }}
+            </p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
 </section>
 {% endif %}
 
 <!-- CTA Section -->
-<section class="section" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white;">
-    <div class="container" style="text-align: center;">
-        <h2 style="font-size: 2.5rem; margin-bottom: 1rem; color: white;">Ready to Transform Your Look?</h2>
-        <p style="font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9;">Join thousands of satisfied customers who trust Chris-Lux for their hair needs.</p>
-        <a href="{% url 'products:product_list' %}" class="btn btn-accent btn-lg" style="font-size: 1.125rem; padding: 1rem 2.5rem;">
-            <i class="fas fa-shopping-bag"></i> Start Shopping
-        </a>
-    </div>
+<section
+  class="section"
+  style="
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      var(--primary-dark) 100%
+    );
+    color: white;
+  "
+>
+  <div class="container" style="text-align: center">
+    <h2 style="font-size: 2.5rem; margin-bottom: 1rem; color: white">
+      Ready to Transform Your Look?
+    </h2>
+    <p style="font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9">
+      Join thousands of satisfied customers who trust Chris-Lux for their hair
+      needs.
+    </p>
+    <a
+      href="{% url 'products:product_list' %}"
+      class="btn btn-accent btn-lg"
+      style="font-size: 1.125rem; padding: 1rem 2.5rem"
+    >
+      <i class="fas fa-shopping-bag"></i> Start Shopping
+    </a>
+  </div>
 </section>
 {% endblock %}
