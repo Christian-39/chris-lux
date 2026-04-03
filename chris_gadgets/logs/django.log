@@ -1,3 +1,4 @@
 WARNING 2026-04-03 16:08:32,553 log 41156 37468 Not Found: /favicon.ico
 WARNING 2026-04-03 16:08:32,624 basehttp 41156 37468 "GET /favicon.ico HTTP/1.1" 404 7642
 WARNING 2026-04-03 16:21:16,126 basehttp 41156 55328 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 17:35:16,098 basehttp 468172 490896 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
