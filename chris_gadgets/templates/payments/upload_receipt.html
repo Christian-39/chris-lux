@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upload Receipt - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Upload Payment Receipt</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-cloud-upload-alt fa-2x text-primary"></i>
+                        </div>
+                        <h5>Payment Receipt</h5>
+                        <p class="text-muted">Upload a clear image of your payment receipt</p>
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_receipt" class="form-label">Receipt Image *</label>
+                            <input type="file" name="receipt" class="form-control" id="id_receipt" accept="image/*,.pdf" required>
+                            <small class="form-text text-muted">Accepted formats: JPG, PNG, PDF (Max 5MB)</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_bank_name" class="form-label">Bank Name</label>
+                            <input type="text" name="bank_name" class="form-control" id="id_bank_name" placeholder="e.g., First Bank">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_transfer_reference" class="form-label">Transfer Reference Number</label>
+                            <input type="text" name="transfer_reference" class="form-control" id="id_transfer_reference" placeholder="e.g., TRX123456789">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_transfer_date" class="form-label">Transfer Date</label>
+                            <input type="date" name="transfer_date" class="form-control" id="id_transfer_date" max="{% now 'Y-m-d' %}">
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary py-2">
+                                <i class="fas fa-upload me-2"></i>Upload Receipt
+                            </button>
+                            <a href="{% url 'payments:payment' order_id=payment.order.id %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Payment
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

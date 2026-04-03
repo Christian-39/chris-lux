@@ -1,0 +1,407 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}{% if product %}Edit{% else %}Add{% endif %} Product - Admin Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">{% if product %}Edit{% else %}Add New{% endif %} Product</h2>
+        <p class="text-muted mb-0">{% if product %}Update product details{% else %}Create a new product{% endif %}</p>
+    </div>
+    <a href="{% url 'admin_dashboard:products' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Products
+    </a>
+</div>
+
+<!-- Display Form Errors -->
+{% if form.errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>Please correct the errors below:</strong>
+    <ul class="mb-0 mt-2">
+        {% for field, errors in form.errors.items %}
+            <li><strong>{{ field|title }}:</strong> {{ errors|join:", " }}</li>
+        {% endfor %}
+    </ul>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endif %}
+
+{% if form.non_field_errors %}
+<div class="alert alert-danger">
+    {{ form.non_field_errors }}
+</div>
+{% endif %}
+
+<!-- Product Form -->
+<form method="post" enctype="multipart/form-data" id="productForm" novalidate>
+    {% csrf_token %}
+    
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Basic Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Basic Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.name.label }} <span class="text-danger">*</span></label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="text-danger small">{{ form.name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.slug.label }}</label>
+                        {{ form.slug }}
+                        <small class="text-muted d-block">Leave empty to auto-generate from name</small>
+                        {% if form.slug.errors %}
+                            <div class="text-danger small">{{ form.slug.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.short_description.label }}</label>
+                        {{ form.short_description }}
+                        <small class="text-muted d-block">Brief description for product listings (max 255 characters)</small>
+                        {% if form.short_description.errors %}
+                            <div class="text-danger small">{{ form.short_description.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.description.label }}</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger small">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Pricing</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">{{ form.price.label }} (₦) <span class="text-danger">*</span></label>
+                                {{ form.price }}
+                                {% if form.price.errors %}
+                                    <div class="text-danger small">{{ form.price.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">{{ form.sale_price.label }} (₦)</label>
+                                {{ form.sale_price }}
+                                <small class="text-muted d-block">Leave empty for no sale</small>
+                                {% if form.sale_price.errors %}
+                                    <div class="text-danger small">{{ form.sale_price.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">{{ form.cost_price.label }} (₦)</label>
+                                {{ form.cost_price }}
+                                <small class="text-muted d-block">For profit calculation</small>
+                                {% if form.cost_price.errors %}
+                                    <div class="text-danger small">{{ form.cost_price.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Inventory</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">{{ form.sku.label }}</label>
+                                {{ form.sku }}
+                                {% if form.sku.errors %}
+                                    <div class="text-danger small">{{ form.sku.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">{{ form.quantity.label }} <span class="text-danger">*</span></label>
+                                {{ form.quantity }}
+                                {% if form.quantity.errors %}
+                                    <div class="text-danger small">{{ form.quantity.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">{{ form.low_stock_threshold.label }}</label>
+                                {{ form.low_stock_threshold }}
+                                {% if form.low_stock_threshold.errors %}
+                                    <div class="text-danger small">{{ form.low_stock_threshold.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-check">
+                        {{ form.track_inventory }}
+                        <label class="form-check-label">{{ form.track_inventory.label }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Images -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Product Images</h5>
+                </div>
+                <div class="card-body">
+                    {% if product and product.images.all %}
+                    <div class="row mb-3">
+                        {% for image in product.images.all %}
+                        <div class="col-md-3 mb-3">
+                            <div class="position-relative">
+                                <img src="{{ image.image.url }}" alt="Product Image" class="img-fluid rounded">
+                                {% if image.is_primary %}
+                                <span class="badge bg-primary position-absolute top-0 start-0 m-1">Primary</span>
+                                {% endif %}
+                                <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1" onclick="deleteImage({{ image.id }})">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label class="form-label">Upload Images</label>
+                        <input type="file" name="images" class="form-control" multiple accept="image/*">
+                        <small class="text-muted">You can select multiple images. First image will be set as primary.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEO -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">SEO Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.meta_title.label }}</label>
+                        {{ form.meta_title }}
+                        {% if form.meta_title.errors %}
+                            <div class="text-danger small">{{ form.meta_title.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.meta_description.label }}</label>
+                        {{ form.meta_description }}
+                        {% if form.meta_description.errors %}
+                            <div class="text-danger small">{{ form.meta_description.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Publish -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Publish</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.is_active }}
+                            <label class="form-check-label">{{ form.is_active.label }}</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.is_featured }}
+                            <label class="form-check-label">{{ form.is_featured.label }}</label>
+                        </div>
+                    </div>
+                    <!-- Condition Field - Add this to your form -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Condition</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Condition <span class="text-danger">*</span></label>
+                                {{ form.condition }}
+                                {% if form.condition.errors %}
+                                    <div class="text-danger small">{{ form.condition.errors }}</div>
+                                {% endif %}
+                                <small class="text-muted">Select the product condition</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>{% if product %}Update{% else %}Create{% endif %} Product
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Category</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.category.label }} <span class="text-danger">*</span></label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                            <div class="text-danger small">{{ form.category.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tags</label>
+                        <input type="text" name="tags" class="form-control" value="{{ product_tags|default:'' }}" placeholder="e.g., wireless, bluetooth, new">
+                        <small class="text-muted">Separate tags with commas</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Specifications -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Specifications</h5>
+                </div>
+                <div class="card-body">
+                    <div id="specifications">
+                        {% if product_specifications %}
+                            {% for spec in product_specifications %}
+                            <div class="row specification-row mb-2">
+                                <div class="col-5">
+                                    <input type="text" name="spec_name[]" class="form-control form-control-sm" value="{{ spec.name }}" placeholder="Name">
+                                </div>
+                                <div class="col-5">
+                                    <input type="text" name="spec_value[]" class="form-control form-control-sm" value="{{ spec.value }}" placeholder="Value">
+                                </div>
+                                <div class="col-2">
+                                    <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeSpec(this)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% elif product and product.specifications %}
+                            {% for name, value in product.specifications.items %}
+                            <div class="row specification-row mb-2">
+                                <div class="col-5">
+                                    <input type="text" name="spec_name[]" class="form-control form-control-sm" value="{{ name }}" placeholder="Name">
+                                </div>
+                                <div class="col-5">
+                                    <input type="text" name="spec_value[]" class="form-control form-control-sm" value="{{ value }}" placeholder="Value">
+                                </div>
+                                <div class="col-2">
+                                    <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeSpec(this)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm w-100" onclick="addSpec()">
+                        <i class="fas fa-plus me-1"></i>Add Specification
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add Bootstrap form classes to Django form inputs
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('input[type="text"], input[type="number"], input[type="email"], input[type="url"], textarea, select');
+        inputs.forEach(input => {
+            if (!input.classList.contains('form-check-input')) {
+                input.classList.add('form-control');
+            }
+        });
+        
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.classList.add('form-check-input');
+        });
+        
+        const selects = document.querySelectorAll('select');
+        selects.forEach(s => {
+            s.classList.remove('form-control');
+            s.classList.add('form-select');
+        });
+    });
+
+    function addSpec() {
+        const container = document.getElementById('specifications');
+        const row = document.createElement('div');
+        row.className = 'row specification-row mb-2';
+        row.innerHTML = `
+            <div class="col-5">
+                <input type="text" name="spec_name[]" class="form-control form-control-sm" placeholder="Name">
+            </div>
+            <div class="col-5">
+                <input type="text" name="spec_value[]" class="form-control form-control-sm" placeholder="Value">
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeSpec(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        container.appendChild(row);
+    }
+
+    function removeSpec(btn) {
+        btn.closest('.specification-row').remove();
+    }
+
+    {% if product %}
+    function deleteImage(imageId) {
+        if (confirm('Are you sure you want to delete this image?')) {
+            fetch(`/dashboard/products/image/${imageId}/delete/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to delete image');
+                }
+            });
+        }
+    }
+    {% endif %}
+</script>
+{% endblock %}

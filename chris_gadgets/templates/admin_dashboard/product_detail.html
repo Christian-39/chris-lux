@@ -1,0 +1,405 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - Product Details{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'admin_dashboard:products' %}">Products</a></li>
+                <li class="breadcrumb-item active">{{ product.name|truncatechars:30 }}</li>
+            </ol>
+        </nav>
+        <h2 class="mb-0">{{ product.name }}</h2>
+        <p class="text-muted mb-0">SKU: {{ product.sku }}</p>
+    </div>
+    <div class="btn-group">
+        <a href="{{ product.get_absolute_url }}" target="_blank" class="btn btn-outline-info">
+            <i class="fas fa-external-link-alt me-2"></i>View on Site
+        </a>
+        <a href="{% url 'admin_dashboard:product_edit' product.id %}" class="btn btn-warning">
+            <i class="fas fa-edit me-2"></i>Edit Product
+        </a>
+        <a href="{% url 'admin_dashboard:products' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</div>
+
+<!-- Product Overview Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Price</h6>
+                        <h3 class="mb-0">₦{{ product.price|floatformat:2 }}</h3>
+                    </div>
+                    <i class="fas fa-tag fa-2x opacity-50"></i>
+                </div>
+                {% if product.compare_at_price %}
+                <small class="text-white-50">
+                    <del>₦{{ product.compare_at_price|floatformat:2 }}</del> 
+                    ({{ product.discount_percentage }}% off)
+                </small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Stock</h6>
+                        <h3 class="mb-0">{{ product.quantity }}</h3>
+                    </div>
+                    <i class="fas fa-box fa-2x opacity-50"></i>
+                </div>
+                <small class="text-white-50">{{ product.get_stock_status_display }}</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Sales</h6>
+                        <h3 class="mb-0">{{ product.sales_count|default:0 }}</h3>
+                    </div>
+                    <i class="fas fa-shopping-cart fa-2x opacity-50"></i>
+                </div>
+                <small class="text-white-50">Total sold</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Views</h6>
+                        <h3 class="mb-0">{{ product.view_count|default:0 }}</h3>
+                    </div>
+                    <i class="fas fa-eye fa-2x opacity-50"></i>
+                </div>
+                <small class="text-white-50">Total views</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column -->
+    <div class="col-lg-8">
+        <!-- Product Images -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Product Images</h5>
+            </div>
+            <div class="card-body">
+                {% if images %}
+                <div class="row g-3">
+                    {% for image in images %}
+                    <div class="col-md-3">
+                        <div class="position-relative">
+                            <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" 
+                                 class="img-fluid rounded border" style="height: 150px; object-fit: cover; width: 100%;">
+                            {% if image.is_primary %}
+                            <span class="badge bg-primary position-absolute top-0 start-0 m-2">Primary</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-image fa-3x mb-3"></i>
+                    <p>No images uploaded</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Product Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Product Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <table class="table table-borderless table-sm">
+                            <tr>
+                                <td class="text-muted" width="40%">Name:</td>
+                                <td class="fw-medium">{{ product.name }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">SKU:</td>
+                                <td class="fw-medium">{{ product.sku }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Slug:</td>
+                                <td class="fw-medium">{{ product.slug }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Category:</td>
+                                <td class="fw-medium">
+                                    <a href="{% url 'admin_dashboard:categories' %}">{{ product.category.name }}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Brand:</td>
+                                <td class="fw-medium">
+                                    {% if product.brand %}
+                                    <a href="{% url 'admin_dashboard:brands' %}">{{ product.brand.name }}</a>
+                                    {% else %}-{% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless table-sm">
+                            <tr>
+                                <td class="text-muted" width="40%">Condition:</td>
+                                <td class="fw-medium">{{ product.get_condition_display }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Status:</td>
+                                <td class="fw-medium">
+                                    {% if product.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Featured:</td>
+                                <td class="fw-medium">
+                                    {% if product.is_featured %}
+                                    <span class="badge bg-warning text-dark">Yes</span>
+                                    {% else %}No{% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Created:</td>
+                                <td class="fw-medium">{{ product.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Updated:</td>
+                                <td class="fw-medium">{{ product.updated_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h6 class="text-muted mb-2">Short Description</h6>
+                <p>{{ product.short_description|linebreaks }}</p>
+
+                <h6 class="text-muted mb-2">Full Description</h6>
+                <p>{{ product.description|linebreaks }}</p>
+
+                {% if product.key_highlights %}
+                <h6 class="text-muted mb-2">Key Highlights</h6>
+                <ul>
+                    {% for highlight in product.key_highlights %}
+                    <li>{{ highlight }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Specifications -->
+        {% if product.specifications %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Specifications</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tbody>
+                        {% for key, value in product.specifications.items %}
+                        <tr>
+                            <td class="text-muted" width="30%">{{ key }}</td>
+                            <td class="fw-medium">{{ value }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Reviews -->
+        {% if reviews %}
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Reviews</h5>
+                <a href="{% url 'admin_dashboard:reviews' %}?product={{ product.id }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% for review in reviews %}
+                <div class="border-bottom pb-3 mb-3 {% if forloop.last %}border-0 mb-0 pb-0{% endif %}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="d-flex align-items-center mb-2">
+                                <strong class="me-2">{{ review.user.get_full_name|default:review.user.email }}</strong>
+                                <span class="text-warning">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                                {% if review.is_verified_purchase %}
+                                <span class="badge bg-success ms-2">Verified Purchase</span>
+                                {% endif %}
+                            </div>
+                            <p class="mb-1">{{ review.comment }}</p>
+                            <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        {% if not review.is_approved %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-lg-4">
+        <!-- Pricing Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Pricing</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless table-sm">
+                    <tr>
+                        <td class="text-muted">Regular Price:</td>
+                        <td class="text-end fw-bold">₦{{ product.price|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Compare at Price:</td>
+                        <td class="text-end">
+                            {% if product.compare_at_price %}
+                            <del>₦{{ product.compare_at_price|floatformat:2 }}</del>
+                            {% else %}-{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Cost Price:</td>
+                        <td class="text-end">
+                            {% if product.cost_price %}
+                            ₦{{ product.cost_price|floatformat:2 }}
+                            {% else %}-{% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Inventory Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Inventory</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless table-sm">
+                    <tr>
+                        <td class="text-muted">Quantity:</td>
+                        <td class="text-end fw-bold">{{ product.quantity }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Low Stock Threshold:</td>
+                        <td class="text-end">{{ product.low_stock_threshold }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Stock Status:</td>
+                        <td class="text-end">
+                            <span class="badge bg-{% if product.stock_status == 'in_stock' %}success{% elif product.stock_status == 'low_stock' %}warning{% else %}danger{% endif %}">
+                                {{ product.get_stock_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- SEO Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">SEO</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block">Meta Title:</small>
+                    <span class="fw-medium">{{ product.meta_title|default:"Not set" }}</span>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block">Meta Description:</small>
+                    <span class="small">{{ product.meta_description|default:"Not set"|truncatechars:100 }}</span>
+                </div>
+                <div>
+                    <small class="text-muted d-block">Meta Keywords:</small>
+                    <span class="small">{{ product.meta_keywords|default:"Not set" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'admin_dashboard:product_edit' product.id %}" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>Edit Product
+                    </a>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="fas fa-trash me-2"></i>Delete Product
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete "<strong>{{ product.name }}</strong>"?</p>
+                <p class="text-danger mb-0">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{% url 'admin_dashboard:product_delete' product.id %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

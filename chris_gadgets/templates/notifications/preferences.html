@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notification Preferences - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 mb-4">
+            {% include 'accounts/includes/sidebar.html' %}
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-bell me-2"></i>Notification Preferences</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Email Notifications -->
+                        <h6 class="fw-bold mb-3">Email Notifications</h6>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="email_order_updates" class="form-check-input" id="email_order_updates" {% if preferences.email_order_updates %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_order_updates">Order updates</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="email_payment_updates" class="form-check-input" id="email_payment_updates" {% if preferences.email_payment_updates %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_payment_updates">Payment updates</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="email_promotions" class="form-check-input" id="email_promotions" {% if preferences.email_promotions %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_promotions">Promotions and offers</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="email_product_updates" class="form-check-input" id="email_product_updates" {% if preferences.email_product_updates %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_product_updates">Product updates</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="email_messages" class="form-check-input" id="email_messages" {% if preferences.email_messages %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_messages">New messages</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="email_reviews" class="form-check-input" id="email_reviews" {% if preferences.email_reviews %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_reviews">Review notifications</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="email_wishlist" class="form-check-input" id="email_wishlist" {% if preferences.email_wishlist %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_wishlist">Wishlist updates</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="email_cart_reminders" class="form-check-input" id="email_cart_reminders" {% if preferences.email_cart_reminders %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_cart_reminders">Cart reminders</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- SMS Notifications -->
+                        <h6 class="fw-bold mb-3">SMS Notifications</h6>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="sms_order_updates" class="form-check-input" id="sms_order_updates" {% if preferences.sms_order_updates %}checked{% endif %}>
+                                    <label class="form-check-label" for="sms_order_updates">Order updates</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="sms_payment_updates" class="form-check-input" id="sms_payment_updates" {% if preferences.sms_payment_updates %}checked{% endif %}>
+                                    <label class="form-check-label" for="sms_payment_updates">Payment updates</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="sms_promotions" class="form-check-input" id="sms_promotions" {% if preferences.sms_promotions %}checked{% endif %}>
+                                    <label class="form-check-label" for="sms_promotions">Promotions</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="sms_delivery_updates" class="form-check-input" id="sms_delivery_updates" {% if preferences.sms_delivery_updates %}checked{% endif %}>
+                                    <label class="form-check-label" for="sms_delivery_updates">Delivery updates</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- Push Notifications -->
+                        <h6 class="fw-bold mb-3">Push Notifications</h6>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="push_order_updates" class="form-check-input" id="push_order_updates" {% if preferences.push_order_updates %}checked{% endif %}>
+                                    <label class="form-check-label" for="push_order_updates">Order updates</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="push_payment_updates" class="form-check-input" id="push_payment_updates" {% if preferences.push_payment_updates %}checked{% endif %}>
+                                    <label class="form-check-label" for="push_payment_updates">Payment updates</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="push_promotions" class="form-check-input" id="push_promotions" {% if preferences.push_promotions %}checked{% endif %}>
+                                    <label class="form-check-label" for="push_promotions">Promotions</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="push_messages" class="form-check-input" id="push_messages" {% if preferences.push_messages %}checked{% endif %}>
+                                    <label class="form-check-label" for="push_messages">New messages</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="push_reviews" class="form-check-input" id="push_reviews" {% if preferences.push_reviews %}checked{% endif %}>
+                                    <label class="form-check-label" for="push_reviews">Review notifications</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="push_wishlist" class="form-check-input" id="push_wishlist" {% if preferences.push_wishlist %}checked{% endif %}>
+                                    <label class="form-check-label" for="push_wishlist">Wishlist updates</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" name="push_cart_reminders" class="form-check-input" id="push_cart_reminders" {% if preferences.push_cart_reminders %}checked{% endif %}>
+                                    <label class="form-check-label" for="push_cart_reminders">Cart reminders</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- Quiet Hours -->
+                        <h6 class="fw-bold mb-3">Quiet Hours</h6>
+                        <div class="mb-4">
+                            <div class="form-check mb-3">
+                                <input type="checkbox" name="quiet_hours_enabled" class="form-check-input" id="quiet_hours_enabled" {% if preferences.quiet_hours_enabled %}checked{% endif %}>
+                                <label class="form-check-label" for="quiet_hours_enabled">Enable quiet hours</label>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="quiet_hours_start" class="form-label">Start Time</label>
+                                    <input type="time" name="quiet_hours_start" class="form-control" id="quiet_hours_start" value="{{ preferences.quiet_hours_start|time:'H:i' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="quiet_hours_end" class="form-label">End Time</label>
+                                    <input type="time" name="quiet_hours_end" class="form-control" id="quiet_hours_end" value="{{ preferences.quiet_hours_end|time:'H:i' }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Preferences
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

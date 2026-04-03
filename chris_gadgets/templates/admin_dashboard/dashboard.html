@@ -1,0 +1,438 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1">Dashboard</h4>
+        <p class="text-muted mb-0">Welcome back, {{ request.user.first_name }}! Here's what's happening today.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'admin_dashboard:product_create' %}" class="btn btn-admin btn-admin-primary">
+            <i class="fas fa-plus me-2"></i>Add Product
+        </a>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <!-- Orders Stats -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="stat-value">{{ stats.today_orders }}</div>
+            <div class="stat-label">Today's Orders</div>
+            <div class="stat-change positive">
+                <i class="fas fa-arrow-up me-1"></i>{{ stats.total_orders }} total
+            </div>
+        </div>
+    </div>
+    
+    <!-- Revenue Stats -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon bg-success bg-opacity-10 text-success">
+                <i class="fas fa-naira-sign"></i>
+            </div>
+            <div class="stat-value">₦{{ stats.today_revenue|intcomma }}</div>
+            <div class="stat-label">Today's Revenue</div>
+            <div class="stat-change positive">
+                <i class="fas fa-chart-line me-1"></i>From verified payments
+            </div>
+        </div>
+    </div>
+    
+    <!-- Customers Stats -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon bg-info bg-opacity-10 text-info">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value">{{ stats.new_customers_today }}</div>
+            <div class="stat-label">New Customers Today</div>
+            <div class="stat-change positive">
+                <i class="fas fa-user-plus me-1"></i>{{ stats.total_customers }} total
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pending Payments -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-value">{{ stats.awaiting_verification }}</div>
+            <div class="stat-label">Pending Verification</div>
+            <div class="stat-change {% if stats.awaiting_verification > 0 %}negative{% else %}positive{% endif %}">
+                {% if stats.awaiting_verification > 0 %}
+                    <i class="fas fa-exclamation-circle me-1"></i>Needs attention
+                {% else %}
+                    <i class="fas fa-check me-1"></i>All caught up
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Status Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h5 class="admin-card-title">Order Status Overview</h5>
+                <a href="{% url 'admin_dashboard:orders' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="admin-card-body">
+                <div class="row text-center">
+                    <div class="col-6 col-md-4 col-lg-2 mb-3">
+                        <div class="p-3 rounded bg-warning bg-opacity-10">
+                            <h3 class="text-warning mb-1">{{ stats.pending_orders }}</h3>
+                            <small class="text-muted">Pending</small>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2 mb-3">
+                        <div class="p-3 rounded bg-info bg-opacity-10">
+                            <h3 class="text-info mb-1">{{ stats.processing_orders }}</h3>
+                            <small class="text-muted">Processing</small>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2 mb-3">
+                        <div class="p-3 rounded bg-primary bg-opacity-10">
+                            <h3 class="text-primary mb-1">{{ stats.shipped_orders }}</h3>
+                            <small class="text-muted">Shipped</small>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2 mb-3">
+                        <div class="p-3 rounded bg-success bg-opacity-10">
+                            <h3 class="text-success mb-1">{{ stats.delivered_orders }}</h3>
+                            <small class="text-muted">Delivered</small>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2 mb-3">
+                        <div class="p-3 rounded bg-danger bg-opacity-10">
+                            <h3 class="text-danger mb-1">{{ stats.cancelled_orders }}</h3>
+                            <small class="text-muted">Cancelled</small>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2 mb-3">
+                        <div class="p-3 rounded bg-dark bg-opacity-10">
+                            <h3 class="text-dark mb-1">{{ stats.total_orders }}</h3>
+                            <small class="text-muted">Total</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts & Tables Row -->
+<div class="row g-4 mb-4">
+    <!-- Sales Chart -->
+    <div class="col-lg-8">
+        <div class="admin-card h-100">
+            <div class="admin-card-header">
+                <h5 class="admin-card-title">Sales Overview (Last 7 Days)</h5>
+                <a href="{% url 'admin_dashboard:reports' %}" class="btn btn-sm btn-outline-primary">View Reports</a>
+            </div>
+            <div class="admin-card-body">
+                <canvas id="salesChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="col-lg-4">
+        <div class="admin-card h-100">
+            <div class="admin-card-header">
+                <h5 class="admin-card-title">Quick Actions</h5>
+            </div>
+            <div class="admin-card-body">
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'admin_dashboard:orders' %}?status=pending" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-clock text-warning me-2"></i>Pending Orders</span>
+                        <span class="badge bg-warning rounded-pill">{{ stats.pending_orders }}</span>
+                    </a>
+                    <a href="{% url 'admin_dashboard:payments' %}?status=awaiting_verification" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-receipt text-info me-2"></i>Payments to Verify</span>
+                        <span class="badge bg-info rounded-pill">{{ stats.awaiting_verification }}</span>
+                    </a>
+                    <a href="{% url 'admin_dashboard:messages' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-envelope text-primary me-2"></i>New Messages</span>
+                        <span class="badge bg-primary rounded-pill">{{ stats.unread_messages }}</span>
+                    </a>
+                    <a href="{% url 'admin_dashboard:conversations' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-comments text-success me-2"></i>Open Conversations</span>
+                        <span class="badge bg-success rounded-pill">{{ stats.open_conversations }}</span>
+                    </a>
+                    <a href="{% url 'admin_dashboard:reviews' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-star text-warning me-2"></i>Pending Reviews</span>
+                        <span class="badge bg-warning rounded-pill">{{ stats.pending_reviews }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Orders & Payments -->
+<div class="row g-4 mb-4">
+    <!-- Recent Orders -->
+    <div class="col-lg-6">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h5 class="admin-card-title">Recent Orders</h5>
+                <a href="{% url 'admin_dashboard:orders' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="admin-card-body p-0">
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'admin_dashboard:order_detail' order.id %}" class="fw-semibold text-primary">
+                                        {{ order.order_number }}
+                                    </a>
+                                </td>
+                                <td>{{ order.user.get_full_name|default:order.user.email }}</td>
+                                <td>₦{{ order.total|intcomma }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ order.status }}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No orders yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Payments -->
+    <div class="col-lg-6">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h5 class="admin-card-title">Recent Payments</h5>
+                <a href="{% url 'admin_dashboard:payments' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="admin-card-body p-0">
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Reference</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in recent_payments %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'admin_dashboard:payment_verify' payment.id %}" class="fw-semibold text-primary">
+                                        {{ payment.payment_reference }}
+                                    </a>
+                                </td>
+                                <td>{{ payment.user.get_full_name|default:payment.user.email }}</td>
+                                <td>₦{{ payment.amount|intcomma }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ payment.status }}">
+                                        {{ payment.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No payments yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Low Stock & New Customers -->
+<div class="row g-4">
+    <!-- Low Stock Products -->
+    <div class="col-lg-6">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h5 class="admin-card-title">Low Stock Alert</h5>
+                <a href="{% url 'admin_dashboard:products' %}?status=low_stock" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="admin-card-body p-0">
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in low_stock_products %}
+                            <tr>
+                                <td>{{ product.name|truncatechars:30 }}</td>
+                                <td>{{ product.category.name }}</td>
+                                <td>
+                                    <span class="badge {% if product.quantity == 0 %}bg-danger{% else %}bg-warning{% endif %}">
+                                        {{ product.quantity }} left
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'admin_dashboard:product_edit' product.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No low stock products</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- New Customers -->
+    <div class="col-lg-6">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h5 class="admin-card-title">New Customers</h5>
+                <a href="{% url 'admin_dashboard:customers' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="admin-card-body p-0">
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Email</th>
+                                <th>Joined</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for customer in recent_customers %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                            {{ customer.initials }}
+                                        </div>
+                                        {{ customer.get_full_name|default:customer.email }}
+                                    </div>
+                                </td>
+                                <td>{{ customer.email }}</td>
+                                <td>{{ customer.date_joined|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'admin_dashboard:customer_detail' customer.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No new customers</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Sales Chart
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ sales_labels|safe }},
+            datasets: [{
+                label: 'Revenue (₦)',
+                data: {{ sales_data|safe }},
+                borderColor: '#4f46e5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#4f46e5',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return '₦' + context.parsed.y.toLocaleString();
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₦' + value.toLocaleString();
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

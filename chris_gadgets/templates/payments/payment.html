@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Payment - Order #{{ order.order_number }} - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Payment Status -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-clock fa-4x text-warning"></i>
+                    </div>
+                    <h4 class="mb-2">Awaiting Payment</h4>
+                    <p class="text-muted">Please complete your payment to process your order</p>
+                    <div class="mt-3">
+                        <span class="badge bg-info fs-6">Order #{{ order.order_number }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Payment Instructions -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-university me-2"></i>Bank Transfer Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Please transfer the exact amount to one of the bank accounts below. Upload your payment receipt after making the transfer.
+                    </div>
+                    
+                    <div class="row g-3">
+                        {% for account in bank_accounts %}
+                        <div class="col-md-6">
+                            <div class="card h-100 border">
+                                <div class="card-body">
+                                    <h6 class="fw-bold">{{ account.bank_name }}</h6>
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <tr>
+                                            <td class="text-muted">Account Name:</td>
+                                            <td class="fw-semibold">{{ account.account_name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">Account Number:</td>
+                                            <td class="fw-semibold">
+                                                <span class="account-number">{{ account.account_number }}</span>
+                                                <button class="btn btn-link btn-sm p-0 ms-2" onclick="copyToClipboard('{{ account.account_number }}')">
+                                                    <i class="fas fa-copy"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    {% if account.instructions %}
+                                    <small class="text-muted d-block mt-2">{{ account.instructions }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <p class="mb-1 text-muted">Amount to Pay:</p>
+                                <h4 class="text-primary fw-bold mb-0">{{ site_settings.default_currency }}{{ order.total|intcomma }}</h4>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1 text-muted">Payment Reference:</p>
+                                <h6 class="fw-bold mb-0">{{ payment.payment_reference }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if payment.qr_code %}
+                    <div class="mt-4 text-center">
+                        <p class="text-muted mb-2">Scan QR code to pay:</p>
+                        <img src="{{ payment.qr_code.url }}" alt="Payment QR Code" class="img-fluid" style="max-width: 200px;">
+                        <p class="small text-muted mt-2">
+                            <a href="{% url 'payments:download_qr' payment.id %}" class="text-decoration-none">
+                                <i class="fas fa-download me-1"></i>Download QR Code
+                            </a>
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Upload Receipt -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Upload Payment Receipt</h5>
+                </div>
+                <div class="card-body">
+                    {% if payment.can_upload_receipt %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                        <h6>Upload Your Receipt</h6>
+                        <p class="text-muted">Upload a clear image of your payment receipt or screenshot</p>
+                        <a href="{% url 'payments:upload_receipt' payment.id %}" class="btn btn-primary">
+                            <i class="fas fa-upload me-2"></i>Upload Receipt
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Receipt uploaded successfully! We will verify your payment shortly.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Order Details -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-shopping-bag me-2"></i>Order Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Order Number:</p>
+                            <p class="fw-semibold">{{ order.order_number }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Order Date:</p>
+                            <p class="fw-semibold">{{ order.created_at|date:"F d, Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Shipping Address:</p>
+                            <p class="mb-0">{{ order.shipping_name }}</p>
+                            <p class="mb-0">{{ order.shipping_phone }}</p>
+                            <p class="mb-0">{{ order.shipping_address }}</p>
+                            <p class="mb-0">{{ order.shipping_city }}, {{ order.get_shipping_state_display }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Order Total:</p>
+                            <p class="fw-bold text-primary fs-5">{{ site_settings.default_currency }}{{ order.total|intcomma }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-eye me-2"></i>View Full Order Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert('Account number copied to clipboard!');
+    });
+}
+</script>
+{% endblock %}

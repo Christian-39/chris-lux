@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% load payment_extras %}
+
+{% block title %}Payment Status - {{ payment.payment_reference }} - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:order_history' %}">Orders</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'orders:order_detail' order.id %}">Order #{{ order.order_number }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Payment Status</li>
+                </ol>
+            </nav>
+
+            <!-- Payment Status Card -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body text-center py-5">
+                    {% if payment.status == 'verified' %}
+                        <div class="mb-4">
+                            <div class="status-icon bg-success">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                        <h4 class="mb-2 text-success">Payment Verified</h4>
+                        <p class="text-muted">Your payment has been verified successfully. Your order is now being processed.</p>
+                    
+                    {% elif payment.status == 'awaiting_verification' %}
+                        <div class="mb-4">
+                            <div class="status-icon bg-info">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <h4 class="mb-2 text-info">Awaiting Verification</h4>
+                        <p class="text-muted">Your receipt has been uploaded and is pending verification. We'll notify you once it's confirmed.</p>
+                    
+                    {% elif payment.status == 'pending' %}
+                        <div class="mb-4">
+                            <div class="status-icon bg-warning">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                        </div>
+                        <h4 class="mb-2 text-warning">Payment Pending</h4>
+                        <p class="text-muted">Please complete your payment and upload your receipt.</p>
+                    
+                    {% elif payment.status == 'rejected' %}
+                        <div class="mb-4">
+                            <div class="status-icon bg-danger">
+                                <i class="fas fa-times"></i>
+                            </div>
+                        </div>
+                        <h4 class="mb-2 text-danger">Payment Rejected</h4>
+                        <p class="text-muted">Your payment verification was unsuccessful. Please review the reason and resubmit.</p>
+                        {% if payment.rejection_reason %}
+                            <div class="alert alert-danger mt-3 mx-auto" style="max-width: 500px;">
+                                <strong><i class="fas fa-exclamation-triangle me-2"></i>Reason:</strong>
+                                <p class="mb-0 mt-1">{{ payment.rejection_reason }}</p>
+                            </div>
+                        {% endif %}
+                    
+                    {% elif payment.status == 'refunded' %}
+                        <div class="mb-4">
+                            <div class="status-icon bg-secondary">
+                                <i class="fas fa-undo"></i>
+                            </div>
+                        </div>
+                        <h4 class="mb-2 text-secondary">Payment Refunded</h4>
+                        <p class="text-muted">Your payment has been refunded. Please allow 3-5 business days for the funds to appear in your account.</p>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <span class="badge bg-{{ payment.status_display_class }} fs-6 me-2">{{ payment.get_status_display }}</span>
+                        <span class="badge bg-dark fs-6">{{ payment.payment_reference }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-center gap-3 mb-4">
+                {% if payment.can_upload_receipt %}
+                    <a href="{% url 'payments:upload_receipt' payment.id %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-upload me-2"></i>Upload Receipt
+                    </a>
+                {% endif %}
+                
+                {% if payment.status == 'rejected' %}
+                    <a href="{% url 'payments:resend_verification' payment.id %}" class="btn btn-warning btn-lg">
+                        <i class="fas fa-redo me-2"></i>Resubmit Payment
+                    </a>
+                {% endif %}
+                
+                <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-shopping-bag me-2"></i>View Order
+                </a>
+            </div>
+
+            <!-- Payment Details -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Payment Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <p class="text-muted mb-1">Payment Reference:</p>
+                            <p class="fw-semibold">{{ payment.payment_reference }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <p class="text-muted mb-1">Payment Method:</p>
+                            <p class="fw-semibold">{{ payment.get_method_display }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <p class="text-muted mb-1">Amount:</p>
+                            <p class="fw-bold text-primary fs-5">{{ site_settings.default_currency }}{{ payment.amount|intcomma }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <p class="text-muted mb-1">Payment Date:</p>
+                            <p class="fw-semibold">{{ payment.created_at|date:"F d, Y" }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if payment.bank_name %}
+                        <hr>
+                        <h6 class="fw-bold mb-3">Transfer Details</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <p class="text-muted mb-1">Bank Name:</p>
+                                <p class="fw-semibold">{{ payment.bank_name }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <p class="text-muted mb-1">Transfer Reference:</p>
+                                <p class="fw-semibold">{{ payment.transfer_reference|default:"N/A" }}</p>
+                            </div>
+                        </div>
+                        {% if payment.transfer_date %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="text-muted mb-1">Transfer Date:</p>
+                                    <p class="fw-semibold">{{ payment.transfer_date|date:"F d, Y" }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% if payment.verified_at %}
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="text-muted mb-1">Verified On:</p>
+                                <p class="fw-semibold">{{ payment.verified_at|date:"F d, Y" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="text-muted mb-1">Verified By:</p>
+                                <p class="fw-semibold">{{ payment.verified_by.get_full_name|default:payment.verified_by.email }}</p>
+                            </div>
+                        </div>
+                        {% if payment.verification_notes %}
+                            <div class="mt-3">
+                                <p class="text-muted mb-1">Verification Notes:</p>
+                                <p class="fst-italic">{{ payment.verification_notes }}</p>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Receipt Section -->
+            {% if payment.receipt %}
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Uploaded Receipt</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center">
+                            <a href="{{ payment.receipt.url }}" target="_blank" class="d-inline-block">
+                                <img src="{{ payment.receipt.url }}" alt="Payment Receipt" class="img-fluid rounded" style="max-height: 400px;">
+                            </a>
+                            <p class="mt-3">
+                                <a href="{{ payment.receipt.url }}" target="_blank" class="btn btn-outline-primary">
+                                    <i class="fas fa-external-link-alt me-2"></i>View Full Size
+                                </a>
+                            </p>
+                            <p class="text-muted small">
+                                <i class="fas fa-clock me-1"></i>Uploaded on {{ payment.receipt_uploaded_at|date:"F d, Y" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Order Summary -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-shopping-bag me-2"></i>Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Order Number:</p>
+                            <p class="fw-semibold">{{ order.order_number }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Order Status:</p>
+                            <span class="badge bg-{{ order.status_display_class }}">{{ order.get_status_display }}</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Order Date:</p>
+                            <p class="fw-semibold">{{ order.created_at|date:"F d, Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted mb-1">Order Total:</p>
+                            <p class="fw-bold text-primary fs-5">{{ site_settings.default_currency }}{{ order.total|intcomma }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-eye me-2"></i>View Full Order Details
+                    </a>
+                </div>
+            </div>
+
+            <!-- Verification Timeline -->
+            {% if payment.verification_logs.exists %}
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0"><i class="fas fa-history me-2"></i>Payment History</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            {% for log in payment.verification_logs.all %}
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-{{ log.action|action_color }}"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">{{ log.get_action_display }}</h6>
+                                        <p class="text-muted small mb-1">{{ log.created_at|date:"F d, Y" }} at {{ log.created_at|time:"H:i" }}</p>
+                                        {% if log.old_status and log.new_status %}
+                                            <p class="small mb-0">
+                                                <span class="badge bg-secondary">{{ log.get_old_status_display|default:log.old_status }}</span>
+                                                <i class="fas fa-arrow-right mx-2 text-muted"></i>
+                                                <span class="badge bg-{{ log.new_status|status_color }}">{{ log.get_new_status_display|default:log.new_status }}</span>
+                                            </p>
+                                        {% endif %}
+                                        {% if log.notes %}
+                                            <p class="small text-muted mt-1 mb-0">{{ log.notes }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Help Section -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-headset fa-2x text-primary"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-1">Need Help?</h6>
+                            <p class="text-muted mb-2">If you have any questions about your payment, please contact our support team.</p>
+                            <a href="{% url 'core:contact' %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-envelope me-1"></i>Contact Support
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.status-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.status-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--bs-border-color);
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -26px;
+    top: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px var(--bs-border-color);
+}
+
+.timeline-content {
+    background-color: var(--bs-light);
+    padding: 15px;
+    border-radius: 8px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-refresh payment status for pending/awaiting verification
+{% if payment.status == 'pending' or payment.status == 'awaiting_verification' %}
+function checkPaymentStatus() {
+    fetch('{% url "payments:check_status_ajax" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: 'payment_id={{ payment.id }}'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.status !== '{{ payment.status }}') {
+            // Status changed, reload page
+            window.location.reload();
+        }
+    })
+    .catch(error => console.error('Error checking payment status:', error));
+}
+
+// Check every 30 seconds
+setInterval(checkPaymentStatus, 30000);
+{% endif %}
+</script>
+{% endblock %}

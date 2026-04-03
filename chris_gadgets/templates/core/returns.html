@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Returns & Refunds - {{ site_settings.site_name }}{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Learn about our return policy and refund process at {{ site_settings.site_name }}. Easy returns within 7 days of delivery.">
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-5 fw-bold mb-3">Returns & Refunds</h1>
+                <p class="lead text-muted mb-0">Easy returns and hassle-free refunds</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Returns Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        {% if page_content and page_content.content %}
+                            {{ page_content.content|safe }}
+                        {% else %}
+                            <div class="returns-content">
+                                <h4 class="mb-4"><i class="fas fa-undo me-2 text-primary"></i>Return Policy</h4>
+                                <p>We want you to be completely satisfied with your purchase. If you're not happy with your order, we offer a straightforward return process.</p>
+                                
+                                <div class="alert alert-info">
+                                    <i class="fas fa-calendar-alt me-2"></i>
+                                    <strong>Return Window:</strong> You have <strong>7 days</strong> from the date of delivery to initiate a return.
+                                </div>
+                                
+                                <h4 class="mb-4 mt-5"><i class="fas fa-check-circle me-2 text-primary"></i>Eligible Items</h4>
+                                <p>Items can be returned if they meet the following conditions:</p>
+                                <ul>
+                                    <li>Item is unused and in original condition</li>
+                                    <li>All original packaging is intact</li>
+                                    <li>All accessories, manuals, and documentation are included</li>
+                                    <li>Item is not damaged (unless received damaged)</li>
+                                </ul>
+                                
+                                <h4 class="mb-4 mt-5"><i class="fas fa-times-circle me-2 text-danger"></i>Non-Returnable Items</h4>
+                                <p>The following items cannot be returned:</p>
+                                <ul>
+                                    <li>Software and digital products (once activated)</li>
+                                    <li>Personalized or customized items</li>
+                                    <li>Gift cards and vouchers</li>
+                                    <li>Items marked as "Final Sale"</li>
+                                    <li>Items damaged due to misuse</li>
+                                </ul>
+                                
+                                <h4 class="mb-4 mt-5"><i class="fas fa-list-ol me-2 text-primary"></i>How to Return</h4>
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <div class="card h-100 border">
+                                            <div class="card-body text-center">
+                                                <div class="step-number mb-3">1</div>
+                                                <h6 class="fw-bold">Request Return</h6>
+                                                <p class="text-muted small mb-0">Log into your account and request a return from your order history</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card h-100 border">
+                                            <div class="card-body text-center">
+                                                <div class="step-number mb-3">2</div>
+                                                <h6 class="fw-bold">Pack Item</h6>
+                                                <p class="text-muted small mb-0">Pack the item securely in its original packaging with all accessories</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card h-100 border">
+                                            <div class="card-body text-center">
+                                                <div class="step-number mb-3">3</div>
+                                                <h6 class="fw-bold">Ship Item</h6>
+                                                <p class="text-muted small mb-0">Ship the item to our return address (shipping cost is your responsibility)</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card h-100 border">
+                                            <div class="card-body text-center">
+                                                <div class="step-number mb-3">4</div>
+                                                <h6 class="fw-bold">Receive Refund</h6>
+                                                <p class="text-muted small mb-0">Once received and inspected, your refund will be processed</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <h4 class="mb-4 mt-5"><i class="fas fa-money-bill-wave me-2 text-primary"></i>Refund Process</h4>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Refund Method</th>
+                                                <th>Processing Time</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>Original Payment Method</strong></td>
+                                                <td>5-10 business days</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Store Credit</strong></td>
+                                                <td>Instant</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Bank Transfer</strong></td>
+                                                <td>3-5 business days</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div class="alert alert-warning mt-4">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Note:</strong> Shipping costs are non-refundable unless the return is due to our error or a defective product.
+                                </div>
+                                
+                                <h4 class="mb-4 mt-5"><i class="fas fa-exclamation-triangle me-2 text-primary"></i>Damaged or Defective Items</h4>
+                                <p>If you receive a damaged or defective item:</p>
+                                <ul>
+                                    <li>Contact us within 48 hours of delivery</li>
+                                    <li>Provide photos of the damage/defect</li>
+                                    <li>We will arrange a free pickup and replacement</li>
+                                    <li>No return shipping costs for damaged/defective items</li>
+                                </ul>
+                                
+                                <h4 class="mb-4 mt-5"><i class="fas fa-exchange-alt me-2 text-primary"></i>Exchanges</h4>
+                                <p>We currently do not offer direct exchanges. If you need a different item:</p>
+                                <ol>
+                                    <li>Return the original item following our return process</li>
+                                    <li>Place a new order for the desired item</li>
+                                </ol>
+                                
+                                <h4 class="mb-4 mt-5"><i class="fas fa-question-circle me-2 text-primary"></i>Frequently Asked Questions</h4>
+                                <div class="accordion" id="returnsFAQ">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                                Who pays for return shipping?
+                                            </button>
+                                        </h2>
+                                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#returnsFAQ">
+                                            <div class="accordion-body">
+                                                The customer is responsible for return shipping costs unless the item is damaged, defective, or incorrect. In those cases, we will cover the return shipping.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                                How long does a refund take?
+                                            </button>
+                                        </h2>
+                                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#returnsFAQ">
+                                            <div class="accordion-body">
+                                                Once we receive and inspect your return, refunds are typically processed within 3-5 business days. The time it takes for the refund to appear in your account depends on your payment method and bank.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                                Can I return an opened item?
+                                            </button>
+                                        </h2>
+                                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#returnsFAQ">
+                                            <div class="accordion-body">
+                                                Items must be in their original, unused condition to be eligible for return. Opened software, activated products, and items showing signs of use cannot be returned.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                                What if I received the wrong item?
+                                            </button>
+                                        </h2>
+                                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#returnsFAQ">
+                                            <div class="accordion-body">
+                                                We apologize for the error! Please contact us immediately with your order number and photos of the incorrect item. We will arrange a free pickup and send the correct item at no additional cost.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <h4 class="mb-4 mt-5"><i class="fas fa-phone me-2 text-primary"></i>Need Help?</h4>
+                                <p>If you have any questions about returns or need assistance, please contact us:</p>
+                                <ul>
+                                    <li>Email: {{ site_settings.support_email|default:"returns@gadgetsstore.ng" }}</li>
+                                    <li>Phone: {{ site_settings.support_phone|default:"+234 800 123 4567" }}</li>
+                                    <li>Hours: Monday - Friday, 9 AM - 6 PM</li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact CTA -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h3 class="mb-3">Still Have Questions?</h3>
+                <p class="text-muted mb-4">Our customer support team is here to help with any return or refund inquiries.</p>
+                <a href="{% url 'core:contact' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-envelope me-2"></i>Contact Support
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.step-number {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 auto;
+}
+</style>
+{% endblock %}

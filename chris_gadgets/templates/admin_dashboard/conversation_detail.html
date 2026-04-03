@@ -1,0 +1,130 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Conversation - Admin Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">{{ conversation.subject|default:"Conversation" }}</h2>
+        <p class="text-muted mb-0">With {{ conversation.customer.get_full_name|default:conversation.customer.email }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if conversation.status == 'open' %}
+        <form action="{% url 'admin_dashboard:conversation_close' conversation.id %}" method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger">
+                <i class="fas fa-times me-2"></i>Close
+            </button>
+        </form>
+        {% endif %}
+        <a href="{% url 'admin_dashboard:messages' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Messages -->
+        <div class="card">
+            <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                <div class="messages-container">
+                    {% for message in messages %}
+                    <div class="message mb-3 {% if message.is_from_admin %}text-end{% endif %}">
+                        <div class="d-flex {% if message.is_from_admin %}justify-content-end{% endif %}">
+                            {% if not message.is_from_admin %}
+                            <div class="flex-shrink-0 me-2">
+                                {% if message.sender.profile_picture %}
+                                <img src="{{ message.sender.profile_picture.url }}" alt="" class="rounded-circle" width="40" height="40">
+                                {% else %}
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    {{ message.sender.first_name|first|upper }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            <div class="message-content {% if message.is_from_admin %}bg-primary text-white{% else %}bg-light{% endif %} rounded p-3" style="max-width: 70%;">
+                                <p class="mb-1">{{ message.content }}</p>
+                                <small class="{% if message.is_from_admin %}text-white-50{% else %}text-muted{% endif %}">
+                                    {{ message.created_at|date:"M d, Y H:i" }}
+                                    {% if message.is_from_admin %}
+                                    <i class="fas fa-check-double ms-1"></i>
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-comments fa-3x mb-3"></i>
+                        <p>No messages yet.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="card-footer">
+                <form action="{% url 'admin_dashboard:conversation_detail' conversation.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" name="content" class="form-control" placeholder="Type your message..." required>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Send
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Customer Info -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Customer</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    {% if conversation.customer.profile_picture %}
+                    <img src="{{ conversation.customer.profile_picture.url }}" alt="" class="rounded-circle me-3" width="50" height="50">
+                    {% else %}
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        {{ conversation.customer.first_name|first|upper }}{{ conversation.customer.last_name|first|upper }}
+                    </div>
+                    {% endif %}
+                    <div>
+                        <h6 class="mb-0">{{ conversation.customer.get_full_name|default:conversation.customer.email }}</h6>
+                        <small class="text-muted">{{ conversation.customer.email }}</small>
+                    </div>
+                </div>
+                <hr>
+                <p class="mb-1"><i class="fas fa-phone me-2 text-muted"></i>{{ conversation.customer.phone_number|default:"N/A" }}</p>
+                <p class="mb-0"><i class="fas fa-calendar me-2 text-muted"></i>Customer since {{ conversation.customer.date_joined|date:"M d, Y" }}</p>
+            </div>
+        </div>
+
+        <!-- Conversation Info -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Details</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-2">
+                    <strong>Status:</strong>
+                    {% if conversation.status == 'open' %}
+                    <span class="badge bg-success">Open</span>
+                    {% elif conversation.status == 'closed' %}
+                    <span class="badge bg-secondary">Closed</span>
+                    {% else %}
+                    <span class="badge bg-warning">{{ conversation.get_status_display }}</span>
+                    {% endif %}
+                </p>
+                <p class="mb-2"><strong>Started:</strong> {{ conversation.created_at|date:"M d, Y H:i" }}</p>
+                <p class="mb-2"><strong>Last Message:</strong> {{ conversation.last_message_at|date:"M d, Y H:i" }}</p>
+                <p class="mb-0"><strong>Total Messages:</strong> {{ messages|length }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

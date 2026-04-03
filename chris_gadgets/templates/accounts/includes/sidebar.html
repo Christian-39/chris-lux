@@ -1,0 +1,31 @@
+<!-- Account Sidebar -->
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+            <a href="{% url 'accounts:profile' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                <i class="fas fa-user me-2"></i>Profile
+            </a>
+            <a href="{% url 'accounts:order_history' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'order_history' %}active{% endif %}">
+                <i class="fas fa-shopping-bag me-2"></i>My Orders
+            </a>
+            <a href="{% url 'accounts:wishlist' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}">
+                <i class="fas fa-heart me-2"></i>Wishlist
+            </a>
+            <a href="{% url 'accounts:addresses' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'addresses' or request.resolver_match.url_name == 'add_address' or request.resolver_match.url_name == 'edit_address' %}active{% endif %}">
+                <i class="fas fa-map-marker-alt me-2"></i>Addresses
+            </a>
+            <a href="{% url 'notifications:notifications' %}" class="list-group-item list-group-item-action {% if 'notifications' in request.path %}active{% endif %}">
+                <i class="fas fa-bell me-2"></i>Notifications
+            </a>
+            <a href="{% url 'messaging:conversations' %}" class="list-group-item list-group-item-action {% if 'messages' in request.path %}active{% endif %}">
+                <i class="fas fa-comments me-2"></i>Messages
+            </a>
+            <a href="{% url 'accounts:settings' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                <i class="fas fa-cog me-2"></i>Settings
+            </a>
+            <a href="{% url 'accounts:logout' %}" class="list-group-item list-group-item-action text-danger">
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+        </div>
+    </div>
+</div>

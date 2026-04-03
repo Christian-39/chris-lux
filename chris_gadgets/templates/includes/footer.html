@@ -1,0 +1,151 @@
+<!-- Footer -->
+<footer class="footer bg-dark text-light pt-5 pb-4">
+    <div class="container">
+        <div class="row g-4">
+            <!-- About -->
+            <div class="col-lg-4 col-md-6">
+                <h5 class="mb-3">{{ site_settings.site_name }}</h5>
+                <p class="text-light-emphasis">
+                    {{ site_settings.site_description|default:'Your trusted source for quality gadgets and accessories in Nigeria. We offer the best prices and fast delivery.' }}
+                </p>
+                
+                <!-- Social Links -->
+                <div class="social-links mt-3">
+                    {% if site_settings.facebook_url %}
+                    <a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener" class="me-2">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    {% endif %}
+                    {% if site_settings.twitter_url %}
+                    <a href="{{ site_settings.twitter_url }}" target="_blank" rel="noopener" class="me-2">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    {% endif %}
+                    {% if site_settings.instagram_url %}
+                    <a href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener" class="me-2">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    {% endif %}
+                    {% if site_settings.youtube_url %}
+                    <a href="{{ site_settings.youtube_url }}" target="_blank" rel="noopener" class="me-2">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    {% endif %}
+                    {% if site_settings.linkedin_url %}
+                    <a href="{{ site_settings.linkedin_url }}" target="_blank" rel="noopener" class="me-2">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="col-lg-2 col-md-6">
+                <h5 class="mb-3">Quick Links</h5>
+                <ul class="list-unstyled footer-links">
+                    <li><a href="{% url 'core:home' %}">Home</a></li>
+                    <li><a href="{% url 'products:product_list' %}">Shop</a></li>
+                    <li><a href="{% url 'products:hot_deals' %}">Hot Deals</a></li>
+                    <li><a href="{% url 'products:new_arrivals' %}">New Arrivals</a></li>
+                    <li><a href="{% url 'core:about' %}">About Us</a></li>
+                    <li><a href="{% url 'core:contact' %}">Contact</a></li>
+                </ul>
+            </div>
+            
+            <!-- Customer Service -->
+            <div class="col-lg-2 col-md-6">
+                <h5 class="mb-3">Customer Service</h5>
+                <ul class="list-unstyled footer-links">
+                    <li><a href="{% url 'core:faq' %}">FAQ</a></li>
+                    <li><a href="{% url 'core:shipping' %}">Shipping Info</a></li>
+                    <li><a href="{% url 'core:returns' %}">Returns Policy</a></li>
+                    <li><a href="{% url 'core:terms' %}">Terms & Conditions</a></li>
+                    <li><a href="{% url 'core:privacy' %}">Privacy Policy</a></li>
+                    <li><a href="{% url 'messaging:conversations' %}">Support</a></li>
+                </ul>
+            </div>
+            
+            <!-- Contact Info -->
+            <div class="col-lg-4 col-md-6">
+                <h5 class="mb-3">Contact Us</h5>
+                <ul class="list-unstyled footer-contact">
+                    {% if site_settings.business_address %}
+                    <li class="mb-2">
+                        <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                        {{ site_settings.business_address }}
+                    </li>
+                    {% endif %}
+                    <li class="mb-2">
+                        <i class="fas fa-phone-alt me-2 text-primary"></i>
+                        <a href="tel:{{ site_settings.contact_phone }}" class="text-light-emphasis text-decoration-none">
+                            {{ site_settings.contact_phone }}
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-envelope me-2 text-primary"></i>
+                        <a href="mailto:{{ site_settings.contact_email }}" class="text-light-emphasis text-decoration-none">
+                            {{ site_settings.contact_email }}
+                        </a>
+                    </li>
+                    {% if site_settings.business_hours %}
+                    <li class="mb-2">
+                        <i class="fas fa-clock me-2 text-primary"></i>
+                        {{ site_settings.business_hours }}
+                    </li>
+                    {% endif %}
+                </ul>
+                
+                <!-- Newsletter -->
+                {% if site_settings.enable_newsletter %}
+                <div class="mt-3">
+                    <h6 class="mb-2">Subscribe to Newsletter</h6>
+                    <form action="{% url 'core:newsletter_subscribe' %}" method="post" class="newsletter-form">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="email" name="email" class="form-control" placeholder="Your email" required>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Trust Badges -->
+        {% load core_extras %}
+        {% get_trust_badges as badges %}
+        {% if badges %}
+        <div class="row mt-4 pt-4 border-top border-secondary">
+            <div class="col-12">
+                <div class="trust-badges d-flex justify-content-center flex-wrap gap-4">
+                    {% for badge in badges %}
+                    <div class="trust-badge text-center">
+                        <i class="{{ badge.icon }} fa-2x text-primary mb-2"></i>
+                        <h6 class="mb-0 small">{{ badge.title }}</h6>
+                        <small class="text-light-emphasis">{{ badge.description }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Payment Methods -->
+        <div class="row mt-4 pt-4 border-top border-secondary">
+            <div class="col-md-6">
+                <p class="mb-0 text-light-emphasis small">
+                    &copy; {% now "Y" %} {{ site_settings.site_name }}. All rights reserved.
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="payment-methods">
+                    <span class="text-light-emphasis small me-2">Payment Methods:</span>
+                    <i class="fas fa-university me-2" title="Bank Transfer"></i>
+                    <i class="fas fa-money-check-alt" title="Secure Payment"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

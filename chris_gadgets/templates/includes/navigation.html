@@ -1,0 +1,158 @@
+<!-- Main Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary d-none d-lg-block">
+    <div class="container">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'core:home' %}">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                
+                <!-- Categories Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-th-large me-1"></i>Categories
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-lg" aria-labelledby="categoriesDropdown">
+                        {% load core_extras %}
+                        {% get_categories as categories %}
+                        {% for category in categories %}
+                        <li>
+                            <a class="dropdown-item" href="{% url 'products:category' slug=category.slug %}">
+                                {% if category.icon %}<i class="{{ category.icon }} me-2"></i>{% endif %}
+                                {{ category.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'products:product_list' %}">
+                                <i class="fas fa-list me-2"></i>All Categories
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- Deals Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dealsDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-fire me-1"></i>Deals
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dealsDropdown">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'products:hot_deals' %}">
+                                <i class="fas fa-fire-alt me-2 text-danger"></i>Hot Deals
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'products:new_arrivals' %}">
+                                <i class="fas fa-star me-2 text-warning"></i>New Arrivals
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'products:flash_sales' %}">
+                                <i class="fas fa-bolt me-2 text-info"></i>Flash Sales
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link {% if 'about' in request.path %}active{% endif %}" href="{% url 'core:about' %}">
+                        <i class="fas fa-info-circle me-1"></i>About
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link {% if 'contact' in request.path %}active{% endif %}" href="{% url 'core:contact' %}">
+                        <i class="fas fa-envelope me-1"></i>Contact
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link {% if 'faq' in request.path %}active{% endif %}" href="{% url 'core:faq' %}">
+                        <i class="fas fa-question-circle me-1"></i>FAQ
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- Right Side Nav -->
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i>My Account
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                <i class="fas fa-user me-2"></i>Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'accounts:order_history' %}">
+                                <i class="fas fa-shopping-bag me-2"></i>My Orders
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'accounts:wishlist' %}">
+                                <i class="fas fa-heart me-2"></i>Wishlist
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'accounts:addresses' %}">
+                                <i class="fas fa-map-marker-alt me-2"></i>Addresses
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'notifications:notifications' %}">
+                                <i class="fas fa-bell me-2"></i>Notifications
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'messaging:conversations' %}">
+                                <i class="fas fa-comments me-2"></i>Messages
+                            </a>
+                        </li>
+                        {% if user.user_type == 'admin' or user.user_type == 'staff' or user.is_superuser %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-primary fw-bold" href="{% url 'admin_dashboard:dashboard' %}">
+                                <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'accounts:settings' %}">
+                                <i class="fas fa-cog me-2"></i>Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:login' %}">
+                        <i class="fas fa-sign-in-alt me-1"></i>Login
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:register' %}">
+                        <i class="fas fa-user-plus me-1"></i>Register
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

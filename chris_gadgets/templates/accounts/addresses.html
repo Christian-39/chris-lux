@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Addresses - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 mb-4">
+            {% include 'accounts/includes/sidebar.html' %}
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">My Addresses</h4>
+                <a href="{% url 'accounts:add_address' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add New Address
+                </a>
+            </div>
+            
+            {% if addresses %}
+            <div class="row g-3">
+                {% for address in addresses %}
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 h-100 {% if address.is_default %}border-primary{% endif %}">
+                        {% if address.is_default %}
+                        <div class="card-header bg-primary text-white py-2">
+                            <small><i class="fas fa-check-circle me-1"></i>Default Address</small>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-secondary">{{ address.get_address_type_display }}</span>
+                                <div class="dropdown">
+                                    <button class="btn btn-link text-dark p-0" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'accounts:edit_address' address.id %}">
+                                                <i class="fas fa-edit me-2"></i>Edit
+                                            </a>
+                                        </li>
+                                        {% if not address.is_default %}
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'accounts:set_default_address' address.id %}">
+                                                <i class="fas fa-check-circle me-2"></i>Set as Default
+                                            </a>
+                                        </li>
+                                        {% endif %}
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="{% url 'accounts:delete_address' address.id %}">
+                                                <i class="fas fa-trash me-2"></i>Delete
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <h6 class="mb-1">{{ address.full_name }}</h6>
+                            <p class="text-muted mb-1">{{ address.phone_number }}</p>
+                            <p class="mb-0">{{ address.street_address }}</p>
+                            <p class="mb-0">{{ address.city }}, {{ address.get_state_display }}</p>
+                            <p class="mb-0">{{ address.lga }}</p>
+                            {% if address.landmark %}
+                            <p class="text-muted small mb-0"><i class="fas fa-map-pin me-1"></i>Landmark: {{ address.landmark }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-map-marker-alt fa-4x text-muted mb-3"></i>
+                    <h5>No Addresses Found</h5>
+                    <p class="text-muted">You haven't added any addresses yet.</p>
+                    <a href="{% url 'accounts:add_address' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add Address
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

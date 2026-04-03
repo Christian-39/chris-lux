@@ -1,0 +1,90 @@
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white py-3 border-0">
+        <div class="d-flex align-items-center">
+            <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-weight: bold;">A</div>
+            <h5 class="mb-0">Admin Panel</h5>
+        </div>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+            
+            <div class="list-group-item bg-light small fw-bold text-uppercase text-muted px-4 py-2">Main</div>
+            <a href="#" class="list-group-item list-group-item-action active" onclick="showPage('dashboard')">
+                <i class="fas fa-chart-bar me-2"></i>Dashboard
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showPage('analytics')">
+                <i class="fas fa-chart-line me-2"></i>Analytics
+            </a>
+
+            <div class="list-group-item bg-light small fw-bold text-uppercase text-muted px-4 py-2">Store Management</div>
+            <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" onclick="showPage('products')">
+                <span><i class="fas fa-box me-2"></i>Products</span>
+                <span class="badge bg-primary rounded-pill">{{ total_products }}</span>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showPage('categories')">
+                <i class="fas fa-tag me-2"></i>Categories
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showPage('brands')">
+                <i class="fas fa-copyright me-2"></i>Brands
+            </a>
+            <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" onclick="showPage('orders')">
+                <span><i class="fas fa-shopping-cart me-2"></i>Orders</span>
+                {% if pending_orders %}
+                <span class="badge bg-warning text-dark rounded-pill">{{ pending_orders }}</span>
+                {% endif %}
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showPage('coupons')">
+                <i class="fas fa-ticket-alt me-2"></i>Coupons
+            </a>
+
+            <div class="list-group-item bg-light small fw-bold text-uppercase text-muted px-4 py-2">User Management</div>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showPage('users')">
+                <i class="fas fa-users me-2"></i>Users
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showPage('addresses')">
+                <i class="fas fa-map-marker-alt me-2"></i>Addresses
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showPage('activity')">
+                <i class="fas fa-clipboard-list me-2"></i>Activity Log
+            </a>
+
+            <div class="list-group-item bg-light small fw-bold text-uppercase text-muted px-4 py-2">Payments</div>
+            <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" onclick="showPage('payments')">
+                <span><i class="fas fa-credit-card me-2"></i>Payments</span>
+                {% if pending_payments %}
+                <span class="badge bg-danger rounded-pill">{{ pending_payments }}</span>
+                {% endif %}
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showPage('refunds')">
+                <i class="fas fa-undo me-2"></i>Refunds
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showPage('bank-accounts')">
+                <i class="fas fa-university me-2"></i>Bank Accounts
+            </a>
+
+            <div class="list-group-item bg-light small fw-bold text-uppercase text-muted px-4 py-2">Communication</div>
+            <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" onclick="showPage('conversations')">
+                <span><i class="fas fa-comments me-2"></i>Conversations</span>
+                {% if unread_messages %}
+                <span class="badge bg-primary rounded-pill">{{ unread_messages }}</span>
+                {% endif %}
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showPage('contact-messages')">
+                <i class="fas fa-envelope me-2"></i>Contact Messages
+            </a>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showPage('notifications')">
+                <i class="fas fa-bell me-2"></i>Notifications
+            </a>
+
+            <div class="list-group-item bg-light small fw-bold text-uppercase text-muted px-4 py-2">System</div>
+            <a href="#" class="list-group-item list-group-item-action" onclick="showPage('site-settings')">
+                <i class="fas fa-cog me-2"></i>Site Settings
+            </a>
+            <a href="#" class="list-group-item list-group-item-action text-danger" href="{% url 'accounts:logout' %}">
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+
+        </div>
+    </div>
+</div>

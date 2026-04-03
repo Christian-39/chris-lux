@@ -1,0 +1,231 @@
+/*
+ * Gadgets Store - Dark Mode Stylesheet
+ */
+
+.dark-mode,
+[data-theme="dark"] {
+    --text-dark: #f9fafb;
+    --text-light: #d1d5db;
+    --bg-light: #111827;
+    --bg-white: #1f2937;
+    --border-color: #374151;
+}
+
+.dark-mode body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+}
+
+.dark-mode .main-header {
+    background-color: var(--bg-white) !important;
+}
+
+.dark-mode .header-action {
+    color: var(--text-dark);
+}
+
+.dark-mode .card {
+    background-color: var(--bg-white);
+    border-color: var(--border-color);
+}
+
+.dark-mode .form-control {
+    background-color: var(--bg-white);
+    border-color: var(--border-color);
+    color: var(--text-dark);
+}
+
+.dark-mode .form-control:focus {
+    background-color: var(--bg-white);
+    color: var(--text-dark);
+}
+
+.dark-mode .dropdown-menu {
+    background-color: var(--bg-white);
+    border-color: var(--border-color);
+}
+
+.dark-mode .dropdown-item {
+    color: var(--text-dark);
+}
+
+.dark-mode .dropdown-item:hover {
+    background-color: var(--bg-light);
+}
+
+.dark-mode .list-group-item {
+    background-color: var(--bg-white);
+    border-color: var(--border-color);
+    color: var(--text-dark);
+}
+
+.dark-mode .modal-content {
+    background-color: var(--bg-white);
+    border-color: var(--border-color);
+}
+
+.dark-mode .modal-header {
+    border-bottom-color: var(--border-color);
+}
+
+.dark-mode .modal-footer {
+    border-top-color: var(--border-color);
+}
+
+.dark-mode .table {
+    color: var(--text-dark);
+}
+
+.dark-mode .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: var(--bg-light);
+}
+
+.dark-mode .breadcrumb-item.active {
+    color: var(--text-light);
+}
+
+.dark-mode .page-link {
+    background-color: var(--bg-white);
+    border-color: var(--border-color);
+    color: var(--text-dark);
+}
+
+.dark-mode .page-link:hover {
+    background-color: var(--bg-light);
+    border-color: var(--border-color);
+}
+
+.dark-mode .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.dark-mode .accordion-button {
+    background-color: var(--bg-white);
+    color: var(--text-dark);
+}
+
+.dark-mode .accordion-button:not(.collapsed) {
+    background-color: var(--bg-light);
+    color: var(--primary-color);
+}
+
+.dark-mode .accordion-item {
+    background-color: var(--bg-white);
+    border-color: var(--border-color);
+}
+
+.dark-mode .nav-tabs .nav-link {
+    color: var(--text-light);
+}
+
+.dark-mode .nav-tabs .nav-link.active {
+    background-color: var(--bg-white);
+    border-color: var(--border-color);
+    color: var(--text-dark);
+}
+
+.dark-mode .nav-tabs {
+    border-bottom-color: var(--border-color);
+}
+
+.dark-mode .toast {
+    background-color: var(--bg-white);
+    color: var(--text-dark);
+}
+
+.dark-mode .toast-header {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    border-bottom-color: var(--border-color);
+}
+
+.dark-mode .offcanvas {
+    background-color: var(--bg-white);
+    color: var(--text-dark);
+}
+
+.dark-mode .offcanvas-header {
+    border-bottom-color: var(--border-color);
+}
+
+.dark-mode .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.dark-mode .text-muted {
+    color: var(--text-light) !important;
+}
+
+.dark-mode .bg-light {
+    background-color: var(--bg-light) !important;
+}
+
+.dark-mode .bg-white {
+    background-color: var(--bg-white) !important;
+}
+
+.dark-mode .border {
+    border-color: var(--border-color) !important;
+}
+
+.dark-mode .border-bottom {
+    border-bottom-color: var(--border-color) !important;
+}
+
+.dark-mode .border-top {
+    border-top-color: var(--border-color) !important;
+}
+
+.dark-mode .mobile-nav {
+    background-color: var(--bg-white);
+}
+
+.dark-mode .mobile-nav-item {
+    color: var(--text-light);
+}
+
+.dark-mode .mobile-nav-item.active {
+    color: var(--primary-color);
+}
+
+/* Product Card Dark Mode */
+.dark-mode .product-card .card-title a {
+    color: var(--text-dark);
+}
+
+.dark-mode .product-card .card-title a:hover {
+    color: var(--primary-color);
+}
+
+/* Form Select Dark Mode */
+.dark-mode .form-select {
+    background-color: var(--bg-white);
+    border-color: var(--border-color);
+    color: var(--text-dark);
+}
+
+.dark-mode .form-select:focus {
+    background-color: var(--bg-white);
+    color: var(--text-dark);
+}
+
+/* Input Group Dark Mode */
+.dark-mode .input-group-text {
+    background-color: var(--bg-light);
+    border-color: var(--border-color);
+    color: var(--text-dark);
+}
+
+/* Alert Dark Mode */
+.dark-mode .alert-light {
+    background-color: var(--bg-light);
+    border-color: var(--border-color);
+    color: var(--text-dark);
+}
+
+/* Badge Dark Mode */
+.dark-mode .badge.bg-light {
+    background-color: var(--bg-light) !important;
+    color: var(--text-dark);
+}

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %} 
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 mb-4">
+            {% include 'accounts/includes/sidebar.html' %}
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="profile-image-wrapper me-4">
+                            {% if user.profile_image %}
+                            <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                            {% else %}
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                                {{ user.initials }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h4 class="mb-1">{{ user.get_full_name }}</h4>
+                            <p class="text-muted mb-2">{{ user.email }}</p>
+                            <span class="badge bg-success">{{ user.get_user_type_display }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="card bg-light border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-shopping-bag fa-2x text-primary mb-2"></i>
+                                    <h5 class="mb-0">{{ orders_count }}</h5>
+                                    <small class="text-muted">Orders</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-heart fa-2x text-danger mb-2"></i>
+                                    <h5 class="mb-0">{{ wishlist_count }}</h5>
+                                    <small class="text-muted">Wishlist</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-map-marker-alt fa-2x text-info mb-2"></i>
+                                    <h5 class="mb-0">{{ addresses_count }}</h5>
+                                    <small class="text-muted">Addresses</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Account Information -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Account Information</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted small">Full Name</label>
+                            <p class="mb-0 fw-semibold">{{ user.get_full_name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small">Email Address</label>
+                            <p class="mb-0 fw-semibold">{{ user.email }}</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted small">Phone Number</label>
+                            <p class="mb-0 fw-semibold">{{ user.phone_number|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small">Date of Birth</label>
+                            <p class="mb-0 fw-semibold">{{ user.date_of_birth|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted small">Gender</label>
+                            <p class="mb-0 fw-semibold">{{ user.get_gender_display|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small">Member Since</label>
+                            <p class="mb-0 fw-semibold">{{ user.date_joined|date:"F d, Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="text-muted small">Email Verified</label>
+                            <p class="mb-0">
+                                {% if user.email_verified %}
+                                <span class="badge bg-success"><i class="fas fa-check me-1"></i>Verified</span>
+                                {% else %}
+                                <span class="badge bg-warning"><i class="fas fa-clock me-1"></i>Pending</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small">Last Login</label>
+                            <p class="mb-0 fw-semibold">{{ user.last_login|date:"F d, Y H:i"|default:"Never" }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white py-3">
+                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </a>
+                    <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-primary ms-2">
+                        <i class="fas fa-lock me-2"></i>Change Password
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

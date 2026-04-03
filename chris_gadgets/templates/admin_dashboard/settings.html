@@ -1,0 +1,280 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Settings - Admin Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Site Settings</h2>
+        <p class="text-muted mb-0">Configure your store settings</p>
+    </div>
+</div>
+
+<!-- Settings Tabs -->
+<div class="card">
+    <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs" id="settingsTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab">
+                    <i class="fas fa-cog me-2"></i>General
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab">
+                    <i class="fas fa-address-card me-2"></i>Contact
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="social-tab" data-bs-toggle="tab" data-bs-target="#social" type="button" role="tab">
+                    <i class="fas fa-share-alt me-2"></i>Social Media
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="payment-tab" data-bs-toggle="tab" data-bs-target="#payment" type="button" role="tab">
+                    <i class="fas fa-credit-card me-2"></i>Payment
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="shipping-tab" data-bs-toggle="tab" data-bs-target="#shipping" type="button" role="tab">
+                    <i class="fas fa-shipping-fast me-2"></i>Shipping
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo" type="button" role="tab">
+                    <i class="fas fa-search me-2"></i>SEO
+                </button>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body">
+        <form action="{% url 'admin_dashboard:settings_save' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="tab-content" id="settingsTabContent">
+                <!-- General Settings -->
+                <div class="tab-pane fade show active" id="general" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Site Name <span class="text-danger">*</span></label>
+                                <input type="text" name="site_name" class="form-control" value="{{ settings.site_name|default:'' }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Site Tagline</label>
+                                <input type="text" name="site_tagline" class="form-control" value="{{ settings.site_tagline|default:'' }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Logo</label>
+                                {% if settings.logo %}
+                                <div class="mb-2">
+                                    <img src="{{ settings.logo.url }}" alt="Logo" height="50">
+                                </div>
+                                {% endif %}
+                                <input type="file" name="logo" class="form-control" accept="image/*">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Favicon</label>
+                                {% if settings.favicon %}
+                                <div class="mb-2">
+                                    <img src="{{ settings.favicon.url }}" alt="Favicon" height="32">
+                                </div>
+                                {% endif %}
+                                <input type="file" name="favicon" class="form-control" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Currency Symbol</label>
+                        <input type="text" name="currency_symbol" class="form-control" value="{{ settings.currency_symbol|default:'₦' }}" style="max-width: 100px;">
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="maintenance_mode" value="true" {% if settings.maintenance_mode %}checked{% endif %}>
+                            <label class="form-check-label">Maintenance Mode</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Settings -->
+                <div class="tab-pane fade" id="contact" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" name="contact_email" class="form-control" value="{{ settings.contact_email|default:'' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" name="contact_phone" class="form-control" value="{{ settings.contact_phone|default:'' }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <textarea name="contact_address" class="form-control" rows="3">{{ settings.contact_address|default:'' }}</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Business Hours</label>
+                                <input type="text" name="business_hours" class="form-control" value="{{ settings.business_hours|default:'' }}" placeholder="Mon-Fri: 9AM - 6PM">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">WhatsApp Number</label>
+                                <input type="tel" name="whatsapp_number" class="form-control" value="{{ settings.whatsapp_number|default:'' }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Media -->
+                <div class="tab-pane fade" id="social" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Facebook URL</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fab fa-facebook"></i></span>
+                                    <input type="url" name="facebook_url" class="form-control" value="{{ settings.facebook_url|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Twitter URL</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fab fa-twitter"></i></span>
+                                    <input type="url" name="twitter_url" class="form-control" value="{{ settings.twitter_url|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Instagram URL</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fab fa-instagram"></i></span>
+                                    <input type="url" name="instagram_url" class="form-control" value="{{ settings.instagram_url|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">YouTube URL</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fab fa-youtube"></i></span>
+                                    <input type="url" name="youtube_url" class="form-control" value="{{ settings.youtube_url|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Settings -->
+                <div class="tab-pane fade" id="payment" role="tabpanel">
+                    <h5 class="mb-3">Bank Transfer Details</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Bank Name</label>
+                                <input type="text" name="bank_name" class="form-control" value="{{ settings.bank_name|default:'' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Account Number</label>
+                                <input type="text" name="bank_account_number" class="form-control" value="{{ settings.bank_account_number|default:'' }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Account Name</label>
+                                <input type="text" name="bank_account_name" class="form-control" value="{{ settings.bank_account_name|default:'' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Payment Instructions</label>
+                                <textarea name="payment_instructions" class="form-control" rows="3">{{ settings.payment_instructions|default:'' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <h5 class="mb-3">Cash on Delivery</h5>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="cod_enabled" value="true" {% if settings.cod_enabled %}checked{% endif %}>
+                            <label class="form-check-label">Enable Cash on Delivery</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Settings -->
+                <div class="tab-pane fade" id="shipping" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Flat Rate Shipping (₦)</label>
+                                <input type="number" name="flat_shipping_rate" class="form-control" value="{{ settings.flat_shipping_rate|default:'0' }}" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Free Shipping Threshold (₦)</label>
+                                <input type="number" name="free_shipping_threshold" class="form-control" value="{{ settings.free_shipping_threshold|default:'0' }}" min="0" step="0.01">
+                                <small class="text-muted">Set to 0 to disable free shipping</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEO Settings -->
+                <div class="tab-pane fade" id="seo" role="tabpanel">
+                    <div class="mb-3">
+                        <label class="form-label">Meta Title</label>
+                        <input type="text" name="meta_title" class="form-control" value="{{ settings.meta_title|default:'' }}">
+                        <small class="text-muted">Recommended: 50-60 characters</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Meta Description</label>
+                        <textarea name="meta_description" class="form-control" rows="3">{{ settings.meta_description|default:'' }}</textarea>
+                        <small class="text-muted">Recommended: 150-160 characters</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Meta Keywords</label>
+                        <input type="text" name="meta_keywords" class="form-control" value="{{ settings.meta_keywords|default:'' }}">
+                        <small class="text-muted">Separate keywords with commas</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Google Analytics ID</label>
+                        <input type="text" name="google_analytics_id" class="form-control" value="{{ settings.google_analytics_id|default:'' }}" placeholder="UA-XXXXXXXXX-X">
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save me-2"></i>Save Settings
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

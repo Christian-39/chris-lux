@@ -1,0 +1,312 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Reviews - Admin Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Product Reviews</h2>
+        <p class="text-muted mb-0">Manage customer reviews and ratings</p>
+    </div>
+</div>
+
+<!-- Review Stats -->
+<div class="row mb-4">
+    <div class="col-md-2 col-6">
+        <div class="card bg-primary text-white text-center">
+            <div class="card-body">
+                <h4 class="mb-0">{{ total_reviews|default:0 }}</h4>
+                <small>Total Reviews</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-6">
+        <div class="card bg-success text-white text-center">
+            <div class="card-body">
+                <h4 class="mb-0">{{ approved_reviews|default:0 }}</h4>
+                <small>Approved</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-6">
+        <div class="card bg-warning text-white text-center">
+            <div class="card-body">
+                <h4 class="mb-0">{{ pending_reviews|default:0 }}</h4>
+                <small>Pending</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-6">
+        <div class="card bg-danger text-white text-center">
+            <div class="card-body">
+                <h4 class="mb-0">{{ rejected_reviews|default:0 }}</h4>
+                <small>Rejected</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="mb-2">Average Rating</h5>
+                <div class="d-flex justify-content-center align-items-center">
+                    <h3 class="mb-0 me-2">{{ average_rating|floatformat:1|default:"0.0" }}</h3>
+                    <div class="text-warning">
+                        {% for i in "12345" %}
+                        {% if forloop.counter <= average_rating %}
+                        <i class="fas fa-star"></i>
+                        {% elif forloop.counter <= average_rating|add:0.5 %}
+                        <i class="fas fa-star-half-alt"></i>
+                        {% else %}
+                        <i class="far fa-star"></i>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" name="q" class="form-control" placeholder="Search reviews..." value="{{ request.GET.q }}">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="approved" {% if request.GET.status == 'approved' %}selected{% endif %}>Approved</option>
+                    <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="rejected" {% if request.GET.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="rating" class="form-select">
+                    <option value="">All Ratings</option>
+                    <option value="5" {% if request.GET.rating == '5' %}selected{% endif %}>5 Stars</option>
+                    <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4 Stars</option>
+                    <option value="3" {% if request.GET.rating == '3' %}selected{% endif %}>3 Stars</option>
+                    <option value="2" {% if request.GET.rating == '2' %}selected{% endif %}>2 Stars</option>
+                    <option value="1" {% if request.GET.rating == '1' %}selected{% endif %}>1 Star</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="product" class="form-select">
+                    <option value="">All Products</option>
+                    {% for product in products %}
+                    <option value="{{ product.id }}" {% if request.GET.product == product.id|stringformat:"s" %}selected{% endif %}>{{ product.name|truncatechars:30 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Reviews List -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Product</th>
+                        <th>Customer</th>
+                        <th>Rating</th>
+                        <th>Review</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in reviews %}
+                    <tr>
+                        <td>
+                            <a href="{{ review.product.get_absolute_url }}" target="_blank" class="text-primary">
+                                {{ review.product.name|truncatechars:25 }}
+                            </a>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle bg-primary text-white me-2" style="width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                                    {{ review.user.first_name|first|upper }}{{ review.user.last_name|first|upper }}
+                                </div>
+                                <span>{{ review.user.get_full_name|default:review.user.email }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-warning">
+                                {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %}
+                                <i class="fas fa-star"></i>
+                                {% else %}
+                                <i class="far fa-star"></i>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <p class="mb-0" style="max-width: 250px;">{{ review.comment|truncatewords:15 }}</p>
+                        </td>
+                        <td>{{ review.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            {% if review.status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                            {% elif review.status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                            {% else %}
+                            <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewModal{{ review.id }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                {% if review.status == 'pending' %}
+                                <form action="{% url 'admin_dashboard:review_approve' review.id %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Approve">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <form action="{% url 'admin_dashboard:review_reject' review.id %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Reject">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ review.id }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No reviews found</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if reviews.has_other_pages %}
+    <div class="card-footer">
+        <nav aria-label="Review pagination">
+            <ul class="pagination justify-content-center mb-0">
+                {% if reviews.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ reviews.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+                </li>
+                {% endif %}
+                {% for num in reviews.paginator.page_range %}
+                {% if reviews.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% if reviews.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ reviews.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- View Modals -->
+{% for review in reviews %}
+<div class="modal fade" id="viewModal{{ review.id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Review Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Product</label>
+                    <p><a href="{{ review.product.get_absolute_url }}" target="_blank">{{ review.product.name }}</a></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Customer</label>
+                    <p>{{ review.user.get_full_name|default:review.user.email }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Rating</label>
+                    <div class="text-warning">
+                        {% for i in "12345" %}
+                        {% if forloop.counter <= review.rating %}
+                        <i class="fas fa-star"></i>
+                        {% else %}
+                        <i class="far fa-star"></i>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Review</label>
+                    <p>{{ review.comment }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Date</label>
+                    <p>{{ review.created_at|date:"F d, Y H:i" }}</p>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label fw-bold">Status</label>
+                    <p>{% if review.status == 'approved' %}<span class="badge bg-success">Approved</span>{% elif review.status == 'pending' %}<span class="badge bg-warning">Pending</span>{% else %}<span class="badge bg-danger">Rejected</span>{% endif %}</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal{{ review.id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this review?</p>
+                <div class="alert alert-light">
+                    <strong>Product:</strong> {{ review.product.name }}<br>
+                    <strong>Customer:</strong> {{ review.user.get_full_name|default:review.user.email }}<br>
+                    <strong>Rating:</strong> {{ review.rating }} stars
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{% url 'admin_dashboard:review_delete' review.id %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

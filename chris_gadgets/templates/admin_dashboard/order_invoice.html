@@ -1,0 +1,296 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice #{{ order.order_number }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            padding: 40px;
+        }
+        
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #0d6efd;
+        }
+        
+        .company-info h1 {
+            color: #0d6efd;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .invoice-title {
+            text-align: right;
+        }
+        
+        .invoice-title h2 {
+            font-size: 24px;
+            color: #0d6efd;
+            margin-bottom: 5px;
+        }
+        
+        .invoice-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .billing-info, .shipping-info {
+            width: 48%;
+        }
+        
+        .billing-info h3, .shipping-info h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #555;
+            text-transform: uppercase;
+        }
+        
+        .info-table {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .info-table td {
+            padding: 5px 0;
+        }
+        
+        .info-table td:first-child {
+            color: #666;
+            width: 40%;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        
+        .items-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .items-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .items-table .text-right {
+            text-align: right;
+        }
+        
+        .items-table .text-center {
+            text-align: center;
+        }
+        
+        .totals-table {
+            width: 300px;
+            margin-left: auto;
+            margin-bottom: 30px;
+        }
+        
+        .totals-table td {
+            padding: 8px 12px;
+        }
+        
+        .totals-table td:first-child {
+            text-align: right;
+            color: #666;
+        }
+        
+        .totals-table td:last-child {
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .totals-table .grand-total {
+            font-size: 18px;
+            border-top: 2px solid #0d6efd;
+        }
+        
+        .totals-table .grand-total td {
+            padding-top: 12px;
+            color: #0d6efd;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-processing { background: #d1ecf1; color: #0c5460; }
+        .status-shipped { background: #fff3cd; color: #856404; }
+        .status-delivered { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+        
+        @media print {
+            body {
+                padding: 20px;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Print Button -->
+    <div class="no-print" style="text-align: center; margin-bottom: 20px;">
+        <button onclick="window.print()" style="padding: 10px 30px; background: #0d6efd; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+            <i class="fas fa-print"></i> Print Invoice
+        </button>
+    </div>
+
+    <!-- Invoice Header -->
+    <div class="invoice-header">
+        <div class="company-info">
+            <h1>GADGETS STORE</h1>
+            <p>Your One-Stop Gadget Shop</p>
+            <p>Email: support@gadgetsstore.ng</p>
+            <p>Phone: +234 800 000 0000</p>
+        </div>
+        <div class="invoice-title">
+            <h2>INVOICE</h2>
+            <p><strong>#{{ order.order_number }}</strong></p>
+            <p>Date: {{ order.created_at|date:"F d, Y" }}</p>
+            <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+        </div>
+    </div>
+
+    <!-- Customer Details -->
+    <div class="invoice-details">
+        <div class="billing-info">
+            <h3>Bill To:</h3>
+            <p><strong>{{ order.user.get_full_name|default:order.user.email }}</strong></p>
+            <p>{{ order.user.email }}</p>
+            <p>{{ order.user.phone_number|default:"" }}</p>
+        </div>
+        <div class="shipping-info">
+            <h3>Ship To:</h3>
+            {% if order.shipping_address %}
+            <p><strong>{{ order.shipping_address.full_name }}</strong></p>
+            <p>{{ order.shipping_address.street_address }}</p>
+            {% if order.shipping_address.apartment %}
+            <p>{{ order.shipping_address.apartment }}</p>
+            {% endif %}
+            <p>{{ order.shipping_address.city }}, {{ order.shipping_address.state }}</p>
+            <p>{{ order.shipping_address.country }} {{ order.shipping_address.postal_code }}</p>
+            <p>Phone: {{ order.shipping_address.phone }}</p>
+            {% else %}
+            <p>No shipping address provided.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Order Info -->
+    <table class="info-table">
+        <tr>
+            <td>Order Date:</td>
+            <td>{{ order.created_at|date:"F d, Y H:i" }}</td>
+            <td>Payment Method:</td>
+            <td>{{ order.get_payment_method_display }}</td>
+        </tr>
+        <tr>
+            <td>Order Status:</td>
+            <td>{{ order.get_status_display }}</td>
+            <td>Payment Status:</td>
+            <td>{{ order.get_payment_status_display }}</td>
+        </tr>
+        {% if order.tracking_number %}
+        <tr>
+            <td>Tracking Number:</td>
+            <td colspan="3">{{ order.tracking_number }}</td>
+        </tr>
+        {% endif %}
+    </table>
+
+    <!-- Order Items -->
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th class="text-center">Qty</th>
+                <th class="text-right">Unit Price</th>
+                <th class="text-right">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td class="text-right">₦{{ item.price|floatformat:2 }}</td>
+                <td class="text-right">₦{{ item.total|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Totals -->
+    <table class="totals-table">
+        <tr>
+            <td>Subtotal:</td>
+            <td>₦{{ order.subtotal|floatformat:2 }}</td>
+        </tr>
+        <tr>
+            <td>Shipping:</td>
+            <td>₦{{ order.shipping_cost|floatformat:2 }}</td>
+        </tr>
+        {% if order.discount > 0 %}
+        <tr>
+            <td>Discount:</td>
+            <td>-₦{{ order.discount|floatformat:2 }}</td>
+        </tr>
+        {% endif %}
+        {% if order.tax > 0 %}
+        <tr>
+            <td>Tax:</td>
+            <td>₦{{ order.tax|floatformat:2 }}</td>
+        </tr>
+        {% endif %}
+        <tr class="grand-total">
+            <td>Total:</td>
+            <td>₦{{ order.total|floatformat:2 }}</td>
+        </tr>
+    </table>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p><strong>Thank you for your business!</strong></p>
+        <p>If you have any questions about this invoice, please contact our support team.</p>
+        <p>&copy; {% now "Y" %} Gadgets Store. All rights reserved.</p>
+    </div>
+</body>
+</html>

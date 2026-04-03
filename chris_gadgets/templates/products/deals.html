@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ title }} - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="card shadow-sm border-0 mb-4 {% if title == 'Hot Deals' %}bg-danger bg-opacity-10 border-danger{% else %}bg-success bg-opacity-10 border-success{% endif %}">
+        <div class="card-body text-center py-5">
+            {% if title == 'Hot Deals' %}
+            <i class="fas fa-fire fa-4x text-danger mb-3"></i>
+            {% else %}
+            <i class="fas fa-star fa-4x text-success mb-3"></i>
+            {% endif %}
+            <h2 class="fw-bold mb-2">{{ title }}</h2>
+            <p class="text-muted mb-0">
+                {% if title == 'Hot Deals' %}
+                Best deals on popular products
+                {% else %}
+                Check out our latest arrivals
+                {% endif %}
+            </p>
+        </div>
+    </div>
+    
+    {% if products %}
+    <div class="row g-3">
+        {% for product in products %}
+        <div class="col-6 col-md-4 col-lg-3">
+            {% include 'includes/product_card.html' with product=product %}
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if paginator.num_pages > 1 %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+            </li>
+            {% endif %}
+            {% for num in paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    {% else %}
+    <div class="card shadow-sm border-0">
+        <div class="card-body text-center py-5">
+            {% if title == 'Hot Deals' %}
+            <i class="fas fa-fire fa-4x text-muted mb-3"></i>
+            <h5>No Hot Deals</h5>
+            {% else %}
+            <i class="fas fa-star fa-4x text-muted mb-3"></i>
+            <h5>No New Arrivals</h5>
+            {% endif %}
+            <p class="text-muted">Check back soon for updates!</p>
+            <a href="{% url 'products:product_list' %}" class="btn btn-primary">
+                <i class="fas fa-th-large me-2"></i>Browse All Products
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

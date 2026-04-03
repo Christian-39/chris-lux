@@ -1,0 +1,222 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+{% load static %}
+
+{% block title %}Payment Details - Admin Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Payment Details</h2>
+        <p class="text-muted mb-0">Reference: {{ payment.reference|default:"N/A" }}</p>
+    </div>
+    <a href="{% url 'admin_dashboard:payments' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Payments
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Payment Info -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Payment Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td class="text-muted">Reference:</td>
+                                <td class="fw-bold">{{ payment.reference|default:"N/A" }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Order #:</td>
+                                <td>
+                                    <a href="{% url 'admin_dashboard:order_detail' order.id %}">#{{ order.order_number }}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Amount:</td>
+                                <td class="fw-bold fs-5">₦{{ payment.amount|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Method:</td>
+                                <td>{{ payment.get_payment_method_display }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td class="text-muted">Status:</td>
+                                <td>
+                                    {% if payment.status == 'verified' %}
+                                    <span class="badge bg-success">Verified</span>
+                                    {% elif payment.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% elif payment.status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ payment.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Date:</td>
+                                <td>{{ payment.created_at|date:"F d, Y H:i" }}</td>
+                            </tr>
+                            {% if payment.verified_at %}
+                            <tr>
+                                <td class="text-muted">Verified:</td>
+                                <td>{{ payment.verified_at|date:"F d, Y H:i" }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if payment.verified_by %}
+                            <tr>
+                                <td class="text-muted">Verified By:</td>
+                                <td>{{ payment.verified_by.get_full_name|default:payment.verified_by.email }}</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Proof -->
+        {% if payment.proof_image %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Payment Proof</h5>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ payment.proof_image.url }}" alt="Payment Proof" class="img-fluid rounded" style="max-height: 500px;">
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Verification Notes -->
+        {% if payment.verification_notes %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Verification Notes</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ payment.verification_notes }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if payment.rejection_reason %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Rejection Reason</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0 text-danger">{{ payment.rejection_reason }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Customer Info -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Customer</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        {{ order.user.first_name|first|upper }}{{ order.user.last_name|first|upper }}
+                    </div>
+                    <div>
+                        <h6 class="mb-0">{{ order.user.get_full_name|default:order.user.email }}</h6>
+                        <small class="text-muted">{{ order.user.email }}</small>
+                    </div>
+                </div>
+                <p class="mb-1"><i class="fas fa-phone me-2 text-muted"></i>{{ order.user.phone_number|default:"N/A" }}</p>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        {% if payment.status == 'pending' %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <button type="button" class="btn btn-success w-100 mb-2" data-bs-toggle="modal" data-bs-target="#verifyModal">
+                    <i class="fas fa-check me-2"></i>Verify Payment
+                </button>
+                <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                    <i class="fas fa-times me-2"></i>Reject Payment
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Verify Modal -->
+{% if payment.status == 'pending' %}
+<div class="modal fade" id="verifyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Verify Payment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{% url 'admin_dashboard:payment_verify' payment.id %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="verify">
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <strong>Order:</strong> #{{ order.order_number }}<br>
+                        <strong>Amount:</strong> ₦{{ payment.amount|floatformat:2 }}<br>
+                        <strong>Customer:</strong> {{ order.user.get_full_name|default:order.user.email }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Verification Notes</label>
+                        <textarea name="verification_notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Verify Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reject Payment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{% url 'admin_dashboard:payment_reject' payment.id %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <strong>Order:</strong> #{{ order.order_number }}<br>
+                        <strong>Amount:</strong> ₦{{ payment.amount|floatformat:2 }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+                        <textarea name="reason" class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Reject Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

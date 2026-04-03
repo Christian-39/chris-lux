@@ -1,0 +1,22 @@
+# Gadgets Store - Django E-commerce Platform
+
+# Django Framework
+django>=5.0,<6.0
+
+# Database
+mysqlclient>=2.2.0
+
+# Image Processing
+pillow>=10.0.0
+boto3
+django-storages 
+gunicorn
+whitenoise
+django-environ
+python-decouple>=3.8
+django-humanize>=0.1
+django-cleanup>=8.0.0
+
+# QR Code Generation
+qrcode[pil]>=7.4.0
+python-dateutil>=2.8.0

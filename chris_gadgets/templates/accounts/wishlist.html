@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}My Wishlist - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 mb-4">
+            {% include 'accounts/includes/sidebar.html' %}
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <h4 class="mb-4">My Wishlist ({{ wishlist_items|length }} items)</h4>
+            
+            {% if wishlist_items %}
+            <div class="row g-3">
+                {% for item in wishlist_items %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="position-relative">
+                            <a href="{% url 'products:product_detail' slug=item.product.slug %}">
+                                {% if item.product.primary_image %}
+                                <img src="{{ item.product.primary_image.image.url }}" alt="{{ item.product.name }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                                {% else %}
+                                <div class="d-flex align-items-center justify-content-center bg-light" style="height: 200px;">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                                {% endif %}
+                            </a>
+                            <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" onclick="removeFromWishlist('{{ item.product.id }}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <a href="{% url 'products:product_detail' slug=item.product.slug %}" class="text-decoration-none text-dark">
+                                    {{ item.product.name|truncatechars:40 }}
+                                </a>
+                            </h6>
+                            <p class="text-primary fw-bold mb-2">
+                                {{ site_settings.default_currency }}{{ item.product.price|intcomma }}
+                            </p>
+                            {% if item.product.in_stock %}
+                            <form action="{% url 'orders:add_to_cart' product_slug=item.product.slug %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                    <i class="fas fa-cart-plus me-1"></i>Add to Cart
+                                </button>
+                            </form>
+                            {% else %}
+                            <button class="btn btn-secondary btn-sm w-100" disabled>
+                                <i class="fas fa-times-circle me-1"></i>Out of Stock
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-heart fa-4x text-muted mb-3"></i>
+                    <h5>Your Wishlist is Empty</h5>
+                    <p class="text-muted">Save items you love to your wishlist.</p>
+                    <a href="{% url 'products:product_list' %}" class="btn btn-primary">
+                        <i class="fas fa-shopping-cart me-2"></i>Start Shopping
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function removeFromWishlist(productId) {
+    if (confirm('Are you sure you want to remove this item from your wishlist?')) {
+        window.location.href = `/accounts/wishlist/remove/${productId}/`;
+    }
+}
+</script>
+{% endblock %}

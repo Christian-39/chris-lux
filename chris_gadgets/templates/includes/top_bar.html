@@ -1,0 +1,58 @@
+<!-- Top Bar -->
+<div class="top-bar bg-dark text-light py-2">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="small">
+                        <i class="fas fa-phone-alt me-1"></i>
+                        <a href="tel:{{ site_settings.contact_phone }}" class="text-light text-decoration-none">
+                            {{ site_settings.contact_phone }}
+                        </a>
+                    </span>
+                    <span class="small d-none d-sm-inline">
+                        <i class="fas fa-envelope me-1"></i>
+                        <a href="mailto:{{ site_settings.contact_email }}" class="text-light text-decoration-none">
+                            {{ site_settings.contact_email }}
+                        </a>
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex justify-content-md-end align-items-center gap-3">
+                    <!-- Theme Toggle -->
+                    <div class="theme-toggle">
+                        <button class="btn btn-sm btn-link text-light p-0" id="themeToggle" title="Toggle Theme">
+                            <i class="fas fa-sun" id="themeIcon"></i>
+                        </button>
+                    </div>
+                    
+                    {% if user.is_authenticated %}
+                    <span class="small">
+                        <i class="fas fa-user me-1"></i>
+                        <a href="{% url 'accounts:profile' %}" class="text-light text-decoration-none">
+                            {{ user.first_name }}
+                        </a>
+                    </span>
+                    <span class="small">
+                        <a href="{% url 'accounts:logout' %}" class="text-light text-decoration-none">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </span>
+                    {% else %}
+                    <span class="small">
+                        <a href="{% url 'accounts:login' %}" class="text-light text-decoration-none">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                    </span>
+                    <span class="small">
+                        <a href="{% url 'accounts:register' %}" class="text-light text-decoration-none">
+                            <i class="fas fa-user-plus me-1"></i>Register
+                        </a>
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

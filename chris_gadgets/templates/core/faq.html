@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FAQ - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-3">Frequently Asked Questions</h1>
+        <p class="lead">Find answers to common questions</p>
+    </div>
+</section>
+
+<!-- FAQ Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                {% if faqs_by_category %}
+                {% for category, faqs in faqs_by_category.items %}
+                <h4 class="fw-bold mb-3">{{ category }}</h4>
+                <div class="accordion mb-4" id="accordion{{ forloop.counter }}">
+                    {% for faq in faqs %}
+                    <div class="accordion-item border-0 shadow-sm mb-2">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ faq.id }}">
+                                {{ faq.question }}
+                            </button>
+                        </h2>
+                        <div id="collapse{{ faq.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#accordion{{ forloop.counter }}">
+                            <div class="accordion-body">
+                                {{ faq.answer|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-question-circle fa-4x text-muted mb-3"></i>
+                    <h5>No FAQs Available</h5>
+                    <p class="text-muted">Check back later for updates.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Still Need Help -->
+<section class="py-5 bg-light">
+    <div class="container text-center">
+        <h3 class="fw-bold mb-3">Still Need Help?</h3>
+        <p class="text-muted mb-4">Can't find what you're looking for? Contact our support team.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'core:contact' %}" class="btn btn-primary">
+                <i class="fas fa-envelope me-2"></i>Contact Us
+            </a>
+            {% if site_settings.whatsapp_number %}
+            <a href="https://wa.me/{{ site_settings.whatsapp_number|cut:'+' }}" target="_blank" class="btn btn-success">
+                <i class="fab fa-whatsapp me-2"></i>WhatsApp
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

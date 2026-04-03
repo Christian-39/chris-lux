@@ -1,0 +1,1758 @@
+ERROR 2026-04-01 18:19:46,135 log 23964 16764 Internal Server Error: /about/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 93, in about_view
+    return render(request, 'core/about.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: core/about.html
+ERROR 2026-04-01 18:19:46,141 basehttp 23964 16764 "GET /about/ HTTP/1.1" 500 86007
+ERROR 2026-04-01 18:19:55,828 log 23964 16764 Internal Server Error: /accounts/login/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\accounts\views.py", line 132, in login_view
+    return render(request, 'accounts/login.html', {'form': form})
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: accounts/login.html
+ERROR 2026-04-01 18:19:55,828 basehttp 23964 16764 "GET /accounts/login/ HTTP/1.1" 500 85975
+WARNING 2026-04-02 14:10:27,706 log 23964 16632 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-02 14:10:27,708 basehttp 23964 16632 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7600
+WARNING 2026-04-02 14:39:00,802 log 23964 16632 Not Found: /media/profiles/default.png
+WARNING 2026-04-02 14:39:00,804 basehttp 23964 16632 "GET /media/profiles/default.png HTTP/1.1" 404 7779
+WARNING 2026-04-02 14:42:27,368 log 23964 16632 Not Found: /media/profiles/default.png
+WARNING 2026-04-02 14:42:27,369 basehttp 23964 16632 "GET /media/profiles/default.png HTTP/1.1" 404 7779
+WARNING 2026-04-02 14:46:05,328 log 23964 18504 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-02 14:46:05,328 basehttp 23964 18504 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7600
+WARNING 2026-04-02 14:46:42,697 log 23964 18504 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-02 14:46:42,697 basehttp 23964 18504 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7600
+WARNING 2026-04-02 14:47:21,599 log 23964 16308 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-02 14:47:21,599 basehttp 23964 16308 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7600
+WARNING 2026-04-02 14:48:03,866 log 23964 16632 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-02 14:48:03,866 basehttp 23964 16632 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7600
+WARNING 2026-04-02 14:49:05,522 log 23964 18504 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-02 14:49:05,522 basehttp 23964 18504 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7600
+WARNING 2026-04-02 14:49:53,104 log 23964 10444 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-02 14:49:53,105 basehttp 23964 10444 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7600
+WARNING 2026-04-02 14:50:28,845 log 23964 10444 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-02 14:50:28,845 basehttp 23964 10444 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7600
+WARNING 2026-04-02 14:57:52,011 log 23964 26108 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-02 14:57:52,013 basehttp 23964 26108 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7600
+WARNING 2026-04-02 14:58:15,363 log 23964 21388 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-02 14:58:15,372 basehttp 23964 21388 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7600
+ERROR 2026-04-02 15:37:00,498 log 23964 21068 Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 80, in home_view
+    return render(request, 'core/home.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 210, in render
+    return template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 174, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'admin_dashboard' not found. 'admin_dashboard' is not a valid view function or pattern name.
+ERROR 2026-04-02 15:37:00,524 basehttp 23964 21068 "GET / HTTP/1.1" 500 213614
+ERROR 2026-04-02 15:50:17,669 log 14732 26516 Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 81, in home_view
+    return render(request, 'core/home.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 210, in render
+    return template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 174, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'admin_dashboard' not found. 'admin_dashboard' is not a valid view function or pattern name.
+ERROR 2026-04-02 15:50:17,690 basehttp 14732 26516 "GET / HTTP/1.1" 500 213614
+ERROR 2026-04-02 15:55:51,186 log 14732 16492 Internal Server Error: /admin-dashboard/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 362, in admin_dashboard
+    'total_orders': Order.objects.count(),
+NameError: name 'Order' is not defined
+ERROR 2026-04-02 15:55:51,186 basehttp 14732 16492 "GET /admin-dashboard/ HTTP/1.1" 500 75948
+ERROR 2026-04-02 15:57:38,939 log 22836 26212 Internal Server Error: /admin-dashboard/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 364, in admin_dashboard
+    'total_users': User.objects.count(),
+NameError: name 'User' is not defined
+ERROR 2026-04-02 15:57:38,947 basehttp 22836 26212 "GET /admin-dashboard/ HTTP/1.1" 500 75950
+ERROR 2026-04-02 16:00:16,373 log 24464 18392 Internal Server Error: /admin-dashboard/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 373, in admin_dashboard
+    return render(request, 'admin/dashboard.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: admin/dashboard.html
+ERROR 2026-04-02 16:00:16,389 basehttp 24464 18392 "GET /admin-dashboard/ HTTP/1.1" 500 90850
+ERROR 2026-04-02 16:20:55,220 log 10608 23232 Internal Server Error: /admin-dashboard/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 369, in admin_dashboard
+    ).aggregate(total=Sum('total'))['total'] or 0
+NameError: name 'Sum' is not defined
+ERROR 2026-04-02 16:20:55,224 basehttp 10608 23232 "GET /admin-dashboard/ HTTP/1.1" 500 75926
+ERROR 2026-04-02 16:23:11,044 log 11232 24832 Internal Server Error: /admin-dashboard/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 398, in admin_dashboard
+    return render(request, 'admin/admin_dashboard.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 490, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 488, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 610, in compile_filter
+    return FilterExpression(token, self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 706, in __init__
+    filter_func = parser.find_filter(filter_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 616, in find_filter
+    raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
+django.template.exceptions.TemplateSyntaxError: Invalid filter: 'intcomma'
+ERROR 2026-04-02 16:23:11,064 basehttp 11232 24832 "GET /admin-dashboard/ HTTP/1.1" 500 281798
+WARNING 2026-04-02 17:04:39,576 log 11232 22104 Not Found: /favicon.ico
+WARNING 2026-04-02 17:04:39,586 basehttp 11232 22104 "GET /favicon.ico HTTP/1.1" 404 7762
+WARNING 2026-04-02 22:43:05,063 log 24200 10752 Not Found: /admin-dashboard/
+WARNING 2026-04-02 22:43:05,074 basehttp 24200 10752 "GET /admin-dashboard/ HTTP/1.1" 404 7504
+ERROR 2026-04-02 22:44:59,984 log 24200 10752 Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 81, in reverse
+    extra, resolver = resolver.namespace_dict[ns]
+KeyError: 'admin_dashboard'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 85, in home_view
+    return render(request, 'core/home.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 210, in render
+    return template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 174, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 92, in reverse
+    raise NoReverseMatch("%s is not a registered namespace" % key)
+django.urls.exceptions.NoReverseMatch: 'admin_dashboard' is not a registered namespace
+ERROR 2026-04-02 22:46:31,522 log 24200 22340 Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 81, in reverse
+    extra, resolver = resolver.namespace_dict[ns]
+KeyError: 'admin_dashboard'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 85, in home_view
+    return render(request, 'core/home.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 210, in render
+    return template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 174, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 92, in reverse
+    raise NoReverseMatch("%s is not a registered namespace" % key)
+django.urls.exceptions.NoReverseMatch: 'admin_dashboard' is not a registered namespace
+ERROR 2026-04-02 22:46:31,528 basehttp 24200 22340 "GET / HTTP/1.1" 500 233403
+WARNING 2026-04-02 22:53:55,900 basehttp 17600 14248 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-02 23:04:55,212 basehttp 17600 16492 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-02 23:06:06,030 basehttp 17600 21760 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-02 23:08:25,758 basehttp 17600 13668 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+ERROR 2026-04-02 23:09:53,157 log 17600 22536 Internal Server Error: /dashboard/products/add/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 501, in admin_product_create_view
+    from products.forms import ProductForm
+ModuleNotFoundError: No module named 'products.forms'
+ERROR 2026-04-02 23:09:53,161 basehttp 17600 22536 "GET /dashboard/products/add/ HTTP/1.1" 500 81010
+ERROR 2026-04-02 23:16:12,705 log 22492 15724 Internal Server Error: /dashboard/products/add/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 510, in admin_product_create_view
+    form = ProductForm()
+NameError: name 'ProductForm' is not defined
+ERROR 2026-04-02 23:16:12,710 basehttp 22492 15724 "GET /dashboard/products/add/ HTTP/1.1" 500 81027
+ERROR 2026-04-02 23:23:18,679 log 22864 24664 Internal Server Error: /dashboard/products/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 244, in _get_session
+    return self._session_cache
+AttributeError: 'SessionStore' object has no attribute '_session_cache'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 279, in ensure_connection
+    self.connect()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 256, in connect
+    self.connection = self.get_new_connection(conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\mysql\base.py", line 256, in get_new_connection
+    connection = Database.connect(**conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\connections.py", line 206, in __init__
+    super().__init__(*args, **kwargs2)
+MySQLdb.OperationalError: (2002, "Can't connect to server on 'mysql.gb.stackcp.com' (10060)")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\middleware.py", line 13, in process_request
+    if request.user.is_authenticated:
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\functional.py", line 251, in inner
+    self._setup()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\functional.py", line 404, in _setup
+    self._wrapped = self._setupfunc()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\middleware.py", line 40, in <lambda>
+    request.user = SimpleLazyObject(lambda: get_user(request))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\middleware.py", line 20, in get_user
+    request._cached_user = auth.get_user(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\__init__.py", line 304, in get_user
+    user_id = _get_user_session_key(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\__init__.py", line 95, in _get_user_session_key
+    return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 55, in __getitem__
+    return self._session[key]
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 249, in _get_session
+    self._session_cache = self.load()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\db.py", line 55, in load
+    s = self._get_session_from_db()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\db.py", line 34, in _get_session_from_db
+    return self.model.objects.get(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 631, in get
+    num = len(clone)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 368, in __len__
+    self._fetch_all()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 1954, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 93, in __iter__
+    results = compiler.execute_sql(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\sql\compiler.py", line 1621, in execute_sql
+    cursor = self.connection.cursor()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 320, in cursor
+    return self._cursor()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 296, in _cursor
+    self.ensure_connection()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 278, in ensure_connection
+    with self.wrap_database_errors:
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 279, in ensure_connection
+    self.connect()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 256, in connect
+    self.connection = self.get_new_connection(conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\mysql\base.py", line 256, in get_new_connection
+    connection = Database.connect(**conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\connections.py", line 206, in __init__
+    super().__init__(*args, **kwargs2)
+django.db.utils.OperationalError: (2002, "Can't connect to server on 'mysql.gb.stackcp.com' (10060)")
+WARNING 2026-04-02 23:24:19,204 log 22864 26180 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-02 23:24:19,211 basehttp 22864 26180 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7753
+WARNING 2026-04-02 23:24:31,554 log 22864 26180 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-02 23:24:31,554 basehttp 22864 26180 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7753
+ERROR 2026-04-02 23:33:12,932 log 22864 24664 Internal Server Error: /dashboard/categories/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 834, in admin_categories_view
+    return render(request, 'admin_dashboard/categories.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'category_edit' with arguments '(UUID('b219b703-f80a-4517-a77e-0bb9dcc39d91'),)' not found. 1 pattern(s) tried: ['dashboard/categories/(?P<category_id>[0-9]+)/edit/\\Z']
+ERROR 2026-04-02 23:33:12,941 basehttp 22864 24664 "GET /dashboard/categories/ HTTP/1.1" 500 201125
+ERROR 2026-04-02 23:36:32,397 log 22864 24664 Internal Server Error: /dashboard/categories/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 834, in admin_categories_view
+    return render(request, 'admin_dashboard/categories.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'category_edit' with arguments '(UUID('b219b703-f80a-4517-a77e-0bb9dcc39d91'),)' not found. 1 pattern(s) tried: ['dashboard/categories/(?P<category_id>[0-9]+)/edit/\\Z']
+ERROR 2026-04-02 23:36:32,397 basehttp 22864 24664 "GET /dashboard/categories/ HTTP/1.1" 500 200582
+ERROR 2026-04-02 23:36:50,880 log 22864 24664 Internal Server Error: /dashboard/categories/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 834, in admin_categories_view
+    return render(request, 'admin_dashboard/categories.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'category_edit' with arguments '(UUID('b219b703-f80a-4517-a77e-0bb9dcc39d91'),)' not found. 1 pattern(s) tried: ['dashboard/categories/(?P<category_id>[0-9]+)/edit/\\Z']
+ERROR 2026-04-02 23:36:50,958 basehttp 22864 24664 "GET /dashboard/categories/ HTTP/1.1" 500 200715
+ERROR 2026-04-02 23:37:51,478 log 22864 24664 Internal Server Error: /dashboard/categories/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 834, in admin_categories_view
+    return render(request, 'admin_dashboard/categories.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'category_edit' with arguments '('phones',)' not found. 1 pattern(s) tried: ['dashboard/categories/(?P<category_id>[0-9]+)/edit/\\Z']
+ERROR 2026-04-02 23:37:51,487 basehttp 22864 24664 "GET /dashboard/categories/ HTTP/1.1" 500 200364
+ERROR 2026-04-02 23:39:09,660 log 22864 24664 Internal Server Error: /dashboard/categories/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 834, in admin_categories_view
+    return render(request, 'admin_dashboard/categories.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'category_edit' with arguments '(UUID('b219b703-f80a-4517-a77e-0bb9dcc39d91'),)' not found. 1 pattern(s) tried: ['dashboard/categories/(?P<category_id>[0-9]+)/edit/\\Z']
+ERROR 2026-04-02 23:39:09,665 basehttp 22864 24664 "GET /dashboard/categories/ HTTP/1.1" 500 200715
+ERROR 2026-04-02 23:40:07,422 log 22864 24664 Internal Server Error: /dashboard/categories/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 834, in admin_categories_view
+    return render(request, 'admin_dashboard/categories.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'category_edit' with arguments '(UUID('b219b703-f80a-4517-a77e-0bb9dcc39d91'),)' not found. 1 pattern(s) tried: ['dashboard/categories/(?P<category_id>[0-9]+)/edit/\\Z']
+ERROR 2026-04-02 23:40:07,446 basehttp 22864 24664 "GET /dashboard/categories/ HTTP/1.1" 500 200840
+ERROR 2026-04-02 23:40:16,676 log 22864 24664 Internal Server Error: /dashboard/categories/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 834, in admin_categories_view
+    return render(request, 'admin_dashboard/categories.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'category_edit' with arguments '(UUID('b219b703-f80a-4517-a77e-0bb9dcc39d91'),)' not found. 1 pattern(s) tried: ['dashboard/categories/(?P<category_id>[0-9]+)/edit/\\Z']
+ERROR 2026-04-02 23:40:16,689 basehttp 22864 24664 "GET /dashboard/categories/ HTTP/1.1" 500 200840
+ERROR 2026-04-02 23:40:29,537 log 22864 24664 Internal Server Error: /dashboard/categories/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 834, in admin_categories_view
+    return render(request, 'admin_dashboard/categories.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'category_edit' with arguments '(UUID('b219b703-f80a-4517-a77e-0bb9dcc39d91'),)' not found. 1 pattern(s) tried: ['dashboard/categories/(?P<category_id>[0-9]+)/edit/\\Z']
+ERROR 2026-04-02 23:40:29,544 basehttp 22864 24664 "GET /dashboard/categories/ HTTP/1.1" 500 200703
+WARNING 2026-04-03 00:15:29,974 basehttp 19400 25680 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 00:15:51,017 basehttp 19400 24140 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 00:24:36,840 basehttp 19400 12060 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 00:33:56,283 basehttp 19400 25628 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 00:41:34,162 log 19400 25568 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-03 00:41:34,178 basehttp 19400 25568 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7753
+WARNING 2026-04-03 00:44:36,242 log 19400 25568 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-03 00:44:36,258 basehttp 19400 25568 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7753
+ERROR 2026-04-03 01:10:21,104 log 25896 16004 Internal Server Error: /dashboard/products/add/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 501, in admin_product_create_view
+    from products.forms import ProductForm
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\products\forms.py", line 4, in <module>
+    class ProductForm(forms.ModelForm):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\forms\models.py", line 334, in __new__
+    raise FieldError(message)
+django.core.exceptions.FieldError: Unknown field(s) (sale_price, track_inventory) specified for Product
+ERROR 2026-04-03 01:10:21,110 basehttp 25896 16004 "POST /dashboard/products/add/ HTTP/1.1" 500 104313
+ERROR 2026-04-03 01:16:03,204 log 18352 16272 Internal Server Error: /dashboard/products/add/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 523, in admin_product_create_view
+    from products.models import ProductSpecification
+ImportError: cannot import name 'ProductSpecification' from 'products.models' (C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\products\models.py)
+ERROR 2026-04-03 01:16:03,204 basehttp 18352 16272 "POST /dashboard/products/add/ HTTP/1.1" 500 87263
+ERROR 2026-04-03 01:31:13,229 log 18812 19792 Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 85, in home_view
+    return render(request, 'core/home.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 199, in render
+    template = context.template.engine.select_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 208, in select_template
+    return self.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 962, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 490, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 488, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 610, in compile_filter
+    return FilterExpression(token, self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 706, in __init__
+    filter_func = parser.find_filter(filter_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 616, in find_filter
+    raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
+django.template.exceptions.TemplateSyntaxError: Invalid filter: 'intcomma'
+ERROR 2026-04-03 01:31:13,260 basehttp 18812 19792 "GET / HTTP/1.1" 500 316926
+ERROR 2026-04-03 01:33:31,421 log 18812 19792 Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 85, in home_view
+    return render(request, 'core/home.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 199, in render
+    template = context.template.engine.select_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 208, in select_template
+    return self.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 962, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 490, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 488, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 610, in compile_filter
+    return FilterExpression(token, self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 706, in __init__
+    filter_func = parser.find_filter(filter_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 616, in find_filter
+    raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
+django.template.exceptions.TemplateSyntaxError: Invalid filter: 'intcomma'
+ERROR 2026-04-03 01:33:31,431 basehttp 18812 19792 "GET / HTTP/1.1" 500 316926
+WARNING 2026-04-03 01:33:49,986 basehttp 18812 13544 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+ERROR 2026-04-03 01:37:45,441 log 18812 20532 Internal Server Error: /dashboard/products/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 494, in admin_products_view
+    return render(request, 'admin_dashboard/products.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 862, in do_for
+    nodelist_loop = parser.parse(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 490, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 488, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 610, in compile_filter
+    return FilterExpression(token, self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 711, in __init__
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ' product.id' from 'admin_dashboard.product_detail product.id'
+ERROR 2026-04-03 01:37:45,462 basehttp 18812 20532 "GET /dashboard/products/ HTTP/1.1" 500 305898
+ERROR 2026-04-03 01:38:26,315 log 18812 20532 Internal Server Error: /dashboard/products/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 494, in admin_products_view
+    return render(request, 'admin_dashboard/products.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 862, in do_for
+    nodelist_loop = parser.parse(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 490, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 488, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 610, in compile_filter
+    return FilterExpression(token, self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 711, in __init__
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ' product.id' from ''admin_dashboard.product_detail' product.id'
+ERROR 2026-04-03 01:38:26,342 basehttp 18812 20532 "GET /dashboard/products/ HTTP/1.1" 500 305896
+ERROR 2026-04-03 01:38:57,389 log 18812 20532 Internal Server Error: /dashboard/products/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 494, in admin_products_view
+    return render(request, 'admin_dashboard/products.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 862, in do_for
+    nodelist_loop = parser.parse(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 490, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 488, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 610, in compile_filter
+    return FilterExpression(token, self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 711, in __init__
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ' product.id' from ''admin_dashboard:product_detail' product.id'
+ERROR 2026-04-03 01:38:57,417 basehttp 18812 20532 "GET /dashboard/products/ HTTP/1.1" 500 305896
+ERROR 2026-04-03 01:39:31,112 log 18812 20532 Internal Server Error: /dashboard/products/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 494, in admin_products_view
+    return render(request, 'admin_dashboard/products.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 862, in do_for
+    nodelist_loop = parser.parse(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 490, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 488, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 610, in compile_filter
+    return FilterExpression(token, self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 711, in __init__
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ' 'admin_dashboard:product_detail' product.id' from 'url 'admin_dashboard:product_detail' product.id'
+ERROR 2026-04-03 01:39:31,125 basehttp 18812 20532 "GET /dashboard/products/ HTTP/1.1" 500 306262
+WARNING 2026-04-03 01:41:39,567 log 18812 10312 Not Found: /dashboard/products/{url 'admin_dashboard:product_detail' product.id}
+WARNING 2026-04-03 01:41:39,567 basehttp 18812 10312 "GET /dashboard/products/%7Burl%20'admin_dashboard:product_detail'%20product.id%7D HTTP/1.1" 404 21938
+ERROR 2026-04-03 01:42:28,678 log 18812 10312 Internal Server Error: /dashboard/products/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 494, in admin_products_view
+    return render(request, 'admin_dashboard/products.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'product_detail' not found. 'product_detail' is not a valid view function or pattern name.
+ERROR 2026-04-03 01:42:28,700 basehttp 18812 10312 "GET /dashboard/products/ HTTP/1.1" 500 205868
+ERROR 2026-04-03 01:45:33,009 log 18812 10312 Internal Server Error: /dashboard/products/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 81, in reverse
+    extra, resolver = resolver.namespace_dict[ns]
+KeyError: 'includes'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 494, in admin_products_view
+    return render(request, 'admin_dashboard/products.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 92, in reverse
+    raise NoReverseMatch("%s is not a registered namespace" % key)
+django.urls.exceptions.NoReverseMatch: 'includes' is not a registered namespace
+ERROR 2026-04-03 01:45:33,025 basehttp 18812 10312 "GET /dashboard/products/ HTTP/1.1" 500 207188
+ERROR 2026-04-03 01:45:53,538 log 18812 10312 Internal Server Error: /dashboard/products/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 494, in admin_products_view
+    return render(request, 'admin_dashboard/products.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'product_card' not found. 'product_card' is not a valid view function or pattern name.
+ERROR 2026-04-03 01:45:53,559 basehttp 18812 10312 "GET /dashboard/products/ HTTP/1.1" 500 205889
+ERROR 2026-04-03 01:46:24,060 log 18812 10312 Internal Server Error: /dashboard/products/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 494, in admin_products_view
+    return render(request, 'admin_dashboard/products.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'product_detail' not found. 'product_detail' is not a valid view function or pattern name.
+ERROR 2026-04-03 01:46:24,072 basehttp 18812 10312 "GET /dashboard/products/ HTTP/1.1" 500 205764
+ERROR 2026-04-03 01:50:23,648 log 13948 20172 Internal Server Error: /dashboard/products/329604b4-053e-4395-a240-c296965e973b/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 613, in admin_product_detail_view
+    from products.models import Product, ProductReview, OrderItem
+ImportError: cannot import name 'OrderItem' from 'products.models' (C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\products\models.py)
+ERROR 2026-04-03 01:50:23,664 basehttp 13948 20172 "GET /dashboard/products/329604b4-053e-4395-a240-c296965e973b/ HTTP/1.1" 500 82613
+WARNING 2026-04-03 01:59:16,390 basehttp 14008 18524 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 01:59:32,786 log 14008 22956 Not Found: /products/329604b4-053e-4395-a240-c296965e973b/add-to-wishlist/
+WARNING 2026-04-03 01:59:32,790 basehttp 14008 22956 "POST /products/329604b4-053e-4395-a240-c296965e973b/add-to-wishlist/ HTTP/1.1" 404 9108
+WARNING 2026-04-03 01:59:42,772 basehttp 14008 19308 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 02:00:58,875 basehttp 14008 10384 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 02:02:18,297 basehttp 14008 18120 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 02:03:16,612 basehttp 14008 11592 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 02:03:54,820 basehttp 14008 16816 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 02:06:34,997 basehttp 14008 22956 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 02:07:33,138 basehttp 14008 13012 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 02:10:17,190 basehttp 14008 20432 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 02:11:13,432 basehttp 14008 26236 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 02:11:32,333 basehttp 14008 20932 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-03 02:11:55,087 basehttp 14008 14692 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978

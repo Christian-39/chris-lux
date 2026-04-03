@@ -1,0 +1,91 @@
+<!-- Header -->
+<header class="main-header bg-white shadow-sm">
+    <div class="container py-3">
+        <div class="row align-items-center">
+            <!-- Logo -->
+            <div class="col-6 col-md-3">
+                <a href="{% url 'core:home' %}" class="logo-link">
+                    {% if site_settings.logo %}
+                    <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_name }}" class="img-fluid" style="max-height: 50px;">
+                    {% else %}
+                    <h4 class="m-0 fw-bold text-primary">{{ site_settings.site_name }}</h4>
+                    {% endif %}
+                </a>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="col-md-6 d-none d-md-block">
+                <form action="{% url 'core:search' %}" method="get" class="search-form">
+                    <div class="input-group">
+                        <input type="text" 
+                               name="q" 
+                               class="form-control" 
+                               placeholder="Search for products..."
+                               value="{{ request.GET.q }}">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Header Actions -->
+            <div class="col-6 col-md-3">
+                <div class="d-flex justify-content-end align-items-center gap-3">
+                    <!-- Wishlist -->
+                    <a href="{% url 'accounts:wishlist' %}" class="header-action position-relative" title="Wishlist">
+                        <i class="far fa-heart fs-5"></i>
+                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill wishlist-count" 
+                              style="font-size: 0.6rem; min-width: 18px;"
+                              {% if not wishlist_count %}hidden{% endif %}>
+                            {{ wishlist_count }}
+                        </span>
+                    </a>
+                    
+                    <!-- Cart -->
+                    <a href="{% url 'orders:cart' %}" class="header-action position-relative" title="Cart">
+                        <i class="fas fa-shopping-cart fs-5"></i>
+                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill cart-count" 
+                              style="font-size: 0.6rem; min-width: 18px;"
+                              {% if not cart_count %}hidden{% endif %}>
+                            {{ cart_count }}
+                        </span>
+                    </a>
+                    
+                    <!-- Notifications -->
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'notifications:notifications' %}" class="header-action position-relative" title="Notifications">
+                        <i class="far fa-bell fs-5"></i>
+                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill notification-count" 
+                              style="font-size: 0.6rem; min-width: 18px;"
+                              {% if not notification_count %}hidden{% endif %}>
+                            {{ notification_count }}
+                        </span>
+                    </a>
+                    {% endif %}
+                    
+                    <!-- Mobile Search Toggle -->
+                    <button class="btn btn-link text-dark p-0 d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearch">
+                        <i class="fas fa-search fs-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Search -->
+        <div class="collapse d-md-none mt-3" id="mobileSearch">
+            <form action="{% url 'core:search' %}" method="get">
+                <div class="input-group">
+                    <input type="text" 
+                           name="q" 
+                           class="form-control" 
+                           placeholder="Search for products..."
+                           value="{{ request.GET.q }}">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</header>

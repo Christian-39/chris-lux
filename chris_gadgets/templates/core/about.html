@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-3">About {{ site_settings.site_name }}</h1>
+        <p class="lead">Your trusted source for quality gadgets and accessories in Nigeria</p>
+    </div>
+</section>
+
+<!-- About Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4">
+                <h2 class="fw-bold mb-4">Who We Are</h2>
+                <p class="text-muted">
+                    {{ site_settings.site_name }} is a leading e-commerce platform specializing in gadgets and accessories 
+                    in Nigeria. We are committed to providing our customers with genuine products at competitive prices, 
+                    backed by excellent customer service.
+                </p>
+                <p class="text-muted">
+                    Founded with a vision to make technology accessible to everyone, we have grown to become one of 
+                    Nigeria's most trusted online stores for electronics and gadgets.
+                </p>
+                <div class="row mt-4">
+                    <div class="col-6">
+                        <h4 class="text-primary fw-bold">10,000+</h4>
+                        <p class="text-muted">Happy Customers</p>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-primary fw-bold">5,000+</h4>
+                        <p class="text-muted">Products</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Why Choose Us?</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-3">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong>Genuine Products</strong> - All products are 100% authentic
+                            </li>
+                            <li class="mb-3">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong>Best Prices</strong> - Competitive pricing guaranteed
+                            </li>
+                            <li class="mb-3">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong>Fast Delivery</strong> - Quick shipping nationwide
+                            </li>
+                            <li class="mb-3">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong>Secure Payment</strong> - Safe and secure checkout
+                            </li>
+                            <li class="mb-3">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong>24/7 Support</strong> - Always here to help
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Values -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5">Our Values</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm text-center">
+                    <div class="card-body p-4">
+                        <i class="fas fa-heart fa-3x text-danger mb-3"></i>
+                        <h5 class="fw-bold">Customer First</h5>
+                        <p class="text-muted mb-0">We put our customers at the center of everything we do.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm text-center">
+                    <div class="card-body p-4">
+                        <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                        <h5 class="fw-bold">Integrity</h5>
+                        <p class="text-muted mb-0">We believe in honest and transparent business practices.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm text-center">
+                    <div class="card-body p-4">
+                        <i class="fas fa-rocket fa-3x text-success mb-3"></i>
+                        <h5 class="fw-bold">Innovation</h5>
+                        <p class="text-muted mb-0">We constantly evolve to serve you better.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+{% if testimonials %}
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5">What Our Customers Say</h2>
+        <div class="row g-4">
+            {% for testimonial in testimonials %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="rating mb-2">
+                            {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= testimonial.rating %}
+                            <i class="fas fa-star text-warning"></i>
+                            {% else %}
+                            <i class="far fa-star text-warning"></i>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        <p class="card-text">"{{ testimonial.content }}"</p>
+                        <div class="d-flex align-items-center mt-3">
+                            {% if testimonial.customer_image %}
+                            <img src="{{ testimonial.customer_image.url }}" alt="{{ testimonial.customer_name }}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                            {% else %}
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <h6 class="mb-0">{{ testimonial.customer_name }}</h6>
+                                {% if testimonial.customer_title %}
+                                <small class="text-muted">{{ testimonial.customer_title }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-3">Ready to Shop?</h2>
+        <p class="lead mb-4">Discover amazing deals on the latest gadgets and accessories</p>
+        <a href="{% url 'products:product_list' %}" class="btn btn-light btn-lg">
+            <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+        </a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - {{ site_settings.site_name }}{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Get in touch with {{ site_settings.site_name }}. We're here to help with your questions, concerns, and feedback.">
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-5 fw-bold mb-3">Contact Us</h1>
+                <p class="lead text-muted mb-0">We're here to help! Reach out to us anytime.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Contact Information -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body p-4">
+                        <h5 class="mb-4">Get in Touch</h5>
+                        
+                        <div class="d-flex mb-4">
+                            <div class="flex-shrink-0">
+                                <div class="contact-icon bg-primary bg-opacity-10 text-primary">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">Address</h6>
+                                <p class="text-muted mb-0">{{ site_settings.address|default:"123 Tech Street, Lagos, Nigeria" }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-4">
+                            <div class="flex-shrink-0">
+                                <div class="contact-icon bg-success bg-opacity-10 text-success">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">Phone</h6>
+                                <p class="text-muted mb-0">{{ site_settings.support_phone|default:"+234 800 123 4567" }}</p>
+                                <small class="text-muted">Mon - Fri, 9 AM - 6 PM</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-4">
+                            <div class="flex-shrink-0">
+                                <div class="contact-icon bg-info bg-opacity-10 text-info">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">Email</h6>
+                                <p class="text-muted mb-0">{{ site_settings.support_email|default:"support@gadgetsstore.ng" }}</p>
+                                <small class="text-muted">We reply within 24 hours</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <div class="contact-icon bg-warning bg-opacity-10 text-warning">
+                                    <i class="fab fa-whatsapp"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">WhatsApp</h6>
+                                <p class="text-muted mb-0">{{ site_settings.whatsapp_number|default:"+234 800 123 4567" }}</p>
+                                <small class="text-muted">Quick responses</small>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <h6 class="mb-3">Follow Us</h6>
+                        <div class="social-links">
+                            {% if site_settings.facebook_url %}
+                                <a href="{{ site_settings.facebook_url }}" class="btn btn-outline-primary btn-sm me-2" target="_blank">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                            {% endif %}
+                            {% if site_settings.twitter_url %}
+                                <a href="{{ site_settings.twitter_url }}" class="btn btn-outline-info btn-sm me-2" target="_blank">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                            {% endif %}
+                            {% if site_settings.instagram_url %}
+                                <a href="{{ site_settings.instagram_url }}" class="btn btn-outline-danger btn-sm me-2" target="_blank">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                            {% endif %}
+                            {% if site_settings.youtube_url %}
+                                <a href="{{ site_settings.youtube_url }}" class="btn btn-outline-danger btn-sm" target="_blank">
+                                    <i class="fab fa-youtube"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Form -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <h5 class="mb-4">Send us a Message</h5>
+                        
+                        <form method="post" action="{% url 'messaging:contact' %}">
+                            {% csrf_token %}
+                            
+                            <div class="row g-3">
+                                {% if not request.user.is_authenticated %}
+                                    <div class="col-md-6">
+                                        <label for="name" class="form-label">Your Name *</label>
+                                        <input type="text" name="name" id="name" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">Email Address *</label>
+                                        <input type="email" name="email" id="email" class="form-control" required>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="col-md-6">
+                                    <label for="subject" class="form-label">Subject *</label>
+                                    <select name="subject" id="subject" class="form-select" required>
+                                        <option value="">Select a subject</option>
+                                        <option value="general">General Inquiry</option>
+                                        <option value="order">Order Question</option>
+                                        <option value="product">Product Information</option>
+                                        <option value="returns">Returns & Refunds</option>
+                                        <option value="technical">Technical Support</option>
+                                        <option value="feedback">Feedback</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" name="phone" id="phone" class="form-control" placeholder="+234 ...">
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label for="message" class="form-label">Your Message *</label>
+                                    <textarea name="message" id="message" class="form-control" rows="6" placeholder="How can we help you?" required></textarea>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-paper-plane me-2"></i>Send Message
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h3 class="mb-3">Frequently Asked Questions</h3>
+                <p class="text-muted mb-4">Find quick answers to common questions</p>
+                <a href="{% url 'core:faq' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-question-circle me-2"></i>View All FAQs
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="map-container" style="height: 400px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                    <div class="text-center text-white">
+                        <i class="fas fa-map-marked-alt fa-4x mb-3"></i>
+                        <h4>{{ site_settings.site_name }}</h4>
+                        <p class="mb-0">{{ site_settings.address|default:"Lagos, Nigeria" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.contact-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.social-links .btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-container {
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+</style>
+{% endblock %}

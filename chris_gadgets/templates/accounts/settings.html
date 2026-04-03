@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Settings - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 mb-4">
+            {% include 'accounts/includes/sidebar.html' %}
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Account Settings</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <h6 class="mb-3">Appearance</h6>
+                        <div class="mb-4">
+                            <label for="id_theme_preference" class="form-label">Theme Preference</label>
+                            {{ form.theme_preference }}
+                            <small class="form-text text-muted">Choose your preferred theme mode</small>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <h6 class="mb-3">Notifications</h6>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    {{ form.newsletter_subscribed }}
+                                    <label class="form-check-label" for="id_newsletter_subscribed">
+                                        Subscribe to newsletter
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.email_notifications }}
+                                    <label class="form-check-label" for="id_email_notifications">
+                                        Email notifications
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    {{ form.sms_notifications }}
+                                    <label class="form-check-label" for="id_sms_notifications">
+                                        SMS notifications
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.push_notifications }}
+                                    <label class="form-check-label" for="id_push_notifications">
+                                        Push notifications
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Danger Zone -->
+            <div class="card shadow-sm border-0 mt-4 border-danger">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 text-danger">Danger Zone</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Delete Account</h6>
+                            <p class="text-muted mb-0 small">Once you delete your account, there is no going back.</p>
+                        </div>
+                        <a href="{% url 'accounts:delete_account' %}" class="btn btn-outline-danger">
+                            <i class="fas fa-trash me-2"></i>Delete Account
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

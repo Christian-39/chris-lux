@@ -1,0 +1,57 @@
+<!-- Mobile Bottom Navigation -->
+<nav class="mobile-nav d-lg-none">
+    <div class="mobile-nav-container">
+        <a href="{% url 'core:home' %}" class="mobile-nav-item {% if request.path == '/' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        
+        <a href="{% url 'products:product_list' %}" class="mobile-nav-item {% if 'products' in request.path %}active{% endif %}">
+            <i class="fas fa-th-large"></i>
+            <span>Shop</span>
+        </a>
+        
+        <a href="{% url 'orders:cart' %}" class="mobile-nav-item {% if 'cart' in request.path %}active{% endif %}">
+            <div class="position-relative">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill cart-count-mobile" 
+                      style="font-size: 0.5rem; min-width: 14px;"
+                      {% if not cart_count %}hidden{% endif %}>
+                    {{ cart_count }}
+                </span>
+            </div>
+            <span>Cart</span>
+        </a>
+        
+        <a href="{% url 'accounts:wishlist' %}" class="mobile-nav-item {% if 'wishlist' in request.path %}active{% endif %}">
+            <div class="position-relative">
+                <i class="fas fa-heart"></i>
+                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill wishlist-count-mobile" 
+                      style="font-size: 0.5rem; min-width: 14px;"
+                      {% if not wishlist_count %}hidden{% endif %}>
+                    {{ wishlist_count }}
+                </span>
+            </div>
+            <span>Wishlist</span>
+        </a>
+        
+        {% if user.is_authenticated %}
+            {% if user.user_type == 'admin' or user.user_type == 'staff' or user.is_superuser %}
+            <a href="{% url 'admin_dashboard:dashboard' %}" class="mobile-nav-item {% if 'dashboard' in request.path %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            {% else %}
+            <a href="{% url 'accounts:profile' %}" class="mobile-nav-item {% if 'profile' in request.path %}active{% endif %}">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+            {% endif %}
+        {% else %}
+        <a href="{% url 'accounts:login' %}" class="mobile-nav-item {% if 'login' in request.path %}active{% endif %}">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Login</span>
+        </a>
+        {% endif %}
+    </div>
+</nav>
