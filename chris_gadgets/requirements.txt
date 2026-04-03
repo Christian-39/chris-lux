@@ -2,6 +2,9 @@
 
 # Django Framework
 django>=5.0,<6.0
+gunicorn
+whitenoise
+psycopg2-binary
 
 # Database
 mysqlclient>=2.2.0
