@@ -67,7 +67,7 @@
                         <div class="row align-items-center">
                             <div class="col-md-6">
                                 <p class="mb-1 text-muted">Amount to Pay:</p>
-                                <h4 class="text-primary fw-bold mb-0">{{ site_settings.default_currency }}{{ order.total|intcomma }}</h4>
+                                <h4 class="text-primary fw-bold mb-0">₦{{ order.total|intcomma }}</h4>
                             </div>
                             <div class="col-md-6">
                                 <p class="mb-1 text-muted">Payment Reference:</p>
@@ -140,7 +140,7 @@
                         </div>
                         <div class="col-md-6">
                             <p class="text-muted mb-1">Order Total:</p>
-                            <p class="fw-bold text-primary fs-5">{{ site_settings.default_currency }}{{ order.total|intcomma }}</p>
+                            <p class="fw-bold text-primary fs-5">₦{{ order.total|intcomma }}</p>
                         </div>
                     </div>
                     <hr>

@@ -106,11 +106,15 @@ def product_detail_view(request, slug):
             product=product,
             defaults={'viewed_at': timezone.now()}
         )
-        # Keep only last 10 items
-        recently_viewed = RecentlyViewed.objects.filter(
+        
+        # Keep only last 10 - delete excess using pk__in
+        excess_ids = RecentlyViewed.objects.filter(
             user=request.user
-        ).order_by('-viewed_at')[10:]
-        recently_viewed.delete()
+        ).order_by('-viewed_at').values('pk')[10:]
+        
+        RecentlyViewed.objects.filter(
+            pk__in=list(excess_ids)
+        ).delete()
     
     # Get reviews
     reviews = product.reviews.filter(is_approved=True).select_related('user')

@@ -1,114 +1,157 @@
 {% load humanize %}
 <!-- Product Card -->
 <div class="product-card h-100">
-    <div class="card h-100 border-0 shadow-sm position-relative">
-        <!-- Badges -->
-        <div class="product-badges position-absolute top-0 start-0 p-2" style="z-index: 2;">
-            {% if product.is_new_arrival %}
-            <span class="badge bg-success mb-1 d-block">New</span>
-            {% endif %}
-            {% if product.is_hot_deal %}
-            <span class="badge bg-danger mb-1 d-block">Hot</span>
-            {% endif %}
-            {% if flash_sale %}
-            <span class="badge bg-warning text-dark mb-1 d-block">-{{ flash_sale.discount_percentage }}%</span>
-            {% elif product.is_on_sale %}
-            <span class="badge bg-warning text-dark mb-1 d-block">-{{ product.discount_percentage }}%</span>
-            {% endif %}
-            {% if product.stock_status == 'low_stock' %}
-            <span class="badge bg-warning mb-1 d-block">Low Stock</span>
-            {% elif product.stock_status == 'out_of_stock' %}
-            <span class="badge bg-secondary mb-1 d-block">Out of Stock</span>
-            {% endif %}
-        </div>
-        
-        <!-- Wishlist Button -->
-        <button class="btn btn-link wishlist-btn position-absolute top-0 end-0 p-2" 
-                data-product-id="{{ product.id }}"
-                style="z-index: 2;"
-                title="{% if in_wishlist %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}">
-            <i class="{% if in_wishlist %}fas{% else %}far{% endif %} fa-heart text-danger"></i>
-        </button>
-        
-        <!-- Product Image -->
-        <a href="{% url 'products:product_detail' slug=product.slug %}" class="product-image-link">
-            <div class="product-image-wrapper" style="height: 200px; overflow: hidden;">
-                {% if product.primary_image %}
-                <img src="{{ product.primary_image.image.url }}" 
-                     alt="{{ product.name }}" 
-                     class="card-img-top"
-                     style="height: 100%; width: 100%; object-fit: cover; transition: transform 0.3s;">
-                {% else %}
-                <div class="d-flex align-items-center justify-content-center h-100 bg-light">
-                    <i class="fas fa-image fa-3x text-muted"></i>
-                </div>
-                {% endif %}
-            </div>
-        </a>
-        
-        <!-- Product Info -->
-        <div class="card-body d-flex flex-column">
-            <!-- Brand -->
-            {% if product.brand %}
-            <small class="text-muted mb-1">{{ product.brand.name }}</small>
-            {% endif %}
-            
-            <!-- Product Name -->
-            <h6 class="card-title mb-2">
-                <a href="{% url 'products:product_detail' slug=product.slug %}" class="text-decoration-none text-dark">
-                    {{ product.name|truncatechars:50 }}
-                </a>
-            </h6>
-            
-            <!-- Rating -->
-            {% if product.review_count > 0 %}
-            <div class="rating mb-2">
-                {% with avg_rating=product.average_rating %}
-                {% for i in "12345"|make_list %}
-                {% if forloop.counter <= avg_rating %}
-                <i class="fas fa-star text-warning small"></i>
-                {% else %}
-                <i class="far fa-star text-warning small"></i>
-                {% endif %}
-                {% endfor %}
-                <small class="text-muted">({{ product.review_count }})</small>
-                {% endwith %}
-            </div>
-            {% endif %}
-            
-            <!-- Price -->
-            <div class="mt-auto">
-                {% if flash_sale %}
-                <div class="price">
-                    <span class="text-primary fw-bold fs-5">{{ site_settings.default_currency }}{{ flash_sale.sale_price|intcomma }}</span>
-                    <span class="text-muted text-decoration-line-through small ms-2">{{ site_settings.default_currency }}{{ product.price|intcomma }}</span>
-                </div>
-                {% elif product.is_on_sale %}
-                <div class="price">
-                    <span class="text-primary fw-bold fs-5">{{ site_settings.default_currency }}{{ product.price|intcomma }}</span>
-                    <span class="text-muted text-decoration-line-through small ms-2">{{ site_settings.default_currency }}{{ product.compare_at_price|intcomma }}</span>
-                </div>
-                {% else %}
-                <div class="price">
-                    <span class="text-primary fw-bold fs-5">{{ site_settings.default_currency }}{{ product.price|intcomma }}</span>
-                </div>
-                {% endif %}
-            </div>
-            
-            <!-- Add to Cart Button -->
-            {% if product.in_stock %}
-            <form action="{% url 'orders:add_to_cart' product_slug=product.slug %}" method="post" class="mt-2">
-                {% csrf_token %}
-                <input type="hidden" name="quantity" value="1">
-                <button type="submit" class="btn btn-primary btn-sm w-100">
-                    <i class="fas fa-cart-plus me-1"></i>Add to Cart
-                </button>
-            </form>
-            {% else %}
-            <button class="btn btn-secondary btn-sm w-100 mt-2" disabled>
-                <i class="fas fa-times-circle me-1"></i>Out of Stock
-            </button>
-            {% endif %}
-        </div>
+  <div class="card h-100 border-0 shadow-sm position-relative">
+    <!-- Badges -->
+    <div
+      class="product-badges position-absolute top-0 start-0 p-2"
+      style="z-index: 2"
+    >
+      {% if product.is_new_arrival %}
+      <span class="badge bg-success mb-1 d-block">New</span>
+      {% endif %} {% if product.is_hot_deal %}
+      <span class="badge bg-danger mb-1 d-block">Hot</span>
+      {% endif %} {% if flash_sale %}
+      <span class="badge bg-warning text-dark mb-1 d-block"
+        >-{{ flash_sale.discount_percentage }}%</span
+      >
+      {% elif product.is_on_sale %}
+      <span class="badge bg-warning text-dark mb-1 d-block"
+        >-{{ product.discount_percentage }}%</span
+      >
+      {% endif %} {% if product.stock_status == 'low_stock' %}
+      <span class="badge bg-warning mb-1 d-block">Low Stock</span>
+      {% elif product.stock_status == 'out_of_stock' %}
+      <span class="badge bg-secondary mb-1 d-block">Out of Stock</span>
+      {% endif %}
     </div>
+
+    <!-- Wishlist Button -->
+    <button
+      class="btn btn-link wishlist-btn position-absolute top-0 end-0 p-2"
+      data-product-id="{{ product.id }}"
+      style="z-index: 2"
+      title="{% if in_wishlist %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}"
+    >
+      <i
+        class="{% if in_wishlist %}fas{% else %}far{% endif %} fa-heart text-danger"
+      ></i>
+    </button>
+
+    <!-- Product Image -->
+    <a
+      href="{% url 'products:product_detail' slug=product.slug %}"
+      class="product-image-link"
+    >
+      <div
+        class="product-image-wrapper"
+        style="height: 200px; overflow: hidden"
+      >
+        {% if product.primary_image %}
+        <img
+          src="{{ product.primary_image.image.url }}"
+          alt="{{ product.name }}"
+          class="card-img-top"
+          style="
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+          "
+        />
+        {% else %}
+        <div
+          class="d-flex align-items-center justify-content-center h-100 bg-light"
+        >
+          <i class="fas fa-image fa-3x text-muted"></i>
+        </div>
+        {% endif %}
+      </div>
+    </a>
+
+    <!-- Product Info -->
+    <div class="card-body d-flex flex-column">
+      <!-- Brand -->
+      {% if product.brand %}
+      <small class="text-muted mb-1">{{ product.brand.name }}</small>
+      {% endif %}
+
+      <!-- Product Name -->
+      <h6 class="card-title mb-2">
+        <a
+          href="{% url 'products:product_detail' slug=product.slug %}"
+          class="text-decoration-none text-dark"
+        >
+          {{ product.name|truncatechars:50 }}
+        </a>
+      </h6>
+
+      <!-- Rating -->
+      {% if product.review_count > 0 %}
+      <div class="rating mb-2">
+        <!-- prettier-ignore -->
+        {% with avg_rating=product.average_rating %} {% for i in "12345"|make_list %} {% if forloop.counter <= avg_rating %}
+        <i class="fas fa-star text-warning small"></i>
+        {% else %}
+        <i class="far fa-star text-warning small"></i>
+        {% endif %} {% endfor %}
+        <small class="text-muted">({{ product.review_count }})</small>
+        {% endwith %}
+      </div>
+      {% endif %}
+
+      <!-- Price -->
+      <div class="mt-auto">
+        {% if flash_sale %}
+        <div class="price">
+          <span class="text-primary fw-bold fs-5"
+            ><!-- prettier-ignore -->
+            ₦{{ flash_sale.sale_price|intcomma }}</span
+          >
+          <span class="text-muted text-decoration-line-through small ms-2"
+            ><!-- prettier-ignore -->
+            ₦{{ product.price|intcomma }}</span
+          >
+        </div>
+        {% elif product.is_on_sale %}
+        <div class="price">
+          <span class="text-primary fw-bold fs-5"
+            ><!-- prettier-ignore -->
+            ₦{{ product.price|intcomma }}</span
+          >
+          <span class="text-muted text-decoration-line-through small ms-2"
+            ><!-- prettier-ignore -->
+            ₦{{ product.compare_at_price|intcomma }}</span
+          >
+        </div>
+        {% else %}
+        <div class="price">
+          <span class="text-primary fw-bold fs-5"
+            ><!-- prettier-ignore -->
+            ₦{{ product.price|intcomma }}</span
+          >
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Add to Cart Button -->
+      {% if product.in_stock %}
+      <form
+        action="{% url 'orders:add_to_cart' product_slug=product.slug %}"
+        method="post"
+        class="mt-2"
+      >
+        {% csrf_token %}
+        <input type="hidden" name="quantity" value="1" />
+        <button type="submit" class="btn btn-primary btn-sm w-100">
+          <i class="fas fa-cart-plus me-1"></i>Add to Cart
+        </button>
+      </form>
+      {% else %}
+      <button class="btn btn-secondary btn-sm w-100 mt-2" disabled>
+        <i class="fas fa-times-circle me-1"></i>Out of Stock
+      </button>
+      {% endif %}
+    </div>
+  </div>
 </div>

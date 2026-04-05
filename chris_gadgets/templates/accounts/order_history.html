@@ -39,7 +39,7 @@
                                     </a>
                                 </td>
                                 <td>{{ order.created_at|date:"M d, Y" }}</td>
-                                <td>{{ site_settings.default_currency }}{{ order.total|intcomma }}</td>
+                                <td>₦{{ order.total|intcomma }}</td>
                                 <td>
                                     <span class="badge bg-{{ order.status_display_class }}">
                                         {{ order.get_status_display }}

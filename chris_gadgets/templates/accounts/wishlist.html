@@ -42,7 +42,7 @@
                                 </a>
                             </h6>
                             <p class="text-primary fw-bold mb-2">
-                                {{ site_settings.default_currency }}{{ item.product.price|intcomma }}
+                                ₦{{ item.product.price|intcomma }}
                             </p>
                             {% if item.product.in_stock %}
                             <form action="{% url 'orders:add_to_cart' product_slug=item.product.slug %}" method="post">

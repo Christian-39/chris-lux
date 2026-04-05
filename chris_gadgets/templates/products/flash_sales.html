@@ -65,8 +65,8 @@
                         <!-- Price -->
                         <div class="mt-auto">
                             <div class="price">
-                                <span class="text-primary fw-bold fs-5">{{ site_settings.default_currency }}{{ flash_sale.sale_price|intcomma }}</span>
-                                <span class="text-muted text-decoration-line-through small ms-2">{{ site_settings.default_currency }}{{ flash_sale.product.price|intcomma }}</span>
+                                <span class="text-primary fw-bold fs-5">₦{{ flash_sale.sale_price|intcomma }}</span>
+                                <span class="text-muted text-decoration-line-through small ms-2">₦{{ flash_sale.product.price|intcomma }}</span>
                             </div>
                             {% if flash_sale.quantity_limit %}
                             <small class="text-muted d-block mt-1">

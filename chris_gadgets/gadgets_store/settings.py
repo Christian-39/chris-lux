@@ -113,31 +113,49 @@ TIME_ZONE = 'Africa/Lagos'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# ============================================
+# STATIC FILES (WhiteNoise)
+# ============================================
+
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# ============================================
+# BACKBLAZE B2 / S3 COMPATIBLE STORAGE
+# ============================================
 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# Use new STORAGES config (Django 4.2+)
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
+# B2 Credentials
 AWS_ACCESS_KEY_ID = config('B2_KEY_ID')
 AWS_SECRET_ACCESS_KEY = config('B2_APPLICATION_KEY')
 AWS_STORAGE_BUCKET_NAME = config('B2_BUCKET_NAME')
 AWS_S3_REGION_NAME = config('B2_REGION_NAME')
-AWS_S3_ENDPOINT_URL = config('B2_ENDPOINT_URL')
+AWS_S3_ENDPOINT_URL = config('B2_ENDPOINT_URL', default='https://s3.us-west-000.backblazeb2.com')
 
+
+# Media URL - B2 friendly URL format
+MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.backblazeb2.com/"
+
+AWS_S3_ADDRESSING_STYLE = "virtual"  # CRITICAL - Without this B2 fails!
+AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_QUERYSTRING_AUTH = False
 AWS_DEFAULT_ACL = 'public-read'
-AWS_S3_FILE_OVERWRITE = False
-AWS_S3_SIGNATURE_VERSION = 's3v4'
-
-MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
+AWS_S3_FILE_OVERWRITE = True  
 
 # Allow large uploads (videos)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

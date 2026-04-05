@@ -81,7 +81,7 @@
                     {% for item in cart.items.all %}
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">{{ item.product.name|truncatechars:30 }} x {{ item.quantity }}</span>
-                        <span>{{ site_settings.default_currency }}{{ item.subtotal|intcomma }}</span>
+                        <span>₦{{ item.subtotal|intcomma }}</span>
                     </div>
                     {% endfor %}
                     
@@ -89,7 +89,7 @@
                     
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Subtotal</span>
-                        <span>{{ site_settings.default_currency }}{{ subtotal|intcomma }}</span>
+                        <span>₦{{ subtotal|intcomma }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Shipping</span>
@@ -97,20 +97,20 @@
                             {% if shipping_cost == 0 %}
                             <span class="text-success">Free</span>
                             {% else %}
-                            {{ site_settings.default_currency }}{{ shipping_cost|intcomma }}
+                            ₦{{ shipping_cost|intcomma }}
                             {% endif %}
                         </span>
                     </div>
                     {% if discount_amount > 0 %}
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Discount</span>
-                        <span class="text-danger">-{{ site_settings.default_currency }}{{ discount_amount|intcomma }}</span>
+                        <span class="text-danger">-₦{{ discount_amount|intcomma }}</span>
                     </div>
                     {% endif %}
                     <hr>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="fw-bold">Total</span>
-                        <span class="fw-bold fs-5 text-primary">{{ site_settings.default_currency }}{{ total|intcomma }}</span>
+                        <span class="fw-bold fs-5 text-primary">₦{{ total|intcomma }}</span>
                     </div>
                     
                     {% if addresses %}
