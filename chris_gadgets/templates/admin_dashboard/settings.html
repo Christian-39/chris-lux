@@ -203,176 +203,323 @@
           </div>
         </div>
 
-        <!-- Hero Banners Management -->
-        <div class="tab-pane fade" id="banners" role="tabpanel">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">Manage Hero Banners</h5>
-            <button
-              type="button"
-              class="btn btn-success btn-sm"
-              onclick="addBannerForm()"
-            >
-              <i class="fas fa-plus me-2"></i>Add New Banner
-            </button>
-          </div>
+          <!-- Hero Banners Management -->
+          <div class="tab-pane fade" id="banners" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">Manage Hero Banners</h5>
+              <button
+                type="button"
+                class="btn btn-success btn-sm"
+                onclick="addBannerForm()"
+              >
+                <i class="fas fa-plus me-2"></i>Add New Banner
+              </button>
+            </div>
 
-          <div id="bannersContainer">
-            {% for banner in hero_banners %}
-            <div class="card mb-3 border" data-banner-id="{{ banner.id }}">
-              <div class="card-body">
-                <div
-                  class="d-flex justify-content-between align-items-start mb-3"
-                >
-                  <h6 class="card-title mb-0">Banner {{ forloop.counter }}</h6>
-                  <button
-                    type="button"
-                    class="btn btn-danger btn-sm"
-                    onclick="removeBanner(this)"
+            <div id="bannersContainer">
+              {% for banner in hero_banners %}
+              <div class="card mb-3 border" data-banner-id="{{ banner.id }}">
+                <div class="card-body">
+                  <div
+                    class="d-flex justify-content-between align-items-start mb-3"
                   >
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-                <div class="row">
-                  <div class="col-md-4">
-                    {% if banner.image %}
-                    <div class="mb-2">
-                      <img
-                        src="{{ banner.image.url }}"
-                        alt="Banner"
-                        class="img-fluid rounded"
-                        style="max-height: 150px; object-fit: cover"
-                      />
-                    </div>
-                    {% endif %}
-                    <div class="mb-3">
-                      <label class="form-label">Banner Image</label>
-                      <input
-                        type="file"
-                        name="banner_image_{{ banner.id }}"
-                        class="form-control"
-                        accept="image/*"
-                      />
-                      <input
-                        type="hidden"
-                        name="banner_id[]"
-                        value="{{ banner.id }}"
-                      />
-                    </div>
+                    <h6 class="card-title mb-0">Banner {{ forloop.counter }}</h6>
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-sm"
+                      onclick="removeBanner(this)"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
                   </div>
-                  <div class="col-md-8">
-                    <div class="row">
-                      <div class="col-md-6 mb-3">
-                        <label class="form-label"
-                          >Title <span class="text-danger">*</span></label
-                        >
-                        <input
-                          type="text"
-                          name="banner_title_{{ banner.id }}"
-                          class="form-control"
-                          value="{{ banner.title }}"
-                          required
+                  
+                  <div class="row">
+                    <!-- Left Column: Images -->
+                    <div class="col-md-4">
+                      <!-- Desktop Image -->
+                      {% if banner.image %}
+                      <div class="mb-2">
+                        <img
+                          src="{{ banner.image.url }}"
+                          alt="Banner"
+                          class="img-fluid rounded"
+                          style="max-height: 150px; object-fit: cover"
                         />
                       </div>
-                      <div class="col-md-6 mb-3">
-                        <label class="form-label">Subtitle</label>
+                      {% endif %}
+                      <div class="mb-3">
+                        <label class="form-label">Image</label>
                         <input
-                          type="text"
-                          name="banner_subtitle_{{ banner.id }}"
+                          type="file"
+                          name="banner_image_{{ banner.id }}"
                           class="form-control"
-                          value="{{ banner.subtitle|default:'' }}"
+                          accept="image/*"
                         />
+                        <small class="text-muted">No file chosen</small>
+                        <input
+                          type="hidden"
+                          name="banner_id[]"
+                          value="{{ banner.id }}"
+                        />
+                      </div>
+                      
+                      <!-- Mobile Image -->
+                      {% if banner.image_mobile %}
+                      <div class="mb-2">
+                        <img
+                          src="{{ banner.image_mobile.url }}"
+                          alt="Mobile Banner"
+                          class="img-fluid rounded"
+                          style="max-height: 100px; object-fit: cover"
+                        />
+                      </div>
+                      {% endif %}
+                      <div class="mb-3">
+                        <label class="form-label">Image mobile</label>
+                        <input
+                          type="file"
+                          name="banner_image_mobile_{{ banner.id }}"
+                          class="form-control"
+                          accept="image/*"
+                        />
+                        <small class="text-muted">No file chosen</small>
+                        <small class="d-block text-muted">Mobile version of banner</small>
                       </div>
                     </div>
-                    <div class="mb-3">
-                      <label class="form-label">Description</label>
-                      <textarea
-                        name="banner_description_{{ banner.id }}"
-                        class="form-control"
-                        rows="2"
-                      >
-                        {{ banner.description|default:'' }}</textarea
-                      >
-                    </div>
-                    <div class="row">
-                      <div class="col-md-6 mb-3">
-                        <label class="form-label">Link URL</label>
-                        <input
-                          type="url"
-                          name="banner_link_{{ banner.id }}"
-                          class="form-control"
-                          value="{{ banner.link|default:'' }}"
-                          placeholder="https://example.com/page"
-                        />
-                      </div>
-                      <div class="col-md-6 mb-3">
-                        <label class="form-label">Link Text</label>
-                        <input
-                          type="text"
-                          name="banner_link_text_{{ banner.id }}"
-                          class="form-control"
-                          value="{{ banner.link_text|default:'Learn More' }}"
-                        />
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-6 mb-3">
-                        <div class="form-check">
+
+                    <!-- Right Column: All Other Fields -->
+                    <div class="col-md-8">
+                      <!-- Title & Subtitle -->
+                      <div class="row">
+                        <div class="col-md-6 mb-3">
+                          <label class="form-label">Title <span class="text-danger">*</span></label>
                           <input
-                            class="form-check-input"
-                            type="checkbox"
-                            name="banner_new_tab_{{ banner.id }}"
-                            value="true"
-                            {%
-                            if
-                            banner.open_in_new_tab
-                            %}checked{%
-                            endif
-                            %}
+                            type="text"
+                            name="banner_title_{{ banner.id }}"
+                            class="form-control"
+                            value="{{ banner.title }}"
+                            required
                           />
-                          <label class="form-check-label"
-                            >Open in new tab</label
-                          >
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label class="form-label">Subtitle</label>
+                          <input
+                            type="text"
+                            name="banner_subtitle_{{ banner.id }}"
+                            class="form-control"
+                            value="{{ banner.subtitle|default:'' }}"
+                          />
                         </div>
                       </div>
-                      <div class="col-md-6 mb-3">
-                        <div class="form-check">
+
+                      <!-- Description -->
+                      <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea
+                          name="banner_description_{{ banner.id }}"
+                          class="form-control"
+                          rows="2"
+                        >{{ banner.description|default:'' }}</textarea>
+                      </div>
+
+                      <!-- Link & Link Text -->
+                      <div class="row">
+                        <div class="col-md-6 mb-3">
+                          <label class="form-label">Link</label>
                           <input
-                            class="form-check-input"
-                            type="checkbox"
-                            name="banner_active_{{ banner.id }}"
-                            value="true"
-                            {%
-                            if
-                            banner.is_active
-                            %}checked{%
-                            endif
-                            %}
+                            type="url"
+                            name="banner_link_{{ banner.id }}"
+                            class="form-control"
+                            value="{{ banner.link|default:'' }}"
+                            placeholder="https://example.com/page"
                           />
-                          <label class="form-check-label">Active</label>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label class="form-label">Link text</label>
+                          <input
+                            type="text"
+                            name="banner_link_text_{{ banner.id }}"
+                            class="form-control"
+                            value="{{ banner.link_text|default:'Shop Now' }}"
+                          />
                         </div>
                       </div>
-                    </div>
-                    <div class="mb-3">
-                      <label class="form-label">Display Order</label>
-                      <input
-                        type="number"
-                        name="banner_order_{{ banner.id }}"
-                        class="form-control"
-                        value="{{ banner.display_order|default:forloop.counter }}"
-                        min="1"
-                        style="max-width: 100px"
-                      />
+
+                      <!-- Position & Display Order -->
+                      <div class="row">
+                        <div class="col-md-6 mb-3">
+                          <label class="form-label">Position</label>
+                          <select name="banner_position_{{ banner.id }}" class="form-select">
+                            <option value="hero" {% if banner.position == 'hero' %}selected{% endif %}>Hero Banner</option>
+                            <option value="top" {% if banner.position == 'top' %}selected{% endif %}>Top Bar</option>
+                            <option value="popup" {% if banner.position == 'popup' %}selected{% endif %}>Popup</option>
+                          </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label class="form-label">Display order</label>
+                          <input
+                            type="number"
+                            name="banner_order_{{ banner.id }}"
+                            class="form-control"
+                            value="{{ banner.display_order|default:0 }}"
+                            min="0"
+                            style="max-width: 100px"
+                          />
+                        </div>
+                      </div>
+
+                      <!-- Color Pickers -->
+                      <div class="row">
+                        <div class="col-md-4 mb-3">
+                          <label class="form-label">Background color</label>
+                          <input
+                            type="color"
+                            name="banner_bg_color_{{ banner.id }}"
+                            class="form-control form-control-color"
+                            value="{{ banner.background_color|default:'#ffffff' }}"
+                            title="Choose background color"
+                          />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                          <label class="form-label">Text color</label>
+                          <input
+                            type="color"
+                            name="banner_text_color_{{ banner.id }}"
+                            class="form-control form-control-color"
+                            value="{{ banner.text_color|default:'#000000' }}"
+                            title="Choose text color"
+                          />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                          <label class="form-label">Button color</label>
+                          <input
+                            type="color"
+                            name="banner_btn_color_{{ banner.id }}"
+                            class="form-control form-control-color"
+                            value="{{ banner.button_color|default:'#0d6efd' }}"
+                            title="Choose button color"
+                          />
+                        </div>
+                      </div>
+
+                      <!-- Schedule: Starts At -->
+                      <div class="mb-3 border p-2 rounded">
+                        <label class="form-label fw-bold">Starts at</label>
+                        <div class="row">
+                          <div class="col-md-6">
+                            <label class="form-label small">Date</label>
+                            <input
+                              type="date"
+                              name="banner_start_date_{{ banner.id }}"
+                              class="form-control"
+                              value="{{ banner.start_at|date:'Y-m-d'|default:'' }}"
+                            />
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label small">Time</label>
+                            <input
+                              type="time"
+                              name="banner_start_time_{{ banner.id }}"
+                              class="form-control"
+                              value="{{ banner.start_at|date:'H:i'|default:'' }}"
+                            />
+                          </div>
+                        </div>
+                        <div class="mt-2">
+                          <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setNow('start', {{ banner.id }})">Today</button>
+                          <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setCurrentTime('start', {{ banner.id }})">Now</button>
+                        </div>
+                      </div>
+
+                      <!-- Schedule: Ends At -->
+                      <div class="mb-3 border p-2 rounded">
+                        <label class="form-label fw-bold">Ends at</label>
+                        <div class="row">
+                          <div class="col-md-6">
+                            <label class="form-label small">Date</label>
+                            <input
+                              type="date"
+                              name="banner_end_date_{{ banner.id }}"
+                              class="form-control"
+                              value="{{ banner.end_at|date:'Y-m-d'|default:'' }}"
+                            />
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label small">Time</label>
+                            <input
+                              type="time"
+                              name="banner_end_time_{{ banner.id }}"
+                              class="form-control"
+                              value="{{ banner.end_at|date:'H:i'|default:'' }}"
+                            />
+                          </div>
+                        </div>
+                        <div class="mt-2">
+                          <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setNow('end', {{ banner.id }})">Today</button>
+                          <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setCurrentTime('end', {{ banner.id }})">Now</button>
+                        </div>
+                      </div>
+
+                      <!-- Checkboxes Row -->
+                      <div class="row">
+                        <div class="col-md-3 mb-3">
+                          <div class="form-check">
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              name="banner_new_tab_{{ banner.id }}"
+                              value="true"
+                              {% if banner.open_in_new_tab %}checked{% endif %}
+                            />
+                            <label class="form-check-label">Open in new tab</label>
+                          </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                          <div class="form-check">
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              name="banner_active_{{ banner.id }}"
+                              value="true"
+                              {% if banner.is_active %}checked{% endif %}
+                            />
+                            <label class="form-check-label">Is active</label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Stats (Read-only) -->
+                      <div class="row bg-light p-2 rounded">
+                        <div class="col-md-6 mb-2">
+                          <label class="form-label small text-muted">View count</label>
+                          <input
+                            type="number"
+                            class="form-control form-control-sm"
+                            value="{{ banner.view_count|default:0 }}"
+                            readonly
+                          />
+                        </div>
+                        <div class="col-md-6 mb-2">
+                          <label class="form-label small text-muted">Click count</label>
+                          <input
+                            type="number"
+                            class="form-control form-control-sm"
+                            value="{{ banner.click_count|default:0 }}"
+                            readonly
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+              {% empty %}
+              <div class="text-center py-5 text-muted" id="noBannersMessage">
+                <i class="fas fa-image fa-3x mb-3"></i>
+                <p>No hero banners yet. Click "Add New Banner" to create one.</p>
+              </div>
+              {% endfor %}
             </div>
-            {% empty %}
-            <div class="text-center py-5 text-muted" id="noBannersMessage">
-              <i class="fas fa-image fa-3x mb-3"></i>
-              <p>No hero banners yet. Click "Add New Banner" to create one.</p>
-            </div>
-            {% endfor %}
           </div>
 
           <!-- Template for new banner (hidden) -->
