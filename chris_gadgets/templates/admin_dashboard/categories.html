@@ -1,238 +1,494 @@
-{% extends 'admin_dashboard/base_admin.html' %}
-{% load static %}
-
-{% block title %}Categories - Admin Dashboard{% endblock %}
-
-{% block content %}
+{% extends 'admin_dashboard/base_admin.html' %} {% load static %}
+<!-- prettier-ignore -->
+{% block title %}Categories - Admin Dashboard{% endblock %} {% block content %}
 <!-- Page Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="mb-1">Categories</h2>
-        <p class="text-muted mb-0">Manage product categories</p>
-    </div>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-        <i class="fas fa-plus me-2"></i>Add Category
-    </button>
+  <div>
+    <h2 class="mb-1">Categories</h2>
+    <p class="text-muted mb-0">Manage product categories</p>
+  </div>
+  <button
+    type="button"
+    class="btn btn-primary"
+    data-bs-toggle="modal"
+    data-bs-target="#addCategoryModal"
+  >
+    <i class="fas fa-plus me-2"></i>Add Category
+  </button>
 </div>
 
 <!-- Categories Grid -->
 <div class="row">
-    {% for category in categories %}
-    <div class="col-md-4 col-lg-3 mb-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                    {% if category.image %}
-                    <img src="{{ category.image.url }}" alt="{{ category.name }}" class="rounded" width="60" height="60" style="object-fit: cover;">
-                    {% else %}
-                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                        <i class="fas fa-folder text-muted fa-2x"></i>
-                    </div>
-                    {% endif %}
-                    <div class="ms-3">
-                        <h5 class="mb-0">{{ category.name }}</h5>
-                        <small class="text-muted">{{ category.products_count|default:0 }} products</small>
-                    </div>
-                </div>
-                <p class="text-muted small mb-3">{{ category.description|truncatewords:15|default:"No description" }}</p>
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" {% if category.is_active %}checked{% endif %} 
-                               onchange="toggleCategoryStatus({{ category.id }}, this.checked)">
-                        <label class="form-check-label small">{{ category.is_active|yesno:"Active,Inactive" }}</label>
-                    </div>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editModal{{ category.id }}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ category.id }}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+  {% for category in categories %}
+  <div class="col-md-4 col-lg-3 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          {% if category.image %}
+          <img
+            src="{{ category.image.url }}"
+            alt="{{ category.name }}"
+            class="rounded"
+            width="60"
+            height="60"
+            style="object-fit: cover"
+          />
+          {% else %}
+          <div
+            class="bg-light rounded d-flex align-items-center justify-content-center"
+            style="width: 60px; height: 60px"
+          >
+            <i class="fas fa-folder text-muted fa-2x"></i>
+          </div>
+          {% endif %}
+          <div class="ms-3">
+            <h5 class="mb-0">{{ category.name }}</h5>
+            <small class="text-muted"
+              >{{ category.product_count|default:0 }} products</small
+            >
+          </div>
         </div>
-    </div>
-    {% empty %}
-    <div class="col-12">
-        <div class="text-center py-5">
-            <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
-            <p class="text-muted">No categories found</p>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                Add Your First Category
+        <p class="text-muted small mb-3">
+          {{ category.description|truncatewords:15|default:"No description" }}
+        </p>
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              {%
+              if
+              category.is_active
+              %}checked{%
+              endif
+              %}
+              onchange="toggleCategoryStatus({{ category.id }}, this.checked)"
+            />
+            <label class="form-check-label small"
+              >{{ category.is_active|yesno:"Active,Inactive" }}</label
+            >
+          </div>
+          <div class="btn-group">
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-warning"
+              data-bs-toggle="modal"
+              data-bs-target="#editModal{{ category.id }}"
+            >
+              <i class="fas fa-edit"></i>
             </button>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+              data-bs-toggle="modal"
+              data-bs-target="#deleteModal{{ category.id }}"
+            >
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-    {% endfor %}
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="text-center py-5">
+      <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+      <p class="text-muted">No categories found</p>
+      <button
+        type="button"
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#addCategoryModal"
+      >
+        Add Your First Category
+      </button>
+    </div>
+  </div>
+  {% endfor %}
 </div>
 
 <!-- Add Category Modal -->
 <div class="modal fade" id="addCategoryModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add New Category</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Category</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <form
+        action="{% url 'admin_dashboard:category_add' %}"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label"
+                  >Name: <span class="text-danger">*</span></label
+                >
+                <input type="text" name="name" class="form-control" required />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Slug:</label>
+                <input
+                  type="text"
+                  name="slug"
+                  class="form-control"
+                  placeholder="auto-generated-if-empty"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Description:</label>
+                <textarea
+                  name="description"
+                  class="form-control"
+                  rows="3"
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Icon:</label>
+                <input
+                  type="text"
+                  name="icon"
+                  class="form-control"
+                  placeholder="fas fa-laptop"
+                />
+                <small class="text-muted">FontAwesome icon class</small>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Image:</label>
+                <input
+                  type="file"
+                  name="image"
+                  class="form-control"
+                  accept="image/*"
+                />
+                <small class="text-muted">No file chosen</small>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Parent:</label>
+                <select name="parent" class="form-select">
+                  <option value="">---------</option>
+                  {% for cat in all_categories %}
+                  <option value="{{ cat.id }}">{{ cat.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
             </div>
-            <form action="{% url 'admin_dashboard:category_add' %}" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Category Name <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Slug</label>
-                        <input type="text" name="slug" class="form-control" placeholder="auto-generated-if-empty">
-                        <small class="text-muted">Leave empty to auto-generate from name</small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea name="description" class="form-control" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Icon Class</label>
-                        <input type="text" name="icon" class="form-control" placeholder="fas fa-laptop">
-                        <small class="text-muted">FontAwesome icon class (e.g., fas fa-laptop)</small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Category Image</label>
-                        <input type="file" name="image" class="form-control" accept="image/*">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Parent Category</label>
-                        <select name="parent" class="form-select">
-                            <option value="">None (Top Level)</option>
-                            {% for cat in all_categories %}
-                            <option value="{{ cat.id }}">{{ cat.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="is_active" value="true" checked>
-                        <label class="form-check-label">Active</label>
-                    </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Display order:</label>
+                <input
+                  type="number"
+                  name="display_order"
+                  class="form-control"
+                  value="0"
+                  min="0"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Meta title:</label>
+                <input type="text" name="meta_title" class="form-control" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Meta description:</label>
+                <textarea
+                  name="meta_description"
+                  class="form-control"
+                  rows="3"
+                ></textarea>
+              </div>
+
+              <div class="border-top pt-3 mt-3">
+                <div class="form-check mb-2">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="is_active"
+                    value="true"
+                    checked
+                  />
+                  <label class="form-check-label">Is active</label>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Category</button>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="is_featured"
+                    value="true"
+                  />
+                  <label class="form-check-label">Is featured</label>
                 </div>
-            </form>
+              </div>
+            </div>
+          </div>
         </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">Add Category</button>
+        </div>
+      </form>
     </div>
+  </div>
 </div>
 
 <!-- Edit Modals -->
 {% for category in categories %}
 <div class="modal fade" id="editModal{{ category.id }}" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Category - {{ category.name }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Category - {{ category.name }}</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <form
+        action="{% url 'admin_dashboard:category_edit' category.id %}"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label"
+                  >Name: <span class="text-danger">*</span></label
+                >
+                <input
+                  type="text"
+                  name="name"
+                  class="form-control"
+                  value="{{ category.name }}"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Slug:</label>
+                <input
+                  type="text"
+                  name="slug"
+                  class="form-control"
+                  value="{{ category.slug }}"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Description:</label>
+                <textarea name="description" class="form-control" rows="3">
+                    {{ category.description }}</textarea
+                >
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Icon:</label>
+                <input
+                  type="text"
+                  name="icon"
+                  class="form-control"
+                  value="{{ category.icon|default:'' }}"
+                />
+                <small class="text-muted">FontAwesome icon class</small>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Image:</label>
+                {% if category.image %}
+                <div class="mb-2">
+                  <img
+                    src="{{ category.image.url }}"
+                    alt="{{ category.name }}"
+                    class="rounded"
+                    width="100"
+                  />
+                </div>
+                {% endif %}
+                <input
+                  type="file"
+                  name="image"
+                  class="form-control"
+                  accept="image/*"
+                />
+                <small class="text-muted">No file chosen</small>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Parent:</label>
+                <select name="parent" class="form-select">
+                  <option value="">---------</option>
+                  {% for cat in all_categories %} {% if cat.id != category.id %}
+                  <option
+                    value="{{ cat.id }}"
+                    {%
+                    if
+                    category.parent.id=""
+                    ="cat.id"
+                    %}selected{%
+                    endif
+                    %}
+                  >
+                    {{ cat.name }}
+                  </option>
+                  {% endif %} {% endfor %}
+                </select>
+              </div>
             </div>
-            <form action="{% url 'admin_dashboard:category_edit' category.id %}" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Category Name <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" value="{{ category.name }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Slug</label>
-                        <input type="text" name="slug" class="form-control" value="{{ category.slug }}">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea name="description" class="form-control" rows="3">{{ category.description }}</textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Icon Class</label>
-                        <input type="text" name="icon" class="form-control" value="{{ category.icon|default:'' }}">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Category Image</label>
-                        {% if category.image %}
-                        <div class="mb-2">
-                            <img src="{{ category.image.url }}" alt="{{ category.name }}" class="rounded" width="100">
-                        </div>
-                        {% endif %}
-                        <input type="file" name="image" class="form-control" accept="image/*">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Parent Category</label>
-                        <select name="parent" class="form-select">
-                            <option value="">None (Top Level)</option>
-                            {% for cat in all_categories %}
-                            {% if cat.id != category.id %}
-                            <option value="{{ cat.id }}" {% if category.parent.id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
-                            {% endif %}
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="is_active" value="true" {% if category.is_active %}checked{% endif %}>
-                        <label class="form-check-label">Active</label>
-                    </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Display order:</label>
+                <input
+                  type="number"
+                  name="display_order"
+                  class="form-control"
+                  value="{{ category.display_order|default:0 }}"
+                  min="0"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Meta title:</label>
+                <input
+                  type="text"
+                  name="meta_title"
+                  class="form-control"
+                  value="{{ category.meta_title|default:'' }}"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Meta description:</label>
+                <textarea name="meta_description" class="form-control" rows="3">
+                    {{ category.meta_description|default:'' }}</textarea
+                >
+              </div>
+
+              <div class="border-top pt-3 mt-3">
+                <div class="form-check mb-2">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="is_active"
+                    value="true"
+                    {%
+                    if
+                    category.is_active
+                    %}checked{%
+                    endif
+                    %}
+                  />
+                  <label class="form-check-label">Is active</label>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="is_featured"
+                    value="true"
+                    {%
+                    if
+                    category.is_featured
+                    %}checked{%
+                    endif
+                    %}
+                  />
+                  <label class="form-check-label">Is featured</label>
                 </div>
-            </form>
+              </div>
+            </div>
+          </div>
         </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
     </div>
+  </div>
 </div>
 
 <!-- Delete Modal -->
 <div class="modal fade" id="deleteModal{{ category.id }}" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Delete Category</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete "<strong>{{ category.name }}</strong>"?</p>
-                {% if category.products_count > 0 %}
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    This category contains {{ category.products_count }} product(s). Please reassign or delete them first.
-                </div>
-                {% endif %}
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form action="{% url 'admin_dashboard:category_delete' category.id %}" method="post" class="d-inline">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger" {% if category.products_count > 0 %}disabled{% endif %}>Delete</button>
-                </form>
-            </div>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Category</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to delete "<strong>{{ category.name }}</strong
+          >"?
+        </p>
+        {% if category.products_count > 0 %}
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          This category contains {{ category.products_count }} product(s).
+          Please reassign or delete them first.
         </div>
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <form
+          action="{% url 'admin_dashboard:category_delete' category.id %}"
+          method="post"
+          class="d-inline"
+        >
+          {% csrf_token %}
+          <!--prettier-ignore-->
+          <button type="submit" class="btn btn-danger" {% if category.products_count > 0 %}disabled{% endif %}>Delete</button>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
-{% endfor %}
-{% endblock %}
-
-{% block extra_js %}
+{% endfor %} {% endblock %} {% block extra_js %}
 <script>
-    function toggleCategoryStatus(categoryId, isActive) {
-        fetch(`/dashboard/categories/${categoryId}/toggle/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ is_active: isActive })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Failed to update category status');
-            }
-        });
-    }
+  function toggleCategoryStatus(categoryId, isActive) {
+    fetch(`/dashboard/categories/${categoryId}/toggle/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ is_active: isActive }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert("Failed to update category status");
+        }
+      });
+  }
 </script>
 {% endblock %}

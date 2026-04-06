@@ -76,7 +76,7 @@
     color: var(--text-dark);
 }
 
-.dark-mode .table-striped > tbody > tr:nth-of-type(odd) > * {
+.dark-mode .table-striped>tbody>tr:nth-of-type(odd)>* {
     background-color: var(--bg-light);
 }
 
@@ -228,4 +228,290 @@
 .dark-mode .badge.bg-light {
     background-color: var(--bg-light) !important;
     color: var(--text-dark);
+}
+
+/* ===== TEXT COLORS - MOST IMPORTANT ===== */
+
+/* Headings - currently missing */
+.dark-mode h1,
+.dark-mode h2,
+.dark-mode h3,
+.dark-mode h4,
+.dark-mode h5,
+.dark-mode h6,
+.dark-mode .h1,
+.dark-mode .h2,
+.dark-mode .h3,
+.dark-mode .h4,
+.dark-mode .h5,
+.dark-mode .h6 {
+    color: var(--text-dark);
+}
+
+/* Paragraphs and spans */
+.dark-mode p,
+.dark-mode span:not(.badge):not(.btn) {
+    color: var(--text-dark);
+}
+
+/* Links that aren't buttons */
+.dark-mode a:not(.btn):not(.nav-link):not(.dropdown-item):not(.page-link) {
+    color: var(--primary-color);
+}
+
+.dark-mode a:not(.btn):not(.nav-link):not(.dropdown-item):not(.page-link):hover {
+    color: #60a5fa;
+    /* lighter blue for dark mode */
+}
+
+/* Labels and form labels */
+.dark-mode label,
+.dark-mode .form-label {
+    color: var(--text-dark);
+}
+
+/* Strong, bold text */
+.dark-mode strong,
+.dark-mode b {
+    color: var(--text-dark);
+}
+
+/* Small text */
+.dark-mode small,
+.dark-mode .small {
+    color: var(--text-light);
+}
+
+/* ===== NAVBAR SPECIFIC ===== */
+
+.dark-mode .navbar-brand {
+    color: var(--text-dark) !important;
+}
+
+.dark-mode .navbar-light .navbar-nav .nav-link {
+    color: var(--text-dark);
+}
+
+.dark-mode .navbar-light .navbar-nav .nav-link:hover,
+.dark-mode .navbar-light .navbar-nav .nav-link.active {
+    color: var(--primary-color);
+}
+
+.dark-mode .navbar-toggler-icon {
+    filter: invert(1);
+}
+
+/* ===== PRODUCT & CATEGORY CARDS ===== */
+
+.dark-mode .product-card .card-text,
+.dark-mode .category-card .card-text,
+.dark-mode .card-text {
+    color: var(--text-light);
+}
+
+.dark-mode .product-card .price,
+.dark-mode .current-price {
+    color: var(--text-dark);
+}
+
+.dark-mode .product-card .old-price,
+.dark-mode .original-price {
+    color: var(--text-light);
+}
+
+/* ===== FOOTER SPECIFIC ===== */
+
+.dark-mode .footer {
+    color: var(--text-dark);
+}
+
+.dark-mode .footer h5,
+.dark-mode .footer h6 {
+    color: var(--text-dark);
+}
+
+.dark-mode .footer p,
+.dark-mode .footer span {
+    color: var(--text-light);
+}
+
+/* ===== BUTTON TEXT COLORS ===== */
+
+.dark-mode .btn-outline-dark {
+    color: var(--text-dark);
+    border-color: var(--text-dark);
+}
+
+.dark-mode .btn-outline-dark:hover {
+    color: var(--bg-white);
+    background-color: var(--text-dark);
+}
+
+/* ===== MISCELLANEOUS ===== */
+
+.dark-mode .text-dark {
+    color: var(--text-dark) !important;
+}
+
+.dark-mode .text-black {
+    color: var(--text-dark) !important;
+}
+
+.dark-mode .text-body {
+    color: var(--text-dark) !important;
+}
+
+/* List items */
+.dark-mode li {
+    color: var(--text-dark);
+}
+
+/* Definition lists */
+.dark-mode dt {
+    color: var(--text-dark);
+}
+
+.dark-mode dd {
+    color: var(--text-light);
+}
+
+/* Blockquotes */
+.dark-mode blockquote,
+.dark-mode .blockquote {
+    color: var(--text-light);
+}
+
+/* Code (if any) */
+.dark-mode code {
+    color: #e5e7eb;
+    background-color: var(--bg-light);
+}
+
+/* Preformatted text */
+.dark-mode pre {
+    color: var(--text-dark);
+    background-color: var(--bg-light);
+}
+
+/* Horizontal rules */
+.dark-mode hr {
+    border-color: var(--border-color);
+    opacity: 1;
+}
+
+/* Placeholder text */
+.dark-mode ::placeholder {
+    color: var(--text-light);
+    opacity: 0.7;
+}
+
+/* ===== TOP BAR ===== */
+
+.dark-mode .top-bar {
+    color: var(--text-light);
+}
+
+.dark-mode .top-bar a {
+    color: var(--text-light);
+}
+
+.dark-mode .top-bar a:hover {
+    color: var(--text-dark);
+}
+
+/* ===== SEARCH & INPUTS ===== */
+
+.dark-mode .search-form .form-control {
+    background-color: var(--bg-white);
+    color: var(--text-dark);
+    border-color: var(--border-color);
+}
+
+.dark-mode .search-form .btn {
+    background-color: var(--bg-light);
+    border-color: var(--border-color);
+    color: var(--text-dark);
+}
+
+/* ===== WISHLIST & ACTION BUTTONS ===== */
+
+.dark-mode .wishlist-btn {
+    color: var(--text-dark);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ===== TRUST BADGES ===== */
+
+.dark-mode .trust-badge h6,
+.dark-mode .trust-badge .h6 {
+    color: var(--text-dark);
+}
+
+.dark-mode .trust-badge p {
+    color: var(--text-light);
+}
+
+/* ===== ALERTS ===== */
+
+.dark-mode .alert-primary {
+    background-color: rgba(37, 99, 235, 0.2);
+    border-color: var(--primary-color);
+    color: var(--text-dark);
+}
+
+.dark-mode .alert-secondary {
+    background-color: rgba(100, 116, 139, 0.2);
+    border-color: var(--secondary-color);
+    color: var(--text-dark);
+}
+
+.dark-mode .alert-success {
+    background-color: rgba(16, 185, 129, 0.2);
+    border-color: var(--success-color);
+    color: var(--text-dark);
+}
+
+.dark-mode .alert-danger {
+    background-color: rgba(239, 68, 68, 0.2);
+    border-color: var(--danger-color);
+    color: var(--text-dark);
+}
+
+.dark-mode .alert-warning {
+    background-color: rgba(245, 158, 11, 0.2);
+    border-color: var(--warning-color);
+    color: var(--text-dark);
+}
+
+.dark-mode .alert-info {
+    background-color: rgba(59, 130, 246, 0.2);
+    border-color: var(--info-color);
+    color: var(--text-dark);
+}
+
+/* ===== PAGINATION ===== */
+
+.dark-mode .page-item.disabled .page-link {
+    background-color: var(--bg-light);
+    border-color: var(--border-color);
+    color: var(--text-light);
+}
+
+/* ===== SCROLLBAR (Webkit) ===== */
+
+.dark-mode ::-webkit-scrollbar {
+    width: 12px;
+}
+
+.dark-mode ::-webkit-scrollbar-track {
+    background: var(--bg-light);
+}
+
+.dark-mode ::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 6px;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-light);
 }
