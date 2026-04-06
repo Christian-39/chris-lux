@@ -3957,3 +3957,424 @@ ERROR 2026-04-05 22:01:21,543 basehttp 77768 76116 "POST /accounts/profile/edit/
 WARNING 2026-04-05 22:02:16,850 basehttp 488 76632 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
 WARNING 2026-04-05 22:13:20,921 basehttp 488 67908 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
 WARNING 2026-04-05 22:14:02,058 basehttp 488 64040 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-05 22:52:14,673 basehttp 488 77228 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 07:42:53,813 log 488 78284 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 07:42:54,171 basehttp 488 78284 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+ERROR 2026-04-06 08:03:04,891 log 488 72876 Internal Server Error: /products/lexus/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 244, in _get_session
+    return self._session_cache
+AttributeError: 'SessionStore' object has no attribute '_session_cache'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 279, in ensure_connection
+    self.connect()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 256, in connect
+    self.connection = self.get_new_connection(conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\mysql\base.py", line 256, in get_new_connection
+    connection = Database.connect(**conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\connections.py", line 206, in __init__
+    super().__init__(*args, **kwargs2)
+MySQLdb.OperationalError: (2005, "Unknown server host 'mysql.gb.stackcp.com' (11001)")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\middleware.py", line 13, in process_request
+    if request.user.is_authenticated:
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\functional.py", line 251, in inner
+    self._setup()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\functional.py", line 404, in _setup
+    self._wrapped = self._setupfunc()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\middleware.py", line 40, in <lambda>
+    request.user = SimpleLazyObject(lambda: get_user(request))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\middleware.py", line 20, in get_user
+    request._cached_user = auth.get_user(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\__init__.py", line 304, in get_user
+    user_id = _get_user_session_key(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\__init__.py", line 95, in _get_user_session_key
+    return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 55, in __getitem__
+    return self._session[key]
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 249, in _get_session
+    self._session_cache = self.load()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\db.py", line 55, in load
+    s = self._get_session_from_db()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\db.py", line 34, in _get_session_from_db
+    return self.model.objects.get(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 631, in get
+    num = len(clone)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 368, in __len__
+    self._fetch_all()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 1954, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 93, in __iter__
+    results = compiler.execute_sql(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\sql\compiler.py", line 1621, in execute_sql
+    cursor = self.connection.cursor()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 320, in cursor
+    return self._cursor()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 296, in _cursor
+    self.ensure_connection()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 278, in ensure_connection
+    with self.wrap_database_errors:
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 279, in ensure_connection
+    self.connect()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 256, in connect
+    self.connection = self.get_new_connection(conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\mysql\base.py", line 256, in get_new_connection
+    connection = Database.connect(**conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\connections.py", line 206, in __init__
+    super().__init__(*args, **kwargs2)
+django.db.utils.OperationalError: (2005, "Unknown server host 'mysql.gb.stackcp.com' (11001)")
+ERROR 2026-04-06 08:03:05,072 log 488 72876 Internal Server Error: /products/lexus/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 244, in _get_session
+    return self._session_cache
+AttributeError: 'SessionStore' object has no attribute '_session_cache'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 279, in ensure_connection
+    self.connect()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 256, in connect
+    self.connection = self.get_new_connection(conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\mysql\base.py", line 256, in get_new_connection
+    connection = Database.connect(**conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\connections.py", line 206, in __init__
+    super().__init__(*args, **kwargs2)
+MySQLdb.OperationalError: (2005, "Unknown server host 'mysql.gb.stackcp.com' (11001)")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\deprecation.py", line 122, in __call__
+    response = self.process_response(request, response)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\middleware.py", line 48, in process_response
+    if request.session.get_expire_at_browser_close():
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 403, in get_expire_at_browser_close
+    if (expiry := self.get("_session_expiry")) is None:
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 74, in get
+    return self._session.get(key, default)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 249, in _get_session
+    self._session_cache = self.load()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\db.py", line 55, in load
+    s = self._get_session_from_db()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\db.py", line 34, in _get_session_from_db
+    return self.model.objects.get(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 631, in get
+    num = len(clone)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 368, in __len__
+    self._fetch_all()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 1954, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 93, in __iter__
+    results = compiler.execute_sql(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\sql\compiler.py", line 1621, in execute_sql
+    cursor = self.connection.cursor()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 320, in cursor
+    return self._cursor()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 296, in _cursor
+    self.ensure_connection()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 278, in ensure_connection
+    with self.wrap_database_errors:
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 279, in ensure_connection
+    self.connect()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 256, in connect
+    self.connection = self.get_new_connection(conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\mysql\base.py", line 256, in get_new_connection
+    connection = Database.connect(**conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\connections.py", line 206, in __init__
+    super().__init__(*args, **kwargs2)
+django.db.utils.OperationalError: (2005, "Unknown server host 'mysql.gb.stackcp.com' (11001)")
+ERROR 2026-04-06 08:03:05,113 basehttp 488 72876 "GET /products/lexus/ HTTP/1.1" 500 254966
+ERROR 2026-04-06 08:03:05,334 log 488 70180 Internal Server Error: /.well-known/appspecific/com.chrome.devtools.json
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 244, in _get_session
+    return self._session_cache
+AttributeError: 'SessionStore' object has no attribute '_session_cache'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 279, in ensure_connection
+    self.connect()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 256, in connect
+    self.connection = self.get_new_connection(conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\mysql\base.py", line 256, in get_new_connection
+    connection = Database.connect(**conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\connections.py", line 206, in __init__
+    super().__init__(*args, **kwargs2)
+MySQLdb.OperationalError: (2005, "Unknown server host 'mysql.gb.stackcp.com' (11001)")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\middleware.py", line 13, in process_request
+    if request.user.is_authenticated:
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\functional.py", line 251, in inner
+    self._setup()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\functional.py", line 404, in _setup
+    self._wrapped = self._setupfunc()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\middleware.py", line 40, in <lambda>
+    request.user = SimpleLazyObject(lambda: get_user(request))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\middleware.py", line 20, in get_user
+    request._cached_user = auth.get_user(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\__init__.py", line 304, in get_user
+    user_id = _get_user_session_key(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\__init__.py", line 95, in _get_user_session_key
+    return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 55, in __getitem__
+    return self._session[key]
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 249, in _get_session
+    self._session_cache = self.load()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\db.py", line 55, in load
+    s = self._get_session_from_db()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\db.py", line 34, in _get_session_from_db
+    return self.model.objects.get(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 631, in get
+    num = len(clone)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 368, in __len__
+    self._fetch_all()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 1954, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 93, in __iter__
+    results = compiler.execute_sql(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\sql\compiler.py", line 1621, in execute_sql
+    cursor = self.connection.cursor()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 320, in cursor
+    return self._cursor()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 296, in _cursor
+    self.ensure_connection()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 278, in ensure_connection
+    with self.wrap_database_errors:
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 279, in ensure_connection
+    self.connect()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 256, in connect
+    self.connection = self.get_new_connection(conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\mysql\base.py", line 256, in get_new_connection
+    connection = Database.connect(**conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\connections.py", line 206, in __init__
+    super().__init__(*args, **kwargs2)
+django.db.utils.OperationalError: (2005, "Unknown server host 'mysql.gb.stackcp.com' (11001)")
+ERROR 2026-04-06 08:03:05,505 log 488 70180 Internal Server Error: /.well-known/appspecific/com.chrome.devtools.json
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 244, in _get_session
+    return self._session_cache
+AttributeError: 'SessionStore' object has no attribute '_session_cache'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 279, in ensure_connection
+    self.connect()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 256, in connect
+    self.connection = self.get_new_connection(conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\mysql\base.py", line 256, in get_new_connection
+    connection = Database.connect(**conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\connections.py", line 206, in __init__
+    super().__init__(*args, **kwargs2)
+MySQLdb.OperationalError: (2005, "Unknown server host 'mysql.gb.stackcp.com' (11001)")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\deprecation.py", line 122, in __call__
+    response = self.process_response(request, response)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\middleware.py", line 48, in process_response
+    if request.session.get_expire_at_browser_close():
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 403, in get_expire_at_browser_close
+    if (expiry := self.get("_session_expiry")) is None:
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 74, in get
+    return self._session.get(key, default)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 249, in _get_session
+    self._session_cache = self.load()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\db.py", line 55, in load
+    s = self._get_session_from_db()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\db.py", line 34, in _get_session_from_db
+    return self.model.objects.get(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 631, in get
+    num = len(clone)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 368, in __len__
+    self._fetch_all()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 1954, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 93, in __iter__
+    results = compiler.execute_sql(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\sql\compiler.py", line 1621, in execute_sql
+    cursor = self.connection.cursor()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 320, in cursor
+    return self._cursor()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 296, in _cursor
+    self.ensure_connection()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 278, in ensure_connection
+    with self.wrap_database_errors:
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 279, in ensure_connection
+    self.connect()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\base\base.py", line 256, in connect
+    self.connection = self.get_new_connection(conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\mysql\base.py", line 256, in get_new_connection
+    connection = Database.connect(**conn_params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\connections.py", line 206, in __init__
+    super().__init__(*args, **kwargs2)
+django.db.utils.OperationalError: (2005, "Unknown server host 'mysql.gb.stackcp.com' (11001)")
+ERROR 2026-04-06 08:03:05,524 basehttp 488 70180 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 500 253698
+WARNING 2026-04-06 08:04:55,311 basehttp 488 76024 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:05:02,057 log 488 74088 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:05:02,057 basehttp 488 74088 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:05:30,741 basehttp 488 73428 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:05:35,960 log 488 69644 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:05:35,966 basehttp 488 69644 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:06:35,787 basehttp 488 2600 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:06:40,708 log 488 78512 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:06:40,708 basehttp 488 78512 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:06:55,264 basehttp 488 74088 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:07:00,848 log 488 78512 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:07:00,848 basehttp 488 78512 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:10:13,017 basehttp 488 76004 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:10:16,505 log 488 74124 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:10:16,505 basehttp 488 74124 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:12:34,293 basehttp 488 77036 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:12:38,341 log 488 78740 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:12:38,341 basehttp 488 78740 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:13:02,810 basehttp 488 74124 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:13:08,755 log 488 70852 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:13:08,755 basehttp 488 70852 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:14:02,476 basehttp 488 67448 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:14:06,443 log 488 70852 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:14:06,446 basehttp 488 70852 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:15:15,962 basehttp 488 76864 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:15:21,147 log 488 78740 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:15:21,157 basehttp 488 78740 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:19:43,551 basehttp 488 76288 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:19:47,619 log 488 76104 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:19:47,629 basehttp 488 76104 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:24:46,341 basehttp 488 69612 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:24:51,996 log 488 78740 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:24:51,999 basehttp 488 78740 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:25:37,135 basehttp 488 70852 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:25:41,369 log 488 78740 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:25:41,369 basehttp 488 78740 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:26:04,865 basehttp 488 78144 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:26:18,932 log 488 76104 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:26:18,932 basehttp 488 76104 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:36:11,091 basehttp 488 34280 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:36:44,621 log 488 61840 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:36:44,621 basehttp 488 61840 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:38:05,704 basehttp 488 75568 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:38:08,739 log 488 61840 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:38:08,739 basehttp 488 61840 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:40:53,341 basehttp 488 78104 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 08:40:56,856 log 488 70544 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 08:40:56,856 basehttp 488 70544 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 08:41:21,208 basehttp 488 74252 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 09:02:17,237 basehttp 488 76528 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 09:02:25,767 log 488 76340 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 09:02:25,767 basehttp 488 76340 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 09:08:04,504 basehttp 488 74776 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 09:08:08,967 log 488 68088 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-04-06 09:08:08,968 basehttp 488 68088 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 7584
+WARNING 2026-04-06 09:09:07,935 basehttp 488 78456 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 09:09:36,741 basehttp 488 76396 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 09:14:28,381 basehttp 488 65104 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 09:15:43,086 basehttp 488 75076 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 09:16:03,912 basehttp 488 69476 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 09:43:08,624 basehttp 72900 71352 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 09:45:11,525 basehttp 72900 69472 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 09:45:35,714 basehttp 72900 76664 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978
+WARNING 2026-04-06 09:48:45,043 basehttp 72596 77228 "GET /static/admin_js/admin.js HTTP/1.1" 404 1978

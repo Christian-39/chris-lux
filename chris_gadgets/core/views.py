@@ -14,6 +14,7 @@ from products.models import Product, Category, Brand, FlashSale, Coupon, Product
 from orders.models import Cart, CartItem, Order, OrderItem
 from payments.models import Payment, BankAccount
 from accounts.models import User
+from core.models import Banner
 from messaging.models import ContactMessage, Conversation
 from notifications.models import Notification
 from .models import SiteSetting, Banner, Testimonial, TrustBadge, PageContent, NewsletterSubscriber, ActivityLog
@@ -21,6 +22,12 @@ from .models import SiteSetting, Banner, Testimonial, TrustBadge, PageContent, N
 
 def home_view(request):
     """Home Page View"""
+    # Hero Banners
+    hero_banners = Banner.objects.filter(
+        is_active=True,
+        position='hero'
+    ).order_by('display_order')
+
     # Featured Products
     featured_products = Product.objects.filter(
         is_active=True,
@@ -54,12 +61,6 @@ def home_view(request):
     
     # Featured Brands
     brands = Brand.objects.filter(is_active=True, is_featured=True)[:6]
-    
-    # Banners
-    hero_banners = Banner.objects.filter(
-        position='hero',
-        is_active=True
-    ).order_by('display_order')
     
     # Testimonials
     testimonials = Testimonial.objects.filter(
@@ -1142,12 +1143,68 @@ def admin_settings_view(request):
         if request.FILES.get('favicon'):
             site_settings.favicon = request.FILES.get('favicon')
         
+        # DELETE banners
+        delete_ids = request.POST.getlist('delete_banner_ids[]')
+
+        if delete_ids:
+            Banner.objects.filter(id__in=delete_ids).delete()
+
+        # UPDATE existing banners
+        banner_ids = request.POST.getlist('banner_id[]')
+
+        for banner_id in banner_ids:
+            try:
+                banner = Banner.objects.get(id=banner_id)
+
+                banner.title = request.POST.get(f'banner_title_{banner_id}')
+                banner.subtitle = request.POST.get(f'banner_subtitle_{banner_id}')
+                banner.description = request.POST.get(f'banner_description_{banner_id}')
+                banner.link = request.POST.get(f'banner_link_{banner_id}')
+                banner.link_text = request.POST.get(f'banner_link_text_{banner_id}')
+                banner.position = 'hero'
+
+                # ✅ checkbox fix
+                banner.open_in_new_tab = f'banner_new_tab_{banner_id}' in request.POST
+                banner.is_active = f'banner_active_{banner_id}' in request.POST
+
+                banner.display_order = int(request.POST.get(f'banner_order_{banner_id}') or 1)
+
+                # image update
+                if request.FILES.get(f'banner_image_{banner_id}'):
+                    banner.image = request.FILES.get(f'banner_image_{banner_id}')
+
+                banner.save()
+
+        # CREATE new banners
+        titles = request.POST.getlist('banner_title_new[]')
+        subtitles = request.POST.getlist('banner_subtitle_new[]')
+        descriptions = request.POST.getlist('banner_description_new[]')
+        links = request.POST.getlist('banner_link_new[]')
+        link_texts = request.POST.getlist('banner_link_text_new[]')
+
+        images = request.FILES.getlist('banner_image_new[]')
+
+        for i in range(len(titles)):
+            Banner.objects.create(
+                title=titles[i],
+                subtitle=subtitles[i] if i < len(subtitles) else '',
+                description=descriptions[i] if i < len(descriptions) else '',
+                link=links[i] if i < len(links) else '',
+                link_text=link_texts[i] if i < len(link_texts) else 'Learn More',
+                image=images[i] if i < len(images) else None,
+                position='hero',
+                is_active=True if i < len(request.POST.getlist('banner_active_new[]')) else False,
+                open_in_new_tab=True if i < len(request.POST.getlist('banner_new_tab_new[]')) else False,
+                display_order=i + 1
+            )
+
         site_settings.save()
         messages.success(request, 'Settings updated successfully!')
         return redirect('admin_dashboard:settings')
-    
+    hero_banners = Banner.objects.filter(position='hero').order_by('display_order')
     context = {
         'settings': site_settings,
+        'hero_banners': hero_banners
     }
     
     return render(request, 'admin_dashboard/settings.html', context)

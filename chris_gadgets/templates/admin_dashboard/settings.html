@@ -290,7 +290,7 @@
                         class="form-control"
                         rows="2"
                       >
-{{ banner.description|default:'' }}</textarea
+                        {{ banner.description|default:'' }}</textarea
                       >
                     </div>
                     <div class="row">
@@ -358,7 +358,7 @@
                         type="number"
                         name="banner_order_{{ banner.id }}"
                         class="form-control"
-                        value="{{ banner.order|default:forloop.counter }}"
+                        value="{{ banner.display_order|default:forloop.counter }}"
                         min="1"
                         style="max-width: 100px"
                       />

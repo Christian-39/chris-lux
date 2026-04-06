@@ -98,6 +98,8 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0.8;
 }
 
+
+
 /* Header */
 .main-header {
     position: sticky;
@@ -403,6 +405,11 @@ h1, h2, h3, h4, h5, h6 {
         bottom: 30px;
     }
 }
+@media (max-width: 767px) {
+    .whatsapp-float {
+        display: none;
+    }
+}
 
 /* Buttons */
 .btn {
@@ -573,4 +580,4 @@ h1, h2, h3, h4, h5, h6 {
     .main-header {
         display: none !important;
     }
-}
+} 
