@@ -1174,6 +1174,13 @@ def admin_settings_view(request):
                     banner.image = request.FILES.get(f'banner_image_{banner_id}')
 
                 banner.save()
+            except Banner.DoesNotExist:
+                # Handle case where banner was deleted between form load and submit
+                continue
+            except Exception as e:
+                # Log error but continue processing other banners
+                print(f"Error updating banner {banner_id}: {e}")
+                continue
 
         # CREATE new banners
         titles = request.POST.getlist('banner_title_new[]')
@@ -1201,6 +1208,7 @@ def admin_settings_view(request):
         site_settings.save()
         messages.success(request, 'Settings updated successfully!')
         return redirect('admin_dashboard:settings')
+    
     hero_banners = Banner.objects.filter(position='hero').order_by('display_order')
     context = {
         'settings': site_settings,
