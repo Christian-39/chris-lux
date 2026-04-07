@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
+from django.db import models
 from django.db.models import Count, Avg, Q, Sum
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -1042,24 +1043,73 @@ def admin_review_approve_view(request, review_id):
 @login_required
 @user_passes_test(is_admin_or_staff, login_url='/')
 def admin_messages_view(request):
-    """Admin Messages/Contact Messages View"""
-    messages_list = ContactMessage.objects.all()
+    """Admin Messages/Conversations View - Matches your template structure"""
     
-    # Filters
+    # Get all conversations with related data
+    conversations_list = Conversation.objects.select_related(
+        'customer', 'assigned_to'
+    ).prefetch_related(
+        'messages', 'messages__sender'
+    )
+    
+    # Apply filters
     status = request.GET.get('status')
+    if status == 'unread':
+        conversations_list = conversations_list.filter(is_read_by_admin=False)
+    elif status == 'read':
+        conversations_list = conversations_list.filter(is_read_by_admin=True)
+    elif status == 'replied':
+        conversations_list = conversations_list.filter(status__in=['resolved', 'closed'])
     
-    if status:
-        messages_list = messages_list.filter(status=status)
+    priority = request.GET.get('priority')
+    if priority:
+        conversations_list = conversations_list.filter(priority=priority)
+    
+    # Search functionality
+    q = request.GET.get('q')
+    if q:
+        conversations_list = conversations_list.filter(
+            models.Q(customer__first_name__icontains=q) |
+            models.Q(customer__last_name__icontains=q) |
+            models.Q(customer__email__icontains=q) |
+            models.Q(custom_subject__icontains=q) |
+            models.Q(messages__content__icontains=q)
+        ).distinct()
+    
+    # Annotate with message counts
+    conversations_list = conversations_list.annotate(
+        message_count=models.Count('messages'),
+        unread_count=models.Count(
+            'messages',
+            filter=models.Q(messages__is_from_admin=False, messages__is_read=False)
+        )
+    )
     
     # Pagination
-    paginator = Paginator(messages_list.order_by('-created_at'), 25)
+    paginator = Paginator(conversations_list.order_by('-last_message_at'), 25)
     page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    conversations = paginator.get_page(page_number)
+    
+    # Calculate stats
+    unread_count = Conversation.objects.filter(is_read_by_admin=False).count()
+    active_conversations = Conversation.objects.filter(status__in=['open', 'pending']).count()
+    
+    # Resolved today
+    today = timezone.now().date()
+    resolved_today = Conversation.objects.filter(
+        status='resolved',
+        resolved_at__date=today
+    ).count()
+    
+    # Average response time (simplified calculation)
+    avg_response_time = "2h 30m"  # Placeholder - implement your actual logic
     
     context = {
-        'messages': page_obj,
-        'new_count': ContactMessage.objects.filter(status='new').count(),
-        'replied_count': ContactMessage.objects.filter(status='replied').count(),
+        'conversations': conversations,
+        'unread_count': unread_count,
+        'active_conversations': active_conversations,
+        'resolved_today': resolved_today,
+        'avg_response_time': avg_response_time,
     }
     
     return render(request, 'admin_dashboard/messages.html', context)
