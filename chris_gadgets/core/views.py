@@ -682,9 +682,9 @@ def admin_product_delete_view(request, product_id):
 @user_passes_test(is_admin_or_staff, login_url='/')
 def admin_orders_view(request):
     """Admin Orders List View"""
-    orders = Order.objects.select_related('user').all()
+    orders_qs = Order.objects.select_related('user').all()
     
-    # Filters
+    # 1. Apply Filters
     status = request.GET.get('status')
     payment_status = request.GET.get('payment_status')
     search = request.GET.get('search')
@@ -692,42 +692,48 @@ def admin_orders_view(request):
     date_to = request.GET.get('date_to')
     
     if status:
-        orders = orders.filter(status=status)
-    
+        orders_qs = orders_qs.filter(status=status)
     if payment_status:
-        orders = orders.filter(payment_status=payment_status)
-    
+        orders_qs = orders_qs.filter(payment_status=payment_status)
     if search:
-        orders = orders.filter(
+        orders_qs = orders_qs.filter(
             Q(order_number__icontains=search) |
             Q(user__email__icontains=search) |
             Q(user__first_name__icontains=search) |
             Q(user__last_name__icontains=search)
         )
-    
     if date_from:
-        orders = orders.filter(created_at__date__gte=date_from)
-    
+        orders_qs = orders_qs.filter(created_at__date__gte=date_from)
     if date_to:
-        orders = orders.filter(created_at__date__lte=date_to)
-    
-    # Pagination
-    paginator = Paginator(orders.order_by('-created_at'), 25)
+        orders_qs = orders_qs.filter(created_at__date__lte=date_to)
+
+    # 2. Optimized Stats (One query to rule them all)
+    stats = Order.objects.aggregate(
+        pending=Count('id', filter=Q(status='pending')),
+        processing=Count('id', filter=Q(status='processing')),
+        shipped=Count('id', filter=Q(status='shipped')),
+        delivered=Count('id', filter=Q(status='delivered')),
+        cancelled=Count('id', filter=Q(status='cancelled')),
+        refunded=Count('id', filter=Q(status='refunded')),
+    )
+
+    # 3. Pagination
+    paginator = Paginator(orders_qs.order_by('-created_at'), 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
     context = {
         'orders': page_obj,
-        'total_orders': Order.objects.count(),
-        'pending_orders': Order.objects.filter(status='pending').count(),
-        'processing_orders': Order.objects.filter(status='processing').count(),
-        'shipped_orders': Order.objects.filter(status='shipped').count(),
-        'delivered_orders': Order.objects.filter(status='delivered').count(),
-        'cancelled_orders': Order.objects.filter(status='cancelled').count(),
+        # Mapping aggregate results to the template variables
+        'pending_count': stats['pending'],
+        'processing_count': stats['processing'],
+        'shipped_count': stats['shipped'],
+        'delivered_count': stats['delivered'],
+        'cancelled_count': stats['cancelled'],
+        'refunded_count': stats['refunded'],
     }
     
     return render(request, 'admin_dashboard/orders.html', context)
-
 
 @login_required
 @user_passes_test(is_admin_or_staff, login_url='/')
