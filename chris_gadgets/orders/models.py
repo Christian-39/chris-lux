@@ -7,7 +7,7 @@ from django.conf import settings
 from decimal import Decimal
 import uuid
 
-
+ 
 class Cart(models.Model):
     """Shopping Cart Model"""
     

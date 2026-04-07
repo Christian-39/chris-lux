@@ -20,6 +20,7 @@ from notifications.models import Notification
 from .models import SiteSetting, Banner, Testimonial, TrustBadge, PageContent, NewsletterSubscriber, ActivityLog
 
 
+    
 def home_view(request):
     """Home Page View"""
     # Hero Banners
@@ -368,6 +369,25 @@ def is_admin_or_staff(user):
     """Check if user is admin or staff"""
     return user.is_authenticated and (user.user_type in ['admin', 'staff'] or user.is_superuser)
 
+def get_client_ip(request):
+    """Get client IP address"""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+    
+@login_required
+@user_passes_test(is_admin_or_staff)
+def admin_payment_detail_view(request, payment_id):
+    print("=" * 50)
+    print(f"VIEW CALLED: {request.method} {request.path}")
+    print(f"POST data: {request.POST if request.method == 'POST' else 'N/A'}")
+    print("=" * 50)
+    
+    from payments.models import Payment
+    
 
 @login_required
 @user_passes_test(is_admin_or_staff, login_url='/')
@@ -633,7 +653,7 @@ def admin_product_detail_view(request, product_id):
         'product': product,
         'total_sales': total_sales,
         'total_revenue': total_revenue,
-        'recent_reviews': recent_reviews,
+        'recent_reviews': recent_reviews, 
         'images': product.images.all(),
     }
     
@@ -760,38 +780,55 @@ def admin_order_detail_view(request, order_id):
 @user_passes_test(is_admin_or_staff, login_url='/')
 def admin_payments_view(request):
     """Admin Payments List View"""
-    payments = Payment.objects.select_related('order', 'user').all()
+    payments_qs = Payment.objects.select_related('order', 'user').all()
     
-    # Filters
+    # 1. Filters (Same as before)
     status = request.GET.get('status')
     search = request.GET.get('search')
-    
     if status:
-        payments = payments.filter(status=status)
-    
+        payments_qs = payments_qs.filter(status=status)
     if search:
-        payments = payments.filter(
+        payments_qs = payments_qs.filter(
             Q(payment_reference__icontains=search) |
             Q(order__order_number__icontains=search) |
             Q(user__email__icontains=search)
         )
+
+    # 2. Stats Calculations
+    today = timezone.now().date()
     
-    # Pagination
-    paginator = Paginator(payments.order_by('-created_at'), 25)
+    # Total Revenue: Sum of amount where status is verified
+    total_revenue = Payment.objects.filter(status='verified').aggregate(
+        total=Sum('amount'))['total'] or 0
+    
+    # Pending Verification: Count of payments waiting for admin review
+    pending_count = Payment.objects.filter(
+        status__in=['pending', 'awaiting_verification']
+    ).count()
+    
+    # Verified Today: Count of payments verified within the current date
+    total_verified = Payment.objects.filter(
+        status='verified').count()
+    
+    # Failed Payments: Count of rejected payments
+    failed_count = Payment.objects.filter(status='rejected').count()
+
+    # 3. Pagination
+    paginator = Paginator(payments_qs.order_by('-created_at'), 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
     context = {
         'payments': page_obj,
-        'pending_count': Payment.objects.filter(status='pending').count(),
-        'awaiting_count': Payment.objects.filter(status='awaiting_verification').count(),
-        'verified_count': Payment.objects.filter(status='verified').count(),
-        'rejected_count': Payment.objects.filter(status='rejected').count(),
+        'total_revenue': total_revenue,
+        'pending_count': pending_count,
+        'total_verified': total_verified,
+        'failed_count': failed_count,
     }
     
     return render(request, 'admin_dashboard/payments.html', context)
 
-
+    
 @login_required
 @user_passes_test(is_admin_or_staff, login_url='/')
 def admin_payment_verify_view(request, payment_id):
@@ -1414,19 +1451,106 @@ def admin_order_export_view(request):
 
 
 @login_required
-@user_passes_test(is_admin_or_staff, login_url='/')
+@user_passes_test(is_admin_or_staff)
 def admin_payment_detail_view(request, payment_id):
-    """Admin Payment Detail View"""
+    """Admin Payment Detail and Update View"""
+    from payments.models import Payment, PaymentVerificationLog
+    from decimal import Decimal
+    
     payment = get_object_or_404(Payment, id=payment_id)
+    order = payment.order
+    
+    if request.method == 'POST':
+        print(f"POST data: {request.POST}")
+        
+        try:
+            old_status = payment.status
+            
+            # Method field - template sends 'method'
+            method = request.POST.get('method')
+            if method:
+                payment.method = method
+            
+            # Amount
+            amount = request.POST.get('amount')
+            if amount:
+                payment.amount = Decimal(str(amount))
+            
+            # Status
+            status = request.POST.get('status')
+            if status:
+                payment.status = status
+            
+            # Bank details
+            payment.bank_name = request.POST.get('bank_name') or None
+            payment.account_name = request.POST.get('account_name') or None
+            payment.account_number = request.POST.get('account_number') or None
+            payment.transfer_reference = request.POST.get('transfer_reference') or None
+            
+            # Notes
+            payment.verification_notes = request.POST.get('verification_notes', '').strip() or None
+            payment.rejection_reason = request.POST.get('rejection_reason', '').strip() or None
+            
+            # Date handling
+            transfer_date = request.POST.get('transfer_date')
+            transfer_time = request.POST.get('transfer_time', '00:00:00')
+            if transfer_date:
+                try:
+                    from datetime import datetime
+                    naive_datetime = datetime.strptime(
+                        f"{transfer_date} {transfer_time}", 
+                        "%Y-%m-%d %H:%M:%S"
+                    )
+                    payment.transfer_date = timezone.make_aware(naive_datetime)
+                except ValueError as e:
+                    print(f"Date error: {e}")
+            
+            # Files
+            if 'receipt' in request.FILES:
+                payment.receipt = request.FILES['receipt']
+                payment.receipt_uploaded_at = timezone.now()
+            
+            if 'qr_code' in request.FILES:
+                payment.qr_code = request.FILES['qr_code']
+            
+            # Clear checkboxes
+            if request.POST.get('receipt_clear'):
+                if payment.receipt:
+                    payment.receipt.delete(save=False)
+                payment.receipt = None
+                payment.receipt_uploaded_at = None
+            
+            if request.POST.get('qr_code_clear'):
+                if payment.qr_code:
+                    payment.qr_code.delete(save=False)
+                payment.qr_code = None
+            
+            payment.save()
+            
+            # Log
+            PaymentVerificationLog.objects.create(
+                payment=payment,
+                action='updated',
+                performed_by=request.user,
+                old_status=payment.old_status,
+                new_status=payment.new_status,
+                notes='Payment details updated'
+            )
+            
+            messages.success(request, 'Payment updated successfully!')
+            return redirect('admin_dashboard:payment_detail', payment_id=payment.id)
+            
+        except Exception as e:
+            import traceback
+            print(f"ERROR: {e}")
+            print(traceback.format_exc())
+            messages.error(request, f'Error: {str(e)}')
     
     context = {
         'payment': payment,
-        'order': payment.order,
+        'order': order,
     }
-    
     return render(request, 'admin_dashboard/payment_detail.html', context)
-
-
 @login_required
 @user_passes_test(is_admin_or_staff, login_url='/')
 def admin_payment_reject_view(request, payment_id):
