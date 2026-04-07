@@ -1,0 +1,107 @@
+{% extends 'admin_dashboard/base_admin.html' %} {% load static %}
+<!--prettier-ignore-->
+{% block title %}{{ title }}{% endblock %} {% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'admin_dashboard:bulk_notifications' %}"
+    >Bulk Notifications</a
+  >
+</li>
+<li class="breadcrumb-item active">{{ title }}</li>
+{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-broadcast-tower me-2"></i>{{ title }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label class="form-label">Title</label>
+              {{ form.title }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Message</label>
+              {{ form.message }}
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Notification Type</label>
+                {{ form.notification_type }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Scheduled At (optional)</label>
+                {{ form.scheduled_at }}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <div class="form-check">
+                {{ form.target_all_users }}
+                <label class="form-check-label">Send to All Users</label>
+              </div>
+            </div>
+
+            <div class="mb-3" id="specific-users-field">
+              <label class="form-label">Or Select Specific Users</label>
+              {{ form.target_specific_users }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Delivery Methods</label>
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-check">
+                    {{ form.send_as_email }}
+                    <label class="form-check-label">Send as Email</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-check">
+                    {{ form.send_as_sms }}
+                    <label class="form-check-label">Send as SMS</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a
+                href="{% url 'admin_dashboard:bulk_notifications' %}"
+                class="btn btn-outline-secondary"
+              >
+                <i class="fas fa-arrow-left me-2"></i>Cancel
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Save as Draft
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  // Toggle specific users field based on "all users" checkbox
+  const allUsersCheckbox = document.querySelector('[name="target_all_users"]');
+  const specificUsersField = document.getElementById("specific-users-field");
+
+  function toggleSpecificUsers() {
+    specificUsersField.style.display = allUsersCheckbox.checked
+      ? "none"
+      : "block";
+  }
+
+  allUsersCheckbox.addEventListener("change", toggleSpecificUsers);
+  toggleSpecificUsers();
+</script>
+{% endblock %}

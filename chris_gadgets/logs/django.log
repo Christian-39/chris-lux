@@ -5958,3 +5958,1259 @@ Traceback (most recent call last):
     raise self.error(token, "Empty block tag on line %d" % token.lineno)
 django.template.exceptions.TemplateSyntaxError: Empty block tag on line 398
 ERROR 2026-04-07 09:48:49,473 basehttp 18200 11212 "GET /dashboard/orders/ HTTP/1.1" 500 254714
+ERROR 2026-04-07 11:02:09,932 log 11120 17968 Internal Server Error: /accounts/orders/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 511, in parse
+    compile_func = self.tags[command]
+KeyError: 'endblock'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\accounts\views.py", line 311, in order_history_view
+    return render(request, 'accounts/order_history.html', {'orders': orders})
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 513, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 578, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 2: 'endblock'. Did you forget to register or load this tag?
+ERROR 2026-04-07 11:02:09,949 basehttp 11120 17968 "GET /accounts/orders/ HTTP/1.1" 500 192337
+ERROR 2026-04-07 11:16:09,247 log 11120 7816 Internal Server Error: /accounts/orders/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 511, in parse
+    compile_func = self.tags[command]
+KeyError: 'endblock'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\accounts\views.py", line 311, in order_history_view
+    return render(request, 'accounts/order_history.html', {'orders': orders})
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 513, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 578, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 2: 'endblock'. Did you forget to register or load this tag?
+ERROR 2026-04-07 11:16:09,255 basehttp 11120 7816 "GET /accounts/orders/ HTTP/1.1" 500 193008
+WARNING 2026-04-07 12:35:03,249 log 16612 17960 Not Found: /media/products/images/Free_Samsung_Galaxy_S24_Ultra_Mockup_PSD.webp
+WARNING 2026-04-07 12:35:03,251 basehttp 16612 17960 "GET /media/products/images/Free_Samsung_Galaxy_S24_Ultra_Mockup_PSD.webp HTTP/1.1" 404 7641
+ERROR 2026-04-07 12:41:28,328 log 16316 3920 Internal Server Error: /accounts/orders/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\accounts\views.py", line 310, in order_history_view
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+NameError: name 'Order' is not defined
+ERROR 2026-04-07 12:41:28,331 basehttp 16316 3920 "GET /accounts/orders/ HTTP/1.1" 500 80327
+WARNING 2026-04-07 12:48:53,591 log 13416 15440 Not Found: /media/products/images/Free_Samsung_Galaxy_S24_Ultra_Mockup_PSD.webp
+WARNING 2026-04-07 12:48:53,593 basehttp 13416 15440 "GET /media/products/images/Free_Samsung_Galaxy_S24_Ultra_Mockup_PSD.webp HTTP/1.1" 404 7641
+WARNING 2026-04-07 12:52:11,893 log 13416 10756 Not Found: /media/products/images/Free_Samsung_Galaxy_S24_Ultra_Mockup_PSD.webp
+WARNING 2026-04-07 12:52:11,893 basehttp 13416 10756 "GET /media/products/images/Free_Samsung_Galaxy_S24_Ultra_Mockup_PSD.webp HTTP/1.1" 404 7641
+ERROR 2026-04-07 12:54:18,886 log 13416 16944 Internal Server Error: /orders/detail/f9710ff7-e137-4248-936a-f3eaf7359c00/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 511, in parse
+    compile_func = self.tags[command]
+KeyError: 'endblock'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\orders\views.py", line 335, in order_detail_view
+    return render(request, 'orders/order_detail.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 513, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 578, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 2: 'endblock'. Did you forget to register or load this tag?
+ERROR 2026-04-07 12:54:18,904 basehttp 13416 16944 "GET /orders/detail/f9710ff7-e137-4248-936a-f3eaf7359c00/ HTTP/1.1" 500 225312
+WARNING 2026-04-07 12:55:55,849 log 13416 16944 Not Found: /media/products/images/Free_Samsung_Galaxy_S24_Ultra_Mockup_PSD.webp
+WARNING 2026-04-07 12:55:55,851 basehttp 13416 16944 "GET /media/products/images/Free_Samsung_Galaxy_S24_Ultra_Mockup_PSD.webp HTTP/1.1" 404 7641
+ERROR 2026-04-07 12:56:06,846 log 13416 4880 Internal Server Error: /orders/track/f9710ff7-e137-4248-936a-f3eaf7359c00/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 1035, in find_library
+    return parser.libraries[name]
+KeyError: 'order_extras'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\orders\views.py", line 389, in track_order_view
+    return render(request, 'orders/track_order.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 1097, in load
+    lib = find_library(parser, name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 1037, in find_library
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'order_extras' is not a registered tag library. Must be one of:
+admin_list
+admin_modify
+admin_urls
+cache
+core_extras
+humanize
+i18n
+l10n
+log
+static
+tz
+ERROR 2026-04-07 12:56:06,866 basehttp 13416 4880 "GET /orders/track/f9710ff7-e137-4248-936a-f3eaf7359c00/ HTTP/1.1" 500 243159
+ERROR 2026-04-07 12:57:35,924 log 13416 4880 Internal Server Error: /orders/track/f9710ff7-e137-4248-936a-f3eaf7359c00/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 1035, in find_library
+    return parser.libraries[name]
+KeyError: 'order_extras'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\orders\views.py", line 389, in track_order_view
+    return render(request, 'orders/track_order.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 1097, in load
+    lib = find_library(parser, name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 1037, in find_library
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'order_extras' is not a registered tag library. Must be one of:
+admin_list
+admin_modify
+admin_urls
+cache
+core_extras
+humanize
+i18n
+l10n
+log
+static
+tz
+ERROR 2026-04-07 12:57:35,943 basehttp 13416 4880 "GET /orders/track/f9710ff7-e137-4248-936a-f3eaf7359c00/ HTTP/1.1" 500 244522
+ERROR 2026-04-07 13:01:44,214 log 13416 4880 Internal Server Error: /orders/track/f9710ff7-e137-4248-936a-f3eaf7359c00/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 1035, in find_library
+    return parser.libraries[name]
+KeyError: 'order_extras'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\orders\views.py", line 389, in track_order_view
+    return render(request, 'orders/track_order.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 1097, in load
+    lib = find_library(parser, name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 1037, in find_library
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'order_extras' is not a registered tag library. Must be one of:
+admin_list
+admin_modify
+admin_urls
+cache
+core_extras
+humanize
+i18n
+l10n
+log
+static
+tz
+ERROR 2026-04-07 13:01:44,221 basehttp 13416 4880 "GET /orders/track/f9710ff7-e137-4248-936a-f3eaf7359c00/ HTTP/1.1" 500 244522
+ERROR 2026-04-07 13:02:33,512 log 11952 4892 Internal Server Error: /orders/track/f9710ff7-e137-4248-936a-f3eaf7359c00/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 511, in parse
+    compile_func = self.tags[command]
+KeyError: 'endif'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\orders\views.py", line 389, in track_order_view
+    return render(request, 'orders/track_order.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 1540, in do_with
+    nodelist = parser.parse(("endwith",))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 1540, in do_with
+    nodelist = parser.parse(("endwith",))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 862, in do_for
+    nodelist_loop = parser.parse(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 513, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 568, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 96: 'endif', expected 'empty' or 'endfor'. Did you forget to register or load this tag?
+ERROR 2026-04-07 13:02:33,534 basehttp 11952 4892 "GET /orders/track/f9710ff7-e137-4248-936a-f3eaf7359c00/ HTTP/1.1" 500 364268
+ERROR 2026-04-07 13:05:57,751 log 11952 4892 Internal Server Error: /orders/track/f9710ff7-e137-4248-936a-f3eaf7359c00/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\orders\views.py", line 389, in track_order_view
+    return render(request, 'orders/track_order.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 962, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 862, in do_for
+    nodelist_loop = parser.parse(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 490, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 488, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 610, in compile_filter
+    return FilterExpression(token, self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 706, in __init__
+    filter_func = parser.find_filter(filter_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 616, in find_filter
+    raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
+django.template.exceptions.TemplateSyntaxError: Invalid filter: 'status_color'
+ERROR 2026-04-07 13:05:57,767 basehttp 11952 4892 "GET /orders/track/f9710ff7-e137-4248-936a-f3eaf7359c00/ HTTP/1.1" 500 315808
+ERROR 2026-04-07 13:07:19,197 log 11952 4892 Internal Server Error: /orders/track/f9710ff7-e137-4248-936a-f3eaf7359c00/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\orders\views.py", line 389, in track_order_view
+    return render(request, 'orders/track_order.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 490, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 488, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 610, in compile_filter
+    return FilterExpression(token, self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 706, in __init__
+    filter_func = parser.find_filter(filter_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 616, in find_filter
+    raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
+django.template.exceptions.TemplateSyntaxError: Invalid filter: 'payment_status_color'
+ERROR 2026-04-07 13:07:19,201 basehttp 11952 4892 "GET /orders/track/f9710ff7-e137-4248-936a-f3eaf7359c00/ HTTP/1.1" 500 234785
+WARNING 2026-04-07 13:36:50,183 log 7464 17548 Not Found: /favicon.ico
+WARNING 2026-04-07 13:36:50,184 basehttp 7464 17548 "GET /favicon.ico HTTP/1.1" 404 7473
+WARNING 2026-04-07 13:37:15,598 log 7464 13888 Not Found: /media/products/images/Free_Samsung_Galaxy_S24_Ultra_Mockup_PSD.webp
+WARNING 2026-04-07 13:37:15,598 basehttp 7464 13888 "GET /media/products/images/Free_Samsung_Galaxy_S24_Ultra_Mockup_PSD.webp HTTP/1.1" 404 7641
+ERROR 2026-04-07 13:42:45,226 log 7464 13472 Internal Server Error: /notifications/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 244, in _get_session
+    return self._session_cache
+AttributeError: 'SessionStore' object has no attribute '_session_cache'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\mysql\base.py", line 76, in execute
+    return self.cursor.execute(query, args)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\cursors.py", line 330, in _query
+    db.query(q)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\connections.py", line 286, in query
+    _mysql.connection.query(self, query)
+MySQLdb.OperationalError: (2013, 'Lost connection to server during query')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\middleware.py", line 13, in process_request
+    if request.user.is_authenticated:
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\functional.py", line 251, in inner
+    self._setup()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\functional.py", line 404, in _setup
+    self._wrapped = self._setupfunc()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\middleware.py", line 40, in <lambda>
+    request.user = SimpleLazyObject(lambda: get_user(request))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\middleware.py", line 20, in get_user
+    request._cached_user = auth.get_user(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\__init__.py", line 304, in get_user
+    user_id = _get_user_session_key(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\__init__.py", line 95, in _get_user_session_key
+    return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 55, in __getitem__
+    return self._session[key]
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 249, in _get_session
+    self._session_cache = self.load()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\db.py", line 55, in load
+    s = self._get_session_from_db()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\db.py", line 34, in _get_session_from_db
+    return self.model.objects.get(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 631, in get
+    num = len(clone)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 368, in __len__
+    self._fetch_all()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 1954, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 93, in __iter__
+    results = compiler.execute_sql(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\sql\compiler.py", line 1623, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\utils.py", line 122, in execute
+    return super().execute(sql, params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\mysql\base.py", line 76, in execute
+    return self.cursor.execute(query, args)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\cursors.py", line 330, in _query
+    db.query(q)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\connections.py", line 286, in query
+    _mysql.connection.query(self, query)
+django.db.utils.OperationalError: (2013, 'Lost connection to server during query')
+ERROR 2026-04-07 13:42:45,355 log 7464 13472 Internal Server Error: /notifications/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 244, in _get_session
+    return self._session_cache
+AttributeError: 'SessionStore' object has no attribute '_session_cache'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\mysql\base.py", line 76, in execute
+    return self.cursor.execute(query, args)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\cursors.py", line 330, in _query
+    db.query(q)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\connections.py", line 286, in query
+    _mysql.connection.query(self, query)
+MySQLdb.OperationalError: (2006, 'Server has gone away')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\utils\deprecation.py", line 122, in __call__
+    response = self.process_response(request, response)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\middleware.py", line 48, in process_response
+    if request.session.get_expire_at_browser_close():
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 403, in get_expire_at_browser_close
+    if (expiry := self.get("_session_expiry")) is None:
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 74, in get
+    return self._session.get(key, default)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\base.py", line 249, in _get_session
+    self._session_cache = self.load()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\db.py", line 55, in load
+    s = self._get_session_from_db()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\sessions\backends\db.py", line 34, in _get_session_from_db
+    return self.model.objects.get(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 631, in get
+    num = len(clone)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 368, in __len__
+    self._fetch_all()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 1954, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\query.py", line 93, in __iter__
+    results = compiler.execute_sql(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\models\sql\compiler.py", line 1623, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\utils.py", line 122, in execute
+    return super().execute(sql, params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\db\backends\mysql\base.py", line 76, in execute
+    return self.cursor.execute(query, args)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\cursors.py", line 330, in _query
+    db.query(q)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\MySQLdb\connections.py", line 286, in query
+    _mysql.connection.query(self, query)
+django.db.utils.OperationalError: (2006, 'Server has gone away')
+ERROR 2026-04-07 13:42:45,363 basehttp 7464 13472 "GET /notifications/ HTTP/1.1" 500 194601
+ERROR 2026-04-07 14:22:21,075 log 7464 12196 Internal Server Error: /dashboard/settings/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 511, in parse
+    compile_func = self.tags[command]
+KeyError: 'endfor'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 1261, in admin_settings_view
+    return render(request, 'admin_dashboard/settings.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 134, in render
+    compiled_parent = self.get_parent(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 131, in get_parent
+    return self.find_template(parent, context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 109, in find_template
+    template, origin = context.template.engine.find_template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 962, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 513, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 568, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 501: 'endfor', expected 'elif', 'else' or 'endif'. Did you forget to register or load this tag?
+ERROR 2026-04-07 14:22:21,087 basehttp 7464 12196 "GET /dashboard/settings/ HTTP/1.1" 500 259506
+ERROR 2026-04-07 14:25:18,805 log 7464 12196 Internal Server Error: /dashboard/settings/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 1261, in admin_settings_view
+    return render(request, 'admin_dashboard/settings.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'notifications' not found. 'notifications' is not a valid view function or pattern name.
+ERROR 2026-04-07 14:25:18,819 basehttp 7464 12196 "GET /dashboard/settings/ HTTP/1.1" 500 173202
+ERROR 2026-04-07 14:26:23,017 log 7464 12196 Internal Server Error: /dashboard/settings/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 1261, in admin_settings_view
+    return render(request, 'admin_dashboard/settings.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'notifications' not found. 'notifications' is not a valid view function or pattern name.
+ERROR 2026-04-07 14:26:23,017 basehttp 7464 12196 "GET /dashboard/settings/ HTTP/1.1" 500 173202
+ERROR 2026-04-07 14:40:28,967 log 7464 11928 Internal Server Error: /dashboard/settings/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 511, in parse
+    compile_func = self.tags[command]
+KeyError: 'endfor'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 1261, in admin_settings_view
+    return render(request, 'admin_dashboard/settings.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 134, in render
+    compiled_parent = self.get_parent(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 131, in get_parent
+    return self.find_template(parent, context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 109, in find_template
+    template, origin = context.template.engine.find_template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 962, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 513, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 568, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 620: 'endfor', expected 'elif', 'else' or 'endif'. Did you forget to register or load this tag?
+ERROR 2026-04-07 14:40:28,978 basehttp 7464 11928 "GET /dashboard/settings/ HTTP/1.1" 500 259384
+ERROR 2026-04-07 14:40:56,796 log 7464 11928 Internal Server Error: /dashboard/settings/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 511, in parse
+    compile_func = self.tags[command]
+KeyError: 'endfor'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 1261, in admin_settings_view
+    return render(request, 'admin_dashboard/settings.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 134, in render
+    compiled_parent = self.get_parent(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 131, in get_parent
+    return self.find_template(parent, context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 109, in find_template
+    template, origin = context.template.engine.find_template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 962, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 513, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 568, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 621: 'endfor', expected 'elif', 'else' or 'endif'. Did you forget to register or load this tag?
+ERROR 2026-04-07 14:40:56,802 basehttp 7464 11928 "GET /dashboard/settings/ HTTP/1.1" 500 259672
+ERROR 2026-04-07 15:13:51,812 log 17920 18216 Internal Server Error: /dashboard/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 511, in parse
+    compile_func = self.tags[command]
+KeyError: 'endfor'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 470, in admin_dashboard_view
+    return render(request, 'admin_dashboard/dashboard.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 134, in render
+    compiled_parent = self.get_parent(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 131, in get_parent
+    return self.find_template(parent, context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 109, in find_template
+    template, origin = context.template.engine.find_template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\defaulttags.py", line 962, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 513, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 568, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 621: 'endfor', expected 'elif', 'else' or 'endif'. Did you forget to register or load this tag?
+ERROR 2026-04-07 15:13:51,855 basehttp 17920 18216 "GET /dashboard/ HTTP/1.1" 500 275103
+WARNING 2026-04-07 15:16:10,423 log 17920 4412 Method Not Allowed (GET): /notifications/ajax/get/
+WARNING 2026-04-07 15:16:11,322 basehttp 17920 4412 "GET /notifications/ajax/get/ HTTP/1.1" 405 0
+ERROR 2026-04-07 15:16:12,136 log 17920 18216 Internal Server Error: /dashboard/notifications/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 2012, in admin_notifications_list_view
+    'notification_types': Notification.NOTIFICATION_TYPES,
+AttributeError: type object 'Notification' has no attribute 'NOTIFICATION_TYPES'
+ERROR 2026-04-07 15:16:12,142 basehttp 17920 18216 "GET /dashboard/notifications/ HTTP/1.1" 500 87455
+ERROR 2026-04-07 15:23:04,277 log 17920 16388 Internal Server Error: /dashboard/notifications/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 2012, in admin_notifications_list_view
+    'notification_types': Notification.NOTIFICATION_TYPES,
+AttributeError: type object 'Notification' has no attribute 'NOTIFICATION_TYPES'
+ERROR 2026-04-07 15:23:04,277 basehttp 17920 16388 "GET /dashboard/notifications/ HTTP/1.1" 500 87592
+ERROR 2026-04-07 15:24:22,002 log 17920 16388 Internal Server Error: /dashboard/notifications/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 2012, in admin_notifications_list_view
+    'notification_types': Notification.NOTIFICATION_TYPES,
+AttributeError: type object 'Notification' has no attribute 'NOTIFICATION_TYPES'
+ERROR 2026-04-07 15:24:22,009 basehttp 17920 16388 "GET /dashboard/notifications/ HTTP/1.1" 500 87592
+ERROR 2026-04-07 15:29:19,817 log 16576 14008 Internal Server Error: /dashboard/notifications/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 511, in parse
+    compile_func = self.tags[command]
+KeyError: 'endblock'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 2021, in admin_notifications_list_view
+    return render(request, 'admin_dashboard/notifications/list.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 197, in compile_nodelist
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 519, in parse
+    raise self.error(token, e)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 517, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 513, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 578, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 3: 'endblock'. Did you forget to register or load this tag?
+ERROR 2026-04-07 15:29:19,852 basehttp 16576 14008 "GET /dashboard/notifications/ HTTP/1.1" 500 236308
+ERROR 2026-04-07 15:31:23,485 log 16576 14008 Internal Server Error: /dashboard/notifications/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 134, in render
+    compiled_parent = self.get_parent(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 131, in get_parent
+    return self.find_template(parent, context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 109, in find_template
+    template, origin = context.template.engine.find_template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 163, in find_template
+    raise TemplateDoesNotExist(name, tried=tried)
+django.template.exceptions.TemplateDoesNotExist: admin_dashboard/base.html
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 2021, in admin_notifications_list_view
+    return render(request, 'admin_dashboard/notifications/list.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 109, in render
+    reraise(exc, self.backend)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 130, in reraise
+    raise new from exc
+django.template.exceptions.TemplateDoesNotExist: admin_dashboard/base.html
+ERROR 2026-04-07 15:31:23,532 basehttp 16576 14008 "GET /dashboard/notifications/ HTTP/1.1" 500 166631
+WARNING 2026-04-07 15:32:57,499 log 16576 8152 Method Not Allowed (GET): /notifications/ajax/get/
+WARNING 2026-04-07 15:32:59,123 basehttp 16576 8152 "GET /notifications/ajax/get/ HTTP/1.1" 405 0
+ERROR 2026-04-07 15:33:03,992 log 16576 14008 Internal Server Error: /dashboard/notification-templates/
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 164, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 134, in render
+    compiled_parent = self.get_parent(context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 131, in get_parent
+    return self.find_template(parent, context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader_tags.py", line 109, in find_template
+    template, origin = context.template.engine.find_template(
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\engine.py", line 163, in find_template
+    raise TemplateDoesNotExist(name, tried=tried)
+django.template.exceptions.TemplateDoesNotExist: admin_dashboard/base.html
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\core\views.py", line 2134, in admin_notification_templates_view
+    return render(request, 'admin_dashboard/notifications/template_list.html', context)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 109, in render
+    reraise(exc, self.backend)
+  File "C:\Users\Eze Christian\Documents\chris-lux\chris_gadgets\venv\lib\site-packages\django\template\backends\django.py", line 130, in reraise
+    raise new from exc
+django.template.exceptions.TemplateDoesNotExist: admin_dashboard/base.html
+ERROR 2026-04-07 15:33:04,006 basehttp 16576 14008 "GET /dashboard/notification-templates/ HTTP/1.1" 500 152401
+WARNING 2026-04-07 15:37:44,064 log 16576 13872 Method Not Allowed (GET): /notifications/ajax/get/
+WARNING 2026-04-07 15:37:46,012 basehttp 16576 13872 "GET /notifications/ajax/get/ HTTP/1.1" 405 0
+WARNING 2026-04-07 15:38:24,514 log 16576 13872 Method Not Allowed (GET): /notifications/ajax/get/
+WARNING 2026-04-07 15:38:26,042 basehttp 16576 13872 "GET /notifications/ajax/get/ HTTP/1.1" 405 0
+WARNING 2026-04-07 15:38:29,546 log 16576 13872 Method Not Allowed (GET): /notifications/ajax/get/
+WARNING 2026-04-07 15:38:32,192 basehttp 16576 13872 "GET /notifications/ajax/get/ HTTP/1.1" 405 0
+WARNING 2026-04-07 15:38:35,674 log 16576 13872 Method Not Allowed (GET): /notifications/ajax/get/
+WARNING 2026-04-07 15:38:37,557 basehttp 16576 13872 "GET /notifications/ajax/get/ HTTP/1.1" 405 0

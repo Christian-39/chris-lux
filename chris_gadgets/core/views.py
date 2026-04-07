@@ -16,7 +16,8 @@ from payments.models import Payment, BankAccount
 from accounts.models import User
 from core.models import Banner
 from messaging.models import ContactMessage, Conversation
-from notifications.models import Notification
+from notifications.models import Notification, NotificationTemplate, BulkNotification
+from notifications.forms import NotificationForm, NotificationTemplateForm, BulkNotificationForm
 from .models import SiteSetting, Banner, Testimonial, TrustBadge, PageContent, NewsletterSubscriber, ActivityLog
 
 
@@ -1959,3 +1960,302 @@ def admin_customers_report_view(request):
         'report_type': 'customers',
     }
     return render(request, 'admin_dashboard/reports.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_or_staff, login_url='/')
+def admin_notifications_list_view(request):
+    """Admin view to list all notifications with filtering"""
+    from notifications.models import Notification
+    
+    notifications = Notification.objects.all().select_related('user').order_by('-created_at')
+    
+    # Filtering
+    filter_type = request.GET.get('type', '')
+    filter_status = request.GET.get('status', '')
+    filter_priority = request.GET.get('priority', '')
+    search_query = request.GET.get('q', '')
+    
+    if filter_type:
+        notifications = notifications.filter(notification_type=filter_type)
+    if filter_status:
+        if filter_status == 'read':
+            notifications = notifications.filter(is_read=True)
+        elif filter_status == 'unread':
+            notifications = notifications.filter(is_read=False)
+    if filter_priority:
+        notifications = notifications.filter(priority=filter_priority)
+    if search_query:
+        notifications = notifications.filter(
+            Q(title__icontains=search_query) |
+            Q(message__icontains=search_query) |
+            Q(user__email__icontains=search_query)
+        )
+    
+    # Pagination
+    paginator = Paginator(notifications, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Stats
+    total_count = Notification.objects.count()
+    unread_count = Notification.objects.filter(is_read=False).count()
+    today_count = Notification.objects.filter(created_at__date=timezone.now().date()).count()
+    
+    # Get choices from the model field using _meta API
+    notification_type_field = Notification._meta.get_field('notification_type')
+    priority_field = Notification._meta.get_field('priority')
+    
+    context = {
+        'page_obj': page_obj,
+        'total_count': total_count,
+        'unread_count': unread_count,
+        'today_count': today_count,
+        'filter_type': filter_type,
+        'filter_status': filter_status,
+        'filter_priority': filter_priority,
+        'search_query': search_query,
+        'notification_types': notification_type_field.choices,
+        'priority_choices': priority_field.choices,
+    }
+    return render(request, 'admin_dashboard/notifications/list.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_or_staff, login_url='/')
+def admin_notification_create_view(request):
+    """Admin view to create new notification"""
+    if request.method == 'POST':
+        form = NotificationForm(request.POST)
+        if form.is_valid():
+            notification = form.save()
+            messages.success(request, f'Notification created successfully for {notification.user.email}')
+            return redirect('admin_dashboard:notifications_list')
+    else:
+        form = NotificationForm()
+    
+    context = {
+        'form': form,
+        'title': 'Create Notification',
+    }
+    return render(request, 'admin_dashboard/notifications/form.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_or_staff, login_url='/')
+def admin_notification_detail_view(request, notification_id):
+    """Admin view to view notification details"""
+    notification = get_object_or_404(Notification, id=notification_id)
+    
+    context = {
+        'notification': notification,
+    }
+    return render(request, 'admin_dashboard/notifications/detail.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_or_staff, login_url='/')
+def admin_notification_edit_view(request, notification_id):
+    """Admin view to edit notification"""
+    notification = get_object_or_404(Notification, id=notification_id)
+    
+    if request.method == 'POST':
+        form = NotificationForm(request.POST, instance=notification)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Notification updated successfully')
+            return redirect('admin_dashboard:notifications_list')
+    else:
+        form = NotificationForm(instance=notification)
+    
+    context = {
+        'form': form,
+        'notification': notification,
+        'title': 'Edit Notification',
+    }
+    return render(request, 'admin_dashboard/notifications/form.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_or_staff, login_url='/')
+def admin_notification_delete_view(request, notification_id):
+    """Admin view to delete notification"""
+    notification = get_object_or_404(Notification, id=notification_id)
+    
+    if request.method == 'POST':
+        notification.delete()
+        messages.success(request, 'Notification deleted successfully')
+        return redirect('admin_dashboard:notifications_list')
+    
+    context = {
+        'notification': notification,
+    }
+    return render(request, 'admin_dashboard/notifications/delete_confirm.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_or_staff, login_url='/')
+def admin_notification_bulk_action_view(request):
+    """Handle bulk actions on notifications"""
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        selected_ids = request.POST.getlist('selected_notifications')
+        
+        if not selected_ids:
+            messages.warning(request, 'No notifications selected')
+            return redirect('admin_dashboard:notifications_list')
+        
+        notifications = Notification.objects.filter(id__in=selected_ids)
+        
+        if action == 'mark_read':
+            count = notifications.update(is_read=True, read_at=timezone.now())
+            messages.success(request, f'{count} notifications marked as read')
+        elif action == 'mark_unread':
+            count = notifications.update(is_read=False, read_at=None)
+            messages.success(request, f'{count} notifications marked as unread')
+        elif action == 'delete':
+            count = notifications.count()
+            notifications.delete()
+            messages.success(request, f'{count} notifications deleted')
+        elif action == 'resend':
+            messages.success(request, f'Resending {notifications.count()} notifications')
+    
+    return redirect('admin_dashboard:notifications_list')
+
+
+@login_required
+@user_passes_test(is_admin_or_staff, login_url='/')
+def admin_notification_templates_view(request):
+    """List notification templates"""
+    templates = NotificationTemplate.objects.all().order_by('-updated_at')
+    context = {
+        'templates': templates,
+    }
+    return render(request, 'admin_dashboard/notifications/template_list.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_or_staff, login_url='/')
+def admin_notification_template_create_view(request):
+    """Create notification template"""
+    if request.method == 'POST':
+        form = NotificationTemplateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Template created successfully')
+            return redirect('admin_dashboard:notification_templates')
+    else:
+        form = NotificationTemplateForm()
+    
+    context = {
+        'form': form,
+        'title': 'Create Template',
+    }
+    return render(request, 'admin_dashboard/notifications/template_form.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_or_staff, login_url='/')
+def admin_notification_template_edit_view(request, template_id):
+    """Edit notification template"""
+    template = get_object_or_404(NotificationTemplate, id=template_id)
+    
+    if request.method == 'POST':
+        form = NotificationTemplateForm(request.POST, instance=template)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Template updated successfully')
+            return redirect('admin_dashboard:notification_templates')
+    else:
+        form = NotificationTemplateForm(instance=template)
+    
+    context = {
+        'form': form,
+        'template': template,
+        'title': 'Edit Template',
+    }
+    return render(request, 'admin_dashboard/notifications/template_form.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_or_staff, login_url='/')
+def admin_notification_template_delete_view(request, template_id):
+    """Delete notification template"""
+    template = get_object_or_404(NotificationTemplate, id=template_id)
+    
+    if request.method == 'POST':
+        template.delete()
+        messages.success(request, 'Template deleted successfully')
+        return redirect('admin_dashboard:notification_templates')
+    
+    context = {
+        'template': template,
+    }
+    return render(request, 'admin_dashboard/notifications/template_delete.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_or_staff, login_url='/')
+def admin_bulk_notifications_view(request):
+    """List bulk notifications"""
+    bulk_notifications = BulkNotification.objects.all().order_by('-created_at')
+    context = {
+        'bulk_notifications': bulk_notifications,
+    }
+    return render(request, 'admin_dashboard/notifications/bulk_list.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_or_staff, login_url='/')
+def admin_bulk_notification_create_view(request):
+    """Create bulk notification"""
+    if request.method == 'POST':
+        form = BulkNotificationForm(request.POST)
+        if form.is_valid():
+            bulk = form.save(commit=False)
+            bulk.save()
+            form.save_m2m()
+            messages.success(request, 'Bulk notification created successfully')
+            return redirect('admin_dashboard:bulk_notifications')
+    else:
+        form = BulkNotificationForm()
+    
+    context = {
+        'form': form,
+        'title': 'Create Bulk Notification',
+    }
+    return render(request, 'admin_dashboard/notifications/bulk_form.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_or_staff, login_url='/')
+def admin_bulk_notification_send_view(request, bulk_id):
+    """Send bulk notification"""
+    bulk = get_object_or_404(BulkNotification, id=bulk_id)
+    
+    if bulk.status == 'draft':
+        bulk.status = 'sending'
+        bulk.sent_at = timezone.now()
+        bulk.save()
+        messages.success(request, 'Bulk notification is being sent')
+    else:
+        messages.warning(request, 'This notification has already been sent or is being sent')
+    
+    return redirect('admin_dashboard:bulk_notifications')
+
+
+@login_required
+@user_passes_test(is_admin_or_staff, login_url='/')
+def admin_bulk_notification_delete_view(request, bulk_id):
+    """Delete bulk notification"""
+    bulk = get_object_or_404(BulkNotification, id=bulk_id)
+    
+    if request.method == 'POST':
+        bulk.delete()
+        messages.success(request, 'Bulk notification deleted successfully')
+        return redirect('admin_dashboard:bulk_notifications')
+    
+    context = {
+        'bulk': bulk,
+    }
+    return render(request, 'admin_dashboard/notifications/bulk_delete.html', context)

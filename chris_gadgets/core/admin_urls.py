@@ -69,6 +69,26 @@ urlpatterns = [
     path('conversations/<uuid:conversation_id>/', views.admin_conversation_detail_view, name='conversation_detail'),
     path('conversations/<uuid:conversation_id>/close/', views.admin_conversation_close_view, name='conversation_close'),
     
+    # Notification Management (Admin)
+    path('notifications/', views.admin_notifications_list_view, name='notifications_list'),
+    path('notifications/create/', views.admin_notification_create_view, name='notification_create'),
+    path('notifications/<uuid:notification_id>/', views.admin_notification_detail_view, name='notification_detail'),
+    path('notifications/<uuid:notification_id>/edit/', views.admin_notification_edit_view, name='notification_edit'),
+    path('notifications/<uuid:notification_id>/delete/', views.admin_notification_delete_view, name='notification_delete'),
+    path('notifications/bulk-action/', views.admin_notification_bulk_action_view, name='notification_bulk_action'),
+    
+    # Notification Templates (Admin)
+    path('notification-templates/', views.admin_notification_templates_view, name='notification_templates'),
+    path('notification-templates/create/', views.admin_notification_template_create_view, name='notification_template_create'),
+    path('notification-templates/<int:template_id>/edit/', views.admin_notification_template_edit_view, name='notification_template_edit'),
+    path('notification-templates/<int:template_id>/delete/', views.admin_notification_template_delete_view, name='notification_template_delete'),
+    
+    # Bulk Notifications (Admin)
+    path('bulk-notifications/', views.admin_bulk_notifications_view, name='bulk_notifications'),
+    path('bulk-notifications/create/', views.admin_bulk_notification_create_view, name='bulk_notification_create'),
+    path('bulk-notifications/<int:bulk_id>/send/', views.admin_bulk_notification_send_view, name='bulk_notification_send'),
+    path('bulk-notifications/<int:bulk_id>/delete/', views.admin_bulk_notification_delete_view, name='bulk_notification_delete'),
+    
     # Settings
     path('settings/', views.admin_settings_view, name='settings'),
     path('settings/save/', views.admin_settings_save_view, name='settings_save'),

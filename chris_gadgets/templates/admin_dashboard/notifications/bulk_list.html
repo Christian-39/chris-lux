@@ -1,0 +1,104 @@
+{% extends 'admin_dashboard/base_admin.html' %} {% load static %}
+<!--prettier-ignore-->
+{% block title %}Bulk Notifications{% endblock %} {% block breadcrumb %}
+<li class="breadcrumb-item active">Bulk Notifications</li>
+{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4>Bulk Notifications</h4>
+    <a
+      href="{% url 'admin_dashboard:bulk_notification_create' %}"
+      class="btn btn-primary"
+    >
+      <i class="fas fa-plus me-2"></i>Create Bulk Notification
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Recipients</th>
+              <th>Sent</th>
+              <th>Scheduled</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for bulk in bulk_notifications %}
+            <tr>
+              <td>{{ bulk.title }}</td>
+              <td>
+                <span class="badge bg-secondary"
+                  >{{ bulk.get_notification_type_display }}</span
+                >
+              </td>
+              <td>
+                {% if bulk.status == 'draft' %}
+                <span class="badge bg-secondary">Draft</span>
+                {% elif bulk.status == 'sending' %}
+                <span class="badge bg-warning">Sending</span>
+                {% elif bulk.status == 'sent' %}
+                <span class="badge bg-success">Sent</span>
+                {% else %}
+                <span class="badge bg-danger">Failed</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if bulk.target_all_users %}
+                <span class="text-muted">All Users</span>
+                {% else %} {{ bulk.target_specific_users.count }} users {% endif
+                %}
+              </td>
+              <td>
+                {% if bulk.sent_count %} {{ bulk.sent_count }}/{{
+                bulk.recipients_count }} {% else %} - {% endif %}
+              </td>
+              <td>
+                {% if bulk.scheduled_at %} {{ bulk.scheduled_at|date:"M d, Y
+                H:i" }} {% else %}
+                <span class="text-muted">Immediate</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  {% if bulk.status == 'draft' %}
+                  <a
+                    href="{% url 'admin_dashboard:bulk_notification_send' bulk.id %}"
+                    class="btn btn-outline-success"
+                    title="Send Now"
+                    onclick="return confirm('Send this notification now?');"
+                  >
+                    <i class="fas fa-paper-plane"></i>
+                  </a>
+                  {% endif %}
+                  <a
+                    href="{% url 'admin_dashboard:bulk_notification_delete' bulk.id %}"
+                    class="btn btn-outline-danger"
+                    title="Delete"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-4">
+                <i class="fas fa-broadcast-tower fa-2x text-muted mb-2"></i>
+                <p class="text-muted mb-0">No bulk notifications found</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,375 @@
+{% extends 'admin_dashboard/base_admin.html' %} {% load static %}
+<!--prettier-ignore-->
+{% block title %}Manage Notifications{% endblock %} {% block breadcrumb %}
+<li class="breadcrumb-item active">Notifications</li>
+{% endblock %} {% block content %}
+<div class="container-fluid">
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="stat-card">
+        <div class="d-flex align-items-center">
+          <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+            <i class="fas fa-bell"></i>
+          </div>
+          <div class="ms-3">
+            <h4 class="mb-0">{{ total_count }}</h4>
+            <small class="text-muted">Total Notifications</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card">
+        <div class="d-flex align-items-center">
+          <div class="stat-icon bg-danger bg-opacity-10 text-danger">
+            <i class="fas fa-envelope-open"></i>
+          </div>
+          <div class="ms-3">
+            <h4 class="mb-0">{{ unread_count }}</h4>
+            <small class="text-muted">Unread</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card">
+        <div class="d-flex align-items-center">
+          <div class="stat-icon bg-success bg-opacity-10 text-success">
+            <i class="fas fa-calendar-day"></i>
+          </div>
+          <div class="ms-3">
+            <h4 class="mb-0">{{ today_count }}</h4>
+            <small class="text-muted">Today</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card">
+        <div class="d-flex align-items-center justify-content-center h-100">
+          <a
+            href="{% url 'admin_dashboard:notification_create' %}"
+            class="btn btn-primary"
+          >
+            <i class="fas fa-plus me-2"></i>Create Notification
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-3">
+        <div class="col-md-3">
+          <input
+            type="text"
+            name="q"
+            class="form-control"
+            placeholder="Search..."
+            value="{{ search_query }}"
+          />
+        </div>
+        <div class="col-md-2">
+          <select name="type" class="form-select">
+            <option value="">All Types</option>
+            {% for type_value, type_label in notification_types %}
+            <option
+              value="{{ type_value }}"
+              {%
+              if
+              filter_type=""
+              ="type_value"
+              %}selected{%
+              endif
+              %}
+            >
+              {{ type_label }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select name="status" class="form-select">
+            <option value="">All Status</option>
+            <option
+              value="read"
+              {%
+              if
+              filter_status=""
+              ="read"
+              %}selected{%
+              endif
+              %}
+            >
+              Read
+            </option>
+            <option
+              value="unread"
+              {%
+              if
+              filter_status=""
+              ="unread"
+              %}selected{%
+              endif
+              %}
+            >
+              Unread
+            </option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select name="priority" class="form-select">
+            <option value="">All Priorities</option>
+            {% for p_value, p_label in priority_choices %}
+            <option
+              value="{{ p_value }}"
+              {%
+              if
+              filter_priority=""
+              ="p_value"
+              %}selected{%
+              endif
+              %}
+            >
+              {{ p_label }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <button type="submit" class="btn btn-outline-primary me-2">
+            <i class="fas fa-filter me-1"></i>Filter
+          </button>
+          <a
+            href="{% url 'admin_dashboard:notifications_list' %}"
+            class="btn btn-outline-secondary"
+          >
+            <i class="fas fa-undo me-1"></i>Reset
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bulk Actions -->
+  <form
+    method="post"
+    action="{% url 'admin_dashboard:notification_bulk_action' %}"
+    id="bulk-form"
+  >
+    {% csrf_token %}
+    <div class="card">
+      <div
+        class="card-header d-flex justify-content-between align-items-center"
+      >
+        <h5 class="mb-0">All Notifications</h5>
+        <div class="btn-group">
+          <button
+            type="submit"
+            name="action"
+            value="mark_read"
+            class="btn btn-sm btn-outline-success"
+          >
+            <i class="fas fa-check me-1"></i>Mark Read
+          </button>
+          <button
+            type="submit"
+            name="action"
+            value="mark_unread"
+            class="btn btn-sm btn-outline-warning"
+          >
+            <i class="fas fa-envelope me-1"></i>Mark Unread
+          </button>
+          <button
+            type="submit"
+            name="action"
+            value="delete"
+            class="btn btn-sm btn-outline-danger"
+            onclick="
+              return confirm(
+                'Are you sure you want to delete selected notifications?',
+              );
+            "
+          >
+            <i class="fas fa-trash me-1"></i>Delete
+          </button>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th width="40">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="select-all"
+                  />
+                </th>
+                <th>User</th>
+                <th>Type</th>
+                <th>Title</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for notification in page_obj %}
+              <tr
+                class="{% if not notification.is_read %}table-primary{% endif %}"
+              >
+                <td>
+                  <input
+                    type="checkbox"
+                    name="selected_notifications"
+                    value="{{ notification.id }}"
+                    class="form-check-input row-checkbox"
+                  />
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div
+                      class="avatar-sm bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center"
+                      style="width: 32px; height: 32px; font-size: 12px"
+                    >
+                      {{ notification.user.first_name|first|upper }}{{
+                      notification.user.last_name|first|upper }}
+                    </div>
+                    <div>
+                      <div class="fw-medium">
+                        {{
+                        notification.user.get_full_name|default:notification.user.email
+                        }}
+                      </div>
+                      <small class="text-muted"
+                        >{{ notification.user.email }}</small
+                      >
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span
+                    class="badge bg-{% if notification.notification_type == 'order' %}warning{% elif notification.notification_type == 'payment' %}info{% elif notification.notification_type == 'review' %}danger{% elif notification.notification_type == 'message' %}success{% else %}secondary{% endif %}"
+                  >
+                    {{ notification.get_notification_type_display }}
+                  </span>
+                </td>
+                <td>
+                  <div class="fw-medium">{{ notification.title }}</div>
+                  <small class="text-muted"
+                    >{{ notification.message|truncatechars:40 }}</small
+                  >
+                </td>
+                <td>
+                  <span
+                    class="badge bg-{% if notification.priority == 'high' %}danger{% elif notification.priority == 'medium' %}warning{% else %}success{% endif %}"
+                  >
+                    {{ notification.get_priority_display }}
+                  </span>
+                </td>
+                <td>
+                  {% if notification.is_read %}
+                  <span class="badge bg-success"
+                    ><i class="fas fa-check me-1"></i>Read</span
+                  >
+                  {% else %}
+                  <span class="badge bg-secondary"
+                    ><i class="fas fa-envelope me-1"></i>Unread</span
+                  >
+                  {% endif %}
+                </td>
+                <td>{{ notification.created_at|date:"M d, Y H:i" }}</td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <a
+                      href="{% url 'admin_dashboard:notification_detail' notification.id %}"
+                      class="btn btn-outline-primary"
+                      title="View"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    <a
+                      href="{% url 'admin_dashboard:notification_edit' notification.id %}"
+                      class="btn btn-outline-warning"
+                      title="Edit"
+                    >
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <a
+                      href="{% url 'admin_dashboard:notification_delete' notification.id %}"
+                      class="btn btn-outline-danger"
+                      title="Delete"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="8" class="text-center py-4">
+                  <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+                  <p class="text-muted mb-0">No notifications found</p>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% if page_obj.has_other_pages %}
+      <div class="card-footer">
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center mb-0">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="?page={{ page_obj.previous_page_number }}{% if filter_type %}&type={{ filter_type }}{% endif %}{% if filter_status %}&status={{ filter_status }}{% endif %}{% if filter_priority %}&priority={{ filter_priority }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+              >
+                <i class="fas fa-chevron-left"></i>
+              </a>
+            </li>
+            {% endif %} {% for num in page_obj.paginator.page_range %}
+            <li
+              class="page-item {% if page_obj.number == num %}active{% endif %}"
+            >
+              <a
+                class="page-link"
+                href="?page={{ num }}{% if filter_type %}&type={{ filter_type }}{% endif %}{% if filter_status %}&status={{ filter_status }}{% endif %}{% if filter_priority %}&priority={{ filter_priority }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+              >
+                {{ num }}
+              </a>
+            </li>
+            {% endfor %} {% if page_obj.has_next %}
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="?page={{ page_obj.next_page_number }}{% if filter_type %}&type={{ filter_type }}{% endif %}{% if filter_status %}&status={{ filter_status }}{% endif %}{% if filter_priority %}&priority={{ filter_priority }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+              >
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document.getElementById("select-all").addEventListener("change", function () {
+    document
+      .querySelectorAll(".row-checkbox")
+      .forEach((cb) => (cb.checked = this.checked));
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'admin_dashboard/base_admin.html' %} {% load static %}
+<!--prettier-ignore-->
+{% block title %}{{ title }}{% endblock %} {% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'admin_dashboard:notification_templates' %}">Templates</a>
+</li>
+<li class="breadcrumb-item active">{{ title }}</li>
+{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>{{ title }}</h5>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Name</label>
+                {{ form.name }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Template Type</label>
+                {{ form.template_type }}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Subject</label>
+              {{ form.subject }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Content</label>
+              {{ form.content }}
+              <small class="form-text text-muted"
+                >Use {{ '{' }}variable_name{{ '}' }} for dynamic content</small
+              >
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Variables (comma separated)</label>
+              {{ form.variables }}
+            </div>
+
+            <div class="mb-3">
+              <div class="form-check">
+                {{ form.is_active }}
+                <label class="form-check-label">Active</label>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a
+                href="{% url 'admin_dashboard:notification_templates' %}"
+                class="btn btn-outline-secondary"
+              >
+                <i class="fas fa-arrow-left me-2"></i>Cancel
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Save Template
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
