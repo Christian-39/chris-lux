@@ -1,296 +1,324 @@
-{% load static %}
-<!DOCTYPE html>
+{% load static %}{% load humanize%}
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Invoice #{{ order.order_number }}</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+      :root {
+        --primary-color: #000000; /* Professional black */
+        --accent-color: #0d6efd;
+        --border-color: #e9ecef;
+        --text-main: #333333;
+        --text-muted: #6c757d;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--text-main);
+        background-color: #f4f7f6;
+        padding: 50px 20px;
+      }
+
+      .invoice-container {
+        max-width: 850px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 60px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        border-radius: 8px;
+      }
+
+      .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 40px;
+      }
+
+      .brand-section h1 {
+        font-size: 24px;
+        letter-spacing: -0.5px;
+        font-weight: 800;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+      }
+
+      .brand-section p {
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+
+      .invoice-meta {
+        text-align: right;
+      }
+      .invoice-meta h2 {
+        font-size: 32px;
+        font-weight: 300;
+        color: var(--text-muted);
+        margin-bottom: 5px;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 10px;
+      }
+      .status-verified,
+      .status-delivered {
+        background: #e6fffa;
+        color: #047481;
+      }
+      .status-pending {
+        background: #fffaf0;
+        color: #975a16;
+      }
+      .status-failed,
+      .status-cancelled {
+        background: #fff5f5;
+        color: #c53030;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 40px;
+        padding: 30px 0;
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .info-block h3 {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
+
+      .info-block p {
+        font-size: 14px;
+        margin-bottom: 4px;
+      }
+
+      .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+      }
+
+      .items-table th {
+        text-align: left;
+        padding: 15px 10px;
+        border-bottom: 2px solid var(--primary-color);
+        font-size: 11px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+
+      .items-table td {
+        padding: 15px 10px;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .totals-section {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .totals-table {
+        width: 250px;
+      }
+      .totals-table td {
+        padding: 10px 0;
+      }
+      .totals-table td:last-child {
+        text-align: right;
+        font-weight: 600;
+      }
+
+      .grand-total-row {
+        border-top: 2px solid var(--border-color);
+      }
+      .grand-total-row td {
+        font-size: 18px;
+        padding-top: 15px !important;
+        color: var(--accent-color);
+      }
+
+      .footer {
+        margin-top: 60px;
+        text-align: center;
+        border-top: 1px solid var(--border-color);
+        padding-top: 30px;
+        color: var(--text-muted);
+        font-size: 11px;
+      }
+
+      .btn-print {
+        background: var(--accent-color);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 6px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 30px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      @media print {
         body {
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #333;
-            padding: 40px;
+          background: white;
+          padding: 0;
         }
-        
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #0d6efd;
+        .invoice-container {
+          box-shadow: none;
+          max-width: 100%;
+          padding: 0;
         }
-        
-        .company-info h1 {
-            color: #0d6efd;
-            font-size: 28px;
-            margin-bottom: 5px;
+        .btn-print {
+          display: none;
         }
-        
-        .invoice-title {
-            text-align: right;
-        }
-        
-        .invoice-title h2 {
-            font-size: 24px;
-            color: #0d6efd;
-            margin-bottom: 5px;
-        }
-        
-        .invoice-details {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-        }
-        
-        .billing-info, .shipping-info {
-            width: 48%;
-        }
-        
-        .billing-info h3, .shipping-info h3 {
-            font-size: 16px;
-            margin-bottom: 10px;
-            color: #555;
-            text-transform: uppercase;
-        }
-        
-        .info-table {
-            width: 100%;
-            margin-bottom: 30px;
-        }
-        
-        .info-table td {
-            padding: 5px 0;
-        }
-        
-        .info-table td:first-child {
-            color: #666;
-            width: 40%;
-        }
-        
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-        
-        .items-table th {
-            background: #f8f9fa;
-            padding: 12px;
-            text-align: left;
-            border-bottom: 2px solid #dee2e6;
-        }
-        
-        .items-table td {
-            padding: 12px;
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .items-table .text-right {
-            text-align: right;
-        }
-        
-        .items-table .text-center {
-            text-align: center;
-        }
-        
-        .totals-table {
-            width: 300px;
-            margin-left: auto;
-            margin-bottom: 30px;
-        }
-        
-        .totals-table td {
-            padding: 8px 12px;
-        }
-        
-        .totals-table td:first-child {
-            text-align: right;
-            color: #666;
-        }
-        
-        .totals-table td:last-child {
-            text-align: right;
-            font-weight: bold;
-        }
-        
-        .totals-table .grand-total {
-            font-size: 18px;
-            border-top: 2px solid #0d6efd;
-        }
-        
-        .totals-table .grand-total td {
-            padding-top: 12px;
-            color: #0d6efd;
-        }
-        
-        .footer {
-            margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid #dee2e6;
-            text-align: center;
-            color: #666;
-            font-size: 12px;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-processing { background: #d1ecf1; color: #0c5460; }
-        .status-shipped { background: #fff3cd; color: #856404; }
-        .status-delivered { background: #d4edda; color: #155724; }
-        .status-cancelled { background: #f8d7da; color: #721c24; }
-        
-        @media print {
-            body {
-                padding: 20px;
-            }
-            .no-print {
-                display: none;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-    <!-- Print Button -->
-    <div class="no-print" style="text-align: center; margin-bottom: 20px;">
-        <button onclick="window.print()" style="padding: 10px 30px; background: #0d6efd; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
-            <i class="fas fa-print"></i> Print Invoice
-        </button>
+  </head>
+  <body>
+    <div style="text-align: center">
+      <button class="btn-print" onclick="window.print()">
+        <i class="fas fa-print"></i> Download as PDF / Print
+      </button>
     </div>
 
-    <!-- Invoice Header -->
-    <div class="invoice-header">
-        <div class="company-info">
-            <h1>GADGETS STORE</h1>
-            <p>Your One-Stop Gadget Shop</p>
-            <p>Email: support@gadgetsstore.ng</p>
-            <p>Phone: +234 800 000 0000</p>
+    <div class="invoice-container">
+      <div class="header-top">
+        <div class="brand-section">
+          <h1>GADGETS STORE</h1>
+          <p>Digital & Luxury Tech Solutions</p>
+          <p>Lagos, Nigeria</p>
+          <p>support@gadgetsstore.ng | +234 802 148 0055</p>
         </div>
-        <div class="invoice-title">
-            <h2>INVOICE</h2>
-            <p><strong>#{{ order.order_number }}</strong></p>
-            <p>Date: {{ order.created_at|date:"F d, Y" }}</p>
-            <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+        <div class="invoice-meta">
+          <h2>INVOICE</h2>
+          <p><strong>#{{ order.order_number }}</strong></p>
+          <p>Issued: {{ order.created_at|date:"d M Y" }}</p>
+          <span class="status-badge status-{{ order.payment.status }}">
+            {{ order.payment.status }}
+          </span>
         </div>
-    </div>
+      </div>
 
-    <!-- Customer Details -->
-    <div class="invoice-details">
-        <div class="billing-info">
-            <h3>Bill To:</h3>
-            <p><strong>{{ order.user.get_full_name|default:order.user.email }}</strong></p>
-            <p>{{ order.user.email }}</p>
-            <p>{{ order.user.phone_number|default:"" }}</p>
+      <div class="info-grid">
+        <div class="info-block">
+          <h3>Customer Information</h3>
+          <p><strong>{{ order.user.get_full_name }}</strong></p>
+          <p>{{ order.user.email }}</p>
+          <p>{{ order.user.phone_number|default:order.shipping_phone }}</p>
         </div>
-        <div class="shipping-info">
-            <h3>Ship To:</h3>
-            {% if order.shipping_address %}
-            <p><strong>{{ order.shipping_address.full_name }}</strong></p>
-            <p>{{ order.shipping_address.street_address }}</p>
-            {% if order.shipping_address.apartment %}
-            <p>{{ order.shipping_address.apartment }}</p>
-            {% endif %}
-            <p>{{ order.shipping_address.city }}, {{ order.shipping_address.state }}</p>
-            <p>{{ order.shipping_address.country }} {{ order.shipping_address.postal_code }}</p>
-            <p>Phone: {{ order.shipping_address.phone }}</p>
-            {% else %}
-            <p>No shipping address provided.</p>
-            {% endif %}
+        <div class="info-block">
+          <h3>Shipping Destination</h3>
+          <p><strong>{{ order.shipping_name }}</strong></p>
+          <p>{{ order.shipping_address }}</p>
+          <p>{{ order.shipping_city }}, {{ order.shipping_lga }}</p>
+          <p>
+            <!-- prettier-ignore -->
+            {{ order.get_shipping_state_display }} {{ order.shipping_postal_code|default:"" }}
+          </p>
         </div>
-    </div>
+      </div>
 
-    <!-- Order Info -->
-    <table class="info-table">
-        <tr>
-            <td>Order Date:</td>
-            <td>{{ order.created_at|date:"F d, Y H:i" }}</td>
-            <td>Payment Method:</td>
-            <td>{{ order.get_payment_method_display }}</td>
-        </tr>
-        <tr>
-            <td>Order Status:</td>
-            <td>{{ order.get_status_display }}</td>
-            <td>Payment Status:</td>
-            <td>{{ order.get_payment_status_display }}</td>
-        </tr>
-        {% if order.tracking_number %}
-        <tr>
-            <td>Tracking Number:</td>
-            <td colspan="3">{{ order.tracking_number }}</td>
-        </tr>
-        {% endif %}
-    </table>
-
-    <!-- Order Items -->
-    <table class="items-table">
+      <table class="items-table">
         <thead>
-            <tr>
-                <th>Item</th>
-                <th class="text-center">Qty</th>
-                <th class="text-right">Unit Price</th>
-                <th class="text-right">Total</th>
-            </tr>
+          <tr>
+            <th style="width: 50%">Description</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th style="text-align: right">Total</th>
+          </tr>
         </thead>
         <tbody>
-            {% for item in order.items.all %}
-            <tr>
-                <td>{{ item.product.name }}</td>
-                <td class="text-center">{{ item.quantity }}</td>
-                <td class="text-right">₦{{ item.price|floatformat:2 }}</td>
-                <td class="text-right">₦{{ item.total|floatformat:2 }}</td>
-            </tr>
-            {% endfor %}
+          {% for item in order.items.all %}
+          <tr>
+            <td>
+              <strong>{{ item.product.name }}</strong><br />
+              <small style="color: gray"
+                >SKU: {{ item.product.id|truncatechars:8 }}</small
+              >
+            </td>
+            <td>{{ item.quantity }}</td>
+            <td>₦{{ item.price|floatformat:2|intcomma }}</td>
+            <td style="text-align: right">
+              ₦{{ item.total|floatformat:2|intcomma }}
+            </td>
+          </tr>
+          {% endfor %}
         </tbody>
-    </table>
+      </table>
 
-    <!-- Totals -->
-    <table class="totals-table">
-        <tr>
-            <td>Subtotal:</td>
-            <td>₦{{ order.subtotal|floatformat:2 }}</td>
-        </tr>
-        <tr>
-            <td>Shipping:</td>
-            <td>₦{{ order.shipping_cost|floatformat:2 }}</td>
-        </tr>
-        {% if order.discount > 0 %}
-        <tr>
-            <td>Discount:</td>
-            <td>-₦{{ order.discount|floatformat:2 }}</td>
-        </tr>
-        {% endif %}
-        {% if order.tax > 0 %}
-        <tr>
-            <td>Tax:</td>
-            <td>₦{{ order.tax|floatformat:2 }}</td>
-        </tr>
-        {% endif %}
-        <tr class="grand-total">
-            <td>Total:</td>
-            <td>₦{{ order.total|floatformat:2 }}</td>
-        </tr>
-    </table>
+      <div class="totals-section">
+        <table class="totals-table">
+          <tr>
+            <td style="color: var(--text-muted)">Subtotal</td>
+            <td>₦{{ order.subtotal|floatformat:2|intcomma }}</td>
+          </tr>
+          <tr>
+            <td style="color: var(--text-muted)">Shipping</td>
+            <td>₦{{ order.shipping_cost|floatformat:2|intcomma }}</td>
+          </tr>
+          {% if order.discount_amount > 0 %}
+          <tr>
+            <td style="color: var(--text-muted)">Discount</td>
+            <td style="color: #c53030">
+              -₦{{ order.discount_amount|floatformat:2|intcomma }}
+            </td>
+          </tr>
+          {% endif %}
+          <tr class="grand-total-row">
+            <td>Grand Total</td>
+            <td>₦{{ order.total|floatformat:2|intcomma }}</td>
+          </tr>
+        </table>
+      </div>
 
-    <!-- Footer -->
-    <div class="footer">
-        <p><strong>Thank you for your business!</strong></p>
-        <p>If you have any questions about this invoice, please contact our support team.</p>
-        <p>&copy; {% now "Y" %} Gadgets Store. All rights reserved.</p>
+      <div class="footer">
+        <p>
+          <strong>PAYMENT TERMS:</strong> Please quote invoice number #{{
+          order.order_number }} for all inquiries.
+        </p>
+        <p>This is a computer-generated document. No signature is required.</p>
+        <p style="margin-top: 15px">
+          &copy; {% now "Y" %} Gadgets Store Nigeria. Thank you for your
+          purchase!
+        </p>
+      </div>
     </div>
-</body>
+  </body>
 </html>
