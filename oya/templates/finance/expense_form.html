@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block page_title %}{{ title|default:"Record Expense" }}{% endblock %}
+{% block breadcrumb %}{{ title|default:"Record Expense" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  @keyframes pulse-subtle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+  }
+  .treasury-pulse {
+    animation: pulse-subtle 2s ease-in-out infinite;
+  }
+  .category-card {
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 2px solid transparent;
+  }
+  .category-card:hover {
+    border-color: var(--oya-primary, #2563eb);
+    background: var(--oya-primary-light, #eff6ff);
+  }
+  .category-card.active {
+    border-color: var(--oya-primary, #2563eb);
+    background: var(--oya-primary-light, #eff6ff);
+  }
+  .receipt-dropzone {
+    border: 2px dashed var(--oya-border, #d1d5db);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+  .receipt-dropzone:hover, .receipt-dropzone.dragover {
+    border-color: var(--oya-primary, #2563eb);
+    background: var(--oya-primary-light, #eff6ff);
+  }
+  .receipt-dropzone.has-file {
+    border-color: var(--oya-success, #10b981);
+    background: rgba(16, 185, 129, 0.05);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8 col-xl-6" style="padding:0 0.5rem;">
+      
+      <!-- Treasury Balance Card -->
+      <div class="card mb-3 treasury-pulse" style="background: linear-gradient(135deg, var(--oya-danger, #dc2626) 0%, var(--oya-danger-dark, #991b1b) 100%); color: #fff; border: none;">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <div style="font-size: 0.75rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Current Treasury Balance</div>
+            <div style="font-size: clamp(1.25rem, 5vw, 1.75rem); font-weight: 700; margin-top: 0.25rem; font-family: 'Segoe UI', system-ui, sans-serif;">
+              ₦{{ treasury_balance|floatformat:2 }}
+            </div>
+            <div style="font-size: 0.75rem; opacity: 0.75; margin-top: 0.25rem;">
+              {{ total_income|floatformat:2 }} in &middot; {{ total_expenses|floatformat:2 }} out
+            </div>
+          </div>
+          <div style="background: rgba(255,255,255,0.15); border-radius: 0.75rem; padding: 0.75rem;">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Expense Preview -->
+      {% if recent_expenses %}
+      <div class="card mb-3" style="border-left: 3px solid var(--oya-danger, #dc2626);">
+        <div class="card-body py-2 px-3">
+          <div style="font-size: 0.75rem; color: var(--oya-text-muted, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Most Recent Expense</div>
+          <div class="d-flex justify-content-between align-items-center mt-1">
+            <span style="font-weight: 500; color: var(--oya-text, #374151);">
+              {{ recent_expenses.0.category }}: {{ recent_expenses.0.description|truncatechars:25 }}
+            </span>
+            <span style="color: var(--oya-danger, #dc2626); font-weight: 600;">
+              -₦{{ recent_expenses.0.amount|floatformat:2 }}
+            </span>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--oya-text-muted, #6b7280);">
+            {{ recent_expenses.0.created_by.get_full_name|default:"Unknown" }} &middot; {{ recent_expenses.0.created_at|timesince }} ago
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="card">
+        <div class="card-header" style="background: var(--oya-surface, #fff); border-bottom: 1px solid var(--oya-border, #e5e7eb);">
+          <h5 class="card-title mb-0" style="font-size: 1rem; font-weight: 600; color: var(--oya-text, #111827);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.5rem; color: var(--oya-danger, #dc2626);">
+              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/>
+            </svg>
+            {{ title }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <!-- Amount -->
+            <div class="mb-3">
+              <label for="{{ form.amount.id_for_label }}" class="form-label" style="font-weight: 500; color: var(--oya-text, #374151); font-size: 0.875rem;">
+                Amount <span style="color: var(--oya-danger, #ef4444);">*</span>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text" style="background: var(--oya-surface-alt, #f9fafb); border-color: var(--oya-border, #d1d5db); color: var(--oya-text-muted, #6b7280); font-weight: 600;">₦</span>
+                {{ form.amount }}
+              </div>
+              {% if form.amount.errors %}
+                <div class="invalid-feedback d-block" style="font-size: 0.875rem;">{{ form.amount.errors|join:", " }}</div>
+              {% endif %}
+              <div class="form-text" style="font-size: 0.75rem;">Enter amount in Naira (e.g., 25000.00)</div>
+            </div>
+
+            <!-- Category -->
+            <div class="mb-3">
+              <label for="{{ form.category.id_for_label }}" class="form-label" style="font-weight: 500; color: var(--oya-text, #374151); font-size: 0.875rem;">
+                Category <span style="color: var(--oya-danger, #ef4444);">*</span>
+              </label>
+              {{ form.category }}
+              {% if form.category.errors %}
+                <div class="invalid-feedback d-block" style="font-size: 0.875rem;">{{ form.category.errors|join:", " }}</div>
+              {% endif %}
+              
+              <!-- Quick Category Select -->
+              <div class="row g-2 mt-2" style="--bs-gutter-x:0.5rem;">
+                {% for value, label in form.category.field.choices %}
+                {% if value %}
+                <div class="col-6 col-md-4" style="padding:0.25rem;">
+                  <div class="category-card p-2 rounded text-center" onclick="document.getElementById('id_category').value='{{ value }}'; document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active')); this.classList.add('active');" data-value="{{ value }}">
+                    <div style="font-size: 0.75rem; font-weight: 500; color: var(--oya-text, #374151);">{{ label }}</div>
+                    {% if value == "ADMINISTRATIVE" %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0.25rem; color: var(--oya-primary, #2563eb);"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    {% elif value == "PROJECT" %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0.25rem; color: var(--oya-success, #10b981);"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    {% elif value == "EVENT" %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0.25rem; color: var(--oya-warning, #f59e0b);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    {% elif value == "MAINTENANCE" %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0.25rem; color: var(--oya-danger, #dc2626);"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                    {% elif value == "SALARY" %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0.25rem; color: var(--oya-info, #3b82f6);"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    {% else %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0.25rem; color: var(--oya-text-muted, #6b7280);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+              <label for="{{ form.description.id_for_label }}" class="form-label" style="font-weight: 500; color: var(--oya-text, #374151); font-size: 0.875rem;">
+                Description <span style="color: var(--oya-danger, #ef4444);">*</span>
+              </label>
+              {{ form.description }}
+              {% if form.description.errors %}
+                <div class="invalid-feedback d-block" style="font-size: 0.875rem;">{{ form.description.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Receipt File -->
+            <div class="mb-3">
+              <label class="form-label" style="font-weight: 500; color: var(--oya-text, #374151); font-size: 0.875rem;">
+                Receipt <span style="color: var(--oya-danger, #ef4444);">*</span>
+              </label>
+              <div class="receipt-dropzone" id="receiptDropzone" onclick="document.getElementById('id_receipt_file').click()">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--oya-text-muted, #9ca3af); margin-bottom: 0.5rem;">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <div style="font-size: 0.875rem; color: var(--oya-text, #374151); font-weight: 500;">Click to upload receipt</div>
+                <div style="font-size: 0.75rem; color: var(--oya-text-muted, #6b7280);">PDF, JPG, JPEG, PNG (max 10MB)</div>
+                <div id="fileName" style="font-size: 0.75rem; color: var(--oya-success, #10b981); font-weight: 500; margin-top: 0.5rem; display: none;"></div>
+              </div>
+              {{ form.receipt_file }}
+              {% if form.receipt_file.errors %}
+                <div class="invalid-feedback d-block" style="font-size: 0.875rem;">{{ form.receipt_file.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Submit Actions -->
+            <div class="d-flex gap-2 mt-4 pt-2" style="border-top: 1px solid var(--oya-border-light, #f3f4f6);">
+              <button type="submit" class="btn btn-danger" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                {{ action|default:"Save" }}
+              </button>
+              <a href="{% url 'finance:expense_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Amount formatting
+    const amountInput = document.getElementById('id_amount');
+    if (amountInput) {
+      amountInput.addEventListener('input', function() {
+        let val = this.value;
+        val = val.replace(/[^0-9.]/g, '');
+        const parts = val.split('.');
+        if (parts.length > 2) {
+          val = parts[0] + '.' + parts.slice(1).join('');
+        }
+        if (parts[1] && parts[1].length > 2) {
+          val = parts[0] + '.' + parts[1].substring(0, 2);
+        }
+        this.value = val;
+      });
+      amountInput.classList.add('form-control');
+      amountInput.style.borderTopLeftRadius = '0';
+      amountInput.style.borderBottomLeftRadius = '0';
+    }
+
+    // Category styling
+    const categorySelect = document.getElementById('id_category');
+    if (categorySelect) {
+      categorySelect.classList.add('form-select');
+      categorySelect.addEventListener('change', function() {
+        document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+        const card = document.querySelector(`.category-card[data-value="${this.value}"]`);
+        if (card) card.classList.add('active');
+      });
+    }
+
+    // Description styling
+    const descInput = document.getElementById('id_description');
+    if (descInput) {
+      descInput.classList.add('form-control');
+    }
+
+    // Receipt file handling
+    const fileInput = document.getElementById('id_receipt_file');
+    const dropzone = document.getElementById('receiptDropzone');
+    const fileName = document.getElementById('fileName');
+
+    if (fileInput) {
+      fileInput.style.display = 'none';
+      
+      fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          dropzone.classList.add('has-file');
+          fileName.textContent = '✓ ' + this.files[0].name;
+          fileName.style.display = 'block';
+        }
+      });
+
+      // Drag and drop
+      dropzone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+      });
+      dropzone.addEventListener('dragleave', function() {
+        this.classList.remove('dragover');
+      });
+      dropzone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+        fileInput.files = e.dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+      });
+    }
+  });
+</script>
+{% endblock %}

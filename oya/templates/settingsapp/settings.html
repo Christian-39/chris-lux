@@ -1,0 +1,821 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Settings{% endblock %}
+{% block page_title %}System Settings{% endblock %}
+{% block breadcrumb %}Configuration{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>System Settings</h1>
+    <p>Configure OYA Management System preferences and options</p>
+  </div>
+</div>
+
+<!-- Profile Photo Section (for current user) -->
+<div class="card" style="margin-bottom:1.5rem;">
+  <div class="card-header">
+    <div>
+      <div class="card-header-title">My Profile Photo</div>
+      <div class="card-header-subtitle">Update your own profile picture</div>
+    </div>
+  </div>
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data" action="{% url 'accounts:profile_update' %}">
+      {% csrf_token %}
+      <div style="display:flex;align-items:center;gap:1.5rem;">
+        <div class="avatar" style="width:80px;height:80px;font-size:1.5rem;background:var(--oya-primary);color:#fff;overflow:hidden;cursor:pointer;" onclick="openImagePreview('{% if user.photo and user.photo.name %}{{ user.photo.url }}{% elif user_member and user_member.photo and user_member.photo.name %}{{ user_member.photo.url }}{% endif %}', '{{ user.full_name|default:user.serial_number }}')">
+          {% if user.photo and user.photo.name %}
+            <img src="{{ user.photo.url }}" alt="{{ user.full_name }}" style="width:100%;height:100%;object-fit:cover;">
+          {% elif user_member and user_member.photo and user_member.photo.name %}
+            <img src="{{ user_member.photo.url }}" alt="{{ user.full_name }}" style="width:100%;height:100%;object-fit:cover;">
+          {% else %}
+            {{ user.get_full_name|first|upper|default:user.serial_number|first|upper }}
+          {% endif %}
+        </div>
+        <div style="flex:1;">
+          <div class="form-group" style="margin-bottom:0.5rem;">
+            <label class="form-label">Upload New Photo</label>
+            <input type="file" name="photo" accept="image/*" class="form-control" id="id_photo">
+            <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-top:0.25rem;">Supported formats: JPG, PNG, GIF. Max size: 5MB.</div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Update Photo
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<form method="post" action="{% url "settingsapp:settings" %}" id="settingsForm">
+  {% csrf_token %}
+
+  <!-- Tabs -->
+  <div class="tabs-wrapper">
+    <div class="tabs">
+      <button type="button" class="tab-btn active" data-tab="tab-system">System Config</button>
+      <button type="button" class="tab-btn" data-tab="tab-users">Users & Access</button>
+      <button type="button" class="tab-btn" data-tab="tab-members">Members</button>
+      <button type="button" class="tab-btn" data-tab="tab-clans">Clans</button>
+      <button type="button" class="tab-btn" data-tab="tab-finance">Finance & Theme</button>
+    </div>
+
+    <!-- System Config Tab -->
+    <div class="tab-content active" id="tab-system">
+      <div class="card" style="margin-top:0;">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Organization Information</div>
+            <div class="card-header-subtitle">Basic details about Okpo Youths Association</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div class="form-group">
+              <label for="{{ form.association_name.id_for_label }}" class="form-label">Organization Name</label>
+              {{ form.association_name }}
+              {% if form.association_name.errors %}
+                <div class="form-error">{{ form.association_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label class="form-label">Short Name (Abbreviation)</label>
+              <input type="text" class="form-control" value="OYA" readonly style="background:var(--oya-bg);cursor:not-allowed;">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="{{ form.motto.id_for_label }}" class="form-label">Motto</label>
+            {{ form.motto }}
+            {% if form.motto.errors %}
+              <div class="form-error">{{ form.motto.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:1.25rem;">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">System Configuration</div>
+            <div class="card-header-subtitle">Core system behavior settings</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="settings-row">
+            <div class="settings-info">
+              <h4>Auto-Generate Member IDs</h4>
+              <p>Automatically assign sequential member IDs on registration</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" checked disabled>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div class="settings-info">
+              <h4>Require Approval for New Members</h4>
+              <p>New registrations need executive approval before activation</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" disabled>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div class="settings-info">
+              <h4>Enable SMS Notifications</h4>
+              <p>Send SMS alerts for important announcements and reminders</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" checked disabled>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div class="settings-info">
+              <h4>Email Notifications</h4>
+              <p>Send email notifications for system events and updates</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" checked disabled>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div class="settings-info">
+              <h4>Session Timeout (minutes)</h4>
+              <p>Automatically log out inactive users after specified time</p>
+            </div>
+            <input type="number" class="form-control" value="30" style="width:80px;text-align:center;" disabled>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users & Access Tab -->
+    <div class="tab-content" id="tab-users">
+      <div class="card" style="margin-top:0;">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">User Management</div>
+            <div class="card-header-subtitle">All system users and their access levels</div>
+          </div>
+          {% if user.is_staff %}
+          <a href="{% url "accounts:user_list" %}" class="btn btn-primary btn-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Manage Users
+          </a>
+          {% endif %}
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Serial Number</th>
+                  <th>Role</th>
+                  <th>Last Login</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for u in all_users %}
+                <tr>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                      <div class="avatar avatar-sm" style="background:var(--oya-primary);color:#fff;overflow:hidden;cursor:pointer;" onclick="openImagePreview('{% if u.photo and u.photo.name %}{{ u.photo.url }}{% elif u.member and u.member.photo and u.member.photo.name %}{{ u.member.photo.url }}{% endif %}', '{{ u.full_name|default:u.serial_number }}')">
+                        {% if u.photo and u.photo.name %}
+                          <img src="{{ u.photo.url }}" alt="{{ u.full_name }}" style="width:100%;height:100%;object-fit:cover;">
+                        {% elif u.member and u.member.photo and u.member.photo.name %}
+                          <img src="{{ u.member.photo.url }}" alt="{{ u.full_name }}" style="width:100%;height:100%;object-fit:cover;">
+                        {% else %}
+                          {{ u.get_initials|default:u.serial_number|first }}
+                        {% endif %}
+                      </div>
+                      <span class="cell-name">{{ u.full_name|default:"No Name" }}</span>
+                    </div>
+                  </td>
+                  <td class="cell-muted">{{ u.serial_number }}</td>
+                  <td><span class="badge badge-{% if u.role == "ADMIN" %}danger{% elif u.role == "EXECUTIVE" %}primary{% elif u.role == "FLOOR_MEMBER" %}success{% else %}secondary{% endif %}">{{ u.get_role_display|default:u.role }}</span></td>
+                  <td class="cell-muted">{{ u.last_login|default:"Never"|date:"M j, Y h:i A" }}</td>
+                  <td><span class="badge badge-{% if u.is_active %}success{% else %}danger{% endif %}">{% if u.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+                  <td>
+                    <div class="table-actions">
+                      <a href="{% url "accounts:user_update" u.id %}" class="table-action-btn" title="Edit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" style="text-align:center;padding:2rem;color:var(--oya-text-muted);">No users found.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Members Tab -->
+    <div class="tab-content" id="tab-members">
+      <div class="card" style="margin-top:0;">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Member Management</div>
+            <div class="card-header-subtitle">All OYA members and their status</div>
+          </div>
+          <div style="display:flex;gap:0.75rem;align-items:center;">
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+              <span class="badge badge-success">{{ member_stats.active }} Active</span>
+              <span class="badge badge-warning">{{ member_stats.past }} Past</span>
+              <span class="badge badge-danger">{{ member_stats.removed }} Removed</span>
+              <span class="badge badge-secondary">{{ member_stats.total }} Total</span>
+            </div>
+            {% if user.is_staff %}
+            <a href="{% url "members:member_create" %}" class="btn btn-primary btn-sm">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Member
+            </a>
+            {% endif %}
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Serial</th>
+                  <th>Clan</th>
+                  <th>Age</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for member in all_members %}
+                <tr>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                      <div class="avatar avatar-sm" style="background:var(--oya-accent);color:#fff;overflow:hidden;cursor:pointer;" onclick="openImagePreview('{% if member.photo and member.photo.name %}{{ member.photo.url }}{% endif %}', '{{ member.full_name }}')">
+                        {% if member.photo and member.photo.name %}
+                          <img src="{{ member.photo.url }}" alt="{{ member.full_name }}" style="width:100%;height:100%;object-fit:cover;">
+                        {% else %}
+                          {{ member.full_name|first }}
+                        {% endif %}
+                      </div>
+                      <span class="cell-name">{{ member.full_name }}</span>
+                    </div>
+                  </td>
+                  <td class="cell-muted">{{ member.serial_number }}</td>
+                  <td><span class="badge badge-info">{{ member.umu_nna_clan.name|default:"No Clan" }}</span></td>
+                  <td class="cell-muted">{{ member.age }}</td>
+                  <td><span class="badge badge-{% if member.status == "ACTIVE" %}success{% elif member.status == "PAST_MEMBER" %}warning{% elif member.status == "REMOVED" %}danger{% else %}secondary{% endif %}">{{ member.get_status_display|default:member.status }}</span></td>
+                  <td>
+                    <div class="table-actions">
+                      <a href="{% url "members:member_detail" member.pk %}" class="table-action-btn" title="View">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                      </a>
+                      {% if user.is_staff %}
+                      <a href="{% url "members:member_update" member.pk %}" class="table-action-btn" title="Edit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      </a>
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" style="text-align:center;padding:2rem;color:var(--oya-text-muted);">No members found.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clans Tab -->
+    <div class="tab-content" id="tab-clans">
+      <div class="card" style="margin-top:0;">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Umu Nna Clans</div>
+            <div class="card-header-subtitle">Manage clan groups and view member distribution</div>
+          </div>
+          {% if user.is_staff %}
+          <button type="button" class="btn btn-primary btn-sm" onclick="openClanModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Clan
+          </button>
+          {% endif %}
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-container">
+            <table class="data-table" id="clansTable">
+              <thead>
+                <tr>
+                  <th style="width:50px;">#</th>
+                  <th>Clan Name</th>
+                  <th style="width:100px;">Members</th>
+                  <th style="width:80px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="clansTableBody">
+                {% for clan in clans %}
+                <tr data-clan-id="{{ clan.id }}">
+                  <td class="cell-muted">{{ forloop.counter }}</td>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                      <div class="avatar avatar-sm" style="background:{% cycle 'var(--oya-primary)' 'var(--oya-accent)' 'var(--oya-success)' 'var(--oya-warning)' 'var(--oya-danger)' 'var(--oya-info)' %};color:#fff;">
+                        {{ clan.name|first|upper }}
+                      </div>
+                      <span class="cell-name clan-name-text">{{ clan.name }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge badge-info">{{ clan.member_count|default:0 }}</span>
+                  </td>
+                  <td>
+                    <div class="table-actions">
+                      <a href="{% url 'members:member_list' %}?clan={{ clan.id }}" class="table-action-btn" title="View Members">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr id="noClansRow">
+                  <td colspan="4" style="text-align:center;padding:2rem;color:var(--oya-text-muted);">
+                    No clans found. Click "Add Clan" to create one.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Finance & Theme Tab -->
+    <div class="tab-content" id="tab-finance">
+      <!-- Theme Switcher -->
+      <div class="card" style="margin-top:0;">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Appearance</div>
+            <div class="card-header-subtitle">Choose your preferred theme mode</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="theme-options">
+            <label class="theme-card {% if settings.theme_mode == "LIGHT" %}active{% endif %}" data-theme-option="light">
+              <div class="theme-preview theme-preview-light"></div>
+              <div class="theme-label">Light</div>
+              <input type="radio" name="theme_mode" value="LIGHT" {% if settings.theme_mode == "LIGHT" %}checked{% endif %} style="display:none;">
+            </label>
+            <label class="theme-card {% if settings.theme_mode == "DARK" %}active{% endif %}" data-theme-option="dark">
+              <div class="theme-preview theme-preview-dark"></div>
+              <div class="theme-label">Dark</div>
+              <input type="radio" name="theme_mode" value="DARK" {% if settings.theme_mode == "DARK" %}checked{% endif %} style="display:none;">
+            </label>
+            <label class="theme-card {% if settings.theme_mode == "AUTO" %}active{% endif %}" data-theme-option="system">
+              <div class="theme-preview theme-preview-system"></div>
+              <div class="theme-label">System</div>
+              <input type="radio" name="theme_mode" value="AUTO" {% if settings.theme_mode == "AUTO" %}checked{% endif %} style="display:none;">
+            </label>
+          </div>
+          {% if form.theme_mode.errors %}
+            <div class="form-error" style="margin-top:0.5rem;">{{ form.theme_mode.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Live Preview Card -->
+      <div class="card" style="margin-top:1.25rem;">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Preview</div>
+            <div class="card-header-subtitle">How cards and components look with selected colors</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="dashboard-grid dashboard-grid-3">
+            <div class="kpi-card" style="margin:0;">
+              <div class="kpi-header">
+                <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+                <span class="kpi-badge up">+12%</span>
+              </div>
+              <div class="kpi-value">342</div>
+              <div class="kpi-label">Active Members</div>
+            </div>
+            <div class="kpi-card accent-success" style="margin:0;">
+              <div class="kpi-header">
+                <div class="kpi-icon" style="background:var(--oya-success-bg);color:var(--oya-success);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+              </div>
+              <div class="kpi-value" style="color:var(--oya-success);">&#x20A6;2.45M</div>
+              <div class="kpi-label">Treasury Balance</div>
+            </div>
+            <div class="kpi-card accent-gold" style="margin:0;">
+              <div class="kpi-header">
+                <div class="kpi-icon" style="background:var(--oya-accent-50);color:var(--oya-accent-dark);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></svg></div>
+              </div>
+              <div class="kpi-value" style="color:var(--oya-accent-dark);">7</div>
+              <div class="kpi-label">Projects</div>
+            </div>
+          </div>
+          <div style="margin-top:1.25rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+            <button class="btn btn-primary" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Primary</button>
+            <button class="btn btn-success" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Success</button>
+            <button class="btn btn-danger" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Danger</button>
+            <button class="btn btn-warning" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Warning</button>
+            <span class="badge badge-success">Badge</span>
+            <span class="badge badge-primary">Primary</span>
+            <span class="badge badge-accent">Accent</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Financial Settings -->
+      <div class="card" style="margin-top:1.25rem;">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Financial Settings</div>
+            <div class="card-header-subtitle">Configure default amounts and payment options</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div class="form-group">
+              <label for="{{ form.yearly_dues.id_for_label }}" class="form-label">Annual Membership Dues (&#x20A6;)</label>
+              {{ form.yearly_dues }}
+              <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-top:0.25rem;">Standard annual dues for all active members</div>
+              {% if form.yearly_dues.errors %}
+                <div class="form-error">{{ form.yearly_dues.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="{{ form.minimum_age.id_for_label }}" class="form-label">Minimum Member Age</label>
+              {{ form.minimum_age }}
+              <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-top:0.25rem;">Minimum age required for membership</div>
+              {% if form.minimum_age.errors %}
+                <div class="form-error">{{ form.minimum_age.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label for="{{ form.past_member_age.id_for_label }}" class="form-label">Past Member Age</label>
+            {{ form.past_member_age }}
+            <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-top:0.25rem;">Age at which members become past members</div>
+            {% if form.past_member_age.errors %}
+              <div class="form-error">{{ form.past_member_age.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0;">
+            <div class="form-group">
+              <label for="{{ form.primary_color.id_for_label }}" class="form-label">Primary Color</label>
+              <div style="display:flex;align-items:center;gap:0.75rem;">
+                {{ form.primary_color }}
+                <span style="font-size:0.75rem;color:var(--oya-text-muted);">Used for headers, buttons, and primary actions</span>
+              </div>
+              {% if form.primary_color.errors %}
+                <div class="form-error">{{ form.primary_color.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="{{ form.accent_color.id_for_label }}" class="form-label">Accent Color</label>
+              <div style="display:flex;align-items:center;gap:0.75rem;">
+                {{ form.accent_color }}
+                <span style="font-size:0.75rem;color:var(--oya-text-muted);">Used for highlights, badges, and special elements</span>
+              </div>
+              {% if form.accent_color.errors %}
+                <div class="form-error">{{ form.accent_color.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if user.is_staff %}
+  <!-- Save Button -->
+  <div style="margin-top:1.5rem;display:flex;justify-content:flex-end;gap:0.75rem;">
+    <button type="button" class="btn btn-secondary" onclick="window.location.reload()">Reset</button>
+    <button type="submit" class="btn btn-primary btn-lg">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      Save All Changes
+    </button>
+  </div>
+  {% endif %}
+</form>
+
+<!-- Add Clan Modal -->
+<div id="clanModal" class="modal" style="display:none;">
+  <div class="modal-overlay" onclick="closeClanModal()"></div>
+  <div class="modal-content" style="max-width:500px;">
+    <div class="modal-header">
+      <h3 style="font-size:1.125rem;font-weight:700;">Add New Clan</h3>
+      <button type="button" class="modal-close" onclick="closeClanModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="clanForm" method="post" action="{% url 'members:clan_create' %}">
+        {% csrf_token %}
+        <div class="form-group" style="margin-bottom:1.5rem;">
+          <label for="clanName" class="form-label">Clan Name <span style="color:var(--oya-danger);">*</span></label>
+          <input type="text" id="clanName" name="name" class="form-control" 
+                 placeholder="Enter clan name (e.g., Umu Onoja)" 
+                 maxlength="100" required autofocus>
+          <div id="clanError" class="form-error" style="display:none;margin-top:0.5rem;"></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeClanModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="clanSubmitBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Add Clan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Tab Styles */
+.tabs-wrapper { margin-top: 1.5rem; }
+.tabs { display: flex; gap: 0.25rem; border-bottom: 2px solid var(--oya-border); margin-bottom: 1.5rem; }
+.tab-btn { padding: 0.75rem 1.25rem; border: none; background: none; color: var(--oya-text-muted); font-weight: 600; font-size: 0.875rem; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+.tab-btn:hover { color: var(--oya-text-primary); }
+.tab-btn.active { color: var(--oya-primary); border-bottom-color: var(--oya-primary); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Theme Options */
+.theme-options { display: flex; gap: 1rem; }
+.theme-card { border: 2px solid var(--oya-border); border-radius: 12px; padding: 1rem; cursor: pointer; text-align: center; transition: all 0.2s; min-width: 120px; }
+.theme-card:hover { border-color: var(--oya-primary); }
+.theme-card.active { border-color: var(--oya-primary); background: var(--oya-primary-bg); }
+.theme-preview { width: 80px; height: 60px; border-radius: 8px; margin: 0 auto 0.5rem; border: 1px solid var(--oya-border); }
+.theme-preview-light { background: #f8fafc; }
+.theme-preview-dark { background: #1e293b; }
+.theme-preview-system { background: linear-gradient(135deg, #f8fafc 50%, #1e293b 50%); }
+.theme-label { font-size: 0.875rem; font-weight: 500; color: var(--oya-text-primary); }
+
+/* Settings Row */
+.settings-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--oya-border); }
+.settings-row:last-child { border-bottom: none; }
+.settings-info h4 { margin: 0 0 0.25rem; font-size: 0.9375rem; font-weight: 600; color: var(--oya-text-primary); }
+.settings-info p { margin: 0; font-size: 0.8125rem; color: var(--oya-text-secondary); }
+
+/* Toggle Switch */
+.toggle { position: relative; display: inline-block; width: 48px; height: 26px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; cursor: pointer; inset: 0; background: var(--oya-border); border-radius: 26px; transition: 0.3s; }
+.toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.toggle input:checked + .toggle-slider { background: var(--oya-primary); }
+.toggle input:checked + .toggle-slider:before { transform: translateX(22px); }
+.toggle input:disabled + .toggle-slider { opacity: 0.5; cursor: not-allowed; }
+
+/* Color Input */
+input[type="color"].form-control { width: 60px; height: 40px; padding: 2px; cursor: pointer; border-radius: var(--oya-radius-md); }
+
+/* Modal Styles */
+.modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+.modal-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+.modal-content { position: relative; background: var(--oya-bg-card); border-radius: var(--oya-radius-lg); box-shadow: var(--oya-shadow-lg); width: 100%; max-width: 500px; animation: modalSlideIn 0.2s ease-out; }
+@keyframes modalSlideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--oya-border); }
+.modal-close { background: none; border: none; cursor: pointer; color: var(--oya-text-muted); padding: 0.25rem; border-radius: var(--oya-radius-sm); transition: all 0.2s; }
+.modal-close:hover { background: var(--oya-bg); color: var(--oya-text-primary); }
+.modal-body { padding: 1.5rem; }
+
+/* Loading State */
+#clanSubmitBtn.loading { opacity: 0.7; pointer-events: none; }
+#clanSubmitBtn.loading svg { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* New Row Highlight */
+@keyframes highlightRow { 0% { background: var(--oya-success-bg); } 100% { background: transparent; } }
+
+
+/* ─── Responsive Settings Styles ─── */
+@media (max-width: 768px) {
+  .tabs { flex-wrap: wrap; gap: 0.15rem; }
+  .tab-btn { padding: 0.5rem 0.75rem; font-size: 0.8125rem; }
+  .theme-options { flex-wrap: wrap; justify-content: center; }
+  .theme-card { min-width: 100px; padding: 0.75rem; }
+  .theme-preview { width: 60px; height: 48px; }
+  .settings-row { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+  .settings-info h4 { font-size: 0.875rem; }
+  .settings-info p { font-size: 0.75rem; }
+  .form-row { grid-template-columns: 1fr !important; gap: 0; }
+  .card-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+  .card-header .btn { width: 100%; justify-content: center; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.625rem 0.75rem; font-size: 0.8125rem; }
+  .table-actions { gap: 0.15rem; }
+  .table-action-btn { width: 28px; height: 28px; }
+  .avatar { width: 36px; height: 36px; font-size: 0.75rem; }
+  .modal-content { margin: 0.5rem; max-width: calc(100vw - 1rem); }
+  .modal-header, .modal-body { padding: 1rem; }
+  .dashboard-grid-3 { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 480px) {
+  .tab-btn { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
+  .theme-card { min-width: 80px; padding: 0.5rem; }
+  .theme-preview { width: 50px; height: 40px; }
+  .theme-label { font-size: 0.75rem; }
+  .settings-info h4 { font-size: 0.8125rem; }
+  .settings-info p { font-size: 0.6875rem; }
+  .toggle { width: 42px; height: 24px; }
+  .toggle-slider::before { width: 18px; height: 18px; }
+  .card-header-title { font-size: 0.9375rem; }
+  .card-header-subtitle { font-size: 0.75rem; }
+  .badge { padding: 0.25rem 0.5rem; font-size: 0.6875rem; }
+  .data-table { font-size: 0.75rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.5rem 0.625rem; }
+  .cell-name { font-size: 0.8125rem; }
+  .cell-muted { font-size: 0.75rem; }
+  .form-control { padding: 0.5rem 0.75rem; font-size: 0.8125rem; }
+  .btn { padding: 0.5rem 1rem; font-size: 0.8125rem; }
+  .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.75rem; }
+  .kpi-value { font-size: 1.25rem !important; }
+  .kpi-label { font-size: 0.8125rem !important; }
+  .kpi-icon { width: 40px !important; height: 40px !important; }
+  .kpi-icon svg { width: 20px !important; height: 20px !important; }
+  .modal-header h3 { font-size: 1rem; }
+  .page-header-left h1 { font-size: 1.25rem !important; }
+  .page-header-left p { font-size: 0.8125rem !important; }
+  .form-label { font-size: 0.8125rem; }
+  input[type="color"].form-control { width: 50px; height: 36px; }
+  .table-container { border-radius: var(--oya-radius-md); }
+}
+
+@media (max-width: 360px) {
+  .tab-btn { padding: 0.35rem 0.5rem; font-size: 0.6875rem; }
+  .theme-card { min-width: 70px; padding: 0.4rem; }
+  .theme-preview { width: 44px; height: 36px; }
+  .theme-label { font-size: 0.6875rem; }
+  .settings-info h4 { font-size: 0.75rem; }
+  .settings-info p { font-size: 0.625rem; }
+  .card-header-title { font-size: 0.875rem; }
+  .card-header-subtitle { font-size: 0.6875rem; }
+  .data-table { font-size: 0.6875rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.4rem 0.5rem; }
+  .badge { padding: 0.2rem 0.4rem; font-size: 0.625rem; }
+  .page-header-left h1 { font-size: 1.125rem !important; }
+  .page-header-left p { font-size: 0.75rem !important; }
+  .btn { padding: 0.375rem 0.75rem; font-size: 0.75rem; }
+  .form-control { padding: 0.375rem 0.625rem; font-size: 0.75rem; }
+  .kpi-value { font-size: 1.125rem !important; }
+  .kpi-label { font-size: 0.75rem !important; }
+}
+</style>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// Theme card selection
+document.querySelectorAll('.theme-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    card.querySelector('input[type="radio"]').checked = true;
+  });
+});
+
+// Clan Modal
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('clanModal');
+  const form = document.getElementById('clanForm');
+  const nameInput = document.getElementById('clanName');
+  const errorDiv = document.getElementById('clanError');
+  const submitBtn = document.getElementById('clanSubmitBtn');
+
+  window.openClanModal = function() {
+    modal.style.display = 'flex';
+    nameInput.value = '';
+    errorDiv.style.display = 'none';
+    nameInput.style.borderColor = '';
+    nameInput.focus();
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeClanModal = function() {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  };
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal.style.display === 'flex') {
+      closeClanModal();
+    }
+  });
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const name = nameInput.value.trim();
+    if (!name) {
+      showError('Clan name is required.');
+      return;
+    }
+
+    submitBtn.classList.add('loading');
+    const originalHtml = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Adding...';
+
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => {
+      if (response.ok) return response.json().catch(() => ({ success: true }));
+      throw new Error('Failed to create clan');
+    })
+    .then(data => {
+      if (data.success !== false) {
+        addClanToTable(name, data.id, data.member_count || 0);
+        closeClanModal();
+      } else {
+        showError(data.error || 'Failed to create clan.');
+      }
+    })
+    .catch(error => {
+      showError(error.message || 'An error occurred. Please try again.');
+    })
+    .finally(() => {
+      submitBtn.classList.remove('loading');
+      submitBtn.innerHTML = originalHtml;
+    });
+  });
+
+  function showError(msg) {
+    errorDiv.textContent = msg;
+    errorDiv.style.display = 'flex';
+    nameInput.style.borderColor = 'var(--oya-danger)';
+  }
+
+  function addClanToTable(name, id, memberCount) {
+    const tbody = document.getElementById('clansTableBody');
+    const noClansRow = document.getElementById('noClansRow');
+
+    if (noClansRow) noClansRow.remove();
+
+    const rowCount = tbody.querySelectorAll('tr').length + 1;
+    const colors = ['var(--oya-primary)', 'var(--oya-accent)', 'var(--oya-success)', 'var(--oya-warning)', 'var(--oya-danger)', 'var(--oya-info)'];
+    const color = colors[(rowCount - 1) % colors.length];
+
+    const newRow = document.createElement('tr');
+    newRow.setAttribute('data-clan-id', id || '');
+    newRow.innerHTML = `
+      <td class="cell-muted">${rowCount}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div class="avatar avatar-sm" style="background:${color};color:#fff;">${name.charAt(0).toUpperCase()}</div>
+          <span class="cell-name clan-name-text">${name}</span>
+        </div>
+      </td>
+      <td><span class="badge badge-info">${memberCount}</span></td>
+      <td>
+        <div class="table-actions">
+          <a href="/members/?clan=${id || ''}" class="table-action-btn" title="View Members">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </a>
+        </div>
+      </td>
+    `;
+
+    tbody.appendChild(newRow);
+    newRow.style.animation = 'highlightRow 1s ease-out';
+  }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Expense Records{% endblock %}
+{% block page_title %}Expense Records{% endblock %}
+{% block breadcrumb %}Finance / Expenses{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 style="font-size:clamp(1.125rem,3vw,1.5rem);">Expense Records</h1>
+    <p>Track and manage all organizational expenditures</p>
+  </div>
+  <div class="page-header-actions">
+    <button class="btn btn-secondary" data-export="expenseTable">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export
+    </button>
+    {% if user.is_staff %}
+    <a href="{% url 'finance:expense_create' %}" class="btn btn-danger">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Record Expense
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="dashboard-grid dashboard-grid-4" style="margin-bottom:1.5rem;">
+  <div class="kpi-card accent-danger">
+    <div class="kpi-header">
+      <div class="kpi-icon" style="background:var(--oya-danger-bg);color:var(--oya-danger);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg></div>
+    </div>
+    <div class="kpi-value" style="color:var(--oya-danger);font-size:clamp(1.25rem,4vw,1.75rem);">&#x20A6;{{ total_expenses|floatformat:0|intcomma }}</div>
+    <div class="kpi-label">Total Expenses YTD</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+    </div>
+    <div class="kpi-value" style="font-size:clamp(1.25rem,4vw,1.75rem);">&#x20A6;{{ this_month_expenses|floatformat:0|intcomma }}</div>
+    <div class="kpi-label">This Month</div>
+  </div>
+  <div class="kpi-card accent-warning">
+    <div class="kpi-header">
+      <div class="kpi-icon" style="background:var(--oya-warning-bg);color:var(--oya-warning);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+    </div>
+    <div class="kpi-value" style="color:var(--oya-warning);font-size:clamp(1.25rem,4vw,1.75rem);">{{ total_records }}</div>
+    <div class="kpi-label">Transactions</div>
+  </div>
+  <div class="kpi-card accent-success">
+    <div class="kpi-header">
+      <div class="kpi-icon" style="background:var(--oya-success-bg);color:var(--oya-success);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+    </div>
+    <div class="kpi-value" style="color:var(--oya-success);font-size:clamp(1.25rem,4vw,1.75rem);">&#x20A6;{{ treasury_balance|floatformat:0|intcomma }}</div>
+    <div class="kpi-label">Net Balance</div>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-bar">
+  <form method="get" style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+    <div class="filter-group">
+      <span class="filter-label">Category:</span>
+      <select name="category" class="form-control" style="width:160px;" onchange="this.form.submit()">
+        <option value="" {% if not category_filter %}selected{% endif %}>All Categories</option>
+        {% for value, label in category_choices %}
+          <option value="{{ value }}" {% if category_filter == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">From:</span>
+      <input type="date" name="date_from" class="form-control" style="width:140px;" value="{{ date_from|default:'' }}">
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">To:</span>
+      <input type="date" name="date_to" class="form-control" style="width:140px;" value="{{ date_to|default:'' }}">
+    </div>
+    <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+    {% if category_filter or date_from or date_to %}
+      <a href="{% url 'finance:expense_list' %}" class="btn btn-sm btn-ghost">Clear</a>
+    {% endif %}
+  </form>
+  <div style="margin-left:auto;font-size:0.875rem;color:var(--oya-text-secondary);">
+    <strong style="color:var(--oya-text-primary);">{{ total_records }}</strong> records
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+  <div class="table-toolbar">
+    <div class="toolbar-search">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <form method="get" style="width:100%;">
+        <input type="text" name="search" placeholder="Search expenses..." 
+               value="{{ search_term }}" data-search-table="expenseTable"
+               onkeydown="if(event.key==='Enter') this.form.submit()">
+        {% if category_filter %}
+          <input type="hidden" name="category" value="{{ category_filter }}">
+        {% endif %}
+        {% if date_from %}
+          <input type="hidden" name="date_from" value="{{ date_from }}">
+        {% endif %}
+        {% if date_to %}
+          <input type="hidden" name="date_to" value="{{ date_to }}">
+        {% endif %}
+      </form>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table" id="expenseTable" data-sortable>
+      <thead>
+        <tr>
+          <th style="width:40px;"><input type="checkbox" class="form-check-input" id="selectAll"></th>
+          <th data-sort="text">Date</th>
+          <th data-sort="text">Description</th>
+          <th data-sort="text">Category</th>
+          <th data-sort="text">Recorded By</th>
+          <th data-sort="number">Amount</th>
+          <th style="width:80px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for expense in expenses %}
+        <tr>
+          <td><input type="checkbox" class="form-check-input row-checkbox" value="{{ expense.pk }}"></td>
+          <td class="cell-muted">{{ expense.created_at|date:"M d, Y" }}</td>
+          <td><span class="cell-name">{{ expense.description }}</span></td>
+          <td>
+            {% if expense.category == "ADMINISTRATIVE" %}
+              <span class="badge badge-secondary">Administrative</span>
+            {% elif expense.category == "PROJECT" %}
+              <span class="badge badge-primary">Project</span>
+            {% elif expense.category == "EVENT" %}
+              <span class="badge badge-warning">Event</span>
+            {% elif expense.category == "MAINTENANCE" %}
+              <span class="badge badge-info">Maintenance</span>
+            {% elif expense.category == "SALARY" %}
+              <span class="badge badge-accent">Salary</span>
+            {% elif expense.category == "OTHER" %}
+              <span class="badge badge-secondary">Other</span>
+            {% endif %}
+          </td>
+          <td class="cell-muted">{{ expense.created_by.get_full_name|default:expense.created_by|default:"System" }}</td>
+          <td style="font-weight:600;color:var(--oya-danger);">&#x20A6;{{ expense.amount|floatformat:2|intcomma }}</td>
+          <td>
+            <div class="table-actions">
+              <a href="{% url 'finance:expense_detail' pk=expense.pk %}" class="table-action-btn" title="View">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </a>
+              {% if expense.receipt_file %}
+                <a href="{{ expense.receipt_file.url }}" class="table-action-btn" title="Download Receipt" target="_blank">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" style="text-align:center;padding:3rem;">
+            <div class="empty-state" style="padding:0;">
+              <div class="empty-state-icon" style="width:60px;height:60px;margin-bottom:1rem;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg>
+              </div>
+              <h3 style="font-size:1rem;">No expense records found</h3>
+              <p style="font-size:0.875rem;">
+                {% if search_term or category_filter or date_from or date_to %}
+                  No records match your search/filter criteria.
+                {% else %}
+                  No expenses have been recorded yet. Click "Record Expense" to get started.
+                {% endif %}
+              </p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if expenses.has_other_pages %}
+  <div class="card-footer">
+    <span style="font-size:0.8125rem;color:var(--oya-text-muted);">Showing {{ expenses.start_index }}-{{ expenses.end_index }} of {{ expenses.paginator.count }} records</span>
+    <div class="pagination">
+      {% if expenses.has_previous %}
+        <a href="?page={{ expenses.previous_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" class="page-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </a>
+      {% else %}
+        <button class="page-btn" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      {% endif %}
+
+      {% for num in expenses.paginator.page_range %}
+        {% if expenses.number == num %}
+          <button class="page-btn active">{{ num }}</button>
+        {% elif num > expenses.number|add:'-3' and num < expenses.number|add:'3' %}
+          <a href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" class="page-btn">{{ num }}</a>
+        {% elif num == 1 or num == expenses.paginator.num_pages %}
+          <a href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" class="page-btn">{{ num }}</a>
+        {% elif num == expenses.number|add:'-3' or num == expenses.number|add:'3' %}
+          <span class="page-btn" style="cursor:default;border:none;background:transparent;">...</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if expenses.has_next %}
+        <a href="?page={{ expenses.next_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" class="page-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      {% else %}
+        <button class="page-btn" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

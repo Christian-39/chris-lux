@@ -1,0 +1,1566 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="description" content="OKPO Youths Association Management System - OYA">
+  <title>{% block title %}Dashboard{% endblock %} | OYA</title>
+
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/darkmode.css' %}">
+  <link rel="stylesheet" href="{% static 'css/mobile.css' %}">
+
+  <!-- Theme initialization (prevents flash) -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('oya_theme');
+      const theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+
+  <style>
+    /* ===== 1. COMPACT SEARCH DROPDOWN ===== */
+    .search-dropdown {
+      position: absolute;
+      top: calc(100% + 0.35rem);
+      left: 0;
+      width: 100%;
+      max-width: 320px;
+      max-height: 280px;
+      overflow-y: auto;
+      background: var(--oya-bg-card);
+      border: 1px solid var(--oya-border);
+      border-radius: var(--oya-radius-md, 10px);
+      box-shadow: var(--oya-shadow-lg, 0 10px 15px rgba(15,23,42,0.08));
+      z-index: 9999;
+      font-size: 0.8125rem;
+    }
+    .search-dropdown.hidden { display: none !important; }
+    .search-dropdown:not(.hidden) { display: block !important; }
+    .search-dropdown .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      color: var(--oya-text-primary);
+      text-decoration: none;
+      transition: background 0.15s;
+      cursor: pointer;
+      font-size: 0.8125rem;
+    }
+    .search-dropdown .dropdown-item:hover {
+      background: var(--oya-bg);
+    }
+    .search-dropdown .dropdown-item .avatar {
+      width: 28px;
+      height: 28px;
+      font-size: 0.75rem;
+    }
+    .search-dropdown .dropdown-divider {
+      height: 1px;
+      background: var(--oya-border);
+      margin: 0.25rem 0;
+    }
+    .search-dropdown .dropdown-header {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--oya-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .search-dropdown .dropdown-item strong {
+      color: var(--oya-primary);
+    }
+
+    /* ===== 2. MOBILE RESPONSIVE FIXES ===== */
+    /* Mobile top header */
+    .mobile-top-header {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--oya-bg-card);
+      border-bottom: 1px solid var(--oya-border);
+      z-index: 900;
+      padding: 0 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Mobile logo - larger */
+    .mobile-logo-img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+    .mobile-logo-text {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--oya-primary);
+    }
+
+    /* Mobile hamburger */
+    .mobile-hamburger {
+      background: none;
+      border: none;
+      padding: 0.5rem;
+      cursor: pointer;
+      color: var(--oya-text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .mobile-hamburger svg {
+      pointer-events: none;
+    }
+
+    /* Mobile slide-out sidebar */
+    .mobile-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 280px;
+      max-width: 85vw;
+      background: var(--oya-bg-card);
+      border-right: 1px solid var(--oya-border);
+      z-index: 1000;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+      box-shadow: 4px 0 12px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+    }
+    .mobile-sidebar.open {
+      transform: translateX(0) !important;
+    }
+
+    /* Mobile sidebar overlay */
+    .mobile-sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .mobile-sidebar-overlay.active {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
+    /* Mobile nav link styles */
+    .mobile-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 1rem;
+      text-decoration: none;
+      color: var(--oya-text-primary);
+      font-size: 0.875rem;
+      transition: background 0.15s;
+      border-radius: 0;
+    }
+    .mobile-nav-link:hover {
+      background: var(--oya-bg-hover, rgba(0,0,0,0.05));
+    }
+    .mobile-nav-link.active {
+      background: var(--oya-primary-light, rgba(59,130,246,0.1));
+      color: var(--oya-primary) !important;
+      border-right: 3px solid var(--oya-primary);
+    }
+
+    /* Fixed bottom navbar */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: var(--oya-bg-card);
+      border-top: 1px solid var(--oya-border);
+      z-index: 900;
+      padding: 0 0.5rem;
+    }
+    .mobile-bottom-nav-items {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 100%;
+    }
+    .mobile-bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 0.25rem 0.75rem;
+      color: var(--oya-text-muted);
+      font-size: 0.625rem;
+      font-weight: 500;
+      border-radius: var(--radius-md, 10px);
+      transition: all 0.15s;
+      text-decoration: none;
+    }
+    .mobile-bottom-nav-item svg {
+      width: 22px;
+      height: 22px;
+    }
+    .mobile-bottom-nav-item.active {
+      color: var(--oya-primary);
+    }
+    .mobile-bottom-nav-item:not(.active):hover {
+      color: var(--oya-text-secondary);
+    }
+
+    /* Body scroll lock when sidebar open */
+    body.sidebar-open {
+      overflow: hidden;
+    }
+
+    /* ===== MOBILE MEDIA QUERIES ===== */
+    @media (max-width: 1024px) {
+      .mobile-top-header {
+        display: flex !important;
+      }
+      .main-content {
+        padding-top: 60px !important;
+      }
+      .topbar {
+        display: none !important;
+      }
+      .sidebar {
+        display: none !important;
+      }
+      .main-content {
+        margin-left: 0 !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .mobile-bottom-nav {
+        display: block !important;
+      }
+      .content-area {
+        padding: 1rem;
+        padding-bottom: 80px !important;
+      }
+      .app-footer {
+        padding-bottom: 80px !important;
+      }
+      .hide-mobile {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .mobile-logo-img {
+        width: 38px;
+        height: 38px;
+      }
+      .mobile-logo-text {
+        font-size: 1rem;
+      }
+    }
+
+    /* ===== THEME TOGGLE ICON VISIBILITY ===== */
+    [data-theme="light"] .theme-icon-sun {
+      display: none !important;
+    }
+    [data-theme="light"] .theme-icon-moon {
+      display: block !important;
+    }
+    [data-theme="dark"] .theme-icon-sun {
+      display: block !important;
+    }
+    [data-theme="dark"] .theme-icon-moon {
+      display: none !important;
+    }
+  </style>
+
+  <style>
+    /* Responsive text scaling */
+    html {
+      font-size: clamp(14px, 2.5vw, 16px);
+    }
+
+    /* Prevent horizontal overflow */
+    body {
+      overflow-x: hidden;
+      word-wrap: break-word;
+    }
+
+    /* Responsive images */
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Responsive tables wrapper */
+    .table-responsive-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: var(--radius-lg);
+    }
+
+    /* Fluid typography for headings */
+    h1 { font-size: clamp(1.25rem, 4vw, 1.875rem); }
+    h2 { font-size: clamp(1.125rem, 3.5vw, 1.5rem); }
+    h3 { font-size: clamp(1rem, 3vw, 1.25rem); }
+    h4 { font-size: clamp(0.9375rem, 2.5vw, 1.125rem); }
+    h5 { font-size: clamp(0.875rem, 2vw, 1rem); }
+    h6 { font-size: clamp(0.8125rem, 1.5vw, 0.875rem); }
+
+    /* Responsive page header */
+    .page-header-left h1 {
+      font-size: clamp(1.125rem, 3vw, 1.5rem);
+    }
+
+    .page-header-left p {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    /* Responsive KPI values */
+    .kpi-value {
+      font-size: clamp(1.25rem, 4vw, 1.75rem);
+    }
+
+    /* Responsive card padding */
+    .card-body {
+      padding: clamp(1rem, 3vw, 1.5rem);
+    }
+
+    .card-header {
+      padding: clamp(0.875rem, 2.5vw, 1.25rem) clamp(1rem, 3vw, 1.5rem);
+    }
+
+    /* Responsive form elements */
+    .form-control,
+    .form-select,
+    .form-input {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    /* Responsive buttons */
+    .btn {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    .btn-lg {
+      font-size: clamp(0.875rem, 2.5vw, 1rem);
+    }
+
+    .btn-sm {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    /* Responsive badges */
+    .badge {
+      font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+    }
+
+    /* Responsive table cells */
+    .data-table thead th,
+    .data-table tbody td {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    /* Responsive activity feed */
+    .activity-text {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    .activity-time {
+      font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+    }
+
+    /* Responsive chart containers */
+    .chart-container {
+      height: clamp(200px, 40vw, 280px);
+    }
+
+    .chart-container-sm {
+      height: clamp(160px, 30vw, 200px);
+    }
+
+    /* Responsive pagination */
+    .page-btn {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    /* Responsive filters */
+    .filter-label {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    /* Responsive footer */
+    .app-footer {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    /* Responsive login */
+    .login-card {
+      padding: clamp(1.5rem, 5vw, 2.5rem);
+    }
+
+    .login-header h1 {
+      font-size: clamp(1.125rem, 4vw, 1.5rem);
+    }
+
+    .login-motto {
+      font-size: clamp(0.6875rem, 2vw, 0.75rem);
+    }
+
+    /* Responsive profile */
+    .profile-avatar {
+      width: clamp(56px, 15vw, 80px);
+      height: clamp(56px, 15vw, 80px);
+      font-size: clamp(1.25rem, 4vw, 2rem);
+    }
+
+    /* Responsive detail grid */
+    .detail-grid {
+      grid-template-columns: clamp(100px, 25vw, 120px) 1fr;
+      gap: clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem);
+    }
+
+    .detail-label {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    .detail-value {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    /* Responsive timeline */
+    .timeline {
+      padding-left: clamp(1.5rem, 5vw, 2rem);
+    }
+
+    .timeline-dot {
+      left: clamp(-1.5rem, -5vw, -2rem);
+      width: clamp(12px, 3vw, 16px);
+      height: clamp(12px, 3vw, 16px);
+    }
+
+    .timeline-title {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    .timeline-desc {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    .timeline-time {
+      font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+    }
+
+    /* Responsive meta items */
+    .meta-label {
+      font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+    }
+
+    .meta-value {
+      font-size: clamp(0.875rem, 2vw, 0.9375rem);
+    }
+
+    /* Responsive notification items */
+    .notification-title {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    .notification-desc {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    .notification-time {
+      font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+    }
+
+    /* Responsive settings */
+    .settings-info h4 {
+      font-size: clamp(0.875rem, 2vw, 0.9375rem);
+    }
+
+    .settings-info p {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    /* Responsive empty state */
+    .empty-state h3 {
+      font-size: clamp(0.9375rem, 2.5vw, 1.125rem);
+    }
+
+    .empty-state p {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    /* Responsive card header titles */
+    .card-header-title {
+      font-size: clamp(0.9375rem, 2.5vw, 1rem);
+    }
+
+    .card-header-subtitle {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    /* Responsive chart titles */
+    .chart-card-title {
+      font-size: clamp(0.9375rem, 2.5vw, 1rem);
+    }
+
+    .chart-card-subtitle {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    /* Responsive quick actions */
+    .quick-action-btn {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    /* Responsive directory cards */
+    .directory-info h4 {
+      font-size: clamp(0.875rem, 2vw, 0.9375rem);
+    }
+
+    .directory-info p {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    /* Responsive stat cards */
+    .stat-card-value {
+      font-size: clamp(1.25rem, 3vw, 1.5rem);
+    }
+
+    .stat-card-label {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    /* Responsive tabs */
+    .tab-btn {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    /* Responsive alerts */
+    .alert {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    /* Responsive toasts */
+    .toast {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    /* Responsive modal */
+    .modal-title {
+      font-size: clamp(1rem, 2.5vw, 1.125rem);
+    }
+
+    /* Responsive dropdown */
+    .dropdown-item {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    /* Responsive form labels */
+    .form-label {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    .form-help {
+      font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+    }
+
+    .form-error {
+      font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+    }
+
+    /* Responsive radio labels */
+    .radio-label {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    /* Responsive theme cards */
+    .theme-label {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    /* Responsive search dropdown */
+    .search-dropdown {
+      max-width: min(320px, 95vw);
+    }
+
+    .search-dropdown .dropdown-item {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    .search-dropdown .dropdown-header {
+      font-size: clamp(0.625rem, 1.5vw, 0.6875rem);
+    }
+
+    /* Responsive mobile nav */
+    .mobile-nav-link {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    .mobile-bottom-nav-item {
+      font-size: clamp(0.5625rem, 1.5vw, 0.625rem);
+    }
+
+    /* Responsive mobile header */
+    .mobile-logo-text {
+      font-size: clamp(0.875rem, 2.5vw, 1.15rem);
+    }
+
+    /* Responsive welcome banner */
+    .welcome-banner h2 {
+      font-size: clamp(1rem, 3.5vw, 1.375rem);
+    }
+
+    .welcome-banner p {
+      font-size: clamp(0.8125rem, 2.5vw, 0.9375rem);
+    }
+
+    /* Responsive table toolbar */
+    .table-toolbar {
+      padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
+    }
+
+    /* Responsive toolbar search */
+    .toolbar-search input {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    /* Responsive page header actions */
+    .page-header-actions {
+      gap: clamp(0.5rem, 1.5vw, 0.75rem);
+    }
+
+    /* Responsive content area */
+    .content-area {
+      padding: clamp(0.75rem, 2.5vw, 1.5rem);
+    }
+
+    /* Responsive main content padding top (for mobile header) */
+    @media (max-width: 1024px) {
+      .main-content {
+        padding-top: clamp(48px, 8vw, 60px) !important;
+      }
+    }
+
+    /* Responsive dashboard grids */
+    .dashboard-grid-4 {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    }
+
+    .dashboard-grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    }
+
+    .dashboard-grid-2 {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-grid-4,
+      .dashboard-grid-3,
+      .dashboard-grid-2 {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* Responsive form rows */
+    .form-row {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* Responsive detail meta grid */
+    .detail-meta-grid {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+    }
+
+    @media (max-width: 480px) {
+      .detail-meta-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* Responsive quick actions grid */
+    .quick-actions {
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 120px), 1fr));
+    }
+
+    @media (max-width: 480px) {
+      .quick-actions {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+
+    /* Responsive directory grid */
+    .directory-grid {
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)) !important;
+    }
+
+    @media (max-width: 480px) {
+      .directory-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* Responsive user detail grid */
+    .user-detail-grid {
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 768px) {
+      .user-detail-grid {
+        grid-template-columns: 300px 1fr !important;
+      }
+    }
+
+    /* Responsive org chart */
+    .org-chart-container {
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Responsive finance hero cards */
+    .finance-hero-amount {
+      font-size: clamp(1.75rem, 6vw, 2.75rem);
+    }
+
+    /* Responsive category cards */
+    .category-card {
+      padding: clamp(0.5rem, 2vw, 0.75rem);
+    }
+
+    .category-card div {
+      font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+    }
+
+    /* Responsive receipt dropzone */
+    .receipt-dropzone {
+      padding: clamp(1rem, 4vw, 2rem);
+    }
+
+    .receipt-dropzone div {
+      font-size: clamp(0.75rem, 2vw, 0.875rem);
+    }
+
+    /* Responsive select2 on mobile */
+    @media (max-width: 480px) {
+      .select2-container {
+        width: 100% !important;
+      }
+
+      .select2-selection--single {
+        height: 40px !important;
+      }
+
+      .select2-selection__rendered {
+        line-height: 38px !important;
+        font-size: 0.8125rem !important;
+      }
+
+      .select2-results__option {
+        font-size: 0.8125rem !important;
+        padding: 0.5rem 0.75rem !important;
+      }
+    }
+
+    /* Responsive timeline for income/expense detail */
+    .timeline-item {
+      padding-bottom: clamp(1rem, 3vw, 1.5rem);
+    }
+
+    .timeline-content {
+      padding: clamp(0.625rem, 2vw, 0.875rem) clamp(0.75rem, 2vw, 1rem);
+    }
+
+    /* Responsive badges in detail views */
+    .detail-badge {
+      font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+      padding: clamp(0.25rem, 1vw, 0.375rem) clamp(0.5rem, 1.5vw, 0.75rem);
+    }
+
+    /* Responsive action buttons in detail */
+    .detail-actions {
+      flex-wrap: wrap;
+      gap: clamp(0.5rem, 1.5vw, 0.75rem);
+    }
+
+    /* Responsive progress bars in finance */
+    .progress-fill {
+      border-radius: 3px;
+    }
+
+    .progress-bar-label {
+      font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+    }
+
+    .progress-bar-value {
+      font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+    }
+
+    /* Responsive filters bar */
+    .filters-bar {
+      padding: clamp(0.75rem, 2vw, 1rem) clamp(0.75rem, 2vw, 1.25rem);
+    }
+
+    .filters-bar form {
+      gap: clamp(0.5rem, 1.5vw, 0.75rem);
+    }
+
+    /* Responsive filter controls */
+    .filters-bar .form-control {
+      width: clamp(120px, 30vw, 160px);
+    }
+
+    @media (max-width: 480px) {
+      .filters-bar .form-control {
+        width: 100% !important;
+      }
+
+      .filters-bar form {
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+
+      .filter-group {
+        width: 100% !important;
+      }
+    }
+
+    /* Responsive pagination info text */
+    .pagination-info {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    /* Responsive table action buttons */
+    .table-actions {
+      gap: clamp(0.125rem, 0.5vw, 0.25rem);
+    }
+
+    .table-action-btn {
+      width: clamp(28px, 8vw, 32px);
+      height: clamp(28px, 8vw, 32px);
+    }
+
+    /* Responsive cell name */
+    .cell-name {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    .cell-muted {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    /* Responsive urgent case */
+    .urgent-case-title {
+      font-size: clamp(0.8125rem, 2vw, 0.875rem);
+    }
+
+    .urgent-case-meta {
+      font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+    }
+
+    /* Responsive stat card change */
+    .stat-card-change {
+      font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+    }
+
+    /* Responsive chart legend */
+    .chart-legend {
+      font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+    }
+
+    /* Responsive tooltip text */
+    .chart-tooltip {
+      font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+    }
+
+    /* Responsive export button text */
+    .export-btn-text {
+      display: inline;
+    }
+
+    @media (max-width: 480px) {
+      .export-btn-text {
+        display: none;
+      }
+    }
+
+    /* Smooth scrolling for overflow containers */
+    .table-container,
+    .org-chart-container,
+    .timeline-container {
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+
+    /* Prevent text overflow in tables */
+    .data-table td,
+    .data-table th {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 480px) {
+      .data-table td,
+      .data-table th {
+        max-width: 150px;
+      }
+    }
+
+    /* Responsive truncation for long text */
+    .truncate-mobile {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: min(220px, 50vw);
+    }
+
+    @media (max-width: 480px) {
+      .truncate-mobile {
+        max-width: 150px;
+      }
+    }
+
+    /* Hide scrollbars but keep functionality */
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Responsive focus states for accessibility */
+    @media (hover: none) {
+      .btn:focus,
+      .form-control:focus,
+      .form-select:focus,
+      .topbar-btn:focus,
+      .table-action-btn:focus,
+      .page-btn:focus,
+      .mobile-nav-item:focus,
+      .mobile-bottom-nav-item:focus {
+        outline: 2px solid var(--oya-primary);
+        outline-offset: 2px;
+      }
+    }
+
+    /* Reduce motion for users who prefer it */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{% static 'images/oya_logo.png' %}">
+</head>
+<body class="no-transition">
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- ===== MOBILE TOP HEADER ===== -->
+  <header class="mobile-top-header" id="mobileTopHeader">
+    <!-- Left: Logo (larger) -->
+    <a href="{% url 'dashboard:index' %}" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:var(--oya-text-primary);">
+      <img src="{% static 'images/oya_logo.png' %}" alt="OYA" class="mobile-logo-img">
+      <span class="mobile-logo-text">OYA</span>
+    </a>
+
+    <!-- Right: Hamburger Menu -->
+    <button type="button" class="mobile-hamburger" id="mobileHamburger" aria-label="Open Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- ===== MOBILE SLIDE-OUT SIDEBAR ===== -->
+  <aside id="mobileSidebar" class="mobile-sidebar">
+    <!-- Mobile Sidebar Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;border-bottom:1px solid var(--oya-border);flex-shrink:0;">
+      <a href="{% url 'dashboard:index' %}" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:var(--oya-text-primary);">
+        <img src="{% static 'images/oya_logo.png' %}" alt="OYA" style="width:32px;height:32px;object-fit:contain;">
+        <span style="font-weight:700;font-size:0.95rem;color:var(--oya-primary);">OYA System</span>
+      </a>
+      <button type="button" id="mobileSidebarClose" style="background:none;border:none;padding:0.25rem;cursor:pointer;color:var(--oya-text-muted);display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Profile Section -->
+    <a href="{% url 'accounts:profile' %}" style="display:flex;align-items:center;gap:0.75rem;text-decoration:none;color:var(--oya-text-primary);padding:1rem;border-bottom:1px solid var(--oya-border);flex-shrink:0;">
+      <div class="avatar avatar-sm" style="width:44px;height:44px;background:var(--oya-primary);color:#fff;overflow:hidden;cursor:pointer;border-radius:50%;flex-shrink:0;">
+        {% if user.photo and user.photo.name %}
+          <img src="{{ user.photo.url }}" alt="{{ user.full_name }}" style="width:100%;height:100%;object-fit:cover;">
+        {% elif user_member and user_member.photo and user_member.photo.name %}
+          <img src="{{ user_member.photo.url }}" alt="{{ user.full_name }}" style="width:100%;height:100%;object-fit:cover;">
+        {% else %}
+          <span style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:0.875rem;">
+            {{ user.get_full_name|first|upper|default:user.serial_number|first|upper }}
+          </span>
+        {% endif %}
+      </div>
+      <div style="display:flex;flex-direction:column;min-width:0;">
+        <span style="font-weight:600;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ user.get_full_name|default:user.serial_number }}</span>
+        <span style="font-size:0.75rem;color:var(--oya-text-muted);">{% if user.is_staff %}Administrator{% else %}Member{% endif %}</span>
+      </div>
+    </a>
+
+    <!-- Navigation -->
+    <nav style="padding:0.5rem 0;flex:1;overflow-y:auto;">
+      <!-- Main -->
+      <div style="margin-bottom:0.5rem;">
+        <div style="padding:0.5rem 1rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--oya-text-muted);letter-spacing:0.5px;">Main</div>
+        <a href="{% url 'dashboard:index' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a href="{% url 'members:member_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'member_list' or request.resolver_match.url_name == 'member_detail' %}active{% endif %}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Members
+        </a>
+        <a href="{% url 'executives:executive_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'executive_list' or request.resolver_match.url_name == 'executive_form' %}active{% endif %}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><line x1="12" y1="11" x2="12" y2="11"/><circle cx="12" cy="7" r="4"/></svg>
+          Executives
+        </a>
+      </div>
+
+      <!-- Operations -->
+      <div style="margin-bottom:0.5rem;">
+        <div style="padding:0.5rem 1rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--oya-text-muted);letter-spacing:0.5px;">Operations</div>
+        <a href="{% url 'operations:case_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'case_list' or request.resolver_match.url_name == 'case_detail' %}active{% endif %}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Cases
+        </a>
+        <a href="{% url 'operations:motorcycle_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'motorcycle_list' %}active{% endif %}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>
+          Motorcycles
+        </a>
+        <a href="{% url 'projects:project_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'project_list' or request.resolver_match.url_name == 'project_detail' %}active{% endif %}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          Projects
+        </a>
+      </div>
+
+      <!-- Finance -->
+      <div style="margin-bottom:0.5rem;">
+        <div style="padding:0.5rem 1rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--oya-text-muted);letter-spacing:0.5px;">Finance</div>
+        <a href="{% url 'finance:finance_summary' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'finance_summary' %}active{% endif %}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Finance Overview
+        </a>
+        <a href="{% url 'finance:income_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'income_list' %}active{% endif %}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Income
+        </a>
+        <a href="{% url 'finance:expense_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'expense_list' %}active{% endif %}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+          Expenses
+        </a>
+      </div>
+
+      <!-- Administration -->
+      <div style="margin-bottom:0.5rem;">
+        <div style="padding:0.5rem 1rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--oya-text-muted);letter-spacing:0.5px;">Administration</div>
+        <a href="{% url 'notifications:notification_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'notification_list' %}active{% endif %}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Notifications
+          {% if unread_notification_count > 0 %}
+          <span style="margin-left:auto;background:var(--oya-danger);color:#fff;font-size:0.625rem;font-weight:700;padding:0.15rem 0.4rem;border-radius:10px;">{{ unread_notification_count }}</span>
+          {% endif %}
+        </a>
+        {% if user.is_staff %}
+        <a href="{% url 'auditlogs:auditlog_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'auditlog_list' %}active{% endif %}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Audit Logs
+        </a>
+        <a href="{% url 'settingsapp:settings' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </a>
+        {% endif %}
+      </div>
+    </nav>
+
+    <!-- Footer: Logout -->
+    <div style="padding:1rem;border-top:1px solid var(--oya-border);flex-shrink:0;">
+      <a href="{% url 'accounts:logout' %}" style="display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;text-decoration:none;color:var(--oya-danger);font-size:0.875rem;border-radius:8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- Mobile Sidebar Overlay -->
+  <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay"></div>
+
+  <!-- ===== MOBILE BOTTOM NAVBAR (Fixed) ===== -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <div class="mobile-bottom-nav-items">
+      <a href="{% url 'dashboard:index' %}" class="mobile-bottom-nav-item {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        Home
+      </a>
+      <a href="{% url 'members:member_list' %}" class="mobile-bottom-nav-item {% if request.resolver_match.url_name == 'member_list' or request.resolver_match.url_name == 'member_detail' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Members
+      </a>
+      <a href="{% url 'finance:finance_summary' %}" class="mobile-bottom-nav-item {% if request.resolver_match.url_name == 'finance_summary' or request.resolver_match.url_name == 'income_list' or request.resolver_match.url_name == 'expense_list' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+        Finance
+      </a>
+      <a href="{% url 'notifications:notification_list' %}" class="mobile-bottom-nav-item {% if request.resolver_match.url_name == 'notification_list' %}active{% endif %}">
+        <div style="position:relative;display:inline-block;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          {% if unread_notification_count > 0 %}
+          <span style="position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:var(--oya-danger);color:#fff;font-size:0.5rem;font-weight:700;display:flex;align-items:center;justify-content:center;">{{ unread_notification_count }}</span>
+          {% endif %}
+        </div>
+        Alerts
+      </a>
+      {% if user.is_staff %}
+      <a href="{% url 'settingsapp:settings' %}" class="mobile-bottom-nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        Settings
+      </a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <!-- App Shell -->
+  <div class="app-shell">
+
+    <!-- Sidebar (Desktop) -->
+    {% include 'includes/sidebar.html' %}
+
+    <!-- Sidebar Overlay (Mobile/Tablet) -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+
+      <!-- Topbar -->
+      <header class="topbar">
+        <!-- Left -->
+        <div class="topbar-left">
+          <h2 class="page-title">{% block page_title %}Dashboard{% endblock %}</h2>
+          <nav class="breadcrumb hide-mobile">
+            <a href="{% url 'dashboard:index' %}">Home</a>
+            <svg class="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+            <span>{% block breadcrumb %}Dashboard{% endblock %}</span>
+          </nav>
+        </div>
+
+        <!-- Search -->
+        <div class="topbar-search hide-mobile">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="globalSearch" placeholder="Search members, records, cases..." autocomplete="off">
+          <!-- Compact Search Dropdown -->
+          <div id="searchResults" class="search-dropdown hidden"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="topbar-actions">
+
+          <!-- Theme Toggle (Working) -->
+          <button class="topbar-btn hide-mobile" id="themeToggleBtn" aria-label="Toggle Theme" title="Toggle Theme">
+            <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+            <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+          </button>
+
+          <!-- Notifications -->
+          <a href="{% url 'notifications:notification_list' %}" class="topbar-btn" aria-label="Notifications" title="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            {% if unread_notification_count > 0 %}
+            <span class="badge" id="notificationBadge">{{ unread_notification_count }}</span>
+            {% endif %}
+          </a>
+
+          <!-- Profile -->
+          <div class="dropdown hide-mobile">
+            <button class="topbar-btn dropdown-toggle" aria-label="User Menu" style="width:auto;padding:0 0.5rem;gap:0.5rem;">
+              <div class="avatar avatar-sm" style="background:var(--oya-primary);color:#fff;overflow:hidden;cursor:pointer;">
+                {% if user.photo and user.photo.name %}
+                  <img src="{{ user.photo.url }}" alt="{{ user.full_name }}" 
+                      style="width:100%;height:100%;object-fit:cover;cursor:pointer;" 
+                      onclick="event.stopPropagation(); openImagePreview('{{ user.photo.url }}', '{{ user.full_name|default:user.serial_number }}')">
+                {% elif user_member and user_member.photo and user_member.photo.name %}
+                  <img src="{{ user_member.photo.url }}" alt="{{ user.full_name }}" 
+                      style="width:100%;height:100%;object-fit:cover;cursor:pointer;" 
+                      onclick="event.stopPropagation(); openImagePreview('{{ user_member.photo.url }}', '{{ user.full_name|default:user.serial_number }}')">
+                {% else %}
+                  <span onclick="event.stopPropagation(); openImagePreview('', '{{ user.full_name|default:user.serial_number }}')" 
+                        style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;">
+                    {{ user.get_full_name|first|upper|default:user.serial_number|first|upper }}
+                  </span>
+                {% endif %}
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="dropdown-menu">
+              <a href="{% url 'accounts:profile' %}" class="dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+                My Profile
+              </a>
+              <a href="{% url 'settingsapp:settings' %}" class="dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                Settings
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="{% url 'accounts:logout' %}" class="dropdown-item" style="color:var(--oya-danger);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Sign Out
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <div class="content-area">
+        {% block content %}
+          {% if user.is_authenticated %}
+            {% if user.has_admin_access %}
+              {% include 'dashboard/admin_dashboard.html' %}
+            {% elif user.has_executive_access %}
+              {% include 'dashboard/admin_dashboard.html' %}
+            {% else %}
+              {% include 'dashboard/member_dashboard.html' %}
+            {% endif %}
+          {% else %}
+            <div class="card" style="text-align:center;padding:3rem;">
+              <h2>Welcome to OYA</h2>
+              <p>Please <a href="{% url 'accounts:login' %}" style="color:var(--oya-primary);">sign in</a> to access your dashboard.</p>
+            </div>
+          {% endif %}
+        {% endblock %}
+      </div>
+
+      <!-- Footer -->
+      {% include 'includes/footer.html' %}
+
+    </main>
+
+  </div>
+
+  <!-- Image Preview Modal -->
+  {% include "_image_preview_modal.html" %}
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- App Scripts -->
+  <script src="{% static 'js/theme.js' %}"></script>
+  <script src="{% static 'js/charts.js' %}"></script>
+  <script src="{% static 'js/search.js' %}"></script>
+  <script src="{% static 'js/dashboard.js' %}"></script>
+
+  {% block extra_js %}{% endblock %}
+
+  <script>
+    // ===== THEME TOGGLE (WORKING) =====
+    (function() {
+      const themeToggleBtn = document.getElementById('themeToggleBtn');
+      if (!themeToggleBtn) return;
+
+      function getCurrentTheme() {
+        return document.documentElement.getAttribute('data-theme') || 'light';
+      }
+
+      function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('oya_theme', theme);
+      }
+
+      themeToggleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const current = getCurrentTheme();
+        const next = current === 'dark' ? 'light' : 'dark';
+        setTheme(next);
+      });
+    })();
+
+    // ===== MOBILE SIDEBAR TOGGLE (CLICKABLE) =====
+    (function() {
+      const hamburger = document.getElementById('mobileHamburger');
+      const mobileSidebar = document.getElementById('mobileSidebar');
+      const sidebarOverlay = document.getElementById('mobileSidebarOverlay');
+      const sidebarClose = document.getElementById('mobileSidebarClose');
+      const body = document.body;
+
+      function openSidebar() {
+        if (mobileSidebar) mobileSidebar.classList.add('open');
+        if (sidebarOverlay) sidebarOverlay.classList.add('active');
+        body.classList.add('sidebar-open');
+      }
+
+      function closeSidebar() {
+        if (mobileSidebar) mobileSidebar.classList.remove('open');
+        if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+        body.classList.remove('sidebar-open');
+      }
+
+      if (hamburger) {
+        hamburger.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openSidebar();
+        });
+        hamburger.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          openSidebar();
+        });
+      }
+
+      if (sidebarClose) {
+        sidebarClose.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeSidebar();
+        });
+      }
+
+      if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', function() {
+          closeSidebar();
+        });
+      }
+
+      // Close on link click
+      if (mobileSidebar) {
+        mobileSidebar.querySelectorAll('a').forEach(function(link) {
+          link.addEventListener('click', function() {
+            closeSidebar();
+          });
+        });
+      }
+
+      // Close on click outside
+      document.addEventListener('click', function(e) {
+        if (mobileSidebar && mobileSidebar.classList.contains('open')) {
+          if (!mobileSidebar.contains(e.target) && !hamburger.contains(e.target)) {
+            closeSidebar();
+          }
+        }
+      });
+
+      // Close on Escape
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeSidebar();
+      });
+
+      // Close on resize to desktop
+      window.addEventListener('resize', function() {
+        if (window.innerWidth > 1024) closeSidebar();
+      });
+    })();
+
+    // ===== COMPACT SEARCH =====
+    (function() {
+      const searchInput = document.getElementById('globalSearch');
+      const searchResults = document.getElementById('searchResults');
+      if (!searchInput || !searchResults) return;
+
+      let debounceTimer;
+      let selectedIndex = -1;
+      let resultItems = [];
+
+      searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        selectedIndex = -1;
+        clearTimeout(debounceTimer);
+
+        if (query.length < 2) {
+          searchResults.classList.add('hidden');
+          searchResults.innerHTML = '';
+          return;
+        }
+
+        debounceTimer = setTimeout(() => {
+          fetch(`/search/ajax/?q=${encodeURIComponent(query)}`)
+            .then(r => r.ok ? r.json() : Promise.reject('Search failed'))
+            .then(data => displayResults(data, query))
+            .catch(err => {
+              console.error('Search error:', err);
+              searchResults.innerHTML = '<div class="dropdown-item" style="color:var(--oya-danger);padding:0.75rem;">Search error. Try again.</div>';
+              searchResults.classList.remove('hidden');
+            });
+        }, 300);
+      });
+
+      searchInput.addEventListener('keydown', function(e) {
+        const query = this.value.trim();
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (query.length >= 2) {
+            if (selectedIndex >= 0 && resultItems[selectedIndex]) {
+              window.location.href = resultItems[selectedIndex].href;
+            } else {
+              window.location.href = `/members/?search=${encodeURIComponent(query)}`;
+            }
+          }
+          return;
+        }
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          const items = searchResults.querySelectorAll('.dropdown-item[href]');
+          resultItems = Array.from(items);
+          if (!resultItems.length) return;
+          selectedIndex = e.key === 'ArrowDown'
+            ? Math.min(selectedIndex + 1, resultItems.length - 1)
+            : Math.max(selectedIndex - 1, 0);
+          resultItems.forEach((item, idx) => {
+            item.style.background = idx === selectedIndex ? 'var(--oya-primary-bg, rgba(11,61,145,0.08))' : '';
+            item.style.color = idx === selectedIndex ? 'var(--oya-primary)' : '';
+          });
+          return;
+        }
+        if (e.key === 'Escape') {
+          searchResults.classList.add('hidden');
+          selectedIndex = -1;
+          this.blur();
+        }
+      });
+
+      function displayResults(data, query) {
+        let html = '';
+        if (data.members && data.members.length > 0) {
+          html += '<div class="dropdown-header">Members</div>';
+          data.members.slice(0, 3).forEach(m => {
+            html += `<a href="/members/${m.id}/" class="dropdown-item">
+              <div class="avatar avatar-sm" style="background:var(--oya-primary);color:#fff;">${m.full_name ? m.full_name.charAt(0).toUpperCase() : '?'}</div>
+              <div><div style="font-weight:500;">${m.full_name || 'Unknown'}</div><div style="font-size:0.7rem;color:var(--oya-text-muted);">${m.serial_number || ''}</div></div>
+            </a>`;
+          });
+        }
+        if (data.users && data.users.length > 0) {
+          html += '<div class="dropdown-header">Users</div>';
+          data.users.slice(0, 2).forEach(u => {
+            html += `<a href="/users/${u.id}/" class="dropdown-item">
+              <div class="avatar avatar-sm" style="background:var(--oya-accent);color:#fff;">${u.full_name ? u.full_name.charAt(0).toUpperCase() : '?'}</div>
+              <div><div style="font-weight:500;">${u.full_name || u.serial_number}</div><div style="font-size:0.7rem;color:var(--oya-text-muted);">${u.role || ''}</div></div>
+            </a>`;
+          });
+        }
+        if (data.cases && data.cases.length > 0) {
+          html += '<div class="dropdown-header">Cases</div>';
+          data.cases.slice(0, 2).forEach(c => {
+            html += `<a href="/operations/cases/${c.id}/" class="dropdown-item">
+              <div style="font-weight:500;">${c.title || 'Case #' + c.id}</div>
+            </a>`;
+          });
+        }
+        if (!html) {
+          html = `<div class="dropdown-item" style="color:var(--oya-text-muted);text-align:center;padding:0.75rem;">No results for "<strong>${query}</strong>"</div>`;
+        }
+        html += `<div class="dropdown-divider"></div>
+          <a href="/members/?search=${encodeURIComponent(query)}" class="dropdown-item" style="text-align:center;color:var(--oya-primary);font-weight:500;font-size:0.75rem;">View all results</a>`;
+        searchResults.innerHTML = html;
+        searchResults.classList.remove('hidden');
+        selectedIndex = -1;
+        resultItems = Array.from(searchResults.querySelectorAll('.dropdown-item[href]'));
+      }
+
+      document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+          searchResults.classList.add('hidden');
+          selectedIndex = -1;
+        }
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === '/' && document.activeElement !== searchInput) {
+          e.preventDefault();
+          searchInput.focus();
+        }
+      });
+    })();
+
+    // Remove no-transition class after load
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.body.classList.remove('no-transition');
+      });
+    });
+  </script>
+</body>
+</html>

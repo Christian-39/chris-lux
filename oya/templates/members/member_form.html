@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if member.pk %}Edit Member{% else %}Add Member{% endif %}{% endblock %}
+{% block page_title %}{% if member.pk %}Edit Member{% else %}Add New Member{% endif %}{% endblock %}
+{% block breadcrumb %}{% if member.pk %}Edit{% else %}New{% endif %}{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 style="font-size:clamp(1.125rem, 3vw, 1.5rem);">{% if member.pk %}Edit Member{% else %}Add New Member{% endif %}</h1>
+    <p>{% if member.pk %}Update member information{% else %}Register a new member into the OYA system{% endif %}</p>
+  </div>
+  <div class="page-header-actions" style="flex-wrap:wrap;gap:0.5rem;">
+    <a href="{% url 'members:member_list' %}" class="btn btn-secondary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Cancel
+    </a>
+  </div>
+</div>
+
+{% if generated_pin %}
+<!-- PIN Display Banner (shown once after creation) -->
+<div class="card" style="margin-bottom:1.25rem;border:2px solid var(--oya-success);background:var(--oya-success-bg);">
+  <div class="card-body" style="display:flex;align-items:center;gap:1rem;">
+    <div style="width:clamp(36px, 12vw, 48px);height:clamp(36px, 12vw, 48px);border-radius:50%;background:var(--oya-success);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div>
+      <div style="font-weight:700;color:var(--oya-success);font-size:clamp(0.875rem, 2.5vw, 1rem);">Member Created Successfully!</div>
+      <div style="color:var(--oya-text-primary);margin-top:0.25rem;">
+        Login PIN for <strong>{{ member.full_name }}</strong>: 
+        <span style="font-family:monospace;font-size:clamp(1rem, 3.5vw, 1.25rem);font-weight:700;background:#fff;padding:0.25rem 0.5rem;border-radius:4px;border:1px solid var(--oya-border);letter-spacing:2px;">{{ generated_pin }}</span>
+      </div>
+      <div style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);color:var(--oya-text-muted);margin-top:0.25rem;">
+        Please share this PIN with the member. It will not be displayed again.
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if updated_pin %}
+<!-- PIN Update Banner -->
+<div class="card" style="margin-bottom:1.25rem;border:2px solid var(--oya-warning);background:var(--oya-warning-bg);">
+  <div class="card-body" style="display:flex;align-items:center;gap:1rem;">
+    <div style="width:clamp(36px, 12vw, 48px);height:clamp(36px, 12vw, 48px);border-radius:50%;background:var(--oya-warning);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    </div>
+    <div>
+      <div style="font-weight:700;color:var(--oya-warning);font-size:clamp(0.875rem, 2.5vw, 1rem);">PIN Updated!</div>
+      <div style="color:var(--oya-text-primary);margin-top:0.25rem;">
+        New PIN for <strong>{{ member.full_name }}</strong>: 
+        <span style="font-family:monospace;font-size:clamp(1rem, 3.5vw, 1.25rem);font-weight:700;background:#fff;padding:0.25rem 0.5rem;border-radius:4px;border:1px solid var(--oya-border);letter-spacing:2px;">{{ updated_pin }}</span>
+      </div>
+      <div style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);color:var(--oya-text-muted);margin-top:0.25rem;">
+        Please share this new PIN with the member. It will not be displayed again.
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" style="max-width:min(900px, 100%);">
+  {% csrf_token %}
+
+  <!-- Account Information -->
+  <div class="card" style="margin-bottom:clamp(0.625rem, 2.5vw, 1.25rem);">
+    <div class="card-header">
+      <div class="card-header-title" style="font-size:clamp(0.9375rem, 2.5vw, 1rem);">Account Information</div>
+    </div>
+    <div class="card-body">
+      <div class="form-row" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr));gap:1rem;margin-bottom:1rem;">
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Serial Number <span style="color:var(--oya-danger);">*</span></label>
+          {{ form.serial_number }}
+          <div style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);color:var(--oya-text-muted);margin-top:0.25rem;">Format: OYA-2026-0001. Used for login.</div>
+          {% if form.serial_number.errors %}
+            <div class="form-error">{{ form.serial_number.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">PIN (6 digits) {% if not member.pk %}<span style="color:var(--oya-text-muted);font-weight:400;">(Optional)</span>{% endif %}</label>
+          {{ form.pin }}
+          <div style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);color:var(--oya-text-muted);margin-top:0.25rem;">
+            {% if member.pk %}Leave blank to keep current PIN.{% else %}Leave blank to auto-generate a 6-digit PIN.{% endif %}
+          </div>
+          {% if form.pin.errors %}
+            <div class="form-error">{{ form.pin.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Basic Information -->
+  <div class="card" style="margin-bottom:clamp(0.625rem, 2.5vw, 1.25rem);">
+    <div class="card-header">
+      <div class="card-header-title" style="font-size:clamp(0.9375rem, 2.5vw, 1rem);">Basic Information</div>
+    </div>
+    <div class="card-body">
+
+      <!-- Row 1: Full Name & Age -->
+      <div class="form-row" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr));gap:1rem;margin-bottom:1rem;">
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Full Name <span style="color:var(--oya-danger);">*</span></label>
+          {{ form.full_name }}
+          {% if form.full_name.errors %}
+            <div class="form-error">{{ form.full_name.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Age <span style="color:var(--oya-danger);">*</span></label>
+          {{ form.age }}
+          <div style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);color:var(--oya-text-muted);margin-top:0.25rem;">Must be between 18 and 55 years old</div>
+          {% if form.age.errors %}
+            <div class="form-error">{{ form.age.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Row 2: Phone & Clan -->
+      <div class="form-row" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr));gap:1rem;margin-bottom:1rem;">
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Phone Number</label>
+          {{ form.phone }}
+          {% if form.phone.errors %}
+            <div class="form-error">{{ form.phone.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Umu Nna Clan <span style="color:var(--oya-danger);">*</span></label>
+          {{ form.umu_nna_clan }}
+          {% if form.umu_nna_clan.errors %}
+            <div class="form-error">{{ form.umu_nna_clan.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Row 3: Location Type -->
+      <div class="form-row" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr));gap:1rem;margin-bottom:1rem;">
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Location Type</label>
+          <div style="display:flex;gap:1.5rem;align-items:center;margin-top:0.5rem;">
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:clamp(0.75rem, 2vw, 0.875rem);font-weight:500;">
+              <input type="radio" name="location_type" value="nigeria" id="loc_nigeria" checked style="width:clamp(14px, 4vw, 18px);height:clamp(14px, 4vw, 18px);accent-color:var(--oya-primary);">
+              <span>In Nigeria</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:clamp(0.75rem, 2vw, 0.875rem);font-weight:500;">
+              <input type="radio" name="location_type" value="abroad" id="loc_abroad"
+                     {% if form.is_abroad.value %}checked{% endif %}
+                     style="width:clamp(14px, 4vw, 18px);height:clamp(14px, 4vw, 18px);accent-color:var(--oya-primary);">
+              <span>Abroad</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Status</label>
+          {{ form.status }}
+          {% if form.status.errors %}
+            <div class="form-error">{{ form.status.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Row 4: Nigerian State -->
+      <div class="form-row" id="nigeria_state_row" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr));gap:1rem;margin-bottom:1rem;">
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Nigerian State <span style="color:var(--oya-danger);">*</span></label>
+          {{ form.nigerian_state }}
+          {% if form.nigerian_state.errors %}
+            <div class="form-error">{{ form.nigerian_state.errors.0 }}</div>
+          {% endif %}
+          <div style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);color:var(--oya-text-muted);margin-top:0.25rem;display:flex;align-items:center;gap:0.25rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Type first letter to jump to a state (36 states + FCT)
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 5: Country (Abroad) -->
+      <div class="form-row" id="abroad_country_row" style="display:none;grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr));gap:1rem;margin-bottom:1rem;">
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Country <span style="color:var(--oya-danger);">*</span></label>
+          {{ form.abroad_country }}
+          {% if form.abroad_country.errors %}
+            <div class="form-error">{{ form.abroad_country.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Hidden field for is_abroad -->
+      {{ form.is_abroad }}
+
+      <!-- Row 6: Legacy State/Abroad -->
+      <div class="form-group" style="margin-bottom:clamp(0.5rem, 2vw, 1rem);">
+        <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">State or Abroad (Auto-populated)</label>
+        {{ form.state_or_abroad }}
+        <div style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);color:var(--oya-text-muted);margin-top:0.25rem;">This field is auto-populated from the location selection above.</div>
+        {% if form.state_or_abroad.errors %}
+          <div class="form-error">{{ form.state_or_abroad.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Row 7: Photo -->
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Photo</label>
+        {{ form.photo }}
+        {% if member.photo %}
+          <div style="margin-top:0.5rem;">
+            <img src="{{ member.photo.url }}" alt="Current photo" style="max-width:100px;max-height:100px;border-radius:var(--oya-radius);border:2px solid var(--oya-border);object-fit:cover;">
+          </div>
+        {% endif %}
+        {% if form.photo.errors %}
+          <div class="form-error">{{ form.photo.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Form Actions -->
+  <div style="display:flex;gap:0.75rem;justify-content:flex-end;flex-wrap:wrap;padding:1rem 0;">
+    <a href="{% url 'members:member_list' %}" class="btn btn-secondary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Cancel
+    </a>
+    <button type="submit" class="btn btn-primary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      {% if member.pk %}Save Changes{% else %}Register Member{% endif %}
+    </button>
+  </div>
+
+</form>
+
+<script>
+(function() {
+    // Toggle between Nigeria/Abroad
+    const locNigeria = document.getElementById('loc_nigeria');
+    const locAbroad = document.getElementById('loc_abroad');
+    const nigeriaRow = document.getElementById('nigeria_state_row');
+    const abroadRow = document.getElementById('abroad_country_row');
+    const isAbroadField = document.getElementById('id_is_abroad');
+    const stateSelect = document.getElementById('id_nigerian_state');
+    const countryInput = document.getElementById('id_abroad_country');
+    const stateAbroadInput = document.getElementById('id_state_or_abroad');
+
+    function toggleLocation() {
+        if (locAbroad.checked) {
+            nigeriaRow.style.display = 'none';
+            abroadRow.style.display = 'grid';
+            if (isAbroadField) isAbroadField.checked = true;
+            if (stateSelect) stateSelect.required = false;
+            if (countryInput) countryInput.required = true;
+            if (countryInput && countryInput.value) {
+                stateAbroadInput.value = countryInput.value;
+            }
+        } else {
+            nigeriaRow.style.display = 'grid';
+            abroadRow.style.display = 'none';
+            if (isAbroadField) isAbroadField.checked = false;
+            if (stateSelect) stateSelect.required = true;
+            if (countryInput) countryInput.required = false;
+            if (stateSelect && stateSelect.value) {
+                stateAbroadInput.value = stateSelect.value;
+            }
+        }
+    }
+
+    if (locNigeria) locNigeria.addEventListener('change', toggleLocation);
+    if (locAbroad) locAbroad.addEventListener('change', toggleLocation);
+
+    // Initialize on load
+    const isAbroadVal = document.getElementById('id_is_abroad');
+    if (isAbroadVal && isAbroadVal.checked) {
+        if (locAbroad) locAbroad.checked = true;
+    }
+    toggleLocation();
+
+    // Auto-update legacy field when state/country changes
+    if (stateSelect) {
+        stateSelect.addEventListener('change', function() {
+            if (!locAbroad.checked) {
+                stateAbroadInput.value = this.value;
+            }
+        });
+    }
+    if (countryInput) {
+        countryInput.addEventListener('input', function() {
+            if (locAbroad.checked) {
+                stateAbroadInput.value = this.value;
+            }
+        });
+    }
+
+    // Age validation (client-side)
+    const ageInput = document.getElementById('id_age');
+    if (ageInput) {
+        ageInput.addEventListener('input', function() {
+            const val = parseInt(this.value);
+            if (isNaN(val)) {
+                this.setCustomValidity('');
+            } else if (val < 18) {
+                this.setCustomValidity('Age must be at least 18 years old.');
+            } else if (val > 55) {
+                this.setCustomValidity('Age must not exceed 55 years old.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+
+    // Keyboard search for state dropdown
+    if (stateSelect) {
+        let searchStr = '';
+        let searchTimeout;
+
+        stateSelect.addEventListener('keydown', function(e) {
+            if (e.key.length === 1 && e.key.match(/[a-zA-Z]/)) {
+                e.preventDefault();
+                clearTimeout(searchTimeout);
+                searchStr += e.key.toLowerCase();
+
+                const options = Array.from(this.options);
+                const match = options.find(opt =>
+                    opt.text.toLowerCase().startsWith(searchStr)
+                );
+                if (match) {
+                    this.value = match.value;
+                    this.dispatchEvent(new Event('change'));
+                }
+
+                searchTimeout = setTimeout(() => {
+                    searchStr = '';
+                }, 800);
+            }
+        });
+    }
+})();
+</script>
+
+{% endblock %}

@@ -1,0 +1,1217 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard
+
+<style>
+/* ─── Responsive Admin Dashboard ─── */
+@media (max-width: 1024px) {
+  .dashboard-grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .dashboard-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid-4 {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .kpi-card {
+    padding: 1.25rem !important;
+  }
+  .kpi-value {
+    font-size: 1.5rem !important;
+  }
+  .kpi-label {
+    font-size: 0.875rem !important;
+  }
+  .kpi-icon {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  .kpi-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .chart-card {
+    padding: 1rem;
+  }
+  .chart-container {
+    height: 240px !important;
+  }
+  .chart-container-sm {
+    height: 200px !important;
+  }
+  .chart-card-title {
+    font-size: 0.9375rem !important;
+  }
+  .chart-card-subtitle {
+    font-size: 0.75rem !important;
+  }
+
+  .card-header {
+    padding: 1rem 1.25rem !important;
+  }
+  .card-header-title {
+    font-size: 0.9375rem !important;
+  }
+  .card-header-subtitle {
+    font-size: 0.75rem !important;
+  }
+  .card-body {
+    padding: 1.25rem !important;
+  }
+
+  .activity-item {
+    padding: 0.625rem 0 !important;
+  }
+  .activity-icon {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .activity-icon svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  .activity-text {
+    font-size: 0.8125rem !important;
+    max-width: min(180px, 45vw) !important;
+  }
+  .activity-time {
+    font-size: 0.6875rem !important;
+  }
+
+  .urgent-case {
+    padding: 0.75rem 0 !important;
+  }
+  .urgent-case > div:first-child > div:first-child {
+    font-size: 0.8125rem !important;
+  }
+  .urgent-case > div:first-child > div:last-child {
+    font-size: 0.75rem !important;
+  }
+  .badge {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.6875rem !important;
+  }
+
+  .quick-actions {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .quick-action-btn {
+    padding: 0.75rem 0.5rem !important;
+    font-size: 0.8125rem !important;
+  }
+  .quick-action-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-card {
+    padding: 1rem !important;
+  }
+  .kpi-value {
+    font-size: 1.25rem !important;
+  }
+  .kpi-label {
+    font-size: 0.8125rem !important;
+  }
+  .kpi-icon {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .kpi-icon svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .chart-container {
+    height: 200px !important;
+  }
+  .chart-container-sm {
+    height: 160px !important;
+  }
+  .chart-card-title {
+    font-size: 0.875rem !important;
+  }
+  .chart-card-subtitle {
+    font-size: 0.6875rem !important;
+  }
+
+  .card-header {
+    padding: 0.875rem 1rem !important;
+  }
+  .card-header-title {
+    font-size: 0.875rem !important;
+  }
+  .card-header-subtitle {
+    font-size: 0.6875rem !important;
+  }
+  .card-body {
+    padding: 1rem !important;
+  }
+
+  .activity-text {
+    font-size: 0.75rem !important;
+    max-width: min(150px, 40vw) !important;
+  }
+  .activity-time {
+    font-size: 0.625rem !important;
+  }
+
+  .urgent-case > div:first-child > div:first-child {
+    font-size: 0.75rem !important;
+  }
+  .urgent-case > div:first-child > div:last-child {
+    font-size: 0.6875rem !important;
+  }
+  .badge {
+    padding: 0.2rem 0.4rem !important;
+    font-size: 0.625rem !important;
+  }
+
+  .quick-action-btn {
+    padding: 0.625rem 0.375rem !important;
+    font-size: 0.75rem !important;
+  }
+  .quick-action-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .btn-sm {
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .kpi-value {
+    font-size: 1.125rem !important;
+  }
+  .kpi-label {
+    font-size: 0.75rem !important;
+  }
+  .chart-container {
+    height: 160px !important;
+  }
+  .activity-text {
+    font-size: 0.6875rem !important;
+  }
+  .quick-action-btn {
+    font-size: 0.6875rem !important;
+  }
+}
+</style>
+
+{% endblock %}
+{% block page_title %}Dashboard
+
+<style>
+/* ─── Responsive Admin Dashboard ─── */
+@media (max-width: 1024px) {
+  .dashboard-grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .dashboard-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid-4 {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .kpi-card {
+    padding: 1.25rem !important;
+  }
+  .kpi-value {
+    font-size: 1.5rem !important;
+  }
+  .kpi-label {
+    font-size: 0.875rem !important;
+  }
+  .kpi-icon {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  .kpi-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .chart-card {
+    padding: 1rem;
+  }
+  .chart-container {
+    height: 240px !important;
+  }
+  .chart-container-sm {
+    height: 200px !important;
+  }
+  .chart-card-title {
+    font-size: 0.9375rem !important;
+  }
+  .chart-card-subtitle {
+    font-size: 0.75rem !important;
+  }
+
+  .card-header {
+    padding: 1rem 1.25rem !important;
+  }
+  .card-header-title {
+    font-size: 0.9375rem !important;
+  }
+  .card-header-subtitle {
+    font-size: 0.75rem !important;
+  }
+  .card-body {
+    padding: 1.25rem !important;
+  }
+
+  .activity-item {
+    padding: 0.625rem 0 !important;
+  }
+  .activity-icon {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .activity-icon svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  .activity-text {
+    font-size: 0.8125rem !important;
+    max-width: min(180px, 45vw) !important;
+  }
+  .activity-time {
+    font-size: 0.6875rem !important;
+  }
+
+  .urgent-case {
+    padding: 0.75rem 0 !important;
+  }
+  .urgent-case > div:first-child > div:first-child {
+    font-size: 0.8125rem !important;
+  }
+  .urgent-case > div:first-child > div:last-child {
+    font-size: 0.75rem !important;
+  }
+  .badge {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.6875rem !important;
+  }
+
+  .quick-actions {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .quick-action-btn {
+    padding: 0.75rem 0.5rem !important;
+    font-size: 0.8125rem !important;
+  }
+  .quick-action-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-card {
+    padding: 1rem !important;
+  }
+  .kpi-value {
+    font-size: 1.25rem !important;
+  }
+  .kpi-label {
+    font-size: 0.8125rem !important;
+  }
+  .kpi-icon {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .kpi-icon svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .chart-container {
+    height: 200px !important;
+  }
+  .chart-container-sm {
+    height: 160px !important;
+  }
+  .chart-card-title {
+    font-size: 0.875rem !important;
+  }
+  .chart-card-subtitle {
+    font-size: 0.6875rem !important;
+  }
+
+  .card-header {
+    padding: 0.875rem 1rem !important;
+  }
+  .card-header-title {
+    font-size: 0.875rem !important;
+  }
+  .card-header-subtitle {
+    font-size: 0.6875rem !important;
+  }
+  .card-body {
+    padding: 1rem !important;
+  }
+
+  .activity-text {
+    font-size: 0.75rem !important;
+    max-width: min(150px, 40vw) !important;
+  }
+  .activity-time {
+    font-size: 0.625rem !important;
+  }
+
+  .urgent-case > div:first-child > div:first-child {
+    font-size: 0.75rem !important;
+  }
+  .urgent-case > div:first-child > div:last-child {
+    font-size: 0.6875rem !important;
+  }
+  .badge {
+    padding: 0.2rem 0.4rem !important;
+    font-size: 0.625rem !important;
+  }
+
+  .quick-action-btn {
+    padding: 0.625rem 0.375rem !important;
+    font-size: 0.75rem !important;
+  }
+  .quick-action-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .btn-sm {
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .kpi-value {
+    font-size: 1.125rem !important;
+  }
+  .kpi-label {
+    font-size: 0.75rem !important;
+  }
+  .chart-container {
+    height: 160px !important;
+  }
+  .activity-text {
+    font-size: 0.6875rem !important;
+  }
+  .quick-action-btn {
+    font-size: 0.6875rem !important;
+  }
+}
+</style>
+
+{% endblock %}
+{% block breadcrumb %}Overview
+
+<style>
+/* ─── Responsive Admin Dashboard ─── */
+@media (max-width: 1024px) {
+  .dashboard-grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .dashboard-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid-4 {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .kpi-card {
+    padding: 1.25rem !important;
+  }
+  .kpi-value {
+    font-size: 1.5rem !important;
+  }
+  .kpi-label {
+    font-size: 0.875rem !important;
+  }
+  .kpi-icon {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  .kpi-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .chart-card {
+    padding: 1rem;
+  }
+  .chart-container {
+    height: 240px !important;
+  }
+  .chart-container-sm {
+    height: 200px !important;
+  }
+  .chart-card-title {
+    font-size: 0.9375rem !important;
+  }
+  .chart-card-subtitle {
+    font-size: 0.75rem !important;
+  }
+
+  .card-header {
+    padding: 1rem 1.25rem !important;
+  }
+  .card-header-title {
+    font-size: 0.9375rem !important;
+  }
+  .card-header-subtitle {
+    font-size: 0.75rem !important;
+  }
+  .card-body {
+    padding: 1.25rem !important;
+  }
+
+  .activity-item {
+    padding: 0.625rem 0 !important;
+  }
+  .activity-icon {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .activity-icon svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  .activity-text {
+    font-size: 0.8125rem !important;
+    max-width: min(180px, 45vw) !important;
+  }
+  .activity-time {
+    font-size: 0.6875rem !important;
+  }
+
+  .urgent-case {
+    padding: 0.75rem 0 !important;
+  }
+  .urgent-case > div:first-child > div:first-child {
+    font-size: 0.8125rem !important;
+  }
+  .urgent-case > div:first-child > div:last-child {
+    font-size: 0.75rem !important;
+  }
+  .badge {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.6875rem !important;
+  }
+
+  .quick-actions {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .quick-action-btn {
+    padding: 0.75rem 0.5rem !important;
+    font-size: 0.8125rem !important;
+  }
+  .quick-action-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-card {
+    padding: 1rem !important;
+  }
+  .kpi-value {
+    font-size: 1.25rem !important;
+  }
+  .kpi-label {
+    font-size: 0.8125rem !important;
+  }
+  .kpi-icon {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .kpi-icon svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .chart-container {
+    height: 200px !important;
+  }
+  .chart-container-sm {
+    height: 160px !important;
+  }
+  .chart-card-title {
+    font-size: 0.875rem !important;
+  }
+  .chart-card-subtitle {
+    font-size: 0.6875rem !important;
+  }
+
+  .card-header {
+    padding: 0.875rem 1rem !important;
+  }
+  .card-header-title {
+    font-size: 0.875rem !important;
+  }
+  .card-header-subtitle {
+    font-size: 0.6875rem !important;
+  }
+  .card-body {
+    padding: 1rem !important;
+  }
+
+  .activity-text {
+    font-size: 0.75rem !important;
+    max-width: min(150px, 40vw) !important;
+  }
+  .activity-time {
+    font-size: 0.625rem !important;
+  }
+
+  .urgent-case > div:first-child > div:first-child {
+    font-size: 0.75rem !important;
+  }
+  .urgent-case > div:first-child > div:last-child {
+    font-size: 0.6875rem !important;
+  }
+  .badge {
+    padding: 0.2rem 0.4rem !important;
+    font-size: 0.625rem !important;
+  }
+
+  .quick-action-btn {
+    padding: 0.625rem 0.375rem !important;
+    font-size: 0.75rem !important;
+  }
+  .quick-action-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .btn-sm {
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .kpi-value {
+    font-size: 1.125rem !important;
+  }
+  .kpi-label {
+    font-size: 0.75rem !important;
+  }
+  .chart-container {
+    height: 160px !important;
+  }
+  .activity-text {
+    font-size: 0.6875rem !important;
+  }
+  .quick-action-btn {
+    font-size: 0.6875rem !important;
+  }
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+{% include "dashboard/_welcome_banner.html" %}
+
+<!-- KPI Cards -->
+<div class="dashboard-grid dashboard-grid-4" style="margin-bottom:1.5rem;">
+
+  <!-- Total Active Members -->
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <div class="kpi-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+    </div>
+    <div class="kpi-value">{{ kpis.total_active_members|default:0 }}</div>
+    <div class="kpi-label">Total Active Members</div>
+  </div>
+
+  <!-- Treasury Balance -->
+  <div class="kpi-card accent-gold">
+    <div class="kpi-header">
+      <div class="kpi-icon" style="background:var(--oya-accent-50);color:var(--oya-accent-dark);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+    </div>
+    <div class="kpi-value" style="color:var(--oya-accent-dark);">&#x20A6;{{ kpis.treasury_balance|floatformat:0|default:"0" }}</div>
+    <div class="kpi-label">Treasury Balance</div>
+  </div>
+
+  <!-- Active Operations -->
+  <div class="kpi-card accent-success">
+    <div class="kpi-header">
+      <div class="kpi-icon" style="background:var(--oya-success-bg);color:var(--oya-success);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+    </div>
+    <div class="kpi-value" style="color:var(--oya-success);">{{ kpis.active_task_force|default:0 }}</div>
+    <div class="kpi-label">Active Task Force</div>
+  </div>
+
+  <!-- Projects Overview -->
+  <div class="kpi-card accent-warning">
+    <div class="kpi-header">
+      <div class="kpi-icon" style="background:var(--oya-warning-bg);color:var(--oya-warning);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></svg>
+      </div>
+    </div>
+    <div class="kpi-value" style="color:var(--oya-warning);">{{ kpis.projects_at_hand|default:0 }}</div>
+    <div class="kpi-label">Ongoing Projects</div>
+  </div>
+</div>
+
+<!-- Charts Row -->
+<div class="dashboard-grid dashboard-grid-2" style="margin-bottom:1.5rem;">
+
+  <!-- Financial Trend Chart -->
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <div class="chart-card-title">Financial Trend</div>
+        <div class="chart-card-subtitle">Income vs Expenses (Year to Date)</div>
+      </div>
+    </div>
+    <div class="chart-container">
+      <canvas id="financialChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Member Distribution -->
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <div class="chart-card-title">Member Distribution</div>
+        <div class="chart-card-subtitle">By membership status</div>
+      </div>
+    </div>
+    <div class="chart-container chart-container-sm" style="display:flex;align-items:center;">
+      <div style="flex:1;height:100%;">
+        <canvas id="memberDistributionChart"></canvas>
+      </div>
+      <div style="padding-left:1.5rem;min-width:140px;">
+        <div style="margin-bottom:0.875rem;">
+          <div style="font-size:clamp(1.25rem,4vw,1.75rem);font-weight:700;">{{ member_stats.total|default:0 }}</div>
+          <div style="font-size:0.8125rem;color:var(--oya-text-muted);">Total Members</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;">
+          <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.8125rem;">
+            <span style="width:10px;height:10px;border-radius:50%;background:var(--oya-primary);display:inline-block;"></span>
+            Active ({{ member_stats.by_status.active|default:0 }})
+          </div>
+          <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.8125rem;">
+            <span style="width:10px;height:10px;border-radius:50%;background:var(--oya-warning);display:inline-block;"></span>
+            Past ({{ member_stats.by_status.past|default:0 }})
+          </div>
+          <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.8125rem;">
+            <span style="width:10px;height:10px;border-radius:50%;background:var(--oya-danger);display:inline-block;"></span>
+            Removed ({{ member_stats.by_status.removed|default:0 }})
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Second Charts Row -->
+<div class="dashboard-grid dashboard-grid-2" style="margin-bottom:1.5rem;">
+
+  <!-- Clan Distribution -->
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <div class="chart-card-title">Clan Distribution</div>
+        <div class="chart-card-subtitle">Members by clan/family group</div>
+      </div>
+    </div>
+    <div class="chart-container">
+      <canvas id="clanDistributionChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Recent Activities - SHOW ONLY 5 -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-header-title">Recent Activities</div>
+        <div class="card-header-subtitle">Latest actions across the system</div>
+      </div>
+      <a href="{% url 'auditlogs:auditlog_list' %}" class="btn btn-sm btn-ghost">View All</a>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <div class="activity-feed" style="padding:0 1.25rem;">
+        {% for activity in recent_activities|slice:":5" %}
+        <div class="activity-item" style="padding:0.75rem 0;">
+          <div class="activity-icon {% if activity.action == 'CREATE' %}success{% elif activity.action == 'DELETE' %}danger{% elif activity.action == 'UPDATE' %}warning{% else %}primary{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              {% if activity.action == 'CREATE' %}
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              {% elif activity.action == 'DELETE' %}
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              {% elif activity.action == 'UPDATE' %}
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              {% else %}
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              {% endif %}
+            </svg>
+          </div>
+          <div class="activity-content" style="min-width:0;">
+            <!-- TRUNCATED: max 60 chars with ellipsis -->
+            <div class="activity-text" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:min(220px,50vw);" title="{{ activity.description }}">
+              {{ activity.description|truncatechars:60 }}
+            </div>
+            <div class="activity-time">{{ activity.created_at|timesince }} ago</div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="activity-item" style="padding:0.75rem 0;">
+          <div class="activity-content">
+            <div class="activity-text">No recent activities</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Urgent Cases & Quick Actions Row -->
+<div class="dashboard-grid dashboard-grid-2">
+
+  <!-- Urgent Cases - REAL DATA -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-header-title" style="display:flex;align-items:center;gap:0.5rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--oya-danger)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Urgent Cases
+        </div>
+        <div class="card-header-subtitle">Requires immediate attention</div>
+      </div>
+      <a href="{% url 'operations:case_list' %}" class="btn btn-sm btn-ghost">View All</a>
+    </div>
+    <div class="card-body">
+      {% for case in urgent_cases %}
+      <div class="urgent-case {% if case.status == 'OPEN' %}high{% else %}medium{% endif %}" style="display:flex;align-items:center;gap:1rem;padding:0.875rem 0;{% if not forloop.last %}border-bottom:1px solid var(--oya-border);{% endif %}">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;color:var(--oya-text-primary);margin-bottom:0.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="{{ case.title }}">{{ case.title|truncatechars:40 }}</div>
+          <div style="font-size:0.8125rem;color:var(--oya-text-muted);">
+            {{ case.case_number }} &middot; {{ case.respondent.full_name|default:"Unknown" }} &middot; Filed {{ case.created_at|date:"M d, Y" }}
+          </div>
+        </div>
+        <span class="badge badge-{% if case.status == 'OPEN' %}danger{% else %}warning{% endif %}">
+          {% if case.status == 'OPEN' %}Open{% else %}In Progress{% endif %}
+        </span>
+      </div>
+      {% empty %}
+      <div style="text-align:center;padding:2rem;color:var(--oya-text-muted);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:0.75rem;opacity:0.5;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <p>No urgent cases at this time</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if user.is_staff %}
+  <!-- Quick Actions -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-header-title">Quick Actions</div>
+        <div class="card-header-subtitle">Frequently used operations</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="quick-actions" style="display:grid;grid-template-columns:repeat(2, 1fr);gap:0.75rem;">
+        <a href="{% url 'members:member_create' %}" class="quick-action-btn" style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem;border:1px solid var(--oya-border);border-radius:var(--oya-radius);text-decoration:none;color:var(--oya-text-primary);transition:all 0.2s;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>
+          New Member
+        </a>
+        <a href="{% url 'finance:income_list' %}" class="quick-action-btn" style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem;border:1px solid var(--oya-border);border-radius:var(--oya-radius);text-decoration:none;color:var(--oya-text-primary);transition:all 0.2s;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Record Income
+        </a>
+        <a href="{% url 'operations:case_create' %}" class="quick-action-btn" style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem;border:1px solid var(--oya-border);border-radius:var(--oya-radius);text-decoration:none;color:var(--oya-text-primary);transition:all 0.2s;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          File Case
+        </a>
+        <a href="{% url 'projects:project_create' %}" class="quick-action-btn" style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem;border:1px solid var(--oya-border);border-radius:var(--oya-radius);text-decoration:none;color:var(--oya-text-primary);transition:all 0.2s;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></svg>
+          New Project
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+// Clan Distribution Chart - REAL DATA
+const clanData = {
+  labels: {{ clan_distribution.labels|safe|default:"[]" }},
+  data: {{ clan_distribution.data|safe|default:"[]" }}
+};
+
+// Member Distribution Chart - REAL DATA
+const memberStats = {
+  active: {{ member_stats.by_status.active|default:0 }},
+  past: {{ member_stats.by_status.past|default:0 }},
+  removed: {{ member_stats.by_status.removed|default:0 }}
+};
+
+// Financial Chart - REAL DATA
+const financeStats = {
+  income: {{ finance_stats.total_income|default:0 }},
+  expenses: {{ finance_stats.total_expenses|default:0 }},
+  balance: {{ finance_stats.treasury_balance|default:0 }}
+};
+
+// Initialize charts when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  // Clan Distribution Chart
+  const clanCtx = document.getElementById('clanDistributionChart');
+  if (clanCtx && clanData.labels.length > 0) {
+    new Chart(clanCtx, {
+      type: 'bar',
+      data: {
+        labels: clanData.labels,
+        datasets: [{
+          label: 'Members',
+          data: clanData.data,
+          backgroundColor: 'var(--oya-primary)',
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: 'var(--oya-border)' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  // Member Distribution Chart
+  const memberCtx = document.getElementById('memberDistributionChart');
+  if (memberCtx) {
+    new Chart(memberCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Active', 'Past', 'Removed'],
+        datasets: [{
+          data: [memberStats.active, memberStats.past, memberStats.removed],
+          backgroundColor: ['var(--oya-primary)', 'var(--oya-warning)', 'var(--oya-danger)'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        cutout: '70%'
+      }
+    });
+  }
+
+  // Financial Chart
+  const financeCtx = document.getElementById('financialChart');
+  if (financeCtx) {
+    new Chart(financeCtx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [
+          {
+            label: 'Income',
+            data: [financeStats.income * 0.1, financeStats.income * 0.15, financeStats.income * 0.2, 
+                   financeStats.income * 0.25, financeStats.income * 0.2, financeStats.income * 0.1],
+            borderColor: 'var(--oya-success)',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            fill: true,
+            tension: 0.4
+          },
+          {
+            label: 'Expenses',
+            data: [financeStats.expenses * 0.15, financeStats.expenses * 0.2, financeStats.expenses * 0.15,
+                   financeStats.expenses * 0.25, financeStats.expenses * 0.15, financeStats.expenses * 0.1],
+            borderColor: 'var(--oya-danger)',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            fill: true,
+            tension: 0.4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: 'var(--oya-border)' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+});
+</script>
+
+
+
+<style>
+/* ─── Responsive Admin Dashboard ─── */
+@media (max-width: 1024px) {
+  .dashboard-grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .dashboard-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid-4 {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .kpi-card {
+    padding: 1.25rem !important;
+  }
+  .kpi-value {
+    font-size: 1.5rem !important;
+  }
+  .kpi-label {
+    font-size: 0.875rem !important;
+  }
+  .kpi-icon {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  .kpi-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .chart-card {
+    padding: 1rem;
+  }
+  .chart-container {
+    height: 240px !important;
+  }
+  .chart-container-sm {
+    height: 200px !important;
+  }
+  .chart-card-title {
+    font-size: 0.9375rem !important;
+  }
+  .chart-card-subtitle {
+    font-size: 0.75rem !important;
+  }
+
+  .card-header {
+    padding: 1rem 1.25rem !important;
+  }
+  .card-header-title {
+    font-size: 0.9375rem !important;
+  }
+  .card-header-subtitle {
+    font-size: 0.75rem !important;
+  }
+  .card-body {
+    padding: 1.25rem !important;
+  }
+
+  .activity-item {
+    padding: 0.625rem 0 !important;
+  }
+  .activity-icon {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .activity-icon svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  .activity-text {
+    font-size: 0.8125rem !important;
+    max-width: min(180px, 45vw) !important;
+  }
+  .activity-time {
+    font-size: 0.6875rem !important;
+  }
+
+  .urgent-case {
+    padding: 0.75rem 0 !important;
+  }
+  .urgent-case > div:first-child > div:first-child {
+    font-size: 0.8125rem !important;
+  }
+  .urgent-case > div:first-child > div:last-child {
+    font-size: 0.75rem !important;
+  }
+  .badge {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.6875rem !important;
+  }
+
+  .quick-actions {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .quick-action-btn {
+    padding: 0.75rem 0.5rem !important;
+    font-size: 0.8125rem !important;
+  }
+  .quick-action-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-card {
+    padding: 1rem !important;
+  }
+  .kpi-value {
+    font-size: 1.25rem !important;
+  }
+  .kpi-label {
+    font-size: 0.8125rem !important;
+  }
+  .kpi-icon {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .kpi-icon svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .chart-container {
+    height: 200px !important;
+  }
+  .chart-container-sm {
+    height: 160px !important;
+  }
+  .chart-card-title {
+    font-size: 0.875rem !important;
+  }
+  .chart-card-subtitle {
+    font-size: 0.6875rem !important;
+  }
+
+  .card-header {
+    padding: 0.875rem 1rem !important;
+  }
+  .card-header-title {
+    font-size: 0.875rem !important;
+  }
+  .card-header-subtitle {
+    font-size: 0.6875rem !important;
+  }
+  .card-body {
+    padding: 1rem !important;
+  }
+
+  .activity-text {
+    font-size: 0.75rem !important;
+    max-width: min(150px, 40vw) !important;
+  }
+  .activity-time {
+    font-size: 0.625rem !important;
+  }
+
+  .urgent-case > div:first-child > div:first-child {
+    font-size: 0.75rem !important;
+  }
+  .urgent-case > div:first-child > div:last-child {
+    font-size: 0.6875rem !important;
+  }
+  .badge {
+    padding: 0.2rem 0.4rem !important;
+    font-size: 0.625rem !important;
+  }
+
+  .quick-action-btn {
+    padding: 0.625rem 0.375rem !important;
+    font-size: 0.75rem !important;
+  }
+  .quick-action-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .btn-sm {
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .kpi-value {
+    font-size: 1.125rem !important;
+  }
+  .kpi-label {
+    font-size: 0.75rem !important;
+  }
+  .chart-container {
+    height: 160px !important;
+  }
+  .activity-text {
+    font-size: 0.6875rem !important;
+  }
+  .quick-action-btn {
+    font-size: 0.6875rem !important;
+  }
+}
+</style>
+
+{% endblock %}

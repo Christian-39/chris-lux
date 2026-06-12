@@ -1,0 +1,92 @@
+{% load static %}
+<!-- Topbar -->
+<<header class="topbar">
+
+  <!-- Left -->
+  <div class="topbar-left">
+    <h2 class="page-title">{% block page_title %}Dashboard{% endblock %}</h2>
+    <nav class="breadcrumb hide-mobile">
+      <a href="{% url 'dashboard:index' %}">Home</a>
+      <svg class="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+      <span>{% block breadcrumb %}Dashboard{% endblock %}</span>
+    </nav>
+  </div>
+
+  <!-- Search -->
+  <div class="topbar-search hide-mobile">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" id="globalSearch" placeholder="Search members, records, cases..." autocomplete="off">
+    <div id="searchResults" class="dropdown-menu hidden" style="top:100%;left:0;width:100%;"></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="topbar-actions">
+
+    <!-- Theme Toggle -->
+    <button class="topbar-btn hide-mobile" data-theme-toggle aria-label="Toggle Theme" title="Toggle Theme">
+      <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+        <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+      <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+
+    <!-- Notifications -->
+    <a href="{% url 'notifications:notification_list' %}" class="topbar-btn" aria-label="Notifications" title="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      {% if unread_notification_count > 0 %}
+      <span class="badge" id="notificationBadge">{{ unread_notification_count }}</span>
+      {% endif %}
+    </a>
+
+    <!-- Profile -->
+    <div class="dropdown hide-mobile">
+      <button class="topbar-btn dropdown-toggle" aria-label="User Menu" style="width:auto;padding:0 0.5rem;gap:0.5rem;">
+        <div class="avatar avatar-sm" style="background:var(--oya-primary);color:#fff;overflow:hidden;cursor:pointer;">
+          {% if user.photo and user.photo.name %}
+            <img src="{{ user.photo.url }}" alt="{{ user.full_name }}" 
+                 style="width:100%;height:100%;object-fit:cover;cursor:pointer;" 
+                 onclick="event.stopPropagation(); openImagePreview('{{ user.photo.url }}', '{{ user.full_name|default:user.serial_number }}')">
+          {% else %}
+            <span onclick="event.stopPropagation(); openImagePreview('', '{{ user.full_name|default:user.serial_number }}')" 
+                  style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;">
+              {{ user.get_full_name|first|upper|default:user.serial_number|first|upper }}
+            </span>
+          {% endif %}
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="dropdown-menu">
+        <a href="{% url 'accounts:profile' %}" class="dropdown-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+          My Profile
+        </a>
+        <a href="{% url 'settingsapp:settings' %}" class="dropdown-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          Settings
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="{% url 'accounts:logout' %}" class="dropdown-item" style="color:var(--oya-danger);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Sign Out
+        </a>
+      </div>
+    </div>
+  </div>
+
+</header>

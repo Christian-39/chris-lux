@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Executives{% endblock %}
+{% block page_title %}Executive Directory{% endblock %}
+{% block breadcrumb %}Leadership{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>Executive Directory</h1>
+    <p>Current OYA executives, committee heads, and their roles</p>
+  </div>
+  <div class="page-header-actions">
+    <button class="btn btn-secondary" data-export="executivesTable">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export
+    </button>
+    <a href="{% url 'executives:executive_create' %}" class="btn btn-primary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Executive
+    </a>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="filters-bar">
+  <div class="filter-group">
+    <span class="filter-label">Filter:</span>
+    <form method="get" style="display:flex;gap:0.5rem;align-items:center;">
+      <select name="status" class="form-control" style="width:160px;" onchange="this.form.submit()">
+        <option value="" {% if not status_filter %}selected{% endif %}>All Executives</option>
+        <option value="current" {% if status_filter == "current" %}selected{% endif %}>Current Only</option>
+        <option value="past" {% if status_filter == "past" %}selected{% endif %}>Past Only</option>
+      </select>
+      {% if search_term %}
+        <input type="hidden" name="search" value="{{ search_term }}">
+      {% endif %}
+    </form>
+  </div>
+  <div style="margin-left:auto;font-size:0.875rem;color:var(--oya-text-secondary);">
+    <strong style="color:var(--oya-text-primary);">{{ total_executives }}</strong> executives &middot; 
+    <strong style="color:var(--oya-text-primary);">{{ current_count }}</strong> current
+  </div>
+</div>
+
+<!-- Executives Grid -->
+<div class="card">
+  <div class="table-toolbar">
+    <div class="toolbar-search">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <form method="get" style="width:100%;">
+        <input type="text" name="search" placeholder="Search executives..." 
+               value="{{ search_term }}" data-search-table="executivesTable"
+               onkeydown="if(event.key==='Enter') this.form.submit()">
+        {% if status_filter %}
+          <input type="hidden" name="status" value="{{ status_filter }}">
+        {% endif %}
+      </form>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table" id="executivesTable" data-sortable>
+      <thead>
+        <tr>
+          <th style="width:50px;"></th>
+          <th data-sort="text">Name</th>
+          <th data-sort="text">Position</th>
+          <th data-sort="text">Phone</th>
+          <th data-sort="text">Tenure</th>
+          <th data-sort="text">Status</th>
+          <th style="width:100px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for exec in executives %}
+        <tr>
+          <td>
+            {% if exec.member.photo %}
+              <img src="{{ exec.member.photo.url }}" alt="" class="avatar avatar-sm" style="object-fit:cover;">
+            {% else %}
+              <div class="avatar avatar-sm" style="background:{% cycle 'var(--oya-primary)' 'var(--oya-accent)' 'var(--oya-success)' 'var(--oya-warning)' 'var(--oya-danger)' 'var(--oya-info)' as color %};color:#fff;">
+                {{ exec.member.full_name|first }}{% if exec.member.full_name.split|length > 1 %}{{ exec.member.full_name.split|last|first }}{% endif %}
+              </div>
+            {% endif %}
+          </td>
+          <td><span class="cell-name">{{ exec.member.full_name }}</span></td>
+          <td>
+            {% if exec.post == "President" %}
+              <span class="badge badge-accent">{{ exec.post }}</span>
+            {% elif exec.post == "Vice President" or exec.post == "Deputy President" %}
+              <span class="badge badge-primary">{{ exec.post }}</span>
+            {% elif exec.post == "Treasurer" or exec.post == "Financial Secretary" %}
+              <span class="badge badge-success">{{ exec.post }}</span>
+            {% elif exec.post == "Secretary" or exec.post == "Assistant Secretary" %}
+              <span class="badge badge-warning">{{ exec.post }}</span>
+            {% else %}
+              <span class="badge badge-info">{{ exec.post }}</span>
+            {% endif %}
+          </td>
+          <td class="cell-muted">{{ exec.member.phone|default:"N/A" }}</td>
+          <td class="cell-muted">{{ exec.start_date|date:"Y" }}{% if exec.end_date %} - {{ exec.end_date|date:"Y" }}{% else %} - Present{% endif %}</td>
+          <td>
+            {% if exec.is_current %}
+              <span class="badge badge-success">Active</span>
+            {% else %}
+              <span class="badge badge-secondary">Past</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="table-actions">
+              <a href="{% url 'executives:executive_update' pk=exec.pk %}" class="table-action-btn" title="Edit">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </a>
+              {% if exec.is_current %}
+                <form method="post" action="{% url 'executives:executive_end_tenure' pk=exec.pk %}" style="display:inline;" onsubmit="return confirm('End tenure for {{ exec.member.full_name }} as {{ exec.post }}?');">
+                  {% csrf_token %}
+                  <button type="submit" class="table-action-btn danger" title="End Tenure">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  </button>
+                </form>
+              {% else %}
+                <button class="table-action-btn" style="opacity:0.3;cursor:default;" title="Tenure Ended" disabled>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" style="text-align:center;padding:3rem;">
+            <div class="empty-state" style="padding:0;">
+              <div class="empty-state-icon" style="width:60px;height:60px;margin-bottom:1rem;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <h3 style="font-size:1rem;">No executives found</h3>
+              <p style="font-size:0.875rem;">
+                {% if search_term or status_filter %}
+                  No results match your search/filter criteria.
+                {% else %}
+                  No executives have been assigned yet. Click "Add Executive" to get started.
+                {% endif %}
+              </p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if executives.has_other_pages %}
+  <div class="card-footer" style="justify-content:center;">
+    <div class="pagination">
+      {% if executives.has_previous %}
+        <a href="?page={{ executives.previous_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="page-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </a>
+      {% else %}
+        <button class="page-btn" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      {% endif %}
+
+      {% for num in executives.paginator.page_range %}
+        {% if executives.number == num %}
+          <button class="page-btn active">{{ num }}</button>
+        {% elif num > executives.number|add:'-3' and num < executives.number|add:'3' %}
+          <a href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="page-btn">{{ num }}</a>
+        {% elif num == 1 or num == executives.paginator.num_pages %}
+          <a href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="page-btn">{{ num }}</a>
+        {% elif num == executives.number|add:'-3' or num == executives.number|add:'3' %}
+          <span class="page-btn" style="cursor:default;border:none;background:transparent;">...</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if executives.has_next %}
+        <a href="?page={{ executives.next_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="page-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      {% else %}
+        <button class="page-btn" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Organizational Chart -->
+{% if current_executives %}
+<div class="card" style="margin-top:1.5rem;">
+  <div class="card-header">
+    <div class="card-header-title">Organizational Structure</div>
+  </div>
+  <div class="card-body">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;max-width:100%;overflow-x:auto;padding:0.5rem;">
+
+      <!-- President -->
+      {% with president=current_executives|first %}
+      {% if president.post == "President" %}
+      <div style="text-align:center;padding:clamp(0.75rem,3vw,1.25rem) clamp(1rem,4vw,2rem);background:linear-gradient(135deg, var(--oya-accent-50), var(--oya-accent-50));border:2px solid var(--oya-accent);border-radius:var(--radius-lg);min-width:min(220px,90vw);max-width:100%;">
+        {% if president.member.photo %}
+          <img src="{{ president.member.photo.url }}" alt="" class="avatar avatar-lg" style="margin:0 auto 0.75rem;object-fit:cover;">
+        {% else %}
+          <div class="avatar avatar-lg" style="background:var(--oya-accent);color:#0F172A;margin:0 auto 0.75rem;">
+            {{ president.member.full_name|first }}{% if president.member.full_name.split|length > 1 %}{{ president.member.full_name.split|last|first }}{% endif %}
+          </div>
+        {% endif %}
+        <div style="font-weight:700;font-size:clamp(0.875rem,3vw,1rem);">{{ president.member.full_name }}</div>
+        <div style="font-size:clamp(0.6875rem,2.5vw,0.8125rem);color:var(--oya-accent-dark);font-weight:600;">{{ president.post }}</div>
+      </div>
+
+      <!-- Arrow -->
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--oya-border)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="6 13 12 19 18 13"/></svg>
+      {% endif %}
+      {% endwith %}
+
+      <!-- Vice President & Secretary Row -->
+      <div style="display:flex;gap:clamp(0.5rem,2vw,2rem);flex-wrap:wrap;justify-content:center;max-width:100%;">
+        {% for exec in current_executives %}
+          {% if exec.post == "Deputy President" or exec.post == "Vice President" %}
+          <div style="text-align:center;padding:1rem 1.5rem;background:var(--oya-primary-50);border:2px solid var(--oya-primary);border-radius:var(--radius-lg);min-width:180px;">
+            {% if exec.member.photo %}
+              <img src="{{ exec.member.photo.url }}" alt="" class="avatar" style="margin:0 auto 0.5rem;object-fit:cover;width:40px;height:40px;border-radius:50%;">
+            {% else %}
+              <div class="avatar" style="background:var(--oya-primary);color:#fff;margin:0 auto 0.5rem;">
+                {{ exec.member.full_name|first }}{% if exec.member.full_name.split|length > 1 %}{{ exec.member.full_name.split|last|first }}{% endif %}
+              </div>
+            {% endif %}
+            <div style="font-weight:600;font-size:0.9375rem;">{{ exec.member.full_name }}</div>
+            <div style="font-size:0.75rem;color:var(--oya-primary);font-weight:600;">{{ exec.post }}</div>
+          </div>
+          {% elif exec.post == "Secretary" %}
+          <div style="text-align:center;padding:1rem 1.5rem;background:var(--oya-warning-bg);border:2px solid var(--oya-warning);border-radius:var(--radius-lg);min-width:180px;">
+            {% if exec.member.photo %}
+              <img src="{{ exec.member.photo.url }}" alt="" class="avatar" style="margin:0 auto 0.5rem;object-fit:cover;width:40px;height:40px;border-radius:50%;">
+            {% else %}
+              <div class="avatar" style="background:var(--oya-warning);color:#fff;margin:0 auto 0.5rem;">
+                {{ exec.member.full_name|first }}{% if exec.member.full_name.split|length > 1 %}{{ exec.member.full_name.split|last|first }}{% endif %}
+              </div>
+            {% endif %}
+            <div style="font-weight:600;font-size:0.9375rem;">{{ exec.member.full_name }}</div>
+            <div style="font-size:0.75rem;color:var(--oya-warning);font-weight:600;">{{ exec.post }}</div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- Arrow -->
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--oya-border)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="6 13 12 19 18 13"/></svg>
+
+      <!-- Other Executives Row -->
+      <div style="display:flex;gap:clamp(0.5rem,2vw,1rem);flex-wrap:wrap;justify-content:center;max-width:100%;">
+        {% for exec in current_executives %}
+          {% if exec.post != "President" and exec.post != "Deputy President" and exec.post != "Vice President" and exec.post != "Secretary" %}
+          <div style="text-align:center;padding:0.875rem 1.25rem;background:var(--oya-bg);border:1.5px solid var(--oya-border);border-radius:var(--radius-md);min-width:140px;">
+            <div style="font-weight:600;font-size:0.875rem;">{{ exec.member.full_name }}</div>
+            <div style="font-size:0.6875rem;color:var(--oya-text-muted);font-weight:600;">{{ exec.post }}</div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

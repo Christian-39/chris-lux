@@ -1,0 +1,59 @@
+
+<!-- Image Preview Modal -->
+<div id="imagePreviewModal" class="modal" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;padding:1rem;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);" onclick="closeImagePreview(event)">
+  <div style="position:relative;max-width:90vw;max-height:90vh;display:flex;flex-direction:column;align-items:center;gap:1rem;" onclick="event.stopPropagation()">
+    <!-- Close button -->
+    <button onclick="closeImagePreview()" style="position:absolute;top:-40px;right:0;background:none;border:none;color:#fff;cursor:pointer;padding:0.5rem;border-radius:50%;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <!-- Image -->
+    <img id="previewImage" src="" alt="" style="max-width:100%;max-height:80vh;object-fit:contain;border-radius:12px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+    <!-- Caption -->
+    <div id="previewCaption" style="color:#fff;font-size:1rem;font-weight:500;text-align:center;padding:0.5rem 1rem;background:rgba(0,0,0,0.5);border-radius:8px;"></div>
+  </div>
+</div>
+
+<script>
+// Image Preview Functions
+function openImagePreview(imageUrl, caption) {
+  const modal = document.getElementById('imagePreviewModal');
+  const img = document.getElementById('previewImage');
+  const cap = document.getElementById('previewCaption');
+
+  if (!imageUrl) {
+    // No image available - show placeholder message
+    cap.textContent = (caption || 'No image') + ' - No photo available';
+    img.style.display = 'none';
+  } else {
+    img.src = imageUrl;
+    img.style.display = 'block';
+    cap.textContent = caption || 'Image Preview';
+  }
+
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeImagePreview(event) {
+  // If event is provided, only close if clicking the overlay (not the image container)
+  if (event && event.target !== event.currentTarget) return;
+
+  const modal = document.getElementById('imagePreviewModal');
+  modal.style.display = 'none';
+  document.body.style.overflow = '';
+
+  // Clear image to free memory
+  const img = document.getElementById('previewImage');
+  img.src = '';
+}
+
+// Keyboard support - Escape to close
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('imagePreviewModal');
+    if (modal && modal.style.display === 'flex') {
+      closeImagePreview();
+    }
+  }
+});
+</script>

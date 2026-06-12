@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+{% load static humanize %}
+
+{% block page_title %}Expense Details{% endblock %}
+{% block breadcrumb %}Expense Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8 col-xl-7" style="padding:0 0.5rem;">
+
+      <!-- Hero Amount Card -->
+      <div class="card mb-4" style="background: linear-gradient(135deg, var(--oya-danger) 0%, #991b1b 100%); border: none; color: #fff;">
+        <div class="card-body" style="padding: 2rem;">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <div class="text-xs font-semibold" style="opacity: 0.85; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.375rem;">
+                  <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/>
+                </svg>
+                Expense Incurred
+              </div>
+              <div style="font-size: clamp(1.75rem, 6vw, 2.75rem); font-weight: 800; letter-spacing: -0.025em; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                ₦{{ expense.amount|intcomma:2 }}
+              </div>
+              <div class="text-sm" style="opacity: 0.85; margin-top: 0.5rem;">
+                {{ expense.amount|intword }} Naira
+              </div>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+              <span class="badge badge-danger" style="background: rgba(255,255,255,0.2); color: #fff; font-size: 0.75rem; padding: 0.5rem 1rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  {% if expense.category == 'ADMINISTRATIVE' %}
+                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                  {% elif expense.category == 'PROJECT' %}
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+                  {% elif expense.category == 'EVENT' %}
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                  {% elif expense.category == 'MAINTENANCE' %}
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                  {% elif expense.category == 'SALARY' %}
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                  {% else %}
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  {% endif %}
+                </svg>
+                {{ expense.get_category_display }}
+              </span>
+              <div class="text-xs" style="opacity: 0.7; margin-top: 0.75rem;">
+                Recorded {{ expense.created_at|naturaltime }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Bar -->
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <a href="{% url 'finance:expense_list' %}" class="btn btn-secondary btn-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Back to List
+        </a>
+        {% if user.is_staff %}
+        <a href="{% url 'finance:expense_delete' expense.pk %}" class="btn btn-danger btn-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+          Delete Record
+        </a>
+        {% endif %}
+      </div>
+
+      <!-- Details Grid -->
+      <div class="row g-2 mb-3" style="--bs-gutter-x:0.5rem;">
+        <!-- Category -->
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body" style="padding: clamp(1rem, 3vw, 1.5rem);">
+              <div class="d-flex align-items-start gap-3">
+                <div class="kpi-icon" style="background: var(--oya-primary-50); color: var(--oya-primary);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold" style="color: var(--oya-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.375rem;">Category</div>
+                  <span class="badge badge-danger">{{ expense.get_category_display }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body" style="padding: clamp(1rem, 3vw, 1.5rem);">
+              <div class="d-flex align-items-start gap-3">
+                <div class="kpi-icon" style="background: var(--oya-info-bg); color: var(--oya-info);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold" style="color: var(--oya-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.375rem;">Description</div>
+                  <div class="font-semibold" style="color: var(--oya-text-primary); line-height: 1.5;">{{ expense.description }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recorded By -->
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body" style="padding: clamp(1rem, 3vw, 1.5rem);">
+              <div class="d-flex align-items-start gap-3">
+                <div class="kpi-icon" style="background: var(--oya-warning-bg); color: var(--oya-warning);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold" style="color: var(--oya-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.375rem;">Recorded By</div>
+                  {% if expense.created_by %}
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="avatar avatar-sm" style="background: var(--oya-primary); color: #fff;">
+                        {{ expense.created_by.get_initials }}
+                      </div>
+                      <div>
+                        <div class="font-semibold" style="color: var(--oya-text-primary);">{{ expense.created_by.get_full_name }}</div>
+                        <div class="text-xs" style="color: var(--oya-text-muted);">{{ expense.created_by.serial_number }}</div>
+                      </div>
+                    </div>
+                  {% else %}
+                    <span style="color: var(--oya-text-muted); font-style: italic;">System Generated</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Date -->
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body" style="padding: clamp(1rem, 3vw, 1.5rem);">
+              <div class="d-flex align-items-start gap-3">
+                <div class="kpi-icon" style="background: var(--oya-success-bg); color: var(--oya-success);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold" style="color: var(--oya-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.375rem;">Date Recorded</div>
+                  <div class="font-semibold" style="color: var(--oya-text-primary);">{{ expense.created_at|date:"l, F j, Y" }}</div>
+                  <div class="text-sm" style="color: var(--oya-text-muted);">
+                    {{ expense.created_at|time:"g:i A" }} · {{ expense.created_at|naturalday }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Receipt Section -->
+      {% if expense.receipt_file %}
+      <div class="card mb-4">
+        <div class="card-body" style="padding: clamp(1rem, 3vw, 1.5rem);">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h6 class="font-semibold" style="font-size: 0.875rem; color: var(--oya-text-primary); margin: 0; text-transform: uppercase; letter-spacing: 0.05em;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem; color: var(--oya-primary);">
+                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/>
+              </svg>
+              Attached Receipt
+            </h6>
+            <span class="badge badge-success">{{ expense.receipt_file.size|filesizeformat }}</span>
+          </div>
+          <a href="{{ expense.receipt_file.url }}" target="_blank" class="btn btn-primary btn-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download Receipt
+          </a>
+          <span class="text-muted text-sm" style="margin-left: 0.75rem;">
+            {{ expense.receipt_file.name|cut:"finance/receipts/" }}
+          </span>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Timeline -->
+      <div class="card">
+        <div class="card-body" style="padding: clamp(1rem, 3vw, 1.5rem);">
+          <h6 class="font-semibold" style="font-size: 0.875rem; color: var(--oya-text-primary); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem; color: var(--oya-primary);">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Activity Timeline
+          </h6>
+
+          <div class="timeline">
+            <!-- Created -->
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background: var(--oya-danger); box-shadow: 0 0 0 2px var(--oya-danger-bg);"></div>
+              <div class="timeline-content">
+                <div class="font-semibold" style="font-size: 0.875rem; color: var(--oya-text-primary);">Record Created</div>
+                <div class="text-xs" style="color: var(--oya-text-muted); margin-top: 0.25rem;">
+                  {{ expense.created_at|naturaltime }} · {{ expense.created_at|date:"M j, Y g:i A" }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Updated (if different) -->
+            {% if expense.updated_at != expense.created_at %}
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background: var(--oya-warning); box-shadow: 0 0 0 2px var(--oya-warning-bg);"></div>
+              <div class="timeline-content">
+                <div class="font-semibold" style="font-size: 0.875rem; color: var(--oya-text-primary);">Last Updated</div>
+                <div class="text-xs" style="color: var(--oya-text-muted); margin-top: 0.25rem;">
+                  {{ expense.updated_at|naturaltime }} · {{ expense.updated_at|date:"M j, Y g:i A" }}
+                </div>
+              </div>
+            </div>
+            {% else %}
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background: var(--oya-border); box-shadow: 0 0 0 2px var(--oya-border-light);"></div>
+              <div class="timeline-content">
+                <div style="font-size: 0.875rem; color: var(--oya-text-muted);">No updates since creation</div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Metadata Badges -->
+          <div class="mt-4 pt-3" style="border-top: 1px solid var(--oya-border-light);">
+            <div class="d-flex flex-wrap gap-2">
+              <span class="badge badge-secondary">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.375rem;">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/>
+                </svg>
+                ID: {{ expense.id|ordinal }}
+              </span>
+              <span class="badge badge-danger">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.375rem;">
+                  <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/>
+                </svg>
+                EXPENSE
+              </span>
+              <span class="badge badge-primary">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.375rem;">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                {{ expense.created_at|timesince }} old
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

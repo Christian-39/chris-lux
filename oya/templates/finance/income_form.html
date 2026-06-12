@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block page_title %}{{ title|default:"Record Income" }}{% endblock %}
+{% block breadcrumb %}{{ title|default:"Record Income" }}{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+  .select2-container--default .select2-selection--single {
+    height: 38px;
+    border: 1px solid var(--oya-border, #d1d5db);
+    border-radius: 0.375rem;
+    background-color: var(--oya-surface, #fff);
+  }
+  .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 36px;
+    padding-left: 0.75rem;
+    color: var(--oya-text, #374151);
+    font-size: 0.875rem;
+  }
+  .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+    width: 36px;
+  }
+  .select2-container--default .select2-selection--single .select2-selection__placeholder {
+    color: var(--oya-text-muted, #9ca3af);
+  }
+  .select2-dropdown {
+    border-color: var(--oya-border, #d1d5db);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  .select2-results__option {
+    padding: 0.625rem 0.875rem;
+    color: var(--oya-text, #374151);
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--oya-border-light, #f3f4f6);
+  }
+  .select2-results__option:last-child {
+    border-bottom: none;
+  }
+  .select2-results__option--highlighted {
+    background-color: var(--oya-primary-light, #eff6ff) !important;
+    color: var(--oya-primary, #2563eb) !important;
+  }
+  .select2-results__option[aria-selected="true"] {
+    background-color: var(--oya-primary, #2563eb) !important;
+    color: #fff !important;
+  }
+  .select2-search__field {
+    border-color: var(--oya-border, #d1d5db) !important;
+    border-radius: 0.375rem;
+    padding: 0.5rem !important;
+  }
+  .select2-search__field:focus {
+    outline: none;
+    border-color: var(--oya-primary, #2563eb) !important;
+    box-shadow: 0 0 0 3px var(--oya-primary-light, #eff6ff);
+  }
+  .member-result {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+  .member-result .member-name {
+    font-weight: 500;
+    color: var(--oya-text, #374151);
+  }
+  .member-result .member-meta {
+    font-size: 0.75rem;
+    color: var(--oya-text-muted, #6b7280);
+  }
+  .select2-results__option--highlighted .member-result .member-name,
+  .select2-results__option--highlighted .member-result .member-meta {
+    color: var(--oya-primary, #2563eb);
+  }
+  .select2-results__option[aria-selected="true"] .member-result .member-name,
+  .select2-results__option[aria-selected="true"] .member-result .member-meta {
+    color: #fff;
+  }
+  @keyframes pulse-subtle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+  }
+  .treasury-pulse {
+    animation: pulse-subtle 2s ease-in-out infinite;
+  }
+  .reason-badge {
+    cursor: pointer;
+    background: var(--oya-surface-alt, #f3f4f6);
+    color: var(--oya-text, #374151);
+    border: 1px solid var(--oya-border, #e5e7eb);
+    font-weight: 400;
+    transition: all 0.15s ease;
+  }
+  .reason-badge:hover {
+    background: var(--oya-primary-light, #eff6ff);
+    border-color: var(--oya-primary, #2563eb);
+    color: var(--oya-primary, #2563eb);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8 col-xl-6" style="padding:0 0.5rem;">
+      
+      <!-- Treasury Balance Card -->
+      <div class="card mb-3 treasury-pulse" style="background: linear-gradient(135deg, var(--oya-primary) 0%, var(--oya-primary-dark, #1d4ed8) 100%); color: #fff; border: none;">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <div style="font-size: 0.75rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Current Treasury Balance</div>
+            <div style="font-size: clamp(1.25rem, 5vw, 1.75rem); font-weight: 700; margin-top: 0.25rem; font-family: 'Segoe UI', system-ui, sans-serif;">
+              ₦{{ treasury_balance|floatformat:2 }}
+            </div>
+            <div style="font-size: 0.75rem; opacity: 0.75; margin-top: 0.25rem;">
+              {{ total_income|floatformat:2 }} in &middot; {{ total_expenses|floatformat:2 }} out
+            </div>
+          </div>
+          <div style="background: rgba(255,255,255,0.15); border-radius: 0.75rem; padding: 0.75rem;">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Income Preview -->
+      {% if recent_incomes %}
+      <div class="card mb-3" style="border-left: 3px solid var(--oya-success, #10b981);">
+        <div class="card-body py-2 px-3">
+          <div style="font-size: 0.75rem; color: var(--oya-text-muted, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Most Recent Income</div>
+          <div class="d-flex justify-content-between align-items-center mt-1">
+            <span style="font-weight: 500; color: var(--oya-text, #374151);">
+              {{ recent_incomes.0.reason|truncatechars:30 }}
+            </span>
+            <span style="color: var(--oya-success, #10b981); font-weight: 600;">
+              +₦{{ recent_incomes.0.amount|floatformat:2 }}
+            </span>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--oya-text-muted, #6b7280);">
+            {{ recent_incomes.0.paid_by|default:"Unknown" }} &middot; {{ recent_incomes.0.created_at|timesince }} ago
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="card">
+        <div class="card-header" style="background: var(--oya-surface, #fff); border-bottom: 1px solid var(--oya-border, #e5e7eb);">
+          <h5 class="card-title mb-0" style="font-size: 1rem; font-weight: 600; color: var(--oya-text, #111827);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.5rem; color: var(--oya-primary, #2563eb);">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+            </svg>
+            {{ title }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="post" novalidate>
+            {% csrf_token %}
+
+            <!-- Amount -->
+            <div class="mb-3">
+              <label for="{{ form.amount.id_for_label }}" class="form-label" style="font-weight: 500; color: var(--oya-text, #374151); font-size: 0.875rem;">
+                Amount <span style="color: var(--oya-danger, #ef4444);">*</span>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text" style="background: var(--oya-surface-alt, #f9fafb); border-color: var(--oya-border, #d1d5db); color: var(--oya-text-muted, #6b7280); font-weight: 600;">₦</span>
+                {{ form.amount }}
+              </div>
+              {% if form.amount.errors %}
+                <div class="invalid-feedback d-block" style="font-size: 0.875rem;">{{ form.amount.errors|join:", " }}</div>
+              {% endif %}
+              <div class="form-text" style="font-size: 0.75rem;">Enter amount in Naira (e.g., 50000.00)</div>
+            </div>
+
+            <!-- Reason -->
+            <div class="mb-3">
+              <label for="{{ form.reason.id_for_label }}" class="form-label" style="font-weight: 500; color: var(--oya-text, #374151); font-size: 0.875rem;">
+                Reason <span style="color: var(--oya-danger, #ef4444);">*</span>
+              </label>
+              {{ form.reason }}
+              {% if form.reason.errors %}
+                <div class="invalid-feedback d-block" style="font-size: 0.875rem;">{{ form.reason.errors|join:", " }}</div>
+              {% endif %}
+              <div class="form-text" style="font-size: 0.75rem; margin-top: 0.5rem;">
+                Common reasons:
+                {% for reason in common_reasons %}
+                  <span class="badge reason-badge" onclick="document.getElementById('id_reason').value='{{ reason|escapejs }}'">{{ reason }}</span>
+                {% empty %}
+                  <span class="badge reason-badge" onclick="document.getElementById('id_reason').value='Annual Dues'">Annual Dues</span>
+                  <span class="badge reason-badge" onclick="document.getElementById('id_reason').value='Donation'">Donation</span>
+                  <span class="badge reason-badge" onclick="document.getElementById('id_reason').value='Project Fund'">Project Fund</span>
+                  <span class="badge reason-badge" onclick="document.getElementById('id_reason').value='Event Fee'">Event Fee</span>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Paid By (Auto-suggest from backend) -->
+            <div class="mb-3">
+              <label for="id_paid_by" class="form-label" style="font-weight: 500; color: var(--oya-text, #374151); font-size: 0.875rem;">
+                Paid By
+              </label>
+              <select name="paid_by" id="id_paid_by" class="form-select" style="width: 100%;">
+                {% if form.paid_by.value %}
+                  <option value="{{ form.paid_by.value }}" selected>{{ form.paid_by.value }}</option>
+                {% endif %}
+              </select>
+              {% if form.paid_by.errors %}
+                <div class="invalid-feedback d-block" style="font-size: 0.875rem;">{{ form.paid_by.errors|join:", " }}</div>
+              {% endif %}
+              <div class="form-text" style="font-size: 0.75rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.25rem;">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                Search by name or serial number (e.g., OYA-2026-0001)
+              </div>
+            </div>
+
+            <!-- Submit Actions -->
+            <div class="d-flex gap-2 mt-4 pt-2" style="border-top: 1px solid var(--oya-border-light, #f3f4f6);">
+              <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                {{ action|default:"Save" }}
+              </button>
+              <a href="{% url 'finance:income_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // Initialize Select2 for Paid By field with AJAX backend search
+    $('#id_paid_by').select2({
+      placeholder: 'Search member by name or serial number...',
+      allowClear: true,
+      minimumInputLength: 2,
+      ajax: {
+        url: '{% url "finance:search_members" %}',
+        dataType: 'json',
+        delay: 300,
+        data: function(params) {
+          return { q: params.term };
+        },
+        processResults: function(data) {
+          return {
+            results: data.results.map(function(item) {
+              return {
+                id: item.name,
+                text: item.text,
+                html: item.html
+              };
+            })
+          };
+        },
+        cache: true
+      },
+      templateResult: function(data) {
+        if (data.loading) return $('<div class="member-result"><span class="member-name">Searching...</span></div>');
+        if (!data.html) return data.text;
+        return $(data.html);
+      },
+      templateSelection: function(data) {
+        return data.text ? data.text.split('(')[0].trim() : data.id;
+      },
+      language: {
+        inputTooShort: function() {
+          return 'Type at least 2 characters to search members...';
+        },
+        noResults: function() {
+          return '<div class="member-result"><span class="member-name">No member found</span><span class="member-meta">Press Enter to use custom name</span></div>';
+        },
+        searching: function() {
+          return '<div class="member-result"><span class="member-name">Searching members...</span></div>';
+        }
+      },
+      escapeMarkup: function(markup) {
+        return markup;
+      },
+      tags: true,
+      createTag: function(params) {
+        var term = $.trim(params.term);
+        if (term === '') return null;
+        return {
+          id: term,
+          text: term + ' (Custom)',
+          isNew: true
+        };
+      }
+    });
+
+    // Amount input formatting
+    $('#id_amount').on('input', function() {
+      let val = $(this).val();
+      val = val.replace(/[^0-9.]/g, '');
+      const parts = val.split('.');
+      if (parts.length > 2) {
+        val = parts[0] + '.' + parts.slice(1).join('');
+      }
+      if (parts[1] && parts[1].length > 2) {
+        val = parts[0] + '.' + parts[1].substring(0, 2);
+      }
+      $(this).val(val);
+    });
+
+    // Add input-group styling to amount field
+    $('#id_amount').addClass('form-control').css({
+      'border-top-left-radius': '0',
+      'border-bottom-left-radius': '0'
+    });
+
+    // Add form-control class to reason field
+    $('#id_reason').addClass('form-control');
+  });
+</script>
+{% endblock %}

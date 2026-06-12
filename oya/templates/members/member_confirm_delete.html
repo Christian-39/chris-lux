@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Delete Member{% endblock %}
+{% block page_title %}Delete Member{% endblock %}
+{% block breadcrumb %}Members{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 style="font-size:clamp(1.125rem, 3vw, 1.5rem);">Delete Member</h1>
+    <p style="font-size:clamp(0.75rem, 2vw, 0.875rem);">Permanently delete member record from the system</p>
+  </div>
+  <div class="page-header-actions" style="flex-wrap:wrap;gap:0.5rem;">
+    <a href="{% url 'members:member_detail' pk=member.pk %}" class="btn btn-secondary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back to Profile
+    </a>
+  </div>
+</div>
+
+<div class="dashboard-grid dashboard-grid-1" style="max-width:600px;margin:0 auto;">
+  <div class="card" style="border:1px solid var(--oya-danger);background:var(--oya-danger-bg);">
+    <div class="card-body" style="text-align:center;padding:clamp(1.25rem, 5vw, 2.5rem);">
+      <div style="width:clamp(48px, 15vw, 64px);height:clamp(48px, 15vw, 64px);border-radius:50%;background:var(--oya-danger);color:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+      </div>
+      <h2 style="font-size:clamp(1rem, 3.5vw, 1.25rem);margin-bottom:0.5rem;color:var(--oya-danger);">Confirm Permanent Deletion</h2>
+      <p style="color:var(--oya-text-secondary);margin-bottom:1.5rem;font-size:clamp(0.75rem, 2vw, 0.875rem);">
+        You are about to permanently delete <strong style="color:var(--oya-text-primary);">{{ member.full_name }}</strong>.
+        This action <strong>cannot be undone</strong>. All data including photo, cases, and assignments will be permanently removed.
+      </p>
+
+      <div style="background:#fff;border:1px solid var(--oya-border);border-radius:var(--oya-radius);padding:1rem;margin-bottom:1.5rem;text-align:left;">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--oya-border);">
+          {% if member.photo %}
+            <img src="{{ member.photo.url }}" alt="" style="width:clamp(36px, 12vw, 48px);height:clamp(36px, 12vw, 48px);border-radius:50%;object-fit:cover;">
+          {% else %}
+            <div style="width:clamp(36px, 12vw, 48px);height:clamp(36px, 12vw, 48px);border-radius:50%;background:var(--oya-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:clamp(0.875rem, 2.5vw, 1rem);">
+              {{ member.full_name|slice:":2"|upper }}
+            </div>
+          {% endif %}
+          <div>
+            <div style="font-weight:600;color:var(--oya-text-primary);">{{ member.full_name }}</div>
+            <div style="font-size:clamp(0.75rem, 2vw, 0.875rem);color:var(--oya-text-muted);">{{ member.serial_number }}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr));gap:0.75rem;font-size:clamp(0.75rem, 2vw, 0.875rem);">
+          <div>
+            <span style="color:var(--oya-text-muted);display:block;font-size:clamp(0.625rem, 1.5vw, 0.75rem);">Clan</span>
+            <span style="color:var(--oya-text-primary);font-weight:500;">{{ member.umu_nna_clan.name|default:"—" }}</span>
+          </div>
+          <div>
+            <span style="color:var(--oya-text-muted);display:block;font-size:clamp(0.625rem, 1.5vw, 0.75rem);">Status</span>
+            <span style="color:var(--oya-text-primary);font-weight:500;">
+              {% if member.status == "ACTIVE" %}
+                <span class="badge badge-success" style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);">Active</span>
+              {% elif member.status == "PAST_MEMBER" %}
+                <span class="badge badge-warning" style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);">Past Member</span>
+              {% elif member.status == "REMOVED" %}
+                <span class="badge badge-danger" style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);">Removed</span>
+              {% endif %}
+            </span>
+          </div>
+          <div>
+            <span style="color:var(--oya-text-muted);display:block;font-size:clamp(0.625rem, 1.5vw, 0.75rem);">Age</span>
+            <span style="color:var(--oya-text-primary);font-weight:500;">{{ member.age }} years</span>
+          </div>
+          <div>
+            <span style="color:var(--oya-text-muted);display:block;font-size:clamp(0.625rem, 1.5vw, 0.75rem);">Registered</span>
+            <span style="color:var(--oya-text-primary);font-weight:500;">{{ member.created_at|date:"M d, Y" }}</span>
+          </div>
+        </div>
+      </div>
+
+      <form method="post" style="display:flex;gap:0.75rem;justify-content:center;">
+        {% csrf_token %}
+        <a href="{% url 'members:member_list' %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-danger">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          Delete Permanently
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
