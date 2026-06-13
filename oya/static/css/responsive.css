@@ -6,8 +6,11 @@
 
 /* ─── Root containment - prevent page-level horizontal scroll ─── */
 html, body {
-  overflow-x: hidden;
   max-width: 100vw;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 /* ─── Main content area - strict containment ─── */
@@ -32,6 +35,12 @@ html, body {
   scrollbar-color: var(--oya-text-muted) transparent;
 }
 
+/* Ensure tables inside wrappers have minimum width to trigger scroll */
+.table-responsive-wrapper .data-table {
+  min-width: 600px;
+  width: 100%;
+}
+
 /* Custom scrollbar for responsive wrappers */
 .table-responsive-wrapper::-webkit-scrollbar,
 .form-responsive-wrapper::-webkit-scrollbar,
@@ -54,8 +63,6 @@ html, body {
 
 /* ─── Table Container (existing class enhancement) ─── */
 .table-container {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: 100%;
@@ -65,15 +72,25 @@ html, body {
 /* ─── Data Table - constrain within scrollable container ─── */
 .data-table {
   width: 100%;
-  min-width: 0;
   table-layout: auto;
+}
+
+/* Tables inside responsive wrappers need minimum width to trigger scroll */
+.table-responsive-wrapper .data-table,
+.table-container .data-table {
+  min-width: 600px;
 }
 
 /* On mobile, tables inside scroll wrappers should have minimum readable width */
 @media (max-width: 768px) {
   .table-responsive-wrapper .data-table,
   .table-container .data-table {
-    min-width: 600px;
+    min-width: 500px;
+  }
+
+  .table-responsive-wrapper,
+  .table-container {
+    -webkit-overflow-scrolling: touch;
   }
 }
 

@@ -145,46 +145,25 @@
     flex-direction: column;
     align-items: stretch;
   }
-
   .toolbar-search {
     max-width: 100% !important;
   }
-
   .data-table {
     font-size: 0.9375rem;
-    min-width: 600px;
   }
-
   .data-table thead th,
   .data-table tbody td {
     padding: 0.875rem 1rem;
   }
-
   .data-table tbody td {
     white-space: nowrap;
   }
-
   .data-table .cell-name {
     max-width: 150px;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
-  .table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: var(--oya-radius-md);
-    box-shadow: inset -4px 0 8px rgba(0,0,0,0.05);
-  }
-
-  .table-container::-webkit-scrollbar {
-    height: 4px;
-  }
-
-  .table-container::-webkit-scrollbar-thumb {
-    background: var(--oya-text-muted);
-    border-radius: 2px;
-  }
+  /* Table scrolling is handled by .table-responsive-wrapper */
 
   .table-actions {
     gap: 0.25rem;
@@ -616,10 +595,8 @@
 
   /* Tables & Lists */
   .data-table {
-    min-width: 500px;
     font-size: 0.875rem;
   }
-
   .data-table .cell-name {
     max-width: 120px;
   }
