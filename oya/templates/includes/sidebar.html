@@ -135,21 +135,30 @@
   <!-- Footer -->
   <div class="sidebar-footer">
     <div class="user-info">
-      {% with member_photo=user.member.photo|default:None %}
-      <div class="user-avatar" style="overflow:hidden;cursor:pointer;" 
-          onclick="openImagePreview('{% if user.photo and user.photo.name %}{{ user.photo.url }}{% elif member_photo and member_photo.name %}{{ member_photo.url }}{% endif %}', '{{ user.full_name|default:user.serial_number }}')">
-        {% if user.photo and user.photo.name %}
-          <img src="{{ user.photo.url }}" alt="{{ user.full_name }}" style="width:100%;height:100%;object-fit:cover;">
-        {% elif member_photo and member_photo.name %}
-          <img src="{{ member_photo.url }}" alt="{{ user.full_name }}" style="width:100%;height:100%;object-fit:cover;">
-        {% else %}
-          {{ user.get_full_name|first|upper|default:user.serial_number|first|upper }}
-        {% endif %}
-      </div>
-      {% endwith %}
+      {% if user.is_authenticated %}
+        {% with member_photo=user.member.photo|default:None %}
+        <div class="user-avatar" style="overflow:hidden;cursor:pointer;"
+            onclick="openImagePreview('{% if user.photo and user.photo.name %}{{ user.photo.url }}{% elif member_photo and member_photo.name %}{{ member_photo.url }}{% endif %}', '{{ user.full_name|default:user.serial_number }}')">
+          {% if user.photo and user.photo.name %}
+            <img src="{{ user.photo.url }}" alt="{{ user.full_name }}" style="width:100%;height:100%;object-fit:cover;">
+          {% elif member_photo and member_photo.name %}
+            <img src="{{ member_photo.url }}" alt="{{ user.full_name }}" style="width:100%;height:100%;object-fit:cover;">
+          {% else %}
+            {{ user.get_full_name|first|upper|default:user.serial_number|first|upper }}
+          {% endif %}
+        </div>
+        {% endwith %}
+      {% else %}
+        <div class="user-avatar" style="overflow:hidden;cursor:pointer;" onclick="openImagePreview('', 'Guest')">?</div>
+      {% endif %}
       <div class="user-details">
-        <div class="user-name">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user }}{% endif %}</div>
-        <div class="user-role">{% if user.is_staff %}Administrator{% else %}Member{% endif %}</div>
+        {% if user.is_authenticated %}
+          <div class="user-name">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user }}{% endif %}</div>
+          <div class="user-role">{% if user.is_staff %}Administrator{% else %}Member{% endif %}</div>
+        {% else %}
+          <div class="user-name">Guest</div>
+          <div class="user-role">Please sign in</div>
+        {% endif %}
       </div>
     </div>
   </div>

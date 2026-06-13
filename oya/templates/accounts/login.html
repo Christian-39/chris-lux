@@ -1,202 +1,322 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login | OYA - OKPO Youths Association</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/base.css' %}">
-  <link rel="stylesheet" href="{% static 'css/layout.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-  <link rel="stylesheet" href="{% static 'css/darkmode.css' %}">
-  <link rel="stylesheet" href="{% static 'css/mobile.css' %}">
-  <link rel="icon" type="image/png" href="{% static 'images/oya_logo.png' %}">
-  <style>
-    /* Login-specific error styles */
-    .form-error {
-      color: var(--oya-danger);
-      font-size: 0.8125rem;
-      margin-top: 0.375rem;
-      display: flex;
-      align-items: center;
-      gap: 0.375rem;
-    }
-    .form-error::before {
-      content: "•";
-      font-size: 1.2rem;
-      line-height: 0;
-    }
-    .field-error {
-      border-color: var(--oya-danger) !important;
-      background-color: var(--oya-danger-bg) !important;
-    }
-    .non-field-errors {
-      background: var(--oya-danger-bg);
-      border: 1px solid var(--oya-danger);
-      border-radius: var(--radius-md);
-      padding: 0.875rem 1rem;
-      margin-bottom: 1.25rem;
-      color: var(--oya-danger);
-      font-size: 0.875rem;
-      display: flex;
-      align-items: flex-start;
-      gap: 0.625rem;
-    }
-    .non-field-errors svg {
-      flex-shrink: 0;
-      margin-top: 0.125rem;
-    }
-    .shake {
-      animation: shake 0.5s ease-in-out;
-    }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-  </style>
-</head>
-<body class="no-transition">
 
-  <div class="login-page">
-    <div class="login-card {% if form.errors %}shake{% endif %}">
+{% block title %}Login{% endblock %}
 
-      <!-- Login Header -->
-      <div class="login-header">
-        <img src="{% static 'images/oya_logo.png' %}" alt="OYA Logo" class="login-logo">
-        <h1>OKPO Youths Association</h1>
-        <p>Management System</p>
-        <div class="login-motto">Peace & Progress</div>
-      </div>
+{% block extra_css %}
+<style>
+  /* Login-specific error styles */
+  .form-error {
+    color: var(--oya-danger);
+    font-size: 0.8125rem;
+    margin-top: 0.375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  .form-error::before {
+    content: "•";
+    font-size: 1.2rem;
+    line-height: 0;
+  }
+  .field-error {
+    border-color: var(--oya-danger) !important;
+    background-color: var(--oya-danger-bg) !important;
+  }
+  .non-field-errors {
+    background: var(--oya-danger-bg);
+    border: 1px solid var(--oya-danger);
+    border-radius: var(--radius-md);
+    padding: 0.875rem 1rem;
+    margin-bottom: 1.25rem;
+    color: var(--oya-danger);
+    font-size: 0.875rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+  }
+  .non-field-errors svg {
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+  }
+  .shake {
+    animation: shake 0.5s ease-in-out;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
 
-      <!-- Login Form -->
-      <form method="post" data-validate novalidate>
-        {% csrf_token %}
+  /* Login page overrides for base layout */
+  .app-shell {
+    display: block;
+    min-height: 100vh;
+  }
+  .sidebar,
+  .topbar,
+  .mobile-top-header,
+  .mobile-bottom-nav,
+  .app-footer {
+    display: none !important;
+  }
+  .main-content {
+    margin-left: 0 !important;
+    padding-top: 0 !important;
+  }
+  .content-area {
+    padding: 0;
+    overflow-x: hidden;
+  }
 
-        <!-- Non-field errors (invalid credentials, etc.) -->
-        {% if form.non_field_errors %}
-          <div class="non-field-errors">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="8" x2="12" y2="12"/>
-              <line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
-            <div>
-              {% for error in form.non_field_errors %}
-                {{ error }}
-              {% endfor %}
-            </div>
+  /* Login page wrapper - Dark Charcoal */
+  .login-page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .login-page-wrapper::before {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.06);
+    top: -200px;
+    right: -200px;
+  }
+  .login-page-wrapper::after {
+    content: '';
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.04);
+    bottom: -150px;
+    left: -150px;
+  }
+
+  /* Login card sizing */
+  .login-card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 440px;
+    padding: clamp(1.5rem, 5vw, 2.5rem);
+  }
+
+  /* Login footer */
+  .login-footer {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--oya-border);
+    text-align: center;
+  }
+  .login-footer p {
+    font-size: 0.8125rem;
+    color: var(--oya-text-muted);
+  }
+
+  /* Security note */
+  .security-note {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: var(--oya-primary-50);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+  .security-note span {
+    font-size: 0.75rem;
+    color: var(--oya-primary);
+    font-weight: 500;
+  }
+
+  /* Copyright */
+  .login-copyright {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.75rem;
+  }
+
+  /* Remember / forgot row */
+  .login-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .login-options a {
+    font-size: 0.875rem;
+    color: var(--oya-primary);
+    font-weight: 500;
+  }
+
+  /* Submit button */
+  .login-submit {
+    width: 100%;
+    padding: 0.75rem;
+  }
+
+  /* Form hint */
+  .form-hint {
+    font-size: 0.75rem;
+    color: var(--oya-text-muted);
+    margin-top: 0.25rem;
+    display: block;
+  }
+
+  /* Alert margin override for login */
+  .login-alert {
+    margin-bottom: 1rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="login-page-wrapper">
+  <div class="login-card {% if form.errors %}shake{% endif %}">
+
+    <!-- Login Header -->
+    <div class="login-header">
+      <img src="{% static 'images/oya_logo.png' %}" alt="OYA Logo" class="login-logo">
+      <h1>OKPO Youths Association</h1>
+      <p>Management System</p>
+      <div class="login-motto">Peace & Progress</div>
+    </div>
+
+    <!-- Login Form -->
+    <form method="post" data-validate novalidate>
+      {% csrf_token %}
+
+      <!-- Non-field errors (invalid credentials, etc.) -->
+      {% if form.non_field_errors %}
+        <div class="non-field-errors">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <div>
+            {% for error in form.non_field_errors %}
+              {{ error }}
+            {% endfor %}
           </div>
-        {% endif %}
+        </div>
+      {% endif %}
 
-        <!-- Success messages -->
-        {% if messages %}
-          {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}" data-auto-hide="5000" style="margin-bottom:1rem;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                {% if message.tags == 'success' %}
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                  <polyline points="22 4 12 14.01 9 11.01"/>
-                {% else %}
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="12" y1="8" x2="12" y2="12"/>
-                  <line x1="12" y1="16" x2="12.01" y2="16"/>
-                {% endif %}
-              </svg>
-              {{ message }}
-            </div>
+      <!-- Success messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} login-alert" data-auto-hide="5000">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              {% if message.tags == 'success' %}
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              {% else %}
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              {% endif %}
+            </svg>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Serial Number Field -->
+      <div class="form-group">
+        <label class="form-label" for="{{ form.serial_number.id_for_label }}">
+          {{ form.serial_number.label }}
+        </label>
+        {{ form.serial_number }}
+        {% if form.serial_number.errors %}
+          {% for error in form.serial_number.errors %}
+            <div class="form-error">{{ error }}</div>
           {% endfor %}
         {% endif %}
-
-        <!-- Serial Number Field -->
-        <div class="form-group">
-          <label class="form-label" for="{{ form.serial_number.id_for_label }}">
-            {{ form.serial_number.label }}
-          </label>
-          {{ form.serial_number }}
-          {% if form.serial_number.errors %}
-            {% for error in form.serial_number.errors %}
-              <div class="form-error">{{ error }}</div>
-            {% endfor %}
-          {% endif %}
-          <small style="font-size:0.75rem;color:var(--oya-text-muted);margin-top:0.25rem;display:block;">
-            Format: OYA-YYYY-XXXX (e.g., OYA-2026-0001)
-          </small>
-        </div>
-
-        <!-- PIN Field -->
-        <div class="form-group">
-          <label class="form-label" for="{{ form.pin.id_for_label }}">
-            {{ form.pin.label }}
-          </label>
-          {{ form.pin }}
-          {% if form.pin.errors %}
-            {% for error in form.pin.errors %}
-              <div class="form-error">{{ error }}</div>
-            {% endfor %}
-          {% endif %}
-        </div>
-
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
-          <label class="form-check">
-            <input type="checkbox" name="remember" class="form-check-input">
-            <span class="form-check-label">Remember me</span>
-          </label>
-          <a href="#" style="font-size:0.875rem;color:var(--oya-primary);font-weight:500;">Forgot password?</a>
-        </div>
-
-        <button type="submit" class="btn btn-primary" style="width:100%;padding:0.75rem;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-            <polyline points="10 17 15 12 10 7"/>
-            <line x1="15" y1="12" x2="3" y2="12"/>
-          </svg>
-          Sign In to Dashboard
-        </button>
-      </form>
-
-      <!-- Login Footer -->
-      <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--oya-border);text-align:center;">
-        <p style="font-size:0.8125rem;color:var(--oya-text-muted);">
-          Don't have an account? Contact your <a href="#" style="color:var(--oya-primary);font-weight:600;">administrator</a>
-        </p>
+        <small class="form-hint">
+          Format: OYA-YYYY-XXXX (e.g., OYA-2026-0001)
+        </small>
       </div>
 
-      <!-- Security Note -->
-      <div style="margin-top:1rem;padding:0.75rem;background:var(--oya-primary-50);border-radius:var(--radius-md);display:flex;align-items:center;gap:0.625rem;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--oya-primary)" stroke-width="2">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      <!-- PIN Field -->
+      <div class="form-group">
+        <label class="form-label" for="{{ form.pin.id_for_label }}">
+          {{ form.pin.label }}
+        </label>
+        {{ form.pin }}
+        {% if form.pin.errors %}
+          {% for error in form.pin.errors %}
+            <div class="form-error">{{ error }}</div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <div class="login-options">
+        <label class="form-check">
+          <input type="checkbox" name="remember" class="form-check-input">
+          <span class="form-check-label">Remember me</span>
+        </label>
+        <a href="#">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn btn-primary login-submit">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+          <polyline points="10 17 15 12 10 7"/>
+          <line x1="15" y1="12" x2="3" y2="12"/>
         </svg>
-        <span style="font-size:0.75rem;color:var(--oya-primary);font-weight:500;">Secured with 256-bit encryption. Authorized access only.</span>
-      </div>
+        Sign In to Dashboard
+      </button>
+    </form>
 
+    <!-- Login Footer -->
+    <div class="login-footer">
+      <p>
+        Don't have an account? Contact your <a href="#" style="color:var(--oya-primary);font-weight:600;">administrator</a>
+      </p>
     </div>
 
-    <!-- Copyright -->
-    <div style="position:absolute;bottom:1.5rem;left:0;right:0;text-align:center;color:rgba(255,255,255,0.6);font-size:0.75rem;">
-      &copy; {% now "Y" %} OKPO Youths Association. All rights reserved.
+    <!-- Security Note -->
+    <div class="security-note">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--oya-primary)" stroke-width="2">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      <span>Secured with 256-bit encryption. Authorized access only.</span>
     </div>
+
   </div>
 
-  <script src="{% static 'js/theme.js' %}"></script>
-  <script src="{% static 'js/dashboard.js' %}"></script>
-  <script>
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.body.classList.remove('no-transition');
-      });
-    });
-    
-    // Add field-error class to inputs with errors
-    document.querySelectorAll('.form-error').forEach(error => {
-      const input = error.previousElementSibling;
-      if (input && input.tagName === 'INPUT') {
-        input.classList.add('field-error');
-      }
-    });
-  </script>
-</body>
-</html>
+  <!-- Copyright -->
+  <div class="login-copyright">
+    &copy; {% now "Y" %} OKPO Youths Association. All rights reserved.
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Add field-error class to inputs with errors
+  document.querySelectorAll('.form-error').forEach(error => {
+    const input = error.previousElementSibling;
+    if (input && input.tagName === 'INPUT') {
+      input.classList.add('field-error');
+    }
+  });
+</script>
+{% endblock %}

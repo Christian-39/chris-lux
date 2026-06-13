@@ -1,9 +1,90 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Users{% endblock %}
-{% block page_title %}User Management{% endblock %}
-{% block breadcrumb %}System{% endblock %}
+{% block title %}Users<style>
+@media (max-width: 768px) {
+  .page-header-left h1 { font-size: 1.375rem !important; }
+  .page-header-left p { font-size: 0.9375rem; }
+  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
+  .form-label { font-size: 0.9375rem; }
+  .card-header-title { font-size: 1rem; }
+  .data-table { font-size: 0.9375rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.75rem 1rem; }
+  .badge { font-size: 0.8125rem; padding: 0.3rem 0.5rem; }
+  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
+  .table-action-btn { width: 36px; height: 36px; }
+  .avatar { width: 40px; height: 40px; font-size: 0.875rem; }
+  .page-btn { min-width: 36px; height: 36px; font-size: 0.875rem; }
+}
+
+@media (max-width: 480px) {
+  .data-table { font-size: 0.875rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.625rem 0.75rem; }
+  .badge { font-size: 0.75rem; }
+  .btn { font-size: 0.8125rem; }
+  .page-btn { min-width: 32px; height: 32px; font-size: 0.8125rem; }
+}
+</style>
+
+{% endblock %}
+{% block page_title %}User Management<style>
+@media (max-width: 768px) {
+  .page-header-left h1 { font-size: 1.375rem !important; }
+  .page-header-left p { font-size: 0.9375rem; }
+  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
+  .form-label { font-size: 0.9375rem; }
+  .card-header-title { font-size: 1rem; }
+  .data-table { font-size: 0.9375rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.75rem 1rem; }
+  .badge { font-size: 0.8125rem; padding: 0.3rem 0.5rem; }
+  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
+  .table-action-btn { width: 36px; height: 36px; }
+  .avatar { width: 40px; height: 40px; font-size: 0.875rem; }
+  .page-btn { min-width: 36px; height: 36px; font-size: 0.875rem; }
+}
+
+@media (max-width: 480px) {
+  .data-table { font-size: 0.875rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.625rem 0.75rem; }
+  .badge { font-size: 0.75rem; }
+  .btn { font-size: 0.8125rem; }
+  .page-btn { min-width: 32px; height: 32px; font-size: 0.8125rem; }
+}
+</style>
+
+{% endblock %}
+{% block breadcrumb %}System<style>
+@media (max-width: 768px) {
+  .page-header-left h1 { font-size: 1.375rem !important; }
+  .page-header-left p { font-size: 0.9375rem; }
+  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
+  .form-label { font-size: 0.9375rem; }
+  .card-header-title { font-size: 1rem; }
+  .data-table { font-size: 0.9375rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.75rem 1rem; }
+  .badge { font-size: 0.8125rem; padding: 0.3rem 0.5rem; }
+  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
+  .table-action-btn { width: 36px; height: 36px; }
+  .avatar { width: 40px; height: 40px; font-size: 0.875rem; }
+  .page-btn { min-width: 36px; height: 36px; font-size: 0.875rem; }
+}
+
+@media (max-width: 480px) {
+  .data-table { font-size: 0.875rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.625rem 0.75rem; }
+  .badge { font-size: 0.75rem; }
+  .btn { font-size: 0.8125rem; }
+  .page-btn { min-width: 32px; height: 32px; font-size: 0.8125rem; }
+}
+</style>
+
+{% endblock %}
 
 {% block content %}
 

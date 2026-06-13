@@ -1,9 +1,72 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ title }}{% endblock %}
-{% block page_title %}{{ title }}{% endblock %}
-{% block breadcrumb %}{{ action }}{% endblock %}
+{% block title %}{{ title }}<style>
+@media (max-width: 768px) {
+  .page-header-left h1 { font-size: 1.375rem !important; }
+  .page-header-left p { font-size: 0.9375rem; }
+  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
+  .form-label { font-size: 0.9375rem; }
+  .form-error { font-size: 0.8125rem; }
+  .card-header-title { font-size: 1rem; }
+  .card-header-subtitle { font-size: 0.875rem; }
+  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
+  .avatar { width: 52px; height: 52px; }
+}
+
+@media (max-width: 480px) {
+  .form-control { font-size: 0.875rem; padding: 0.5rem 0.75rem; }
+  .form-label { font-size: 0.875rem; }
+  .page-header-left h1 { font-size: 1.25rem !important; }
+  .btn { font-size: 0.8125rem; }
+}
+</style>
+
+{% endblock %}
+{% block page_title %}{{ title }}<style>
+@media (max-width: 768px) {
+  .page-header-left h1 { font-size: 1.375rem !important; }
+  .page-header-left p { font-size: 0.9375rem; }
+  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
+  .form-label { font-size: 0.9375rem; }
+  .form-error { font-size: 0.8125rem; }
+  .card-header-title { font-size: 1rem; }
+  .card-header-subtitle { font-size: 0.875rem; }
+  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
+  .avatar { width: 52px; height: 52px; }
+}
+
+@media (max-width: 480px) {
+  .form-control { font-size: 0.875rem; padding: 0.5rem 0.75rem; }
+  .form-label { font-size: 0.875rem; }
+  .page-header-left h1 { font-size: 1.25rem !important; }
+  .btn { font-size: 0.8125rem; }
+}
+</style>
+
+{% endblock %}
+{% block breadcrumb %}{{ action }}<style>
+@media (max-width: 768px) {
+  .page-header-left h1 { font-size: 1.375rem !important; }
+  .page-header-left p { font-size: 0.9375rem; }
+  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
+  .form-label { font-size: 0.9375rem; }
+  .form-error { font-size: 0.8125rem; }
+  .card-header-title { font-size: 1rem; }
+  .card-header-subtitle { font-size: 0.875rem; }
+  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
+  .avatar { width: 52px; height: 52px; }
+}
+
+@media (max-width: 480px) {
+  .form-control { font-size: 0.875rem; padding: 0.5rem 0.75rem; }
+  .form-label { font-size: 0.875rem; }
+  .page-header-left h1 { font-size: 1.25rem !important; }
+  .btn { font-size: 0.8125rem; }
+}
+</style>
+
+{% endblock %}
 
 {% block content %}
 
@@ -149,5 +212,26 @@
     </form>
   </div>
 </div>
+
+<style>
+@media (max-width: 768px) {
+  .page-header-left h1 { font-size: 1.375rem !important; }
+  .page-header-left p { font-size: 0.9375rem; }
+  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
+  .form-label { font-size: 0.9375rem; }
+  .form-error { font-size: 0.8125rem; }
+  .card-header-title { font-size: 1rem; }
+  .card-header-subtitle { font-size: 0.875rem; }
+  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
+  .avatar { width: 52px; height: 52px; }
+}
+
+@media (max-width: 480px) {
+  .form-control { font-size: 0.875rem; padding: 0.5rem 0.75rem; }
+  .form-label { font-size: 0.875rem; }
+  .page-header-left h1 { font-size: 1.25rem !important; }
+  .btn { font-size: 0.8125rem; }
+}
+</style>
 
 {% endblock %}

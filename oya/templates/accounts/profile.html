@@ -274,6 +274,37 @@
 .settings-info p { margin:0; font-size:0.8125rem; color:var(--oya-text-secondary); }
 .unread { background:rgba(26,35,126,0.03); }
 .unread td { font-weight:500; }
+
+@media (max-width: 768px) {
+  .profile-card { flex-direction: column; text-align: center; }
+  .profile-avatar { width: 64px !important; height: 64px !important; }
+  .dashboard-grid-2 { grid-template-columns: 1fr !important; }
+  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
+  .form-label { font-size: 0.9375rem; }
+  .form-error { font-size: 0.8125rem; }
+  .settings-info h4 { font-size: 1rem; }
+  .settings-info p { font-size: 0.875rem; }
+  .settings-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  .data-table { font-size: 0.9375rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.75rem 1rem; }
+  .badge { font-size: 0.8125rem; padding: 0.3rem 0.5rem; }
+  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
+  .kpi-value { font-size: 1.5rem !important; }
+  .kpi-label { font-size: 0.9375rem !important; }
+}
+
+@media (max-width: 480px) {
+  .form-control { font-size: 0.875rem; padding: 0.5rem 0.75rem; }
+  .form-label { font-size: 0.875rem; }
+  .data-table { font-size: 0.875rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.625rem 0.75rem; }
+  .settings-info h4 { font-size: 0.9375rem; }
+  .settings-info p { font-size: 0.8125rem; }
+  .badge { font-size: 0.75rem; }
+  .btn { font-size: 0.8125rem; }
+}
 </style>
 
 {% endblock %}

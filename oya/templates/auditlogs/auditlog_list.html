@@ -1,9 +1,129 @@
 {% extends "base.html" %}
 {% load static oya_tags %}
 
-{% block title %}Audit Log{% endblock %}
-{% block page_title %}Audit Log{% endblock %}
-{% block breadcrumb %}System Logs{% endblock %}
+{% block title %}Audit Log<style>
+@media (max-width: 768px) {
+  .page-header-left h1 { font-size: 1.375rem; }
+  .page-header-left p { font-size: 0.9375rem; }
+  .filters-bar { flex-direction: column; align-items: stretch; gap: 0.75rem; padding: 1rem; }
+  .filter-group { width: 100%; }
+  .filter-group .form-control { width: 100%; }
+  .filter-label { font-size: 0.875rem; }
+  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
+  .data-table { font-size: 0.9375rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.75rem 1rem; }
+  .badge { font-size: 0.8125rem; padding: 0.3rem 0.5rem; }
+  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
+  .table-action-btn { width: 36px; height: 36px; }
+  .page-btn { min-width: 36px; height: 36px; font-size: 0.875rem; }
+  .card-header-title { font-size: 1rem; }
+  .card-header-subtitle { font-size: 0.875rem; }
+  .detail-label { font-size: 0.8125rem; }
+  .detail-value { font-size: 0.9375rem; }
+  .detail-value pre { font-size: 0.8125rem; }
+  .modal-header h3 { font-size: 1.125rem; }
+  .modal-header, .modal-body { padding: 1.25rem; }
+}
+
+@media (max-width: 480px) {
+  .filters-bar { padding: 0.75rem; }
+  .data-table { font-size: 0.875rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.625rem 0.75rem; }
+  .badge { font-size: 0.75rem; }
+  .btn { font-size: 0.8125rem; }
+  .page-btn { min-width: 32px; height: 32px; font-size: 0.8125rem; }
+  .modal-header h3 { font-size: 1rem; }
+  .modal-header, .modal-body { padding: 1rem; }
+  .detail-label { font-size: 0.75rem; }
+  .detail-value { font-size: 0.875rem; }
+}
+</style>
+
+{% endblock %}
+{% block page_title %}Audit Log<style>
+@media (max-width: 768px) {
+  .page-header-left h1 { font-size: 1.375rem; }
+  .page-header-left p { font-size: 0.9375rem; }
+  .filters-bar { flex-direction: column; align-items: stretch; gap: 0.75rem; padding: 1rem; }
+  .filter-group { width: 100%; }
+  .filter-group .form-control { width: 100%; }
+  .filter-label { font-size: 0.875rem; }
+  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
+  .data-table { font-size: 0.9375rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.75rem 1rem; }
+  .badge { font-size: 0.8125rem; padding: 0.3rem 0.5rem; }
+  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
+  .table-action-btn { width: 36px; height: 36px; }
+  .page-btn { min-width: 36px; height: 36px; font-size: 0.875rem; }
+  .card-header-title { font-size: 1rem; }
+  .card-header-subtitle { font-size: 0.875rem; }
+  .detail-label { font-size: 0.8125rem; }
+  .detail-value { font-size: 0.9375rem; }
+  .detail-value pre { font-size: 0.8125rem; }
+  .modal-header h3 { font-size: 1.125rem; }
+  .modal-header, .modal-body { padding: 1.25rem; }
+}
+
+@media (max-width: 480px) {
+  .filters-bar { padding: 0.75rem; }
+  .data-table { font-size: 0.875rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.625rem 0.75rem; }
+  .badge { font-size: 0.75rem; }
+  .btn { font-size: 0.8125rem; }
+  .page-btn { min-width: 32px; height: 32px; font-size: 0.8125rem; }
+  .modal-header h3 { font-size: 1rem; }
+  .modal-header, .modal-body { padding: 1rem; }
+  .detail-label { font-size: 0.75rem; }
+  .detail-value { font-size: 0.875rem; }
+}
+</style>
+
+{% endblock %}
+{% block breadcrumb %}System Logs<style>
+@media (max-width: 768px) {
+  .page-header-left h1 { font-size: 1.375rem; }
+  .page-header-left p { font-size: 0.9375rem; }
+  .filters-bar { flex-direction: column; align-items: stretch; gap: 0.75rem; padding: 1rem; }
+  .filter-group { width: 100%; }
+  .filter-group .form-control { width: 100%; }
+  .filter-label { font-size: 0.875rem; }
+  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
+  .data-table { font-size: 0.9375rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.75rem 1rem; }
+  .badge { font-size: 0.8125rem; padding: 0.3rem 0.5rem; }
+  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
+  .table-action-btn { width: 36px; height: 36px; }
+  .page-btn { min-width: 36px; height: 36px; font-size: 0.875rem; }
+  .card-header-title { font-size: 1rem; }
+  .card-header-subtitle { font-size: 0.875rem; }
+  .detail-label { font-size: 0.8125rem; }
+  .detail-value { font-size: 0.9375rem; }
+  .detail-value pre { font-size: 0.8125rem; }
+  .modal-header h3 { font-size: 1.125rem; }
+  .modal-header, .modal-body { padding: 1.25rem; }
+}
+
+@media (max-width: 480px) {
+  .filters-bar { padding: 0.75rem; }
+  .data-table { font-size: 0.875rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.625rem 0.75rem; }
+  .badge { font-size: 0.75rem; }
+  .btn { font-size: 0.8125rem; }
+  .page-btn { min-width: 32px; height: 32px; font-size: 0.8125rem; }
+  .modal-header h3 { font-size: 1rem; }
+  .modal-header, .modal-body { padding: 1rem; }
+  .detail-label { font-size: 0.75rem; }
+  .detail-value { font-size: 0.875rem; }
+}
+</style>
+
+{% endblock %}
 
 {% block content %}
 
@@ -228,5 +348,45 @@ function closeAuditModal() {
 }
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeAuditModal(); });
 </script>
+
+<style>
+@media (max-width: 768px) {
+  .page-header-left h1 { font-size: 1.375rem; }
+  .page-header-left p { font-size: 0.9375rem; }
+  .filters-bar { flex-direction: column; align-items: stretch; gap: 0.75rem; padding: 1rem; }
+  .filter-group { width: 100%; }
+  .filter-group .form-control { width: 100%; }
+  .filter-label { font-size: 0.875rem; }
+  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
+  .data-table { font-size: 0.9375rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.75rem 1rem; }
+  .badge { font-size: 0.8125rem; padding: 0.3rem 0.5rem; }
+  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
+  .table-action-btn { width: 36px; height: 36px; }
+  .page-btn { min-width: 36px; height: 36px; font-size: 0.875rem; }
+  .card-header-title { font-size: 1rem; }
+  .card-header-subtitle { font-size: 0.875rem; }
+  .detail-label { font-size: 0.8125rem; }
+  .detail-value { font-size: 0.9375rem; }
+  .detail-value pre { font-size: 0.8125rem; }
+  .modal-header h3 { font-size: 1.125rem; }
+  .modal-header, .modal-body { padding: 1.25rem; }
+}
+
+@media (max-width: 480px) {
+  .filters-bar { padding: 0.75rem; }
+  .data-table { font-size: 0.875rem; }
+  .data-table thead th,
+  .data-table tbody td { padding: 0.625rem 0.75rem; }
+  .badge { font-size: 0.75rem; }
+  .btn { font-size: 0.8125rem; }
+  .page-btn { min-width: 32px; height: 32px; font-size: 0.8125rem; }
+  .modal-header h3 { font-size: 1rem; }
+  .modal-header, .modal-body { padding: 1rem; }
+  .detail-label { font-size: 0.75rem; }
+  .detail-value { font-size: 0.875rem; }
+}
+</style>
 
 {% endblock %}
