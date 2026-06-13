@@ -5,6 +5,7 @@ Okpo Youths Association Management System
 """
 
 import os
+from decouple import config
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -90,25 +91,14 @@ ASGI_APPLICATION = "oya.asgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": os.environ.get("DB_NAME", "oya_db"),
-#         "USER": os.environ.get("DB_USER", "oya_user"),
-#         "PASSWORD": os.environ.get("DB_PASSWORD", "oya_password"),
-#         "HOST": os.environ.get("DB_HOST", "localhost"),
-#         "PORT": os.environ.get("DB_PORT", "3306"),
-#         "OPTIONS": {
-#             "charset": "utf8mb4",
-#             "init_command": "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1",
-#         },
-#     }
-# }
-
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': config('DB_ENGINE', default='django.db.backends.sqlite3'),
+        'NAME': config('DB_NAME', default=BASE_DIR / 'db.sqlite3'),
+        'USER': config('DB_USER', default=''),
+        'PASSWORD': config('DB_PASSWORD', default=''),
+        'HOST': config('DB_HOST', default=''),
+        'PORT': config('DB_PORT', default=''),
     }
 }
 
@@ -151,21 +141,78 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-# Media files
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+# Media & Storage Configuration
+MEDIA_STORAGE_MODE = os.environ.get("MEDIA_STORAGE_MODE", "local")
+
+if MEDIA_STORAGE_MODE == "b2":
+    # Backblaze B2 Production Settings
+    B2_KEY_ID = os.environ.get("B2_KEY_ID")
+    B2_APPLICATION_KEY = os.environ.get("B2_APPLICATION_KEY")
+    B2_BUCKET_NAME = os.environ.get("B2_BUCKET_NAME")
+    B2_BUCKET_REGION = os.environ.get("B2_BUCKET_REGION", "us-west-004")
+    B2_ENDPOINT_URL = os.environ.get("B2_ENDPOINT_URL")
+    B2_CUSTOM_DOMAIN = os.environ.get("B2_CUSTOM_DOMAIN", None)
+    
+    AWS_ACCESS_KEY_ID = B2_KEY_ID
+    AWS_SECRET_ACCESS_KEY = B2_APPLICATION_KEY
+    AWS_STORAGE_BUCKET_NAME = B2_BUCKET_NAME
+    AWS_S3_REGION_NAME = B2_BUCKET_REGION
+    AWS_S3_ENDPOINT_URL = B2_ENDPOINT_URL
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+    AWS_DEFAULT_ACL = None
+    AWS_S3_VERIFY = True
+    
+    if B2_CUSTOM_DOMAIN:
+        AWS_S3_CUSTOM_DOMAIN = B2_CUSTOM_DOMAIN.replace("https://", "").replace("http://", "")
+    
+    MEDIA_URL = f"https://{B2_CUSTOM_DOMAIN}/media/" if B2_CUSTOM_DOMAIN else f"{B2_ENDPOINT_URL}/{B2_BUCKET_NAME}/media/"
+    
+    STORAGES = {
+        "default": {
+            "BACKEND": "oya.storage_backends.BackblazeB2Storage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+else:
+    # Local storage for development
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "media"
+    
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+
+# Whitenoise for static files in production
+if not DEBUG:
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+    STORAGES["staticfiles"] = {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    }
+
+# Security settings for production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Session settings
@@ -181,14 +228,6 @@ LOGOUT_REDIRECT_URL = "/accounts/login/"
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
-
-if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
 
 # Logging
 LOGS_DIR = BASE_DIR / "logs"
