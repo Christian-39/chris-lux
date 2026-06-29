@@ -167,6 +167,8 @@ if MEDIA_STORAGE_MODE == "b2":
     AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_DEFAULT_ACL = None
     AWS_S3_VERIFY = True
+    AWS_S3_ADDRESSING_STYLE = "virtual"
+
     
     if B2_CUSTOM_DOMAIN:
         AWS_S3_CUSTOM_DOMAIN = B2_CUSTOM_DOMAIN.replace("https://", "").replace("http://", "")
