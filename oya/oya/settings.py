@@ -155,7 +155,7 @@ if MEDIA_STORAGE_MODE == "b2":
     B2_KEY_ID = config("B2_KEY_ID")
     B2_APPLICATION_KEY = config("B2_APPLICATION_KEY")
     B2_BUCKET_NAME = config("B2_BUCKET_NAME")
-    B2_BUCKET_REGION = config"B2_BUCKET_REGION", "us-west-004")
+    B2_BUCKET_REGION = config("B2_BUCKET_REGION", "us-west-004")
     B2_ENDPOINT_URL = config("B2_ENDPOINT_URL")
     B2_CUSTOM_DOMAIN = config("B2_CUSTOM_DOMAIN", None)
     
