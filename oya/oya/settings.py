@@ -147,65 +147,56 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-# Media & Storage Configuration
-# ============================================================
-# IMPORTANT: Backblaze B2 App Key Permissions Required:
-#   - listAllBucketNames (required for S3-compatible SDKs)
-#   - listBuckets (required for HeadObject to return 404 instead of 403)
-#   - readBuckets
-#   - listFiles
-#   - readFiles (required for HeadObject/exists checks)
-#   - writeFiles (required for uploads)
-#   - deleteFiles (required for file deletion)
-#
-# If your app key is missing "readFiles" or "listBuckets", you will get
-# 403 Forbidden on HeadObject operations when django-storages checks
-# if a file already exists before uploading.
-# ============================================================
+# ============================================
+# BACKBLAZE B2 / S3 COMPATIBLE STORAGE
+# ============================================
+
 MEDIA_STORAGE_MODE = config("MEDIA_STORAGE_MODE", "local")
 
 if MEDIA_STORAGE_MODE == "b2":
-    # Backblaze B2 Production Settings
+    # B2 Credentials
     B2_KEY_ID = config("B2_KEY_ID")
     B2_APPLICATION_KEY = config("B2_APPLICATION_KEY")
     B2_BUCKET_NAME = config("B2_BUCKET_NAME")
     B2_BUCKET_REGION = config("B2_BUCKET_REGION", "us-west-004")
-    B2_ENDPOINT_URL = config("B2_ENDPOINT_URL")
+    B2_ENDPOINT_URL = config("B2_ENDPOINT_URL", "https://s3.us-west-004.backblazeb2.com")
     B2_CUSTOM_DOMAIN = config("B2_CUSTOM_DOMAIN", None)
-    
-    # Map B2 credentials to AWS S3-compatible settings for django-storages
+
+    # Map to AWS S3-compatible settings
     AWS_ACCESS_KEY_ID = B2_KEY_ID
     AWS_SECRET_ACCESS_KEY = B2_APPLICATION_KEY
     AWS_STORAGE_BUCKET_NAME = B2_BUCKET_NAME
     AWS_S3_REGION_NAME = B2_BUCKET_REGION
     AWS_S3_ENDPOINT_URL = B2_ENDPOINT_URL
+
+    # CRITICAL B2 Settings
+    AWS_S3_ADDRESSING_STYLE = "virtual"  # CRITICAL - Without this B2 fails!
     AWS_S3_SIGNATURE_VERSION = "s3v4"
-    AWS_DEFAULT_ACL = None
-    AWS_S3_VERIFY = True
-    AWS_S3_ADDRESSING_STYLE = "virtual"
-    
-    # Handle custom domain for public URLs
+    AWS_QUERYSTRING_AUTH = False
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_S3_FILE_OVERWRITE = True
+
+    # Media URL
     if B2_CUSTOM_DOMAIN:
         AWS_S3_CUSTOM_DOMAIN = B2_CUSTOM_DOMAIN.replace("https://", "").replace("http://", "")
         MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
     else:
-        # Use the B2 S3-compatible endpoint URL with bucket name
-        # Format: https://s3.<region>.backblazeb2.com/<bucket-name>/media/
-        MEDIA_URL = f"{B2_ENDPOINT_URL}/{B2_BUCKET_NAME}/media/"
-    
+        MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.backblazeb2.com/media/"
+
     STORAGES = {
         "default": {
-            "BACKEND": "oya.storage_backends.BackblazeB2Storage",
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
         },
         "staticfiles": {
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
+
 else:
     # Local storage for development
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
-    
+
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
