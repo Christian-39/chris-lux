@@ -12,7 +12,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
+SECRET_KEY = config(
     "DJANGO_SECRET_KEY",
     "django-insecure-change-me-in-production-oy4-kp0-y0uth5-@550c!@t!0n",
 )
@@ -148,16 +148,16 @@ STATICFILES_DIRS = [
 ]
 
 # Media & Storage Configuration
-MEDIA_STORAGE_MODE = os.environ.get("MEDIA_STORAGE_MODE", "local")
+MEDIA_STORAGE_MODE = config("MEDIA_STORAGE_MODE", "local")
 
 if MEDIA_STORAGE_MODE == "b2":
     # Backblaze B2 Production Settings
-    B2_KEY_ID = os.environ.get("B2_KEY_ID")
-    B2_APPLICATION_KEY = os.environ.get("B2_APPLICATION_KEY")
-    B2_BUCKET_NAME = os.environ.get("B2_BUCKET_NAME")
-    B2_BUCKET_REGION = os.environ.get("B2_BUCKET_REGION", "us-west-004")
-    B2_ENDPOINT_URL = os.environ.get("B2_ENDPOINT_URL")
-    B2_CUSTOM_DOMAIN = os.environ.get("B2_CUSTOM_DOMAIN", None)
+    B2_KEY_ID = config("B2_KEY_ID")
+    B2_APPLICATION_KEY = config("B2_APPLICATION_KEY")
+    B2_BUCKET_NAME = config("B2_BUCKET_NAME")
+    B2_BUCKET_REGION = config"B2_BUCKET_REGION", "us-west-004")
+    B2_ENDPOINT_URL = config("B2_ENDPOINT_URL")
+    B2_CUSTOM_DOMAIN = config("B2_CUSTOM_DOMAIN", None)
     
     AWS_ACCESS_KEY_ID = B2_KEY_ID
     AWS_SECRET_ACCESS_KEY = B2_APPLICATION_KEY
@@ -293,8 +293,8 @@ CACHES = {
 }
 
 # Celery settings
-CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379/0")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
