@@ -23,7 +23,8 @@ class BackblazeB2Storage(S3Storage):
     Fixed for django-storages >= 1.14 with proper B2 addressing.
     """
     
-    # Class-level defaults
+    # Class-level defaults - these MUST be set as class attributes
+    # for django-storages to pick them up properly
     bucket_name = getattr(settings, "B2_BUCKET_NAME", "")
     endpoint_url = getattr(settings, "B2_ENDPOINT_URL", "")
     region_name = getattr(settings, "B2_BUCKET_REGION", "us-west-004")
@@ -31,7 +32,11 @@ class BackblazeB2Storage(S3Storage):
     file_overwrite = False
     default_acl = None
     querystring_auth = False
-    addressing_style = "virtual"  # B2 REQUIRES virtual-hosted style
+    addressing_style = "virtual"
+    
+    # B2-specific: disable ACL completely
+    # This prevents boto3 from sending x-amz-acl headers
+    object_parameters = {}
     
     # Custom domain for public URLs
     custom_domain = getattr(settings, "B2_CUSTOM_DOMAIN", None)
@@ -39,7 +44,7 @@ class BackblazeB2Storage(S3Storage):
         custom_domain = custom_domain.replace("https://", "").replace("http://", "")
     
     def get_default_settings(self):
-        """Override to inject B2-specific settings that django-storages needs."""
+        """Override to inject B2-specific settings."""
         return {
             **super().get_default_settings(),
             "bucket_name": self.bucket_name,
@@ -51,28 +56,44 @@ class BackblazeB2Storage(S3Storage):
             "querystring_auth": self.querystring_auth,
             "addressing_style": self.addressing_style,
             "custom_domain": self.custom_domain,
+            "object_parameters": self.object_parameters,
         }
     
     def get_object_parameters(self, name):
         """
-        Override to remove ACL parameters from upload requests.
-        B2 does not support per-object ACLs and will reject them.
+        Override to NEVER send ACL parameters.
+        B2 does not support per-object ACLs.
         """
-        params = super().get_object_parameters(name)
-        # Remove any ACL-related parameters that B2 doesn't support
-        params.pop("ACL", None)
-        params.pop("GrantFullControl", None)
-        params.pop("GrantRead", None)
-        params.pop("GrantReadACP", None)
-        params.pop("GrantWrite", None)
-        params.pop("GrantWriteACP", None)
-        return params
+        # Return empty dict - no ACL headers ever
+        return {}
     
     def _get_write_parameters(self, name, content=None):
         """
         Override to ensure no ACL is sent with PUT/POST requests.
         """
         params = super()._get_write_parameters(name, content)
-        # Strip ACL from write operations - B2 bucket-level ACL only
+        # Strip ACL from write operations
         params.pop("ACL", None)
+        params.pop("acl", None)
         return params
+    
+    def exists(self, name):
+        """
+        Override exists() to handle B2's quirks with head_object.
+        B2 returns 403 instead of 404 for non-existent objects in some cases.
+        """
+        if not name:
+            return False
+        try:
+            return super().exists(name)
+        except Exception as e:
+            error_msg = str(e).lower()
+            # B2 returns 403 for non-existent objects sometimes
+            # Also handle 404 properly
+            if "404" in error_msg or "not found" in error_msg:
+                return False
+            if "403" in error_msg or "forbidden" in error_msg:
+                # Object likely doesn't exist, B2 is just being weird
+                return False
+            # Re-raise if it's a real error
+            raise
