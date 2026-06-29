@@ -1,142 +1,123 @@
-/* ==========================================================================
-   OKPO YOUTHS ASSOCIATION MANAGEMENT SYSTEM
-   OYA - Core Design System, Reset & Form Framework
-   ========================================================================== */
+/* ============================================
+   FILE 4 OF 4: base.css
+   OYA - CSS Variables, Reset, Typography,
+   Form Framework, Component Base Styles
+   ============================================ */
 
-/* ─── CSS Variables & Custom Properties ─── */
+/* ─── CSS Variables ─── */
 :root {
-  /* Primary Identity Colors */
+  /* Primary Palette */
   --oya-primary: #0B3D91;
-  --oya-primary-light: #1a56c7;
-  --oya-primary-dark: #082e6e;
-  --oya-primary-50: #e8f0fe;
-  --oya-primary-100: #c2d8fc;
-  --oya-primary-200: #9bc0fa;
+  --oya-primary-light: #1a5bc7;
+  --oya-primary-dark: #072a66;
+  --oya-primary-50: rgba(11, 61, 145, 0.05);
+  --oya-primary-100: rgba(11, 61, 145, 0.1);
 
-  /* Accent Branding (Gold) */
+  /* Accent */
   --oya-accent: #D4AF37;
-  --oya-accent-light: #e4c96a;
-  --oya-accent-dark: #b3922b;
-  --oya-accent-50: #fcf8e8;
+  --oya-accent-light: #e4c95a;
+  --oya-accent-dark: #b8941d;
+  --oya-accent-50: rgba(212, 175, 55, 0.05);
 
-  /* Interface Background Colors */
+  /* Semantic Colors */
+  --oya-success: #10B981;
+  --oya-success-bg: rgba(16, 185, 129, 0.1);
+  --oya-warning: #F59E0B;
+  --oya-warning-bg: rgba(245, 158, 11, 0.1);
+  --oya-danger: #EF4444;
+  --oya-danger-bg: rgba(239, 68, 68, 0.1);
+  --oya-info: #3B82F6;
+  --oya-info-bg: rgba(59, 130, 246, 0.1);
+
+  /* Backgrounds */
   --oya-bg: #F5F7FA;
-  --oya-bg-white: #FFFFFF;
   --oya-bg-card: #FFFFFF;
-  --oya-bg-elevated: #FFFFFF;
+  --oya-bg-white: #FFFFFF;
+  --oya-bg-sidebar: #FFFFFF;
+  --oya-bg-hover: #F1F5F9;
 
-  /* Typography Text Colors */
+  /* Text */
   --oya-text-primary: #0F172A;
   --oya-text-secondary: #475569;
   --oya-text-muted: #94A3B8;
-  --oya-text-white: #FFFFFF;
 
-  /* Architectural Borders */
+  /* Borders */
   --oya-border: #E2E8F0;
   --oya-border-light: #F1F5F9;
 
-  /* Functional Status Semantic Tokens */
-  --oya-success: #10B981;
-  --oya-success-bg: #D1FAE5;
-  --oya-warning: #F59E0B;
-  --oya-warning-bg: #FEF3C7;
-  --oya-danger: #EF4444;
-  --oya-danger-bg: #FEE2E2;
-  --oya-info: #3B82F6;
-  --oya-info-bg: #DBEAFE;
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 
-  /* Layout Constants */
-  --sidebar-width: 260px;
-  --sidebar-collapsed: 72px;
-  --sidebar-bg: #0F172A;
-  --sidebar-text: #94A3B8;
-  --sidebar-active: #0B3D91;
-  --sidebar-hover: rgba(255, 255, 255, 0.05);
-  --topbar-height: 64px;
-
-  /* Elevation Shadows */
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
-  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-
-  /* Radius Framework */
+  /* Radius */
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
 
-  /* Timing & Animations */
+  /* Transitions */
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
-  --transition-slow: 350ms ease;
 
-  /* Typography Stack */
-  --font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* Font */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* ─── Dark Mode Color Token Overrides ─── */
+/* ─── Dark Mode Variables ─── */
 [data-theme="dark"] {
   --oya-bg: #0B1120;
+  --oya-bg-card: #0F172A;
   --oya-bg-white: #0F172A;
-  --oya-bg-card: #1E293B;
-  --oya-bg-elevated: #1E293B;
+  --oya-bg-sidebar: #0F172A;
+  --oya-bg-hover: #1E293B;
 
   --oya-text-primary: #F1F5F9;
-  --oya-text-secondary: #CBD5E1;
+  --oya-text-secondary: #94A3B8;
   --oya-text-muted: #64748B;
 
-  --oya-border: #334155;
+  --oya-border: #1E293B;
   --oya-border-light: #1E293B;
 
-  --sidebar-bg: #020617;
-  --sidebar-hover: rgba(255, 255, 255, 0.08);
-
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
 }
 
-/* ─── Reset Rules & Base Structural Setup ─── */
-*, *::before, *::after {
+/* ─── Reset ─── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 html {
-  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   font-family: var(--font-family);
-  background-color: var(--oya-bg);
+  font-size: 0.875rem;
+  line-height: 1.5;
   color: var(--oya-text-primary);
-  line-height: 1.6;
-  min-height: 100vh;
-  overflow-x: hidden;
+  background: var(--oya-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
-  transition: color var(--transition-fast);
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* ─── Typography Design Framework ─── */
+/* ─── Typography ─── */
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  line-height: 1.3;
+  font-weight: 700;
+  line-height: 1.25;
   color: var(--oya-text-primary);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 h1 { font-size: 1.875rem; }
@@ -146,244 +127,36 @@ h4 { font-size: 1.125rem; }
 h5 { font-size: 1rem; }
 h6 { font-size: 0.875rem; }
 
-/* Scale Utilities */
-.text-xs { font-size: 0.75rem; }
-.text-sm { font-size: 0.875rem; }
-.text-base { font-size: 1rem; }
-.text-lg { font-size: 1.125rem; }
-.text-xl { font-size: 1.25rem; }
-.text-2xl { font-size: 1.5rem; }
-
-/* Weight Utilities */
-.font-medium { font-weight: 500; }
-.font-semibold { font-weight: 600; }
-.font-bold { font-weight: 700; }
-
-/* ─── Global Global Layout Utilities ─── */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.justify-center { justify-content: center; }
-.gap-1 { gap: 0.25rem; }
-.gap-2 { gap: 0.5rem; }
-.gap-3 { gap: 0.75rem; }
-.gap-4 { gap: 1rem; }
-
-.grid { display: grid; }
-.hidden { display: none !important; }
-.w-full { width: 100%; }
-.h-full { height: 100%; }
-
-/* ─── System Level Custom Scrollbars ─── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--oya-text-muted);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--oya-text-secondary);
-}
-
-::selection {
-  background: var(--oya-primary);
-  color: var(--oya-text-white);
-}
-
-
-/* ==========================================================================
-   OYA - Standard Form Architecture Framework
-   ========================================================================== */
-
-/* ─── Native Custom Select Dropdown ─── */
-.form-select {
-  width: 100%;
-  padding: 0.625rem 2.5rem 0.625rem 0.875rem;
-  border: 1.5px solid var(--oya-border);
-  border-radius: var(--radius-md);
-  background: var(--oya-bg-white);
-  color: var(--oya-text-primary);
-  font-family: var(--font-family);
-  font-size: 0.875rem;
-  transition: all var(--transition-fast);
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  cursor: pointer;
-}
-
-.form-select:focus {
-  outline: none;
-  border-color: var(--oya-primary);
-  box-shadow: 0 0 0 3px rgba(11, 61, 145, 0.1);
-}
-
-.form-select:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background-color: var(--oya-bg);
-}
-
-/* ─── Text Fields (Inputs) ─── */
-.form-input {
-  width: 100%;
-  padding: 0.625rem 0.875rem;
-  border: 1.5px solid var(--oya-border);
-  border-radius: var(--radius-md);
-  background: var(--oya-bg-white);
-  color: var(--oya-text-primary);
-  font-family: var(--font-family);
-  font-size: 0.875rem;
-  transition: all var(--transition-fast);
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--oya-primary);
-  box-shadow: 0 0 0 3px rgba(11, 61, 145, 0.1);
-}
-
-.form-input::placeholder {
-  color: var(--oya-text-muted);
-}
-
-.form-input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background-color: var(--oya-bg);
-}
-
-/* Step Spinner Adjustments for Number Fields */
-.form-input[type="number"]::-webkit-inner-spin-button,
-.form-input[type="number"]::-webkit-outer-spin-button {
-  opacity: 1;
-  height: 28px;
-  cursor: pointer;
-}
-
-/* ─── Multiline Text Areas ─── */
-.form-textarea {
-  width: 100%;
-  padding: 0.625rem 0.875rem;
-  border: 1.5px solid var(--oya-border);
-  border-radius: var(--radius-md);
-  background: var(--oya-bg-white);
-  color: var(--oya-text-primary);
-  font-family: var(--font-family);
-  font-size: 0.875rem;
-  transition: all var(--transition-fast);
-  resize: vertical;
-  min-height: 100px;
-}
-
-.form-textarea:focus {
-  outline: none;
-  border-color: var(--oya-primary);
-  box-shadow: 0 0 0 3px rgba(11, 61, 145, 0.1);
-}
-
-/* ─── File Upload Elements ─── */
-.form-input[type="file"] {
-  padding: 0.5rem 0.875rem;
-  cursor: pointer;
-}
-
-.form-input[type="file"]::-webkit-file-upload-button {
-  padding: 0.375rem 0.875rem;
-  border: 1.5px solid var(--oya-border);
-  border-radius: var(--radius-sm);
-  background: var(--oya-bg);
+p {
+  margin-bottom: 1rem;
   color: var(--oya-text-secondary);
-  font-family: var(--font-family);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+a {
+  color: var(--oya-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--oya-primary-light);
+}
+
+small {
   font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-right: 0.75rem;
-  transition: all var(--transition-fast);
 }
 
-.form-input[type="file"]::-webkit-file-upload-button:hover {
-  background: var(--oya-primary);
-  color: #FFFFFF;
-  border-color: var(--oya-primary);
-}
-
-/* ─── Selection Choices (Radio Selection) ─── */
-.radio-group {
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
-  margin-top: 0.5rem;
-}
-
-.radio-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-size: 0.875rem;
-  color: var(--oya-text-primary);
-  font-weight: 500;
-}
-
-.radio-label input[type="radio"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: var(--oya-primary);
-  margin: 0;
-}
-
-/* ─── Grid Framework for Form Layouts ─── */
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0 1.25rem;
-  margin-bottom: 0;
-}
-
-.form-row .form-group {
-  margin-bottom: 1.25rem;
-}
-
-.form-row-single {
-  grid-template-columns: 1fr;
-}
-
+/* ─── Form Framework ─── */
 .form-group {
   margin-bottom: 1.25rem;
+  min-width: 0;
 }
 
-.form-group:last-child {
-  margin-bottom: 0;
-}
-
-/* Labels, Validations, and Feedback Markers */
 .form-label {
   display: block;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--oya-text-primary);
   margin-bottom: 0.5rem;
@@ -391,894 +164,380 @@ h6 { font-size: 0.875rem; }
 
 .form-label .required {
   color: var(--oya-danger);
-  margin-left: 2px;
 }
 
-.form-help {
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--oya-text-primary);
+  background: var(--oya-bg-card);
+  border: 1px solid var(--oya-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  font-family: inherit;
+  min-width: 0;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--oya-primary);
+  box-shadow: 0 0 0 3px rgba(11, 61, 145, 0.1);
+}
+
+.form-control::placeholder {
+  color: var(--oya-text-muted);
+}
+
+.form-control:disabled {
+  background: var(--oya-bg-hover);
+  cursor: not-allowed;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 100px;
+}
+
+select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.25rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+  gap: 1rem;
+  min-width: 0;
+}
+
+.form-row > * {
+  min-width: 0;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--oya-border);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.form-actions > * {
+  min-width: 0;
+}
+
+.form-hint {
   font-size: 0.75rem;
   color: var(--oya-text-muted);
   margin-top: 0.375rem;
-  line-height: 1.4;
 }
 
 .form-error {
   font-size: 0.75rem;
   color: var(--oya-danger);
   margin-top: 0.375rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
 }
 
-.form-error::before {
-  content: '!';
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--oya-danger);
-  color: #FFF;
-  font-size: 0.625rem;
-  font-weight: 700;
+/* ─── Input Groups ─── */
+.input-group {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.input-group > * {
+  min-width: 0;
+}
+
+.input-group .form-control {
+  border-radius: 0;
+  flex: 1;
+}
+
+.input-group .form-control:first-child {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.input-group .form-control:last-child {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.input-group-text {
+  display: flex;
+  align-items: center;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  color: var(--oya-text-secondary);
+  background: var(--oya-bg-hover);
+  border: 1px solid var(--oya-border);
+  white-space: nowrap;
+}
+
+.input-group-text:first-child {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  border-right: 0;
+}
+
+.input-group-text:last-child {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  border-left: 0;
+}
+
+/* ─── Buttons ─── */
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.5;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  font-family: inherit;
+  white-space: nowrap;
+  min-width: 0;
 }
 
-/* ─── Compound Structural Form Cards ─── */
-.form-card {
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--oya-primary);
+  color: #FFF;
+  border-color: var(--oya-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--oya-primary-light);
+  border-color: var(--oya-primary-light);
+}
+
+.btn-secondary {
+  background: var(--oya-bg-card);
+  color: var(--oya-text-primary);
+  border-color: var(--oya-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--oya-bg-hover);
+}
+
+.btn-danger {
+  background: var(--oya-danger);
+  color: #FFF;
+  border-color: var(--oya-danger);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #DC2626;
+  border-color: #DC2626;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--oya-text-secondary);
+  border-color: transparent;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--oya-bg-hover);
+  color: var(--oya-text-primary);
+}
+
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--radius-md);
+}
+
+/* ─── Cards ─── */
+.card {
   background: var(--oya-bg-card);
   border: 1px solid var(--oya-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  margin-bottom: 1.25rem;
-  overflow: hidden;
-}
-
-.form-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--oya-border);
-  background: var(--oya-bg);
-}
-
-.form-card-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--oya-text-primary);
-}
-
-.form-card-body {
-  padding: 1.5rem;
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  padding: 1rem 0;
-  flex-wrap: wrap;
-}
-
-/* ─── Functional Context Components ─── */
-.photo-preview {
-  margin-top: 0.5rem;
-  display: inline-block;
-}
-
-.photo-preview img {
-  max-width: 100px;
-  max-height: 100px;
-  border-radius: var(--radius-md);
-  border: 2px solid var(--oya-border);
-  object-fit: cover;
-}
-
-/* Regional/Geographical Location UI Blocks */
-.location-section {
-  border: 1.5px solid var(--oya-border);
-  border-radius: var(--radius-md);
-  padding: 1rem 1.25rem;
-  background: var(--oya-bg);
-  margin-bottom: 1.25rem;
-}
-
-.location-toggle {
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
-}
-
-.state-dropdown {
-  position: relative;
-}
-
-.state-dropdown select {
-  width: 100%;
-}
-
-.state-dropdown .search-hint {
-  font-size: 0.75rem;
-  color: var(--oya-text-muted);
-  margin-top: 0.375rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.state-dropdown .search-hint svg {
-  width: 14px;
-  height: 14px;
-}
-
-
-/* ==========================================================================
-   OYA - Contextual Dark Mode UI Extensions
-   ========================================================================== */
-
-[data-theme="dark"] .form-input,
-[data-theme="dark"] .form-select,
-[data-theme="dark"] .form-textarea {
-  background: var(--oya-bg-white);
-  border-color: var(--oya-border);
-  color: var(--oya-text-primary);
-}
-
-[data-theme="dark"] .form-input:focus,
-[data-theme="dark"] .form-select:focus,
-[data-theme="dark"] .form-textarea:focus {
-  border-color: var(--oya-primary);
-  box-shadow: 0 0 0 3px rgba(11, 61, 145, 0.2);
-}
-
-[data-theme="dark"] .form-input::placeholder {
-  color: var(--oya-text-muted);
-}
-
-[data-theme="dark"] .form-input[type="file"]::-webkit-file-upload-button {
-  background: var(--oya-bg);
-  color: var(--oya-text-secondary);
-  border-color: var(--oya-border);
-}
-
-[data-theme="dark"] .location-section {
-  background: var(--oya-bg-white);
-  border-color: var(--oya-border);
-}
-
-[data-theme="dark"] .photo-preview img {
-  border-color: var(--oya-border);
-}
-
-
-/* ==========================================================================
-   OYA - Structural Responsive Adaptations
-   ========================================================================== */
-
-@media (max-width: 768px) {
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
-  .form-card-body {
-    padding: 1.25rem;
-  }
-
-  .form-actions {
-    flex-direction: column;
-  }
-
-  .form-actions .btn {
-    width: 100%;
-  }
-
-  .radio-group {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
-
-  .form-label {
-    font-size: 0.9375rem;
-  }
-
-  .form-input,
-  .form-select,
-  .form-textarea {
-    font-size: 0.9375rem;
-    padding: 0.625rem 0.875rem;
-  }
-
-  .form-help,
-  .form-error {
-    font-size: 0.8125rem;
-  }
-
-  .photo-preview img {
-    max-width: 90px;
-    max-height: 90px;
-  }
-}
-
-/* ==========================================================================
-   OYA - Base CSS Additions (Responsive Typography & Extracted Inline Styles)
-   ========================================================================== */
-
-/* ─── Responsive Typography Scale ─── */
-html {
-  font-size: clamp(14px, 2.5vw, 16px);
-}
-
-/* Prevent horizontal overflow at root */
-body {
-  overflow-x: hidden;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-/* Responsive images globally */
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* Fluid typography for headings */
-h1 { font-size: clamp(1.25rem, 4vw, 1.875rem); }
-h2 { font-size: clamp(1.125rem, 3.5vw, 1.5rem); }
-h3 { font-size: clamp(1rem, 3vw, 1.25rem); }
-h4 { font-size: clamp(0.9375rem, 2.5vw, 1.125rem); }
-h5 { font-size: clamp(0.875rem, 2vw, 1rem); }
-h6 { font-size: clamp(0.8125rem, 1.5vw, 0.875rem); }
-
-/* ─── Responsive Page Header ─── */
-.page-header-left h1 {
-  font-size: clamp(1.125rem, 3vw, 1.5rem);
-}
-
-.page-header-left p {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-/* ─── Responsive KPI Values ─── */
-.kpi-value {
-  font-size: clamp(1.25rem, 4vw, 1.75rem);
-}
-
-/* ─── Responsive Card Padding ─── */
-.card-body {
-  padding: clamp(1rem, 3vw, 1.5rem);
+  min-width: 0;
 }
 
 .card-header {
-  padding: clamp(0.875rem, 2.5vw, 1.25rem) clamp(1rem, 3vw, 1.5rem);
-}
-
-/* ─── Responsive Form Elements ─── */
-.form-control,
-.form-select,
-.form-input {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-/* ─── Responsive Buttons ─── */
-.btn {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-.btn-lg {
-  font-size: clamp(0.875rem, 2.5vw, 1rem);
-}
-
-.btn-sm {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-}
-
-/* ─── Responsive Badges ─── */
-.badge {
-  font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
-}
-
-/* ─── Responsive Table Cells ─── */
-.data-table thead th,
-.data-table tbody td {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-/* ─── Responsive Activity Feed ─── */
-.activity-text {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-.activity-time {
-  font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
-}
-
-/* ─── Responsive Chart Containers ─── */
-.chart-container {
-  height: clamp(200px, 40vw, 280px);
-}
-
-.chart-container-sm {
-  height: clamp(160px, 30vw, 200px);
-}
-
-/* ─── Responsive Pagination ─── */
-.page-btn {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-/* ─── Responsive Filters ─── */
-.filter-label {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-}
-
-/* ─── Responsive Footer ─── */
-.app-footer {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-}
-
-/* ─── Responsive Login ─── */
-.login-card {
-  padding: clamp(1.5rem, 5vw, 2.5rem);
-}
-
-.login-header h1 {
-  font-size: clamp(1.125rem, 4vw, 1.5rem);
-}
-
-.login-motto {
-  font-size: clamp(0.6875rem, 2vw, 0.75rem);
-}
-
-/* ─── Responsive Profile ─── */
-.profile-avatar {
-  width: clamp(56px, 15vw, 80px);
-  height: clamp(56px, 15vw, 80px);
-  font-size: clamp(1.25rem, 4vw, 2rem);
-}
-
-/* ─── Responsive Detail Grid ─── */
-.detail-grid {
-  grid-template-columns: clamp(100px, 25vw, 120px) 1fr;
-  gap: clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem);
-}
-
-.detail-label {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-}
-
-.detail-value {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-/* ─── Responsive Timeline ─── */
-.timeline {
-  padding-left: clamp(1.5rem, 5vw, 2rem);
-}
-
-.timeline-dot {
-  left: clamp(-1.5rem, -5vw, -2rem);
-  width: clamp(12px, 3vw, 16px);
-  height: clamp(12px, 3vw, 16px);
-}
-
-.timeline-title {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-.timeline-desc {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-}
-
-.timeline-time {
-  font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
-}
-
-/* ─── Responsive Meta Items ─── */
-.meta-label {
-  font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
-}
-
-.meta-value {
-  font-size: clamp(0.875rem, 2vw, 0.9375rem);
-}
-
-/* ─── Responsive Notification Items ─── */
-.notification-title {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-.notification-desc {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-}
-
-.notification-time {
-  font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
-}
-
-/* ─── Responsive Settings ─── */
-.settings-info h4 {
-  font-size: clamp(0.875rem, 2vw, 0.9375rem);
-}
-
-.settings-info p {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-}
-
-/* ─── Responsive Empty State ─── */
-.empty-state h3 {
-  font-size: clamp(0.9375rem, 2.5vw, 1.125rem);
-}
-
-.empty-state p {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-/* ─── Responsive Card Header Titles ─── */
-.card-header-title {
-  font-size: clamp(0.9375rem, 2.5vw, 1rem);
-}
-
-.card-header-subtitle {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-}
-
-/* ─── Responsive Chart Titles ─── */
-.chart-card-title {
-  font-size: clamp(0.9375rem, 2.5vw, 1rem);
-}
-
-.chart-card-subtitle {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-}
-
-/* ─── Responsive Quick Actions ─── */
-.quick-action-btn {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-}
-
-/* ─── Responsive Directory Cards ─── */
-.directory-info h4 {
-  font-size: clamp(0.875rem, 2vw, 0.9375rem);
-}
-
-.directory-info p {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-}
-
-/* ─── Responsive Stat Cards ─── */
-.stat-card-value {
-  font-size: clamp(1.25rem, 3vw, 1.5rem);
-}
-
-.stat-card-label {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-}
-
-/* ─── Responsive Tabs ─── */
-.tab-btn {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-/* ─── Responsive Alerts ─── */
-.alert {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-/* ─── Responsive Toasts ─── */
-.toast {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-/* ─── Responsive Modal ─── */
-.modal-title {
-  font-size: clamp(1rem, 2.5vw, 1.125rem);
-}
-
-/* ─── Responsive Dropdown ─── */
-.dropdown-item {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-/* ─── Responsive Form Labels ─── */
-.form-label {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-.form-help {
-  font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
-}
-
-.form-error {
-  font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
-}
-
-/* ─── Responsive Radio Labels ─── */
-.radio-label {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-/* ─── Responsive Theme Cards ─── */
-.theme-label {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-}
-
-/* ─── Responsive Search Dropdown ─── */
-.search-dropdown .dropdown-item {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-}
-
-.search-dropdown .dropdown-header {
-  font-size: clamp(0.625rem, 1.5vw, 0.6875rem);
-}
-
-/* ─── Responsive Mobile Nav ─── */
-.mobile-nav-link {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-.mobile-bottom-nav-item {
-  font-size: clamp(0.5625rem, 1.5vw, 0.625rem);
-}
-
-/* ─── Responsive Mobile Header ─── */
-.mobile-logo-text {
-  font-size: clamp(0.875rem, 2.5vw, 1.15rem);
-}
-
-/* ─── Responsive Welcome Banner ─── */
-.welcome-banner h2 {
-  font-size: clamp(1rem, 3.5vw, 1.375rem);
-}
-
-.welcome-banner p {
-  font-size: clamp(0.8125rem, 2.5vw, 0.9375rem);
-}
-
-/* ─── Responsive Table Toolbar ─── */
-.table-toolbar {
-  padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
-}
-
-/* ─── Responsive Toolbar Search ─── */
-.toolbar-search input {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
-}
-
-/* ─── Responsive Page Header Actions ─── */
-.page-header-actions {
-  gap: clamp(0.5rem, 1.5vw, 0.75rem);
-}
-
-/* ─── Responsive Content Area ─── */
-.content-area {
-  padding: clamp(0.75rem, 2.5vw, 1.5rem);
-}
-
-/* ─── Responsive Main Content Padding Top (for mobile header) ─── */
-@media (max-width: 1024px) {
-  .main-content {
-    padding-top: clamp(48px, 8vw, 60px) !important;
-  }
-}
-
-/* ─── Responsive Dashboard Grids ─── */
-.dashboard-grid-4 {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-}
-
-.dashboard-grid-3 {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-}
-
-.dashboard-grid-2 {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-}
-
-@media (max-width: 768px) {
-  .dashboard-grid-4,
-  .dashboard-grid-3,
-  .dashboard-grid-2 {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* ─── Responsive Form Rows ─── */
-.form-row {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-}
-
-@media (max-width: 768px) {
-  .form-row {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* ─── Responsive Detail Meta Grid ─── */
-.detail-meta-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
-}
-
-@media (max-width: 480px) {
-  .detail-meta-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* ─── Responsive Quick Actions Grid ─── */
-.quick-actions {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 120px), 1fr));
-}
-
-@media (max-width: 480px) {
-  .quick-actions {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-}
-
-/* ─── Responsive Directory Grid ─── */
-.directory-grid {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)) !important;
-}
-
-@media (max-width: 480px) {
-  .directory-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* ─── Responsive User Detail Grid ─── */
-.user-detail-grid {
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 768px) {
-  .user-detail-grid {
-    grid-template-columns: 300px 1fr !important;
-  }
-}
-
-/* ─── Responsive Org Chart ─── */
-.org-chart-container {
-  max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* ─── Responsive Finance Hero Cards ─── */
-.finance-hero-amount {
-  font-size: clamp(1.75rem, 6vw, 2.75rem);
-}
-
-/* ─── Responsive Category Cards ─── */
-.category-card {
-  padding: clamp(0.5rem, 2vw, 0.75rem);
-}
-
-.category-card div {
-  font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
-}
-
-/* ─── Responsive Receipt Dropzone ─── */
-.receipt-dropzone {
-  padding: clamp(1rem, 4vw, 2rem);
-}
-
-.receipt-dropzone div {
-  font-size: clamp(0.75rem, 2vw, 0.875rem);
-}
-
-/* ─── Responsive Select2 on Mobile ─── */
-@media (max-width: 480px) {
-  .select2-container {
-    width: 100% !important;
-  }
-
-  .select2-selection--single {
-    height: 40px !important;
-  }
-
-  .select2-selection__rendered {
-    line-height: 38px !important;
-    font-size: 0.8125rem !important;
-  }
-
-  .select2-results__option {
-    font-size: 0.8125rem !important;
-    padding: 0.5rem 0.75rem !important;
-  }
-}
-
-/* ─── Responsive Timeline for Income/Expense Detail ─── */
-.timeline-item {
-  padding-bottom: clamp(1rem, 3vw, 1.5rem);
-}
-
-.timeline-content {
-  padding: clamp(0.625rem, 2vw, 0.875rem) clamp(0.75rem, 2vw, 1rem);
-}
-
-/* ─── Responsive Badges in Detail Views ─── */
-.detail-badge {
-  font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
-  padding: clamp(0.25rem, 1vw, 0.375rem) clamp(0.5rem, 1.5vw, 0.75rem);
-}
-
-/* ─── Responsive Action Buttons in Detail ─── */
-.detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--oya-border-light);
+  gap: 1rem;
   flex-wrap: wrap;
-  gap: clamp(0.5rem, 1.5vw, 0.75rem);
+  min-width: 0;
 }
 
-/* ─── Responsive Progress Bars in Finance ─── */
-.progress-fill {
-  border-radius: 3px;
+.card-header > * {
+  min-width: 0;
 }
 
-.progress-bar-label {
-  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+.card-body {
+  padding: 1.25rem;
+  min-width: 0;
 }
 
-.progress-bar-value {
-  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+.card-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--oya-border-light);
+  min-width: 0;
 }
 
-/* ─── Responsive Filters Bar ─── */
-.filters-bar {
-  padding: clamp(0.75rem, 2vw, 1rem) clamp(0.75rem, 2vw, 1.25rem);
+/* ─── Badges ─── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 12px;
+  white-space: nowrap;
 }
 
-.filters-bar form {
-  gap: clamp(0.5rem, 1.5vw, 0.75rem);
+.badge-success {
+  background: var(--oya-success-bg);
+  color: var(--oya-success);
 }
 
-/* ─── Responsive Filter Controls ─── */
-.filters-bar .form-control {
-  width: clamp(120px, 30vw, 160px);
+.badge-warning {
+  background: var(--oya-warning-bg);
+  color: var(--oya-warning);
 }
 
-@media (max-width: 480px) {
-  .filters-bar .form-control {
-    width: 100% !important;
-  }
-
-  .filters-bar form {
-    flex-direction: column !important;
-    align-items: stretch !important;
-  }
-
-  .filter-group {
-    width: 100% !important;
-  }
+.badge-danger {
+  background: var(--oya-danger-bg);
+  color: var(--oya-danger);
 }
 
-/* ─── Responsive Pagination Info Text ─── */
-.pagination-info {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+.badge-info {
+  background: var(--oya-info-bg);
+  color: var(--oya-info);
 }
 
-/* ─── Responsive Table Action Buttons ─── */
-.table-actions {
-  gap: clamp(0.125rem, 0.5vw, 0.25rem);
+/* ─── Alerts ─── */
+.alert {
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  border-left: 3px solid;
+  margin-bottom: 1rem;
+  min-width: 0;
 }
 
-.table-action-btn {
-  width: clamp(28px, 8vw, 32px);
-  height: clamp(28px, 8vw, 32px);
+.alert-success {
+  background: var(--oya-success-bg);
+  border-color: var(--oya-success);
+  color: var(--oya-success);
 }
 
-/* ─── Responsive Cell Name ─── */
-.cell-name {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
+.alert-warning {
+  background: var(--oya-warning-bg);
+  border-color: var(--oya-warning);
+  color: var(--oya-warning);
 }
 
-.cell-muted {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+.alert-danger {
+  background: var(--oya-danger-bg);
+  border-color: var(--oya-danger);
+  color: var(--oya-danger);
 }
 
-/* ─── Responsive Urgent Case ─── */
-.urgent-case-title {
-  font-size: clamp(0.8125rem, 2vw, 0.875rem);
+.alert-info {
+  background: var(--oya-info-bg);
+  border-color: var(--oya-info);
+  color: var(--oya-info);
 }
 
-.urgent-case-meta {
-  font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+/* ─── Empty States ─── */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  min-width: 0;
 }
 
-/* ─── Responsive Stat Card Change ─── */
-.stat-card-change {
-  font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  color: var(--oya-text-muted);
 }
 
-/* ─── Responsive Chart Legend ─── */
-.chart-legend {
-  font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+.empty-state-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--oya-text-primary);
+  margin-bottom: 0.5rem;
 }
 
-/* ─── Responsive Tooltip Text ─── */
-.chart-tooltip {
-  font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
+.empty-state-desc {
+  font-size: 0.875rem;
+  color: var(--oya-text-muted);
 }
 
-/* ─── Responsive Export Button Text ─── */
-.export-btn-text {
-  display: inline;
+/* ─── Skeleton Loading ─── */
+.skeleton {
+  background: linear-gradient(90deg, var(--oya-border-light) 25%, var(--oya-border) 50%, var(--oya-border-light) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: var(--radius-sm);
 }
 
-@media (max-width: 480px) {
-  .export-btn-text {
-    display: none;
-  }
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
-/* ─── Smooth Scrolling for Overflow Containers ─── */
-.table-container,
-.org-chart-container,
-.timeline-container,
-.table-responsive-wrapper,
-.form-responsive-wrapper {
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-}
-
-/* ─── Prevent Text Overflow in Tables ─── */
-.data-table td,
-.data-table th {
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-@media (max-width: 480px) {
-  .data-table td,
-  .data-table th {
-    max-width: 150px;
-  }
-}
-
-/* ─── Responsive Truncation for Long Text ─── */
-.truncate-mobile {
+/* ─── Utilities ─── */
+.text-truncate {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: min(220px, 50vw);
+  min-width: 0;
 }
 
-@media (max-width: 480px) {
-  .truncate-mobile {
-    max-width: 150px;
-  }
+.text-wrap {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-/* ─── Hide Scrollbars but Keep Functionality ─── */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
+.flex-wrap {
+  flex-wrap: wrap;
 }
 
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
 
-/* ─── Responsive Focus States for Accessibility ─── */
-@media (hover: none) {
-  .btn:focus,
-  .form-control:focus,
-  .form-select:focus,
-  .topbar-btn:focus,
-  .table-action-btn:focus,
-  .page-btn:focus,
-  .mobile-nav-item:focus,
-  .mobile-bottom-nav-item:focus {
-    outline: 2px solid var(--oya-primary);
-    outline-offset: 2px;
-  }
-}
-
-/* ─── Reduce Motion for Users Who Prefer It ─── */
+/* ─── Reduced Motion ─── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1287,156 +546,32 @@ h6 { font-size: clamp(0.8125rem, 1.5vw, 0.875rem); }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+
+  html {
+    scroll-behavior: auto;
+  }
 }
 
-/* ─── Topbar Avatar Styles (extracted from inline) ─── */
-#topbarAvatar {
-  background: var(--oya-primary);
-  color: #fff;
-  overflow: hidden;
-  cursor: pointer;
-}
+/* ─── Print Styles ─── */
+@media print {
+  body {
+    background: #FFF;
+    color: #000;
+  }
 
-#topbarAvatarImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  cursor: pointer;
-}
+  .card,
+  .btn,
+  .badge {
+    box-shadow: none;
+    border: 1px solid #CCC;
+  }
 
-#topbarAvatarInitial {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-}
+  a {
+    text-decoration: underline;
+    color: #000;
+  }
 
-/* Dropdown toggle button sizing */
-#userMenuToggle {
-  width: auto;
-  padding: 0 0.5rem;
-  gap: 0.5rem;
-}
-
-.dropdown-chevron {
-  flex-shrink: 0;
-}
-
-/* Danger dropdown item */
-.dropdown-item-danger {
-  color: var(--oya-danger);
-}
-
-.dropdown-item-danger:hover {
-  background: var(--oya-danger-bg);
-}
-
-/* ─── Topbar Search Enhancement ─── */
-.topbar-search {
-  position: relative;
-  width: 320px;
-  max-width: 100%;
-}
-
-.topbar-search .search-icon {
-  position: absolute;
-  left: 0.875rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 18px;
-  height: 18px;
-  color: var(--oya-text-muted);
-  pointer-events: none;
-}
-
-.topbar-search input {
-  width: 100%;
-  padding: 0.625rem 1rem 0.625rem 2.5rem;
-  border: 1px solid var(--oya-border);
-  border-radius: var(--radius-lg);
-  background: var(--oya-bg);
-  color: var(--oya-text-primary);
-  font-size: 0.875rem;
-  font-family: var(--font-family);
-  transition: all var(--transition-fast);
-}
-
-.topbar-search input:focus {
-  outline: none;
-  border-color: var(--oya-primary);
-  box-shadow: 0 0 0 3px rgba(11, 61, 145, 0.1);
-}
-
-.topbar-search input::placeholder {
-  color: var(--oya-text-muted);
-}
-
-/* ─── Topbar Actions Layout ─── */
-.topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-
-/* ─── Topbar Button Styles ─── */
-.topbar-btn {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--oya-border);
-  background: var(--oya-bg-white);
-  color: var(--oya-text-secondary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--transition-fast);
-  flex-shrink: 0;
-}
-
-.topbar-btn:hover {
-  background: var(--oya-bg);
-  border-color: var(--oya-primary);
-  color: var(--oya-primary);
-}
-
-.topbar-btn .badge {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
-  background: var(--oya-danger);
-  color: #FFF;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ─── Dropdown Positioning Fix ─── */
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown.open .dropdown-menu {
-  opacity: 1;
-  pointer-events: all;
-  transform: translateY(0);
-}
-
-/* ─── Breadcrumb Separator ─── */
-.breadcrumb-separator {
-  width: 16px;
-  height: 16px;
-  opacity: 0.5;
-  flex-shrink: 0;
+  .no-print {
+    display: none !important;
+  }
 }
