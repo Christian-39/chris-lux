@@ -148,6 +148,20 @@ STATICFILES_DIRS = [
 ]
 
 # Media & Storage Configuration
+# ============================================================
+# IMPORTANT: Backblaze B2 App Key Permissions Required:
+#   - listAllBucketNames (required for S3-compatible SDKs)
+#   - listBuckets (required for HeadObject to return 404 instead of 403)
+#   - readBuckets
+#   - listFiles
+#   - readFiles (required for HeadObject/exists checks)
+#   - writeFiles (required for uploads)
+#   - deleteFiles (required for file deletion)
+#
+# If your app key is missing "readFiles" or "listBuckets", you will get
+# 403 Forbidden on HeadObject operations when django-storages checks
+# if a file already exists before uploading.
+# ============================================================
 MEDIA_STORAGE_MODE = config("MEDIA_STORAGE_MODE", "local")
 
 if MEDIA_STORAGE_MODE == "b2":
@@ -159,6 +173,7 @@ if MEDIA_STORAGE_MODE == "b2":
     B2_ENDPOINT_URL = config("B2_ENDPOINT_URL")
     B2_CUSTOM_DOMAIN = config("B2_CUSTOM_DOMAIN", None)
     
+    # Map B2 credentials to AWS S3-compatible settings for django-storages
     AWS_ACCESS_KEY_ID = B2_KEY_ID
     AWS_SECRET_ACCESS_KEY = B2_APPLICATION_KEY
     AWS_STORAGE_BUCKET_NAME = B2_BUCKET_NAME
@@ -168,14 +183,15 @@ if MEDIA_STORAGE_MODE == "b2":
     AWS_DEFAULT_ACL = None
     AWS_S3_VERIFY = True
     AWS_S3_ADDRESSING_STYLE = "virtual"
-    AWS_S3_OBJECT_PARAMETERS = {}
-    AWS_AUTO_CREATE_BUCKET = False
-
     
+    # Handle custom domain for public URLs
     if B2_CUSTOM_DOMAIN:
         AWS_S3_CUSTOM_DOMAIN = B2_CUSTOM_DOMAIN.replace("https://", "").replace("http://", "")
-    
-    MEDIA_URL = f"https://{B2_CUSTOM_DOMAIN}/media/" if B2_CUSTOM_DOMAIN else f"{B2_ENDPOINT_URL}/{B2_BUCKET_NAME}/media/"
+        MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+    else:
+        # Use the B2 S3-compatible endpoint URL with bucket name
+        # Format: https://s3.<region>.backblazeb2.com/<bucket-name>/media/
+        MEDIA_URL = f"{B2_ENDPOINT_URL}/{B2_BUCKET_NAME}/media/"
     
     STORAGES = {
         "default": {
