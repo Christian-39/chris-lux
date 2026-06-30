@@ -211,9 +211,9 @@
           {% else %}
             <div class="welcome-section">
               <h2>Welcome to OYA</h2>
-              <p>Please sign in to access your dashboard.</p>
+              <p>Please sign in to access your dashbord.</p>
             </div>
-          {% endif %}
+           {% endif %}
           {% endblock %}
         </div>
       </div>
@@ -227,43 +227,98 @@
   <script src="{% static 'js/main.js' %}"></script>
 
   <script>
-    // ===== THEME SYSTEM =====
+    // ===== THEME SYSTEM (FIXED) =====
     (function() {
       const STORAGE_KEY = 'oya_theme';
-      function getCurrentTheme() { return localStorage.getItem(STORAGE_KEY) || 'system'; }
-      function setTheme(theme, source) {
-        let applied = theme;
-        if (theme === 'system' || theme === 'auto') {
-          applied = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        document.documentElement.setAttribute('data-theme', applied);
-        localStorage.setItem(STORAGE_KEY, theme);
-        window.dispatchEvent(new CustomEvent('oyathemechange', { detail: { theme: theme, source: source || 'topbar' } }));
+
+      function getSystemTheme() {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
 
+      function resolveTheme(theme) {
+        // Always returns 'light' or 'dark' — never 'system'
+        if (theme === 'system' || theme === 'auto') {
+          return getSystemTheme();
+        }
+        return theme || getSystemTheme();
+      }
+
+      function getCurrentTheme() {
+        return localStorage.getItem(STORAGE_KEY) || 'system';
+      }
+
+      function setTheme(theme, source) {
+        const applied = resolveTheme(theme);
+        // Set the applied theme (light/dark) on <html>
+        document.documentElement.setAttribute('data-theme', applied);
+        // Store the user's preference (light/dark/system) in localStorage
+        localStorage.setItem(STORAGE_KEY, theme);
+        // Dispatch event with BOTH raw and applied theme
+        window.dispatchEvent(new CustomEvent('oyathemechange', {
+          detail: {
+            theme: theme,        // raw: light/dark/system
+            applied: applied,    // resolved: light/dark
+            source: source || 'topbar'
+          }
+        }));
+      }
+
+      // Initialize theme on page load
+      (function initTheme() {
+        const saved = getCurrentTheme();
+        const applied = resolveTheme(saved);
+        document.documentElement.setAttribute('data-theme', applied);
+      })();
+
+      // Desktop topbar theme options (if they exist)
       const themeOptions = document.querySelectorAll('[data-theme-option]');
       themeOptions.forEach(btn => {
-        btn.addEventListener('click', function() { setTheme(this.dataset.themeOption, 'topbar'); });
+        btn.addEventListener('click', function() {
+          setTheme(this.dataset.themeOption, 'topbar');
+        });
       });
 
+      // Mobile header theme button (cycles: light → dark → system → light)
       const mobileThemeBtn = document.getElementById('mobileThemeBtn');
       if (mobileThemeBtn) {
         mobileThemeBtn.addEventListener('click', function(e) {
-          e.preventDefault(); e.stopPropagation();
+          e.preventDefault();
+          e.stopPropagation();
           const current = getCurrentTheme();
-          const next = current === 'light' ? 'dark' : (current === 'dark' ? 'system' : 'light');
+          let next;
+          if (current === 'light') next = 'dark';
+          else if (current === 'dark') next = 'system';
+          else next = 'light';
           setTheme(next, 'mobile-header');
         });
       }
 
+      // Settings page theme buttons (if they exist)
       const settingsThemeBtns = document.querySelectorAll('[data-settings-theme]');
       settingsThemeBtns.forEach(btn => {
-        btn.addEventListener('click', function() { setTheme(this.dataset.settingsTheme, 'settings'); });
+        btn.addEventListener('click', function() {
+          setTheme(this.dataset.settingsTheme, 'settings');
+        });
       });
 
+      // Listen for theme changes from other sources (e.g., settings page)
       window.addEventListener('oyathemechange', function(e) {
+        // Only update if the change came from a different source
+        // AND the applied theme is different from what's currently on <html>
         if (e.detail && e.detail.source !== 'topbar' && e.detail.source !== 'mobile-header') {
-          document.documentElement.setAttribute('data-theme', e.detail.theme);
+          const currentApplied = document.documentElement.getAttribute('data-theme');
+          if (e.detail.applied && e.detail.applied !== currentApplied) {
+            document.documentElement.setAttribute('data-theme', e.detail.applied);
+          }
+        }
+      });
+
+      // Listen for system theme changes when in 'system' mode
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+        const currentPref = getCurrentTheme();
+        if (currentPref === 'system' || currentPref === 'auto') {
+          const newApplied = e.matches ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', newApplied);
         }
       });
     })();
