@@ -53,19 +53,41 @@
       <img src="{% static 'images/oya_logo.png' %}" alt="OYA" class="mobile-logo-img">
       <span class="mobile-logo-text">OYA</span>
     </a>
-    <button type="button" class="mobile-hamburger" id="mobileHamburger" aria-label="Open Menu">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
-      </svg>
-    </button>
+    <div class="mobile-header-actions">
+      <!-- Theme Toggle -->
+      <button class="mobile-theme-btn" id="mobileThemeBtn" aria-label="Toggle Theme" title="Cycle Theme">
+        <svg class="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        <svg class="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="theme-icon-system" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+      </button>
+      <!-- Users Link -->
+      <a href="{% url 'accounts:user_list' %}" class="mobile-users-btn" aria-label="Users" title="All Users">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </a>
+      <!-- Hamburger -->
+      <button type="button" class="mobile-hamburger" id="mobileHamburger" aria-label="Open Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
   </header>
 
   <!-- ===== MOBILE SLIDE-OUT SIDEBAR ===== -->
   <aside id="mobileSidebar" class="mobile-sidebar">
     <div class="mobile-sidebar-header">
       <a href="{% url 'dashboard:index' %}" class="mobile-brand">
-        <img src="{% static 'images/oya_logo.png' %}" alt="OYA" style="width:32px;height:32px;object-fit:contain;">
-        <span style="font-weight:700;font-size:0.95rem;color:var(--oya-primary);">OYA System</span>
+        <img src="{% static 'images/oya_logo.png' %}" alt="OYA" class="mobile-logo-img">
+        <span class="mobile-logo-text">OYA System</span>
       </a>
       <button type="button" id="mobileSidebarClose" class="mobile-sidebar-close" aria-label="Close Menu">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -90,162 +112,23 @@
       </div>
       <div class="mobile-profile-info">
         <span class="mobile-profile-name">{{ user.get_full_name|default:user.serial_number }}</span>
-        <span class="mobile-profile-role">{% if user.is_staff %}Administrator{% else %}Member{% endif %}</span>
-      </div>
-    </a>
-    {% else %}
-    <a href="{% url 'accounts:login' %}" class="mobile-profile-link">
-      <div class="avatar avatar-sm" style="width:44px;height:44px;background:var(--oya-primary);color:#fff;display:flex;align-items:center;justify-content:center;border-radius:50%;flex-shrink:0;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><line x1="12" y1="11" x2="12" y2="11"/><circle cx="12" cy="7" r="4"/></svg>
-      </div>
-      <div class="mobile-profile-info">
-        <span class="mobile-profile-name">Guest</span>
-        <span class="mobile-profile-role">Sign in to continue</span>
+        <span class="mobile-profile-role">{{ user.get_role_display|default:"Member" }}</span>
       </div>
     </a>
     {% endif %}
 
-    <!-- Navigation -->
-    <nav class="mobile-nav-menu">
-      <!-- Main -->
-      <div class="mobile-nav-section">
-        <div class="mobile-nav-section-title">Main</div>
-        <a href="{% url 'dashboard:index' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          Dashboard
-        </a>
-        <a href="{% url 'members:member_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'member_list' or request.resolver_match.url_name == 'member_detail' %}active{% endif %}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Members
-        </a>
-        <a href="{% url 'executives:executive_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'executive_list' or request.resolver_match.url_name == 'executive_form' %}active{% endif %}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><line x1="12" y1="11" x2="12" y2="11"/><circle cx="12" cy="7" r="4"/></svg>
-          Executives
-        </a>
-      </div>
-
-      <!-- Operations -->
-      <div class="mobile-nav-section">
-        <div class="mobile-nav-section-title">Operations</div>
-        <a href="{% url 'operations:case_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'case_list' or request.resolver_match.url_name == 'case_detail' %}active{% endif %}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          Cases
-        </a>
-        <a href="{% url 'operations:motorcycle_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'motorcycle_list' %}active{% endif %}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>
-          Motorcycles
-        </a>
-        <a href="{% url 'projects:project_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'project_list' or request.resolver_match.url_name == 'project_detail' %}active{% endif %}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-          Projects
-        </a>
-      </div>
-
-      <!-- Finance -->
-      <div class="mobile-nav-section">
-        <div class="mobile-nav-section-title">Finance</div>
-        <a href="{% url 'finance:finance_summary' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'finance_summary' %}active{% endif %}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          Finance Overview
-        </a>
-        <a href="{% url 'finance:income_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'income_list' %}active{% endif %}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-          Income
-        </a>
-        <a href="{% url 'finance:expense_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'expense_list' %}active{% endif %}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
-          Expenses
-        </a>
-      </div>
-
-      <!-- Administration -->
-      <div class="mobile-nav-section">
-        <div class="mobile-nav-section-title">Administration</div>
-        <a href="{% url 'notifications:notification_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'notification_list' %}active{% endif %}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          Notifications
-          {% if user.is_authenticated and unread_notification_count > 0 %}
-          <span class="mobile-nav-badge">{{ unread_notification_count }}</span>
-          {% endif %}
-        </a>
-        {% if user.is_authenticated and user.is_staff %}
-        <a href="{% url 'auditlogs:auditlog_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'auditlog_list' %}active{% endif %}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          Audit Logs
-        </a>
-        <a href="{% url 'settingsapp:settings' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          Settings
-        </a>
-        {% endif %}
-      </div>
+    <!-- Mobile Navigation Links -->
+    <nav class="mobile-sidebar-nav">
+      {% include 'includes/mobile_nav.html' %}
     </nav>
-
-    <!-- Footer: Logout -->
-    <div class="mobile-sidebar-footer">
-      {% if user.is_authenticated %}
-      <a href="{% url 'accounts:logout' %}" class="mobile-logout-link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Logout
-      </a>
-      {% else %}
-      <a href="{% url 'accounts:login' %}" class="mobile-logout-link" style="color:var(--oya-primary);">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-        Sign In
-      </a>
-      {% endif %}
-    </div>
   </aside>
 
   <!-- Mobile Sidebar Overlay -->
   <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay"></div>
 
   <!-- ===== MOBILE BOTTOM NAVBAR (Fixed) ===== -->
-  <nav class="mobile-bottom-nav" id="mobileBottomNav">
-    <div class="mobile-bottom-nav-items">
-      <a href="{% url 'dashboard:index' %}" class="mobile-bottom-nav-item {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-        </svg>
-        Home
-      </a>
-      <a href="{% url 'members:member_list' %}" class="mobile-bottom-nav-item {% if request.resolver_match.url_name == 'member_list' or request.resolver_match.url_name == 'member_detail' %}active{% endif %}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
-        Members
-      </a>
-      <a href="{% url 'finance:finance_summary' %}" class="mobile-bottom-nav-item {% if request.resolver_match.url_name == 'finance_summary' or request.resolver_match.url_name == 'income_list' or request.resolver_match.url_name == 'expense_list' %}active{% endif %}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-        </svg>
-        Finance
-      </a>
-      <a href="{% url 'notifications:notification_list' %}" class="mobile-bottom-nav-item {% if request.resolver_match.url_name == 'notification_list' %}active{% endif %}">
-        <div style="position:relative;display:inline-block;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-          </svg>
-          {% if user.is_authenticated and unread_notification_count > 0 %}
-          <span class="mobile-bottom-nav-badge">{{ unread_notification_count }}</span>
-          {% endif %}
-        </div>
-        Alerts
-      </a>
-      {% if user.is_authenticated and user.is_staff %}
-      <a href="{% url 'settingsapp:settings' %}" class="mobile-bottom-nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-        </svg>
-        Settings
-      </a>
-      {% endif %}
-    </div>
-  </nav>
+  {% include 'includes/mobile_nav.html' %}
 
-  <!-- App Shell -->
   <div class="app-shell">
 
     <!-- Sidebar (Desktop) -->
@@ -261,8 +144,9 @@
       {% include 'includes/topbar.html' %}
 
       <!-- Content Area -->
-      <div class="content-area">
-        {% block content %}
+      <div class="content-area" id="contentArea">
+        <div class="page-container">
+          {% block content %}
           {% if user.is_authenticated %}
             {% if user.has_admin_access %}
               {% include 'dashboard/admin_dashboard.html' %}
@@ -272,19 +156,19 @@
               {% include 'dashboard/member_dashboard.html' %}
             {% endif %}
           {% else %}
-            <div class="card" style="text-align:center;padding:3rem;">
+            <div class="welcome-section">
               <h2>Welcome to OYA</h2>
-              <p>Please <a href="{% url 'accounts:login' %}" style="color:var(--oya-primary);">sign in</a> to access your dashboard.</p>
+              <p>Please sign in to access your dashboard.</p>
             </div>
           {% endif %}
-        {% endblock %}
+          {% endblock %}
+        </div>
       </div>
 
       <!-- Footer -->
       {% include 'includes/footer.html' %}
 
     </main>
-
   </div>
 
   <!-- Image Preview Modal -->
@@ -293,52 +177,62 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-  <!-- App Scripts -->
-  <script src="{% static 'js/theme.js' %}"></script>
-  <script src="{% static 'js/charts.js' %}"></script>
-  <script src="{% static 'js/search.js' %}"></script>
-  <script src="{% static 'js/dashboard.js' %}"></script>
-
-  {% block extra_js %}{% endblock %}
+  <!-- Main JS -->
+  <script src="{% static 'js/main.js' %}"></script>
 
   <script>
     // ===== UNIFIED THEME SYSTEM (Topbar + Settings Sync) =====
     (function() {
       const STORAGE_KEY = 'oya_theme';
-      const themeToggleBtn = document.getElementById('themeToggleBtn');
 
       function getCurrentTheme() {
-        return document.documentElement.getAttribute('data-theme') || 'light';
+        return localStorage.getItem(STORAGE_KEY) || 'system';
       }
 
       function setTheme(theme, source) {
-        document.documentElement.setAttribute('data-theme', theme);
+        let applied = theme;
+        if (theme === 'system' || theme === 'auto') {
+          applied = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', applied);
         localStorage.setItem(STORAGE_KEY, theme);
         window.dispatchEvent(new CustomEvent('oyathemechange', {
           detail: { theme: theme, source: source || 'topbar' }
         }));
       }
 
-      if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', function(e) {
+      // Desktop topbar theme buttons
+      const themeOptions = document.querySelectorAll('[data-theme-option]');
+      themeOptions.forEach(btn => {
+        btn.addEventListener('click', function() {
+          setTheme(this.dataset.themeOption, 'topbar');
+        });
+      });
+
+      // Mobile theme button (cycle)
+      const mobileThemeBtn = document.getElementById('mobileThemeBtn');
+      if (mobileThemeBtn) {
+        mobileThemeBtn.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
           const current = getCurrentTheme();
-          const next = current === 'dark' ? 'light' : 'dark';
-          setTheme(next, 'topbar');
+          const next = current === 'light' ? 'dark' : (current === 'dark' ? 'system' : 'light');
+          setTheme(next, 'mobile-header');
         });
       }
 
-      window.addEventListener('oyathemechange', function(e) {
-        if (e.detail && e.detail.source !== 'topbar') {
-          document.documentElement.setAttribute('data-theme', e.detail.theme);
-        }
+      // Settings page theme buttons
+      const settingsThemeBtns = document.querySelectorAll('[data-settings-theme]');
+      settingsThemeBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          setTheme(this.dataset.settingsTheme, 'settings');
+        });
       });
 
-      window.addEventListener('storage', function(e) {
-        if (e.key === STORAGE_KEY) {
-          const theme = e.newValue || 'light';
-          document.documentElement.setAttribute('data-theme', theme);
+      // Listen for theme changes from other sources
+      window.addEventListener('oyathemechange', function(e) {
+        if (e.detail && e.detail.source !== 'topbar' && e.detail.source !== 'mobile-header') {
+          document.documentElement.setAttribute('data-theme', e.detail.theme);
         }
       });
     })();
@@ -380,19 +274,23 @@
       }
 
       if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', function() {
+        sidebarOverlay.addEventListener('click', function(e) {
+          e.preventDefault();
           closeSidebar();
         });
       }
 
+      // Close sidebar when clicking a link inside it
       if (mobileSidebar) {
-        mobileSidebar.querySelectorAll('a').forEach(function(link) {
+        const sidebarLinks = mobileSidebar.querySelectorAll('a');
+        sidebarLinks.forEach(function(link) {
           link.addEventListener('click', function() {
             closeSidebar();
           });
         });
       }
 
+      // Close sidebar when clicking outside
       document.addEventListener('click', function(e) {
         if (mobileSidebar && mobileSidebar.classList.contains('open')) {
           if (!mobileSidebar.contains(e.target) && !hamburger.contains(e.target)) {
@@ -401,142 +299,123 @@
         }
       });
 
+      // Close sidebar on Escape key
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeSidebar();
+        if (e.key === 'Escape' && mobileSidebar && mobileSidebar.classList.contains('open')) {
+          closeSidebar();
+        }
       });
 
+      // Handle window resize - close sidebar when going to desktop
       window.addEventListener('resize', function() {
-        if (window.innerWidth > 1024) closeSidebar();
+        if (window.innerWidth > 1024 && mobileSidebar && mobileSidebar.classList.contains('open')) {
+          closeSidebar();
+        }
       });
     })();
 
-    // ===== COMPACT SEARCH =====
+    // ===== SIDEBAR TOGGLE (Desktop) =====
     (function() {
-      const searchInput = document.getElementById('globalSearch');
-      const searchResults = document.getElementById('searchResults');
-      if (!searchInput || !searchResults) return;
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const body = document.body;
 
-      let debounceTimer;
-      let selectedIndex = -1;
-      let resultItems = [];
-
-      searchInput.addEventListener('input', function() {
-        const query = this.value.trim();
-        selectedIndex = -1;
-        clearTimeout(debounceTimer);
-
-        if (query.length < 2) {
-          searchResults.classList.add('hidden');
-          searchResults.innerHTML = '';
-          return;
-        }
-
-        debounceTimer = setTimeout(() => {
-          fetch(`/search/ajax/?q=${encodeURIComponent(query)}`)
-            .then(r => r.ok ? r.json() : Promise.reject('Search failed'))
-            .then(data => displayResults(data, query))
-            .catch(err => {
-              console.error('Search error:', err);
-              searchResults.innerHTML = '<div class="dropdown-item" style="color:var(--oya-danger);padding:0.75rem;">Search error. Try again.</div>';
-              searchResults.classList.remove('hidden');
-            });
-        }, 300);
-      });
-
-      searchInput.addEventListener('keydown', function(e) {
-        const query = this.value.trim();
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          if (query.length >= 2) {
-            if (selectedIndex >= 0 && resultItems[selectedIndex]) {
-              window.location.href = resultItems[selectedIndex].href;
-            } else {
-              window.location.href = `/members/?search=${encodeURIComponent(query)}`;
-            }
-          }
-          return;
-        }
-        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-          e.preventDefault();
-          const items = searchResults.querySelectorAll('.dropdown-item[href]');
-          resultItems = Array.from(items);
-          if (!resultItems.length) return;
-          selectedIndex = e.key === 'ArrowDown'
-            ? Math.min(selectedIndex + 1, resultItems.length - 1)
-            : Math.max(selectedIndex - 1, 0);
-          resultItems.forEach((item, idx) => {
-            item.style.background = idx === selectedIndex ? 'var(--oya-primary-bg, rgba(11,61,145,0.08))' : '';
-            item.style.color = idx === selectedIndex ? 'var(--oya-primary)' : '';
-          });
-          return;
-        }
-        if (e.key === 'Escape') {
-          searchResults.classList.add('hidden');
-          selectedIndex = -1;
-          this.blur();
-        }
-      });
-
-      function displayResults(data, query) {
-        let html = '';
-        if (data.members && data.members.length > 0) {
-          html += '<div class="dropdown-header">Members</div>';
-          data.members.slice(0, 3).forEach(m => {
-            html += `<a href="/members/${m.id}/" class="dropdown-item">
-              <div class="avatar avatar-sm" style="background:var(--oya-primary);color:#fff;">${m.full_name ? m.full_name.charAt(0).toUpperCase() : '?'}</div>
-              <div><div style="font-weight:500;">${m.full_name || 'Unknown'}</div><div style="font-size:0.7rem;color:var(--oya-text-muted);">${m.serial_number || ''}</div></div>
-            </a>`;
-          });
-        }
-        if (data.users && data.users.length > 0) {
-          html += '<div class="dropdown-header">Users</div>';
-          data.users.slice(0, 2).forEach(u => {
-            html += `<a href="/users/${u.id}/" class="dropdown-item">
-              <div class="avatar avatar-sm" style="background:var(--oya-accent);color:#fff;">${u.full_name ? u.full_name.charAt(0).toUpperCase() : '?'}</div>
-              <div><div style="font-weight:500;">${u.full_name || u.serial_number}</div><div style="font-size:0.7rem;color:var(--oya-text-muted);">${u.role || ''}</div></div>
-            </a>`;
-          });
-        }
-        if (data.cases && data.cases.length > 0) {
-          html += '<div class="dropdown-header">Cases</div>';
-          data.cases.slice(0, 2).forEach(c => {
-            html += `<a href="/operations/cases/${c.id}/" class="dropdown-item">
-              <div style="font-weight:500;">${c.title || 'Case #' + c.id}</div>
-            </a>`;
-          });
-        }
-        if (!html) {
-          html = `<div class="dropdown-item" style="color:var(--oya-text-muted);text-align:center;padding:0.75rem;">No results for "<strong>${query}</strong>"</div>`;
-        }
-        html += `<div class="dropdown-divider"></div>
-          <a href="/members/?search=${encodeURIComponent(query)}" class="dropdown-item" style="text-align:center;color:var(--oya-primary);font-weight:500;font-size:0.75rem;">View all results</a>`;
-        searchResults.innerHTML = html;
-        searchResults.classList.remove('hidden');
-        selectedIndex = -1;
-        resultItems = Array.from(searchResults.querySelectorAll('.dropdown-item[href]'));
+      if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', function() {
+          sidebar.classList.toggle('collapsed');
+          body.classList.toggle('sidebar-collapsed');
+        });
       }
 
-      document.addEventListener('click', function(e) {
-        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-          searchResults.classList.add('hidden');
-          selectedIndex = -1;
-        }
+      if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', function() {
+          sidebar.classList.remove('open');
+          sidebarOverlay.classList.remove('active');
+        });
+      }
+    })();
+
+    // ===== DROPDOWN TOGGLES =====
+    (function() {
+      document.querySelectorAll('.dropdown-toggle').forEach(function(toggle) {
+        toggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var parent = this.closest('.dropdown');
+          document.querySelectorAll('.dropdown.open').forEach(function(d) {
+            if (d !== parent) d.classList.remove('open');
+          });
+          parent.classList.toggle('open');
+        });
       });
 
-      document.addEventListener('keydown', function(e) {
-        if (e.key === '/' && document.activeElement !== searchInput) {
-          e.preventDefault();
-          searchInput.focus();
-        }
+      document.addEventListener('click', function(e) {
+        document.querySelectorAll('.dropdown.open').forEach(function(d) {
+          if (!d.contains(e.target)) d.classList.remove('open');
+        });
       });
     })();
 
-    // Remove no-transition class after load
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.body.classList.remove('no-transition');
-      });
+    // ===== NOTIFICATIONS BADGE POLLING =====
+    (function() {
+      function updateNotificationBadge() {
+        fetch('/notifications/api/unread-count/')
+          .then(function(response) { return response.json(); })
+          .then(function(data) {
+            var badge = document.getElementById('notificationBadge');
+            if (badge) {
+              if (data.count > 0) {
+                badge.textContent = data.count > 99 ? '99+' : data.count;
+                badge.style.display = 'flex';
+              } else {
+                badge.style.display = 'none';
+              }
+            }
+          })
+          .catch(function() {});
+      }
+      // Update every 60 seconds
+      setInterval(updateNotificationBadge, 60000);
+      // Initial update
+      updateNotificationBadge();
+    })();
+
+    // ===== TOAST NOTIFICATIONS =====
+    window.showToast = function(message, type) {
+      type = type || 'info';
+      var container = document.getElementById('toastContainer');
+      if (!container) return;
+      var toast = document.createElement('div');
+      toast.className = 'toast toast-' + type;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(function() {
+        toast.classList.add('show');
+      }, 10);
+      setTimeout(function() {
+        toast.classList.remove('show');
+        setTimeout(function() {
+          if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 300);
+      }, 3000);
+    };
+
+    // Show Django messages as toasts
+    {% if messages %}
+    (function() {
+      {% for message in messages %}
+        window.showToast("{{ message|escapejs }}", "{{ message.tags|default:'info' }}");
+      {% endfor %}
+    })();
+    {% endif %}
+
+    // ===== REMOVE NO-TRANSITION CLASS AFTER LOAD =====
+    window.addEventListener('load', function() {
+      document.body.classList.remove('no-transition');
     });
   </script>
+
+  {% block extra_js %}{% endblock %}
 </body>
 </html>
