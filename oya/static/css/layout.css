@@ -1462,3 +1462,119 @@ body.sidebar-open { overflow: hidden; }
   font-size: 0.875rem;
   padding: 0.5rem 0.75rem;
 }
+
+/* ==========================================================================
+   THEME DROPDOWN & MOBILE RESPONSIVE FIXES
+   Added for topbar theme toggle + users link visibility
+   ========================================================================== */
+
+/* ─── Theme Dropdown Specific Styles ─── */
+.dropdown-menu-right {
+  right: 0;
+  left: auto;
+}
+
+.dropdown-header {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--oya-text-muted);
+  border-bottom: 1px solid var(--oya-border);
+  margin-bottom: 0.25rem;
+}
+
+.dropdown-item.active {
+  background: var(--oya-primary-50);
+  color: var(--oya-primary);
+}
+
+.dropdown-item.active .dropdown-check {
+  opacity: 1 !important;
+}
+
+.dropdown-item .dropdown-check {
+  transition: opacity var(--transition-fast);
+}
+
+/* Theme toggle button icons */
+.topbar-btn .theme-icon-current,
+.topbar-btn .theme-icon-moon,
+.topbar-btn .theme-icon-desktop {
+  display: none;
+}
+
+/* Show the correct icon based on active theme */
+.topbar-btn[data-active-theme="light"] .theme-icon-current,
+.topbar-btn[data-active-theme="dark"] .theme-icon-moon,
+.topbar-btn[data-active-theme="system"] .theme-icon-desktop {
+  display: inline-block;
+}
+
+/* ─── Hide/Show Utilities (matching your breakpoint pattern) ─── */
+@media (max-width: 768px) {
+  .hide-mobile { display: none !important; }
+}
+
+@media (min-width: 769px) {
+  .show-mobile-only { display: none !important; }
+}
+
+/* ─── Mobile: compress topbar actions to fit ─── */
+@media (max-width: 768px) {
+  .topbar-actions {
+    gap: 0.25rem;
+  }
+
+  .topbar-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* On mobile, hide dropdown chevron next to avatar to save space */
+  #userMenuToggle .dropdown-chevron {
+    display: none;
+  }
+
+  #userMenuToggle {
+    padding: 0;
+    width: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    padding: 0 0.75rem;
+  }
+
+  .topbar-actions {
+    gap: 0.15rem;
+  }
+
+  .topbar-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .topbar-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* ─── Fix: old theme icon CSS now supports new classes ─── */
+[data-theme="light"] .theme-icon-sun,
+[data-theme="light"] .theme-icon-current { display: none; }
+
+[data-theme="light"] .theme-icon-moon { display: block; }
+
+[data-theme="dark"] .theme-icon-sun,
+[data-theme="dark"] .theme-icon-current { display: block; }
+
+[data-theme="dark"] .theme-icon-moon { display: none; }
+
+/* System preference fallback for theme icons */
+[data-theme="system"] .theme-icon-current { display: block; }
+[data-theme="system"] .theme-icon-moon { display: none; }
+[data-theme="system"] .theme-icon-sun { display: none; }
