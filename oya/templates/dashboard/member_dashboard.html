@@ -65,67 +65,6 @@
   </div>
 </div>
 
-<!-- RECENT ACTIVITIES (Members View - Money & Membership Only) -->
-<div class="dashboard-grid dashboard-grid-1" style="margin-bottom:1.5rem;">
-  <div class="card">
-    <div class="card-header">
-      <div>
-        <div class="card-header-title">Recent Activities</div>
-        <div class="card-header-subtitle">Financial & membership updates</div>
-      </div>
-    </div>
-    <div class="card-body" style="padding:0;">
-      <div class="activity-feed" style="padding:0 1.25rem;">
-        {% for activity in recent_activities %}
-        <div class="activity-item" style="padding:0.75rem 0;{% if not forloop.last %}border-bottom:1px solid var(--oya-border);{% endif %}">
-          <div class="activity-icon 
-            {% if 'income' in activity.model_name|lower or 'dues' in activity.model_name|lower or 'payment' in activity.description|lower or '₦' in activity.description %}success
-            {% elif 'expense' in activity.model_name|lower or 'expense' in activity.description|lower %}danger
-            {% elif 'member' in activity.model_name|lower and 'added' in activity.description|lower or 'created' in activity.description|lower or 'new' in activity.description|lower %}primary
-            {% elif 'removed' in activity.description|lower or 'past' in activity.description|lower or 'deactivated' in activity.description|lower %}warning
-            {% else %}primary{% endif %}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              {% if 'income' in activity.model_name|lower or 'dues' in activity.model_name|lower or 'payment' in activity.description|lower or '₦' in activity.description %}
-                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-              {% elif 'expense' in activity.model_name|lower or 'expense' in activity.description|lower %}
-                <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
-              {% elif 'removed' in activity.description|lower or 'past' in activity.description|lower or 'deactivated' in activity.description|lower %}
-                <path d="M18 6L6 18M6 6l12 12"/>
-              {% else %}
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-              {% endif %}
-            </svg>
-          </div>
-          <div class="activity-content" style="min-width:0;">
-            <div class="activity-text" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:min(220px,50vw);" title="{{ activity.description }}">
-              {{ activity.description|truncatechars:60|default:activity.action }}
-            </div>
-            <div class="activity-time" style="display:flex;justify-content:space-between;align-items:center;">
-              <span>{{ activity.created_at|timesince }} ago</span>
-              {% if 'income' in activity.model_name|lower or 'dues' in activity.model_name|lower or 'payment' in activity.description|lower or '₦' in activity.description %}
-                <span class="badge" style="background:var(--oya-success-bg);color:var(--oya-success);font-size:0.75rem;">Income</span>
-              {% elif 'expense' in activity.model_name|lower or 'expense' in activity.description|lower %}
-                <span class="badge" style="background:var(--oya-danger-bg);color:var(--oya-danger);font-size:0.75rem;">Expense</span>
-              {% elif 'removed' in activity.description|lower or 'past' in activity.description|lower or 'deactivated' in activity.description|lower %}
-                <span class="badge" style="background:var(--oya-warning-bg);color:var(--oya-warning);font-size:0.75rem;">Removed</span>
-              {% elif 'member' in activity.model_name|lower or 'added' in activity.description|lower or 'created' in activity.description|lower or 'new' in activity.description|lower %}
-                <span class="badge" style="background:var(--oya-primary-bg);color:var(--oya-primary);font-size:0.75rem;">New Member</span>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-        {% empty %}
-        <div class="activity-item" style="padding:0.75rem 0;">
-          <div class="activity-content">
-            <div class="activity-text">No recent financial or membership activities</div>
-            <div class="activity-time">Check back later for updates</div>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- Charts Row -->
 <div class="dashboard-grid dashboard-grid-2" style="margin-bottom:1.5rem;">
