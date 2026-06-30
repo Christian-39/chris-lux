@@ -148,7 +148,9 @@ def member_dashboard(request):
     """Member-only dashboard view."""
     kpis = get_dashboard_kpis()
     member_stats = get_member_statistics()
-    recent_activities = get_recent_activities()
+    
+    # Floor members get restricted activities (money + member add/remove only)
+    member_activities = get_member_recent_activities(limit=5)
 
     # Real data for member dashboard
     clan_distribution = get_clan_distribution()
@@ -156,7 +158,7 @@ def member_dashboard(request):
     task_force = get_active_task_force()
     notices = get_recent_notices()
 
-    # Financial trend data for charts - auto-detects year with data
+    # Financial trend data for charts
     trend_data = get_income_expense_trend()
 
     # Get member-specific contribution data
@@ -174,7 +176,7 @@ def member_dashboard(request):
     context = {
         "kpis": kpis,
         "member_stats": member_stats,
-        "recent_activities": recent_activities,
+        "recent_activities": member_activities,  # restricted view for members
         "clan_distribution": clan_distribution,
         "executives": executives,
         "task_force": task_force,
@@ -186,6 +188,7 @@ def member_dashboard(request):
         "is_member": True,
     }
     return render(request, "dashboard/member_dashboard.html", context)
+
 
 
 
