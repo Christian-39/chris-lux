@@ -62,7 +62,7 @@ class Income(BaseModel):
 class DuesPayment(BaseModel):
     """
     Tracks yearly dues payments per member.
-    Platform started 2020. Dues = ₦5,000/year (fixed).
+    Platform started 2020. Dues = \u20a65,000/year (fixed).
     """
     YEARLY_DUES_AMOUNT = 5000
 
@@ -120,13 +120,13 @@ class DuesPayment(BaseModel):
         ]
 
     def __str__(self):
-        return f"{self.member.get_full_name()} — {self.year} Dues"
+        return f"{self.member.get_full_name()} \u2014 {self.year} Dues"
 
     def clean(self):
         if self.year < 2020:
             raise ValidationError({"year": "Dues year cannot be before platform creation (2020)."})
         if self.amount_paid != self.YEARLY_DUES_AMOUNT:
-            raise ValidationError({"amount_paid": f"Yearly dues must be exactly ₦{self.YEARLY_DUES_AMOUNT:,}."})
+            raise ValidationError({"amount_paid": f"Yearly dues must be exactly \u20a6{self.YEARLY_DUES_AMOUNT:,}."})
 
     @property
     def status(self):
@@ -136,12 +136,11 @@ class DuesPayment(BaseModel):
     def get_member_debt(cls, member):
         """
         Calculate total dues debt for a member.
-        Debt = (years_from_joining_to_now × 5000) − total_paid
+        Debt = (years_from_joining_to_now \u00d7 5000) \u2212 total_paid
         """
         from datetime import datetime
         current_year = datetime.now().year
 
-        # If member joined before 2020, count from 2020
         join_year = getattr(member, 'year_joined', None) or 2020
         start_year = max(join_year, 2020)
 
