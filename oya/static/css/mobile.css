@@ -1,22 +1,14 @@
 /* ==========================================================================
-   FILE 5 OF 6: mobile.css
-   OYA - Mobile-Specific Overrides (≤768px)
-   MUST be loaded AFTER layout.css
+   mobile.css — Mobile-Specific Overrides
    ========================================================================== */
 
-/* ─── Mobile Logo Sizes ─── */
+/* ─── Mobile Logo ─── */
 .mobile-logo-img {
   width: 42px;
   height: 42px;
   object-fit: contain;
   flex-shrink: 0;
 }
-
-/* ─── Hide/Show Utilities ─── */
-/* NOTE: layout.css already defines these with !important in @media rules.
-   These base rules provide the default state without !important
-   to avoid specificity conflicts. The @media rules in layout.css
-   handle the actual responsive behavior. */
 
 /* ─── Mobile Top Header ─── */
 .mobile-top-header {
@@ -73,97 +65,234 @@
 /* ─── Mobile Sidebar ─── */
 .mobile-sidebar {
   display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  max-width: 85vw;
+  background: var(--oya-bg-card);
+  border-right: 1px solid var(--oya-border);
+  z-index: 1000;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  box-shadow: 4px 0 12px rgba(0,0,0,0.15);
+}
+
+.mobile-sidebar.open {
+  transform: translateX(0) !important;
+}
+
+.mobile-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--oya-border);
+}
+
+.mobile-sidebar-close {
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  color: var(--oya-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-profile-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  text-decoration: none;
+  color: var(--oya-text-primary);
+  border-bottom: 1px solid var(--oya-border);
+}
+
+.mobile-profile-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mobile-profile-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-profile-role {
+  font-size: 0.75rem;
+  color: var(--oya-text-muted);
+}
+
+.mobile-sidebar-nav {
+  padding: 0.5rem 0;
+}
+
+.mobile-nav-section {
+  margin-bottom: 0.5rem;
+}
+
+.mobile-nav-section-title {
+  padding: 0.5rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--oya-text-muted);
+  letter-spacing: 0.5px;
+}
+
+.mobile-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  text-decoration: none;
+  color: var(--oya-text-primary);
+  font-size: 0.875rem;
+  transition: background 0.15s;
+}
+
+.mobile-nav-link:hover {
+  background: var(--oya-bg-hover, rgba(0,0,0,0.05));
+}
+
+.mobile-nav-link.active {
+  background: var(--oya-primary-light, rgba(59,130,246,0.1));
+  color: var(--oya-primary) !important;
+  border-right: 3px solid var(--oya-primary);
+}
+
+.mobile-nav-badge {
+  margin-left: auto;
+  background: var(--oya-danger);
+  color: #fff;
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 10px;
+}
+
+.mobile-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-sidebar-overlay.active {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* ─── Mobile Header Actions ─── */
+.mobile-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.mobile-theme-btn,
+.mobile-users-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--oya-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  width: 40px;
+  height: 40px;
+}
+
+.mobile-theme-btn:hover,
+.mobile-users-btn:hover {
+  background: var(--oya-bg-hover, rgba(0,0,0,0.05));
+  color: var(--oya-primary);
+}
+
+.mobile-theme-btn:active,
+.mobile-users-btn:active {
+  opacity: 0.7;
+}
+
+.mobile-theme-btn .theme-icon-light,
+.mobile-theme-btn .theme-icon-dark,
+.mobile-theme-btn .theme-icon-system {
+  display: none;
+}
+
+.mobile-theme-btn[data-active-theme="light"] .theme-icon-light,
+.mobile-theme-btn[data-active-theme="dark"] .theme-icon-dark,
+.mobile-theme-btn[data-active-theme="system"] .theme-icon-system {
+  display: inline-block;
+}
+
+.mobile-hamburger {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--oya-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.mobile-hamburger:active {
+  opacity: 0.7;
 }
 
 /* ─── Mobile Breakpoint (≤768px) ─── */
 @media (max-width: 768px) {
-  /* Hide desktop sidebar */
   .sidebar {
     display: none;
   }
 
-  /* Show mobile bottom nav */
+  .mobile-top-header {
+    display: flex !important;
+  }
+
   .mobile-nav {
     display: block;
   }
 
-  /* Show mobile sidebar when triggered */
   .mobile-sidebar {
     display: block;
   }
 
-  /* Adjust main content for bottom nav */
   .main-content {
+    padding-top: 56px !important;
     padding-bottom: 64px !important;
   }
 
-  /* Mobile logo smaller on very small screens */
+  .topbar {
+    display: none !important;
+  }
+
   .mobile-logo-img {
     width: 38px;
     height: 38px;
-  }
-
-  /* Mobile header actions */
-  .mobile-header-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  /* Mobile theme button */
-  .mobile-theme-btn,
-  .mobile-users-btn {
-    background: none;
-    border: none;
-    padding: 0.5rem;
-    cursor: pointer;
-    color: var(--oya-text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-md);
-    transition: all 0.15s ease;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    width: 40px;
-    height: 40px;
-  }
-
-  .mobile-theme-btn:hover,
-  .mobile-users-btn:hover {
-    background: var(--oya-bg-hover, rgba(0,0,0,0.05));
-    color: var(--oya-primary);
-  }
-
-  .mobile-theme-btn:active,
-  .mobile-users-btn:active {
-    opacity: 0.7;
-  }
-
-  /* Mobile theme button icons - show only active one */
-  .mobile-theme-btn .theme-icon-light,
-  .mobile-theme-btn .theme-icon-dark,
-  .mobile-theme-btn .theme-icon-system {
-    display: none;
-  }
-
-  .mobile-theme-btn[data-active-theme="light"] .theme-icon-light,
-  .mobile-theme-btn[data-active-theme="dark"] .theme-icon-dark,
-  .mobile-theme-btn[data-active-theme="system"] .theme-icon-system {
-    display: inline-block;
-  }
-
-  /* Mobile sidebar theme button icons */
-  #mobileSidebarThemeBtn .sidebar-theme-icon-light,
-  #mobileSidebarThemeBtn .sidebar-theme-icon-dark,
-  #mobileSidebarThemeBtn .sidebar-theme-icon-system {
-    display: none;
-  }
-
-  #mobileSidebarThemeBtn[data-active-theme="light"] .sidebar-theme-icon-light,
-  #mobileSidebarThemeBtn[data-active-theme="dark"] .sidebar-theme-icon-dark,
-  #mobileSidebarThemeBtn[data-active-theme="system"] .sidebar-theme-icon-system {
-    display: inline-block;
   }
 }
 
@@ -197,16 +326,8 @@
   }
 }
 
-/* ─── Tablet (481px–768px) ─── */
-@media (min-width: 481px) and (max-width: 768px) {
-  .dashboard-grid-4 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 /* ─── Landscape Mobile ─── */
 @media (max-height: 500px) and (orientation: landscape) and (max-width: 768px) {
-  .mobile-bottom-nav,
   .mobile-nav {
     height: 52px;
   }
@@ -230,7 +351,7 @@
 /* ─── Touch Device Optimizations ─── */
 @media (hover: none) and (pointer: coarse) {
   .btn, .table-action-btn, .page-btn, .topbar-btn,
-  .dropdown-item, .mobile-nav-item, .mobile-bottom-nav-item,
+  .dropdown-item, .mobile-nav-item,
   .tab-btn, .quick-action-btn, .category-card, .theme-card,
   .nav-item, .mobile-nav-link,
   .form-control, .form-select, .form-input, .form-textarea {
@@ -238,8 +359,14 @@
   }
 
   .mobile-theme-btn,
-  .mobile-users-btn {
+  .mobile-users-btn,
+  .mobile-hamburger {
     min-height: 44px;
     min-width: 44px;
   }
+}
+
+/* Prevent body scroll when sidebar is open */
+body.sidebar-open {
+  overflow: hidden;
 }
