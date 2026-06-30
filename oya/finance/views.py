@@ -2,7 +2,7 @@
 Updated views for OYA finance with dues tracking and donation separation.
 """
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -10,7 +10,8 @@ from django.core.paginator import Paginator
 from django.db.models import Q, Sum, Count
 from django.utils import timezone
 from django.http import JsonResponse
-from datetime import timedelta
+from django.db.models.functions import Coalesce
+from django.db.models import Value, DecimalField
 from auditlogs.services import log_action
 from accounts.models import User
 from .models import Income, Expense, DuesPayment
@@ -114,7 +115,7 @@ def dues_tracker(request):
                 total_dues_collected += YEARLY_DUES
             else:
                 row["years"][year] = {"status": "OWED", "payment": None}
-            total_dues_expected += YEARLY_DUES
+                total_dues_expected += YEARLY_DUES
 
         member_rows.append(row)
 
@@ -160,7 +161,7 @@ def dues_create(request):
                 object_type="DuesPayment",
                 object_id=dues.id,
                 ip_address=getattr(request, "client_ip", ""),
-                description=f"Recorded dues: {dues.member.get_full_name()} - {dues.year} (\u20a6{dues.amount_paid:,.2f})"
+                description=f"Recorded dues: {dues.member.get_full_name()} - {dues.year} (₦{dues.amount_paid:,.2f})"
             )
             messages.success(request, f"Dues recorded for {dues.member.get_full_name()} - {dues.year}.")
             return redirect("finance:dues_tracker")
@@ -238,13 +239,72 @@ def dues_delete(request, pk):
 
 
 # ============================================================
-# INCOME (Legacy - redirects to donations)
+# INCOME LIST (SPLIT: DUES + DONATIONS)
 # ============================================================
 
 @login_required
 def income_list(request):
-    """Redirect old income list to donation list."""
-    return redirect("finance:donation_list")
+    """List all income records split by Dues and Donations with totals."""
+    # --- DUES (from Income records with income_type="DUES") ---
+    dues_qs = Income.objects.filter(income_type="DUES").select_related(
+        "created_by", "dues_payment", "dues_payment__member"
+    ).order_by("-created_at")
+
+    # --- DONATIONS & OTHER (non-dues income) ---
+    donation_qs = Income.objects.exclude(income_type="DUES").select_related("created_by")
+
+    # Search/filter for donations
+    search_term = request.GET.get("search", "")
+    if search_term:
+        donation_qs = donation_qs.filter(
+            Q(reason__icontains=search_term) |
+            Q(paid_by__icontains=search_term) |
+            Q(created_by__full_name__icontains=search_term)
+        )
+
+    type_filter = request.GET.get("type", "")
+    if type_filter:
+        donation_qs = donation_qs.filter(income_type=type_filter)
+
+    date_from = request.GET.get("date_from", "")
+    date_to = request.GET.get("date_to", "")
+    if date_from:
+        dues_qs = dues_qs.filter(created_at__date__gte=date_from)
+        donation_qs = donation_qs.filter(created_at__date__gte=date_from)
+    if date_to:
+        dues_qs = dues_qs.filter(created_at__date__lte=date_to)
+        donation_qs = donation_qs.filter(created_at__date__lte=date_to)
+
+    # Pagination for donations only
+    paginator = Paginator(donation_qs, 25)
+    page = request.GET.get("page", 1)
+    donation_incomes = paginator.get_page(page)
+
+    # Totals
+    total_dues = Income.objects.filter(income_type="DUES").aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+
+    total_donations = Income.objects.exclude(income_type="DUES").aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+
+    total_income = total_dues + total_donations
+    total_records = Income.objects.count()
+
+    context = {
+        "dues_incomes": dues_qs,
+        "donation_incomes": donation_incomes,
+        "search_term": search_term,
+        "type_filter": type_filter,
+        "date_from": date_from,
+        "date_to": date_to,
+        "total_dues": total_dues,
+        "total_donations": total_donations,
+        "total_income": total_income,
+        "total_records": total_records,
+    }
+    return render(request, "finance/income_list.html", context)
 
 
 @login_required
@@ -281,7 +341,7 @@ def income_create(request):
                 object_type="Income",
                 object_id=income.id,
                 ip_address=getattr(request, "client_ip", ""),
-                description=f"Recorded {income.get_income_type_display()}: \u20a6{income.amount:,.2f} - {income.reason}"
+                description=f"Recorded {income.get_income_type_display()}: ₦{income.amount:,.2f} - {income.reason}"
             )
             messages.success(request, "Income recorded successfully.")
             return redirect("finance:donation_list")
@@ -330,7 +390,7 @@ def income_delete(request, pk):
             object_type="Income",
             object_id=pk,
             ip_address=getattr(request, "client_ip", ""),
-            description=f"Deleted {income_type}: \u20a6{amount:,.2f} - {reason}"
+            description=f"Deleted {income_type}: ₦{amount:,.2f} - {reason}"
         )
         messages.success(request, "Income record deleted.")
         return redirect("finance:donation_list")
@@ -431,7 +491,7 @@ def expense_create(request):
                 object_type="Expense",
                 object_id=expense.id,
                 ip_address=getattr(request, "client_ip", ""),
-                description=f"Recorded expense: \u20a6{expense.amount:,.2f} - {expense.category}"
+                description=f"Recorded expense: ₦{expense.amount:,.2f} - {expense.category}"
             )
             messages.success(request, "Expense recorded successfully.")
             return redirect("finance:expense_list")
@@ -479,7 +539,7 @@ def expense_delete(request, pk):
             object_type="Expense",
             object_id=pk,
             ip_address=getattr(request, "client_ip", ""),
-            description=f"Deleted expense: \u20a6{amount:,.2f} - {category}"
+            description=f"Deleted expense: ₦{amount:,.2f} - {category}"
         )
         messages.success(request, "Expense record deleted.")
         return redirect("finance:expense_list")
@@ -596,9 +656,9 @@ def search_members(request):
     results = []
     for u in users:
         html = (
-            f'<div class="member-result">'
-            f'  <span class="member-name">{u.get_full_name()}</span>'
-            f'  <span class="member-meta">{u.serial_number} &middot; {u.get_role_display()}</span>'
+            f'<div class="search-result-item">'
+            f'<div class="search-result-name">{u.get_full_name()}</div>'
+            f'<div class="search-result-meta">{u.serial_number} · {u.get_role_display()}</div>'
             f'</div>'
         )
         results.append({
