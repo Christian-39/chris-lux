@@ -33,9 +33,7 @@ class IncomeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Default to DONATION for non-dues entries
         self.fields["income_type"].initial = "DONATION"
-        # Remove DUES from choices here — dues have their own form
         choices = [c for c in Income.INCOME_TYPE_CHOICES if c[0] != "DUES"]
         self.fields["income_type"].choices = choices
 
@@ -97,7 +95,6 @@ class DuesPaymentForm(forms.ModelForm):
         year = cleaned_data.get("year")
 
         if member and year:
-            # Check if dues already recorded for this member + year
             existing = DuesPayment.objects.filter(member=member, year=year)
             if self.instance.pk:
                 existing = existing.exclude(pk=self.instance.pk)
@@ -113,11 +110,10 @@ class DuesPaymentForm(forms.ModelForm):
         instance.recorded_by = self.recorded_by
 
         if commit:
-            # Create the linked Income record first
             income = Income.objects.create(
                 income_type="DUES",
                 amount=DuesPayment.YEARLY_DUES_AMOUNT,
-                reason=f"Yearly Dues — {instance.year}",
+                reason=f"Yearly Dues \u2014 {instance.year}",
                 paid_by=instance.member.get_full_name(),
                 created_by=self.recorded_by,
             )
