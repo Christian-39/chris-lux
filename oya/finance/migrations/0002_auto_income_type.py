@@ -21,7 +21,7 @@ def set_income_types(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         # Replace with your actual last migration name
-        ("finance", "000X_previous_migration"),
+        ("finance", "0001_initial"),
     ]
 
     operations = [
