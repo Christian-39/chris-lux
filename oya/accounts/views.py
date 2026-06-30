@@ -11,6 +11,7 @@ from django.views.decorators.http import require_http_methods, require_POST
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum, Value, DecimalField
 from django.db.models.functions import Coalesce
+from django.utils import timezone
 from core.exceptions import ValidationError, DuplicateRecordError
 from auditlogs.services import log_request_action
 from .models import User
@@ -174,12 +175,9 @@ def user_update(request, pk):
     if request.method == "POST":
         form = UserUpdateForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
-            # Check if PIN was changed
             pin_changed = bool(form.cleaned_data.get("new_pin"))
             user = form.save()
 
-            # If the user being updated is the current user and PIN changed,
-            # update session hash to prevent logout
             if pin_changed and request.user.id == user.id:
                 update_session_auth_hash(request, user)
 
@@ -247,7 +245,6 @@ def pin_reset(request):
 
             try:
                 user = User.objects.get(serial_number=serial_number)
-                # Use set_pin() instead of set_password() for consistency
                 user.set_pin(new_pin)
                 user.save()
 
@@ -277,31 +274,59 @@ def pin_reset(request):
 
 @login_required
 def profile_view(request):
-    """View own profile with dues, notifications, and settings."""
-    from finance.models import Income, Expense
+    """View own profile with dues, donations, and full contribution tracking."""
+    from finance.models import Income, Expense, DuesPayment
     from notifications.models import Notification
     from django.conf import settings
+    from django.db.models import Sum, Value, DecimalField
+    from django.db.models.functions import Coalesce
 
     user = request.user
+    PLATFORM_START_YEAR = 2020
+    YEARLY_DUES = 5000
+    current_year = timezone.now().year
 
-    # Get payment history from Income model (where paid_by matches user's name or serial)
-    # Since Income.paid_by is a CharField, we search by name or serial
-    payments_qs = Income.objects.filter(
+    # --- DUES DATA ---
+    debt_info = DuesPayment.get_member_debt(user)
+    dues_payments = DuesPayment.objects.filter(member=user).select_related("recorded_by").order_by("-year")
+    total_dues_paid = dues_payments.aggregate(
+        total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
+    )["total"]
+
+    years = list(range(PLATFORM_START_YEAR, current_year + 1))
+    year_status = []
+    for year in years:
+        payment = dues_payments.filter(year=year).first()
+        year_status.append({
+            "year": year,
+            "status": "PAID" if payment else "OWED",
+            "payment": payment,
+        })
+
+    # --- DONATIONS DATA ---
+    donations_qs = Income.objects.exclude(income_type="DUES").filter(
         Q(paid_by__icontains=user.full_name) |
         Q(paid_by__icontains=user.serial_number) |
         Q(created_by=user)
-    ).order_by("-created_at")
+    ).select_related("created_by").order_by("-created_at")
 
-    payments_paginator = Paginator(payments_qs, 10)
+    total_donations = donations_qs.aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+
+    # --- COMBINED CONTRIBUTIONS ---
+    total_contributions = total_dues_paid + total_donations
+
+    # --- ALL PAYMENTS (for general history) ---
+    all_payments_qs = Income.objects.filter(
+        Q(paid_by__icontains=user.full_name) |
+        Q(paid_by__icontains=user.serial_number) |
+        Q(created_by=user)
+    ).select_related("created_by").order_by("-created_at")
+
+    payments_paginator = Paginator(all_payments_qs, 10)
     payments_page = request.GET.get("payments_page", 1)
     payments = payments_paginator.get_page(payments_page)
-
-    # Calculate total paid (sum of income where user is the payer)
-    total_paid = Income.objects.filter(
-        Q(paid_by__icontains=user.full_name) |
-        Q(paid_by__icontains=user.serial_number) |
-        Q(created_by=user)
-    ).aggregate(total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField())))["total"]
 
     # Get recent notifications (global + personal)
     notifications = Notification.objects.filter(
@@ -315,7 +340,15 @@ def profile_view(request):
     context = {
         "user": user,
         "payments": payments,
-        "total_paid": total_paid,
+        "total_paid": total_contributions,
+        "total_dues_paid": total_dues_paid,
+        "total_donations": total_donations,
+        "debt_info": debt_info,
+        "year_status": year_status,
+        "yearly_dues": YEARLY_DUES,
+        "current_year": current_year,
+        "dues_payments": dues_payments,
+        "donations": donations_qs,
         "notifications": notifications,
         "profile_form": profile_form,
         "pin_form": pin_form,
@@ -361,7 +394,7 @@ def change_pin(request):
             action="PIN_RESET",
             object_type="User",
             object_id=request.user.id,
-            description=f"User changed their own PIN"
+            description="User changed their own PIN"
         )
         messages.success(request, "PIN updated successfully.")
     else:
