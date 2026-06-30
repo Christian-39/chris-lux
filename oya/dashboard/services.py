@@ -94,11 +94,31 @@ def get_finance_statistics():
 def get_income_expense_trend(year=None):
     """
     Get monthly income vs expenses data for chart display.
-    Returns data for each month Jan-current_month of the given year (or current year).
-    Includes all income types (dues, donations, events, other) + dues payments.
+    
+    If year is provided, filters to that year.
+    If year is None, auto-detects the year with the most financial data
+    (or uses current year if no historical data exists).
+    This ensures existing records always show.
     """
+    from django.db.models import Max, Min
+    
+    # Auto-detect year if not specified
     if year is None:
-        year = datetime.now().year
+        # Find the latest year that has any income or expense records
+        latest_income_year = Income.objects.aggregate(
+            latest=Max('created_at__year')
+        )['latest']
+        latest_expense_year = Expense.objects.aggregate(
+            latest=Max('created_at__year')
+        )['latest']
+        
+        # Use the latest year that has data, or fall back to current year
+        if latest_income_year or latest_expense_year:
+            year = max(
+                y for y in [latest_income_year, latest_expense_year] if y
+            )
+        else:
+            year = datetime.now().year
 
     cache_key = f"oya_income_expense_trend_{year}"
     cached = cache.get(cache_key)
@@ -112,13 +132,13 @@ def get_income_expense_trend(year=None):
     expense_data = []
 
     for month in range(1, 13):
-        # Income for this month (all types including linked dues payments)
+        # Income for this month and year
         monthly_income = Income.objects.filter(
             created_at__year=year,
             created_at__month=month
         ).aggregate(total=Sum("amount"))["total"] or 0
 
-        # Expenses for this month
+        # Expenses for this month and year
         monthly_expense = Expense.objects.filter(
             created_at__year=year,
             created_at__month=month
@@ -127,15 +147,17 @@ def get_income_expense_trend(year=None):
         income_data.append(float(monthly_income))
         expense_data.append(float(monthly_expense))
 
-    # Only return months up to current month for current year
+    # Determine which months to display
     current_year = datetime.now().year
     current_month = datetime.now().month
 
     if year == current_year:
+        # Current year: only show up to current month
         display_months = months[:current_month]
         display_income = income_data[:current_month]
         display_expense = expense_data[:current_month]
     else:
+        # Past year: show all 12 months
         display_months = months
         display_income = income_data
         display_expense = expense_data
@@ -245,10 +267,10 @@ def invalidate_dashboard_cache():
     cache.delete("oya_member_statistics")
     cache.delete("oya_finance_statistics")
     cache.delete("oya_clan_distribution")
-    # Also invalidate trend cache for current and previous year
+    # Also invalidate trend cache for current and nearby years
     current_year = datetime.now().year
-    cache.delete(f"oya_income_expense_trend_{current_year}")
-    cache.delete(f"oya_income_expense_trend_{current_year - 1}")
+    for y in range(current_year - 2, current_year + 2):
+        cache.delete(f"oya_income_expense_trend_{y}")
 
 
 # --- Private helper functions ---
