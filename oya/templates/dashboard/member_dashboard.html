@@ -166,6 +166,26 @@
   </div>
 </div>
 
+<!-- Financial Trend Chart (NEW for members - association-wide) -->
+<div class="dashboard-grid dashboard-grid-1" style="margin-bottom:1.5rem;">
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <div class="chart-card-title">Financial Trend</div>
+        <div class="chart-card-subtitle">Income vs Expenses (Year to Date)</div>
+      </div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:flex-end;">
+        <span class="badge" style="background:var(--oya-success-bg);color:var(--oya-success);">Income: &#x20A6;{{ trend_data.total_income_ytd|floatformat:0|intcomma }}</span>
+        <span class="badge" style="background:var(--oya-danger-bg);color:var(--oya-danger);">Expenses: &#x20A6;{{ trend_data.total_expenses_ytd|floatformat:0|intcomma }}</span>
+        <span class="badge" style="background:var(--oya-primary-bg);color:var(--oya-primary);">Net: &#x20A6;{{ trend_data.net_ytd|floatformat:0|intcomma }}</span>
+      </div>
+    </div>
+    <div class="chart-container">
+      <canvas id="financialTrendChart"></canvas>
+    </div>
+  </div>
+</div>
+
 <!-- Charts Row -->
 <div class="dashboard-grid dashboard-grid-2" style="margin-bottom:1.5rem;">
 
@@ -298,7 +318,6 @@
       </div>
     </div>
   </div>
-</div>
 
 <!-- Quick Actions Row -->
 <div class="dashboard-grid dashboard-grid-2">
@@ -381,7 +400,115 @@ const memberStats = {
   removed: {{ member_stats.by_status.removed|default:0 }}
 };
 
+// Financial Trend - REAL DATA from backend
+const trendData = {
+  labels: {{ trend_data.months|safe|default:"['Jan','Feb','Mar','Apr','May','Jun']" }},
+  income: {{ trend_data.income|safe|default:"[0,0,0,0,0,0]" }},
+  expenses: {{ trend_data.expenses|safe|default:"[0,0,0,0,0,0]" }}
+};
+
 document.addEventListener('DOMContentLoaded', function() {
+  // Financial Trend Chart - REAL DATA
+  const trendCtx = document.getElementById('financialTrendChart');
+  if (trendCtx) {
+    window.memberFinancialChart = new Chart(trendCtx, {
+      type: 'line',
+      data: {
+        labels: trendData.labels,
+        datasets: [
+          {
+            label: 'Income',
+            data: trendData.income,
+            borderColor: 'var(--oya-success)',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          },
+          {
+            label: 'Expenses',
+            data: trendData.expenses,
+            borderColor: 'var(--oya-danger)',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            align: 'end',
+            labels: {
+              usePointStyle: true,
+              padding: 20,
+              font: { size: 12 }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            padding: 12,
+            cornerRadius: 8,
+            callbacks: {
+              label: function(context) {
+                let label = context.dataset.label || '';
+                if (label) label += ': ';
+                label += '\u20A6' + context.parsed.y.toLocaleString('en-NG', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                });
+                return label;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                if (value >= 1000000) return '\u20A6' + (value/1000000).toFixed(1) + 'M';
+                if (value >= 1000) return '\u20A6' + (value/1000).toFixed(0) + 'K';
+                return '\u20A6' + value;
+              },
+              font: { size: 11 }
+            },
+            grid: { color: 'var(--oya-border)' }
+          },
+          x: {
+            ticks: { font: { size: 11 } },
+            grid: { display: false }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        }
+      }
+    });
+  }
+
+  // Auto-refresh financial chart every 5 minutes
+  setInterval(function() {
+    fetch('{% url "dashboard:financial_trend_ajax" %}')
+      .then(response => response.json())
+      .then(data => {
+        if (window.memberFinancialChart) {
+          window.memberFinancialChart.data.labels = data.months;
+          window.memberFinancialChart.data.datasets[0].data = data.income;
+          window.memberFinancialChart.data.datasets[1].data = data.expenses;
+          window.memberFinancialChart.update('none');
+        }
+      })
+      .catch(error => console.error('Error fetching trend data:', error));
+  }, 300000);
+
   // Payment History Chart
   const paymentCtx = document.getElementById('paymentHistoryChart');
   if (paymentCtx) {
@@ -390,7 +517,7 @@ document.addEventListener('DOMContentLoaded', function() {
       data: {
         labels: paymentStats.labels,
         datasets: [{
-          label: 'Amount (&#x20A6;)',
+          label: 'Amount (\u20A6)',
           data: paymentStats.data,
           backgroundColor: 'var(--oya-success)',
           borderRadius: 4,
@@ -473,3 +600,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </style>
 
 {% endblock %}
+
