@@ -26,15 +26,59 @@
   <!-- Actions -->
   <div class="topbar-actions">
 
-    <!-- Theme Toggle -->
-    <button class="topbar-btn hide-mobile" id="themeToggleBtn" aria-label="Toggle Theme" title="Toggle Theme">
-      <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-      </svg>
-      <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-      </svg>
-    </button>
+    <!-- ═══════════════════════════════════════════════════════
+         THEME DROPDOWN — Available to ALL users
+         Replaces the old single moon/sun toggle button
+         ═══════════════════════════════════════════════════════ -->
+    <div class="dropdown hide-mobile">
+      <button class="topbar-btn dropdown-toggle" id="themeMenuToggle" aria-label="Theme Menu" title="Change Theme">
+        <!-- Sun icon (shown when light mode is active) -->
+        <svg class="theme-icon-current" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        <!-- Moon icon (shown when dark mode is active) -->
+        <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Desktop icon (shown when system mode is active) -->
+        <svg class="theme-icon-desktop" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+      </button>
+      <div class="dropdown-menu dropdown-menu-right" id="themeDropdownMenu" style="min-width:180px;">
+        <div class="dropdown-header">Appearance</div>
+
+        <button type="button" class="dropdown-item" data-theme-option="light">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          Light
+          <svg class="dropdown-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;opacity:0;">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </button>
+
+        <button type="button" class="dropdown-item" data-theme-option="dark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          Dark
+          <svg class="dropdown-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;opacity:0;">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </button>
+
+        <button type="button" class="dropdown-item" data-theme-option="system">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+          System
+          <svg class="dropdown-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;opacity:0;">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
 
     <!-- Notifications -->
     <a href="{% url 'notifications:notification_list' %}" class="topbar-btn" aria-label="Notifications" title="Notifications">
@@ -44,6 +88,17 @@
       {% if unread_notification_count > 0 %}
       <span class="badge" id="notificationBadge">{{ unread_notification_count }}</span>
       {% endif %}
+    </a>
+
+    <!-- ═══════════════════════════════════════════════════════
+         USERS LINK — Visible to ALL authenticated users
+         Same icon as sidebar, not restricted to staff
+         ═══════════════════════════════════════════════════════ -->
+    <a href="{% url 'accounts:user_list' %}" class="topbar-btn hide-mobile" aria-label="Users" title="All Users">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
     </a>
 
     <!-- Profile Dropdown -->
@@ -92,16 +147,113 @@
 </header>
 
 <script>
-// User dropdown toggle
+// ═══════════════════════════════════════════════════════════════
+// THEME DROPDOWN LOGIC
+// ═══════════════════════════════════════════════════════════════
 (function() {
-  const toggle = document.getElementById('userMenuToggle');
-  const menu = document.getElementById('userDropdownMenu');
+  const themeToggle = document.getElementById('themeMenuToggle');
+  const themeMenu   = document.getElementById('themeDropdownMenu');
+  if (!themeToggle || !themeMenu) return;
+
+  // Toggle dropdown open/close
+  themeToggle.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const parent = themeToggle.closest('.dropdown');
+    // Close other open dropdowns first
+    document.querySelectorAll('.dropdown.open').forEach(function(d) {
+      if (d !== parent) d.classList.remove('open');
+    });
+    parent.classList.toggle('open');
+  });
+
+  // Close when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!themeToggle.contains(e.target) && !themeMenu.contains(e.target)) {
+      themeToggle.closest('.dropdown').classList.remove('open');
+    }
+  });
+
+  // Handle theme option clicks
+  themeMenu.querySelectorAll('[data-theme-option]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var theme = this.dataset.themeOption;
+
+      // Use OYA global if available (from oya-theme.js), otherwise fallback
+      if (window.OYA && window.OYA.setTheme) {
+        window.OYA.setTheme(theme);
+      } else {
+        // Direct fallback — same logic as OYA Theme Manager
+        localStorage.setItem('oya-theme', theme);
+        var root = document.documentElement;
+        if (theme === 'system') {
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+        } else {
+          root.setAttribute('data-theme', theme);
+        }
+        updateThemeDropdownUI(theme);
+      }
+      themeToggle.closest('.dropdown').classList.remove('open');
+    });
+  });
+
+  // Update checkmarks and toggle icon
+  function updateThemeDropdownUI(theme) {
+    themeMenu.querySelectorAll('[data-theme-option]').forEach(function(btn) {
+      var check = btn.querySelector('.dropdown-check');
+      var isActive = btn.dataset.themeOption === theme;
+      if (check) check.style.opacity = isActive ? '1' : '0';
+      btn.classList.toggle('active', isActive);
+    });
+
+    // Swap toggle button icon based on active theme
+    var currentIcon  = themeToggle.querySelector('.theme-icon-current');
+    var moonIcon     = themeToggle.querySelector('.theme-icon-moon');
+    var desktopIcon  = themeToggle.querySelector('.theme-icon-desktop');
+
+    if (currentIcon)  currentIcon.style.display  = theme === 'light'  ? 'inline-block' : 'none';
+    if (moonIcon)     moonIcon.style.display     = theme === 'dark'   ? 'inline-block' : 'none';
+    if (desktopIcon)  desktopIcon.style.display  = theme === 'system' ? 'inline-block' : 'none';
+  }
+
+  // Initialize on page load
+  function initThemeDropdown() {
+    var stored = localStorage.getItem('oya-theme');
+    var theme  = (stored === 'dark' || stored === 'light') ? stored : 'system';
+    updateThemeDropdownUI(theme);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initThemeDropdown);
+  } else {
+    initThemeDropdown();
+  }
+
+  // Sync across tabs when localStorage changes
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'oya-theme') {
+      updateThemeDropdownUI(e.newValue || 'system');
+    }
+  });
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// USER DROPDOWN LOGIC (updated to close theme dropdown too)
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  var toggle = document.getElementById('userMenuToggle');
+  var menu   = document.getElementById('userDropdownMenu');
   if (!toggle || !menu) return;
 
   toggle.addEventListener('click', function(e) {
     e.preventDefault();
     e.stopPropagation();
-    const parent = toggle.closest('.dropdown');
+    var parent = toggle.closest('.dropdown');
+    // Close theme dropdown if open
+    document.querySelectorAll('.dropdown.open').forEach(function(d) {
+      if (d !== parent) d.classList.remove('open');
+    });
     parent.classList.toggle('open');
   });
 
@@ -112,10 +264,10 @@
   });
 
   // Avatar click opens image preview
-  const avatarImg = document.getElementById('topbarAvatarImg');
-  const avatarInitial = document.getElementById('topbarAvatarInitial');
-  const topbarAvatar = document.getElementById('topbarAvatar');
-  const userName = topbarAvatar ? (topbarAvatar.dataset.name || 'Guest') : 'Guest';
+  var avatarImg     = document.getElementById('topbarAvatarImg');
+  var avatarInitial = document.getElementById('topbarAvatarInitial');
+  var topbarAvatar  = document.getElementById('topbarAvatar');
+  var userName      = topbarAvatar ? (topbarAvatar.dataset.name || 'Guest') : 'Guest';
 
   if (avatarImg) {
     avatarImg.addEventListener('click', function(e) {
@@ -123,7 +275,6 @@
       openImagePreview(this.src, userName);
     });
   }
-
   if (avatarInitial) {
     avatarInitial.addEventListener('click', function(e) {
       e.stopPropagation();
