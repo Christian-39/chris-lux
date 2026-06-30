@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum, Count, Prefetch
+from django.db.models import Q, Sum, Count
 from django.utils import timezone
 from django.http import JsonResponse
 from datetime import timedelta
@@ -18,21 +18,19 @@ from .forms import IncomeForm, ExpenseForm, DuesPaymentForm
 
 logger = logging.getLogger("oya")
 
-# ─── Constants ───────────────────────────────────────────────────────────────
 PLATFORM_START_YEAR = 2020
 YEARLY_DUES = 5000
 
 
-# ═════════════════════════════════════════════════════════════════════════════
+# ============================================================
 # DONATIONS / OTHER CONTRIBUTIONS
-# ═════════════════════════════════════════════════════════════════════════════
+# ============================================================
 
 @login_required
 def donation_list(request):
     """List all non-dues income (donations, events, other)."""
     queryset = Income.objects.exclude(income_type="DUES").select_related("created_by")
 
-    # Search
     search_term = request.GET.get("search", "")
     if search_term:
         queryset = queryset.filter(
@@ -41,12 +39,10 @@ def donation_list(request):
             Q(created_by__full_name__icontains=search_term)
         )
 
-    # Type filter
     type_filter = request.GET.get("type", "")
     if type_filter:
         queryset = queryset.filter(income_type=type_filter)
 
-    # Date filter
     date_from = request.GET.get("date_from", "")
     date_to = request.GET.get("date_to", "")
     if date_from:
@@ -58,7 +54,6 @@ def donation_list(request):
     page = request.GET.get("page", 1)
     donations = paginator.get_page(page)
 
-    # Stats
     total_donations = Income.objects.exclude(income_type="DUES").aggregate(
         total=Sum("amount")
     )["total"] or 0
@@ -85,29 +80,23 @@ def donation_list(request):
     return render(request, "finance/donation_list.html", context)
 
 
-# ═════════════════════════════════════════════════════════════════════════════
+# ============================================================
 # DUES TRACKER
-# ═════════════════════════════════════════════════════════════════════════════
+# ============================================================
 
 @login_required
 def dues_tracker(request):
-    """
-    Full member × year grid showing dues payment status.
-    Paid = green, Owed = red.
-    """
+    """Full member x year grid showing dues payment status."""
     current_year = timezone.now().year
     years = list(range(PLATFORM_START_YEAR, current_year + 1))
 
-    # Get all active members with their dues payments
     members = User.objects.filter(is_active=True).order_by("full_name")
 
-    # Prefetch dues payments for efficiency
     dues_map = {}
     for dp in DuesPayment.objects.select_related("member").all():
         key = (dp.member_id, dp.year)
         dues_map[key] = dp
 
-    # Build grid data
     member_rows = []
     total_dues_collected = 0
     total_dues_expected = 0
@@ -129,12 +118,10 @@ def dues_tracker(request):
 
         member_rows.append(row)
 
-    # Summary stats
     active_members_count = members.count()
     total_possible_dues = active_members_count * len(years) * YEARLY_DUES
     collection_rate = round((total_dues_collected / total_possible_dues * 100), 1) if total_possible_dues > 0 else 0
 
-    # This year's collection
     this_year_paid = DuesPayment.objects.filter(year=current_year).count()
     this_year_expected = active_members_count
     this_year_rate = round((this_year_paid / this_year_expected * 100), 1) if this_year_expected > 0 else 0
@@ -173,9 +160,9 @@ def dues_create(request):
                 object_type="DuesPayment",
                 object_id=dues.id,
                 ip_address=getattr(request, "client_ip", ""),
-                description=f"Recorded dues: {dues.member.get_full_name()} — {dues.year} (₦{dues.amount_paid:,.2f})"
+                description=f"Recorded dues: {dues.member.get_full_name()} - {dues.year} (\u20a6{dues.amount_paid:,.2f})"
             )
-            messages.success(request, f"Dues recorded for {dues.member.get_full_name()} — {dues.year}.")
+            messages.success(request, f"Dues recorded for {dues.member.get_full_name()} - {dues.year}.")
             return redirect("finance:dues_tracker")
         else:
             for error in form.errors.values():
@@ -198,13 +185,9 @@ def member_dues_detail(request, member_id):
     current_year = timezone.now().year
     years = list(range(PLATFORM_START_YEAR, current_year + 1))
 
-    # Get debt breakdown
     debt_info = DuesPayment.get_member_debt(member)
-
-    # Get payment history
     payments = DuesPayment.objects.filter(member=member).select_related("recorded_by").order_by("-year")
 
-    # Build year-by-year status
     year_status = []
     for year in years:
         payment = payments.filter(year=year).first()
@@ -237,7 +220,6 @@ def dues_delete(request, pk):
     if request.method == "POST":
         member_name = dues.member.get_full_name()
         year = dues.year
-        # Also delete the linked income record
         if dues.income:
             dues.income.delete()
         dues.delete()
@@ -247,17 +229,17 @@ def dues_delete(request, pk):
             object_type="DuesPayment",
             object_id=pk,
             ip_address=getattr(request, "client_ip", ""),
-            description=f"Deleted dues record: {member_name} — {year}"
+            description=f"Deleted dues record: {member_name} - {year}"
         )
-        messages.success(request, f"Dues record deleted for {member_name} — {year}.")
+        messages.success(request, f"Dues record deleted for {member_name} - {year}.")
         return redirect("finance:dues_tracker")
 
     return render(request, "finance/dues_confirm_delete.html", {"dues": dues})
 
 
-# ═════════════════════════════════════════════════════════════════════════════
-# INCOME (Legacy — redirects to donations or dues)
-# ═════════════════════════════════════════════════════════════════════════════
+# ============================================================
+# INCOME (Legacy - redirects to donations)
+# ============================================================
 
 @login_required
 def income_list(request):
@@ -299,7 +281,7 @@ def income_create(request):
                 object_type="Income",
                 object_id=income.id,
                 ip_address=getattr(request, "client_ip", ""),
-                description=f"Recorded {income.get_income_type_display()}: ₦{income.amount:,.2f} - {income.reason}"
+                description=f"Recorded {income.get_income_type_display()}: \u20a6{income.amount:,.2f} - {income.reason}"
             )
             messages.success(request, "Income recorded successfully.")
             return redirect("finance:donation_list")
@@ -348,7 +330,7 @@ def income_delete(request, pk):
             object_type="Income",
             object_id=pk,
             ip_address=getattr(request, "client_ip", ""),
-            description=f"Deleted {income_type}: ₦{amount:,.2f} - {reason}"
+            description=f"Deleted {income_type}: \u20a6{amount:,.2f} - {reason}"
         )
         messages.success(request, "Income record deleted.")
         return redirect("finance:donation_list")
@@ -356,9 +338,9 @@ def income_delete(request, pk):
     return render(request, "finance/income_confirm_delete.html", {"income": income})
 
 
-# ═════════════════════════════════════════════════════════════════════════════
-# EXPENSES (Unchanged except redirect updates)
-# ═════════════════════════════════════════════════════════════════════════════
+# ============================================================
+# EXPENSES
+# ============================================================
 
 @login_required
 def expense_list(request):
@@ -449,7 +431,7 @@ def expense_create(request):
                 object_type="Expense",
                 object_id=expense.id,
                 ip_address=getattr(request, "client_ip", ""),
-                description=f"Recorded expense: ₦{expense.amount:,.2f} - {expense.category}"
+                description=f"Recorded expense: \u20a6{expense.amount:,.2f} - {expense.category}"
             )
             messages.success(request, "Expense recorded successfully.")
             return redirect("finance:expense_list")
@@ -497,7 +479,7 @@ def expense_delete(request, pk):
             object_type="Expense",
             object_id=pk,
             ip_address=getattr(request, "client_ip", ""),
-            description=f"Deleted expense: ₦{amount:,.2f} - {category}"
+            description=f"Deleted expense: \u20a6{amount:,.2f} - {category}"
         )
         messages.success(request, "Expense record deleted.")
         return redirect("finance:expense_list")
@@ -505,16 +487,15 @@ def expense_delete(request, pk):
     return render(request, "finance/expense_confirm_delete.html", {"expense": expense})
 
 
-# ═════════════════════════════════════════════════════════════════════════════
+# ============================================================
 # FINANCE SUMMARY / DASHBOARD
-# ═════════════════════════════════════════════════════════════════════════════
+# ============================================================
 
 @login_required
 def finance_summary(request):
     """Display financial summary with split KPIs."""
     current_year = timezone.now().year
 
-    # ── Income splits ──────────────────────────────────────────────────────
     total_dues = Income.objects.filter(income_type="DUES").aggregate(
         total=Sum("amount")
     )["total"] or 0
@@ -527,7 +508,6 @@ def finance_summary(request):
     total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or 0
     treasury_balance = total_income - total_expenses
 
-    # ── Dues-specific stats ──────────────────────────────────────────────
     active_members = User.objects.filter(is_active=True).count()
     years_count = current_year - PLATFORM_START_YEAR + 1
     total_dues_possible = active_members * years_count * YEARLY_DUES
@@ -536,7 +516,6 @@ def finance_summary(request):
     this_year_dues_paid = DuesPayment.objects.filter(year=current_year).count()
     this_year_dues_rate = round((this_year_dues_paid / active_members * 100), 1) if active_members > 0 else 0
 
-    # ── Expense breakdown ────────────────────────────────────────────────
     expenses_raw = Expense.objects.values("category").annotate(
         total=Sum("amount")
     ).order_by("-total")
@@ -550,7 +529,6 @@ def finance_summary(request):
             "percentage": percentage,
         })
 
-    # ── Recent transactions ────────────────────────────────────────────────
     recent_income = list(Income.objects.select_related("created_by").all()[:10])
     recent_expenses = list(Expense.objects.select_related("created_by").all()[:10])
 
@@ -565,7 +543,6 @@ def finance_summary(request):
         reverse=True
     )[:10]
 
-    # ── Top debtors (members with highest dues debt) ─────────────────────
     members = User.objects.filter(is_active=True)
     debtor_list = []
     for member in members:
@@ -599,9 +576,9 @@ def finance_summary(request):
     return render(request, "finance/finance_summary.html", context)
 
 
-# ═════════════════════════════════════════════════════════════════════════════
+# ============================================================
 # AJAX ENDPOINTS
-# ═════════════════════════════════════════════════════════════════════════════
+# ============================================================
 
 @login_required
 def search_members(request):
