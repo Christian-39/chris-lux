@@ -63,8 +63,8 @@
     <div class="chart-card-header">
       <div>
         <div class="chart-card-title">Financial Trend</div>
-        <div class="chart-card-subtitle">Income vs Expenses (Year to Date)</div>
-      </div>
+        <div class="chart-card-subtitle">Income vs Expenses ({{ trend_data.year }})</div>
+
       <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:flex-end;">
         <span class="badge" style="background:var(--oya-success-bg);color:var(--oya-success);">Income: &#x20A6;{{ trend_data.total_income_ytd|floatformat:0|intcomma }}</span>
         <span class="badge" style="background:var(--oya-danger-bg);color:var(--oya-danger);">Expenses: &#x20A6;{{ trend_data.total_expenses_ytd|floatformat:0|intcomma }}</span>
