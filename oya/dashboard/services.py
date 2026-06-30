@@ -2,11 +2,12 @@
 Dashboard services for OYA KPIs and aggregations.
 """
 import logging
+from datetime import datetime
 from django.db.models import Sum, Count, Q
 from django.core.cache import cache
 from members.models import Member, Clan
 from executives.models import Executive
-from finance.models import Income, Expense
+from finance.models import Income, Expense, DuesPayment
 from projects.models import Project
 from operations.models import TaskForceMember, Motorcycle, CaseFile
 from elections.models import Election
@@ -30,12 +31,12 @@ def get_dashboard_kpis():
         "total_income": _get_total_income(),
         "total_expenses": _get_total_expenses(),
         "pending_cases": _get_pending_cases(),
-        "active_task_force": _get_active_task_force(),
+        "active_task_force": _get_active_task_force_count(),
         "motorcycles_active": _get_motorcycles_active(),
         "projects_finished": _get_projects_finished(),
         "projects_at_hand": _get_projects_at_hand(),
         "projects_future": _get_projects_future(),
-        "current_executives": _get_current_executives(),
+        "current_executives": _get_current_executives_count(),
         "upcoming_elections": _get_upcoming_elections(),
     }
 
@@ -88,6 +89,69 @@ def get_finance_statistics():
 
     cache.set(cache_key, stats, CACHE_TIMEOUT)
     return stats
+
+
+def get_income_expense_trend(year=None):
+    """
+    Get monthly income vs expenses data for chart display.
+    Returns data for each month Jan-current_month of the given year (or current year).
+    Includes all income types (dues, donations, events, other) + dues payments.
+    """
+    if year is None:
+        year = datetime.now().year
+
+    cache_key = f"oya_income_expense_trend_{year}"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+
+    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+    income_data = []
+    expense_data = []
+
+    for month in range(1, 13):
+        # Income for this month (all types including linked dues payments)
+        monthly_income = Income.objects.filter(
+            created_at__year=year,
+            created_at__month=month
+        ).aggregate(total=Sum("amount"))["total"] or 0
+
+        # Expenses for this month
+        monthly_expense = Expense.objects.filter(
+            created_at__year=year,
+            created_at__month=month
+        ).aggregate(total=Sum("amount"))["total"] or 0
+
+        income_data.append(float(monthly_income))
+        expense_data.append(float(monthly_expense))
+
+    # Only return months up to current month for current year
+    current_year = datetime.now().year
+    current_month = datetime.now().month
+
+    if year == current_year:
+        display_months = months[:current_month]
+        display_income = income_data[:current_month]
+        display_expense = expense_data[:current_month]
+    else:
+        display_months = months
+        display_income = income_data
+        display_expense = expense_data
+
+    result = {
+        "year": year,
+        "months": display_months,
+        "income": display_income,
+        "expenses": display_expense,
+        "total_income_ytd": sum(display_income),
+        "total_expenses_ytd": sum(display_expense),
+        "net_ytd": sum(display_income) - sum(display_expense),
+    }
+
+    cache.set(cache_key, result, CACHE_TIMEOUT)
+    return result
 
 
 def get_recent_activities(limit=10):
@@ -159,11 +223,11 @@ def get_member_contributions(member):
     from finance.models import Income
     try:
         contributions = Income.objects.filter(
-            member=member
-        ).order_by("-date")[:6]
-        total = Income.objects.filter(member=member).aggregate(
-            total=Sum("amount")
-        )["total"] or 0
+            paid_by__icontains=member.full_name
+        ).order_by("-created_at")[:6]
+        total = Income.objects.filter(
+            paid_by__icontains=member.full_name
+        ).aggregate(total=Sum("amount"))["total"] or 0
         return {
             "contributions": contributions,
             "total_contributed": total,
@@ -181,6 +245,10 @@ def invalidate_dashboard_cache():
     cache.delete("oya_member_statistics")
     cache.delete("oya_finance_statistics")
     cache.delete("oya_clan_distribution")
+    # Also invalidate trend cache for current and previous year
+    current_year = datetime.now().year
+    cache.delete(f"oya_income_expense_trend_{current_year}")
+    cache.delete(f"oya_income_expense_trend_{current_year - 1}")
 
 
 # --- Private helper functions ---
@@ -229,7 +297,7 @@ def _get_pending_cases():
         return 0
 
 
-def _get_active_task_force():
+def _get_active_task_force_count():
     """Get count of active task force members."""
     try:
         return TaskForceMember.objects.filter(is_active=True).count()
@@ -269,10 +337,10 @@ def _get_projects_future():
         return 0
 
 
-def _get_current_executives():
-    """Get list of current executives."""
+def _get_current_executives_count():
+    """Get count of current executives."""
     try:
-        return Executive.objects.filter(is_current=True).select_related("member").count()
+        return Executive.objects.filter(is_current=True).count()
     except Exception:
         return 0
 
