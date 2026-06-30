@@ -22,6 +22,7 @@ from .services import (
     get_active_task_force,
     get_recent_notices,
     get_member_contributions,
+    get_income_expense_trend,
 )
 
 logger = logging.getLogger("oya")
@@ -33,7 +34,7 @@ def global_search_ajax(request):
     query = request.GET.get('q', '').strip()
     if len(query) < 2:
         return JsonResponse({'members': [], 'users': [], 'cases': []})
-    
+
     # Search members
     members = Member.objects.filter(
         Q(full_name__icontains=query) |
@@ -41,21 +42,21 @@ def global_search_ajax(request):
         Q(phone__icontains=query) |
         Q(state_or_abroad__icontains=query)
     )[:5]
-    
+
     # Search users
     users = User.objects.filter(
         Q(full_name__icontains=query) |
         Q(serial_number__icontains=query) |
         Q(phone__icontains=query)
     )[:5]
-    
+
     # Search cases
     cases = CaseFile.objects.filter(
         Q(title__icontains=query) |
         Q(description__icontains=query) |
         Q(status__icontains=query)
     )[:5]
-    
+
     return JsonResponse({
         'members': [
             {
@@ -86,6 +87,22 @@ def global_search_ajax(request):
     })
 
 
+@login_required
+def financial_trend_ajax(request):
+    """
+    AJAX endpoint to return income vs expenses trend data as JSON.
+    Supports ?year=YYYY parameter. Defaults to current year.
+    """
+    from datetime import datetime
+    year_param = request.GET.get('year')
+    try:
+        year = int(year_param) if year_param else datetime.now().year
+    except ValueError:
+        year = datetime.now().year
+
+    trend_data = get_income_expense_trend(year=year)
+    return JsonResponse(trend_data)
+
 
 @login_required
 def index(request):
@@ -95,12 +112,15 @@ def index(request):
     finance_stats = get_finance_statistics()
     recent_activities = get_recent_activities()
 
-    # NEW: Real data for dashboard components
+    # Real data for dashboard components
     clan_distribution = get_clan_distribution()
     urgent_cases = get_urgent_cases()
     executives = get_current_executives()
     task_force = get_active_task_force()
     notices = get_recent_notices()
+
+    # Financial trend data for charts
+    trend_data = get_income_expense_trend()
 
     # Role-based context
     is_admin = request.user.has_admin_access()
@@ -116,6 +136,7 @@ def index(request):
         "executives": executives,
         "task_force": task_force,
         "notices": notices,
+        "trend_data": trend_data,
         "is_admin": is_admin,
         "is_executive": is_executive,
     }
@@ -129,11 +150,14 @@ def member_dashboard(request):
     member_stats = get_member_statistics()
     recent_activities = get_recent_activities()
 
-    # NEW: Real data for member dashboard
+    # Real data for member dashboard
     clan_distribution = get_clan_distribution()
     executives = get_current_executives()
     task_force = get_active_task_force()
     notices = get_recent_notices()
+
+    # Financial trend data for charts (members see association-wide financial trends)
+    trend_data = get_income_expense_trend()
 
     # Get member-specific contribution data
     try:
@@ -158,6 +182,7 @@ def member_dashboard(request):
         "member": member,
         "contributions": contributions,
         "total_contributed": total_contributed,
+        "trend_data": trend_data,
         "is_member": True,
     }
     return render(request, "dashboard/member_dashboard.html", context)
