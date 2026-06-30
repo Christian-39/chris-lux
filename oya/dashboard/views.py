@@ -119,7 +119,7 @@ def index(request):
     task_force = get_active_task_force()
     notices = get_recent_notices()
 
-    # Financial trend data for charts
+    # Financial trend data for charts - auto-detects year with data
     trend_data = get_income_expense_trend()
 
     # Role-based context
@@ -156,7 +156,7 @@ def member_dashboard(request):
     task_force = get_active_task_force()
     notices = get_recent_notices()
 
-    # Financial trend data for charts (members see association-wide financial trends)
+    # Financial trend data for charts - auto-detects year with data
     trend_data = get_income_expense_trend()
 
     # Get member-specific contribution data
@@ -186,6 +186,7 @@ def member_dashboard(request):
         "is_member": True,
     }
     return render(request, "dashboard/member_dashboard.html", context)
+
 
 
 @login_required
