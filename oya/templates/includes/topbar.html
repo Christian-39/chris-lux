@@ -26,9 +26,7 @@
   <!-- Actions -->
   <div class="topbar-actions">
 
-    <!-- ═══════════════════════════════════════════════════════
-         THEME DROPDOWN — Desktop/Tablet (≥769px)
-         ═══════════════════════════════════════════════════════ -->
+    <!-- THEME DROPDOWN — Desktop/Tablet (≥769px) -->
     <div class="dropdown hide-mobile">
       <button class="topbar-btn dropdown-toggle" id="themeMenuToggle" aria-label="Theme Menu" title="Change Theme" data-active-theme="light">
         <svg class="theme-icon-current" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -73,22 +71,6 @@
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════
-         THEME CYCLE BUTTON — Mobile (≤768px)
-         Single tap cycles: Light → Dark → System → Light
-         ═══════════════════════════════════════════════════════ -->
-    <button class="topbar-btn show-mobile-only" id="themeCycleBtn" aria-label="Toggle Theme" title="Cycle Theme" data-active-theme="light">
-      <svg class="theme-icon-current" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-      </svg>
-      <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-      </svg>
-      <svg class="theme-icon-desktop" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
-      </svg>
-    </button>
-
     <!-- Notifications -->
     <a href="{% url 'notifications:notification_list' %}" class="topbar-btn" aria-label="Notifications" title="Notifications">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -99,9 +81,7 @@
       {% endif %}
     </a>
 
-    <!-- ═══════════════════════════════════════════════════════
-         USERS LINK — Visible on ALL screen sizes
-         ═══════════════════════════════════════════════════════ -->
+    <!-- USERS LINK — Visible on ALL screen sizes (Desktop topbar) -->
     <a href="{% url 'accounts:user_list' %}" class="topbar-btn" aria-label="Users" title="All Users">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -155,9 +135,7 @@
 </header>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
 // THEME DROPDOWN LOGIC (Desktop/Tablet ≥769px)
-// ═══════════════════════════════════════════════════════════════
 (function() {
   var themeToggle = document.getElementById('themeMenuToggle');
   var themeMenu   = document.getElementById('themeDropdownMenu');
@@ -188,26 +166,7 @@
   });
 })();
 
-// ═══════════════════════════════════════════════════════════════
-// THEME CYCLE LOGIC (Mobile ≤768px)
-// Tap cycles: Light → Dark → System → Light
-// ═══════════════════════════════════════════════════════════════
-(function() {
-  var cycleBtn = document.getElementById('themeCycleBtn');
-  if (!cycleBtn) return;
-
-  cycleBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var current = localStorage.getItem('oya-theme') || 'system';
-    var next = current === 'light' ? 'dark' : (current === 'dark' ? 'system' : 'light');
-    setThemeAll(next);
-  });
-})();
-
-// ═══════════════════════════════════════════════════════════════
 // UNIFIED THEME SETTER — used by both desktop dropdown & mobile cycle
-// ═══════════════════════════════════════════════════════════════
 function setThemeAll(theme) {
   // Use OYA global if available
   if (window.OYA && window.OYA.setTheme) {
@@ -239,18 +198,28 @@ function updateAllThemeUI(theme) {
     });
   }
 
-  // Update button icons on both desktop and mobile buttons
-  var buttons = [document.getElementById('themeMenuToggle'), document.getElementById('themeCycleBtn')];
-  buttons.forEach(function(btn) {
-    if (!btn) return;
-    btn.setAttribute('data-active-theme', theme);
-    btn.querySelectorAll('.theme-icon-current, .theme-icon-moon, .theme-icon-desktop').forEach(function(icon) {
+  // Update button icons on desktop theme toggle
+  var desktopBtn = document.getElementById('themeMenuToggle');
+  if (desktopBtn) {
+    desktopBtn.setAttribute('data-active-theme', theme);
+    desktopBtn.querySelectorAll('.theme-icon-current, .theme-icon-moon, .theme-icon-desktop').forEach(function(icon) {
       icon.style.display = 'none';
     });
     var activeClass = theme === 'system' ? 'theme-icon-desktop' : (theme === 'dark' ? 'theme-icon-moon' : 'theme-icon-current');
-    var activeIcon = btn.querySelector('.' + activeClass);
+    var activeIcon = desktopBtn.querySelector('.' + activeClass);
     if (activeIcon) activeIcon.style.display = 'inline-block';
-  });
+  }
+
+  // Update mobile theme button icons
+  var mobileBtn = document.getElementById('mobileThemeBtn');
+  if (mobileBtn) {
+    mobileBtn.querySelectorAll('.theme-icon-light, .theme-icon-dark, .theme-icon-system').forEach(function(icon) {
+      icon.style.display = 'none';
+    });
+    var mobileActiveClass = theme === 'system' ? 'theme-icon-system' : (theme === 'dark' ? 'theme-icon-dark' : 'theme-icon-light');
+    var mobileActiveIcon = mobileBtn.querySelector('.' + mobileActiveClass);
+    if (mobileActiveIcon) mobileActiveIcon.style.display = 'inline-block';
+  }
 }
 
 // Initialize on page load
@@ -273,9 +242,7 @@ window.addEventListener('storage', function(e) {
   }
 });
 
-// ═══════════════════════════════════════════════════════════════
 // USER DROPDOWN LOGIC
-// ═══════════════════════════════════════════════════════════════
 (function() {
   var toggle = document.getElementById('userMenuToggle');
   var menu   = document.getElementById('userDropdownMenu');
