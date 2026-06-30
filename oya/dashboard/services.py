@@ -177,9 +177,70 @@ def get_income_expense_trend(year=None):
 
 
 def get_recent_activities(limit=10):
-    """Get recent audit log activities."""
+    """Get recent audit log activities for ADMIN/EXECUTIVE dashboards."""
     from auditlogs.models import AuditLog
-    return AuditLog.objects.select_related("user").all()[:limit]
+    return AuditLog.objects.select_related("user").all().order_by("-created_at")[:limit]
+
+
+def get_member_recent_activities(limit=10):
+    """
+    Get recent activities for FLOOR MEMBERS — restricted view.
+    Only shows:
+      - Money-related: income, expenses, dues payments recorded
+      - Member additions: new members added
+      - Member removals: members removed or status changed to PAST/REMOVED
+    """
+    from auditlogs.models import AuditLog
+    from django.db.models import Q
+    
+    # Money-related keywords (case-insensitive search on action/description)
+    money_keywords = [
+        'income', 'expense', 'dues', 'payment', '₦', 'naira', 'recorded income',
+        'recorded expense', 'finance', 'treasury', 'contribution', 'donation'
+    ]
+    
+    # Member addition keywords
+    add_keywords = [
+        'added member', 'new member', 'member created', 'created member',
+        'registered member', 'member added'
+    ]
+    
+    # Member removal keywords
+    remove_keywords = [
+        'removed member', 'member removed', 'past member', 'member past',
+        'status changed to past', 'status changed to removed',
+        'deactivated member', 'member deactivated'
+    ]
+    
+    # Build Q object for money-related
+    money_q = Q()
+    for kw in money_keywords:
+        money_q |= Q(action__icontains=kw) | Q(description__icontains=kw)
+    
+    # Build Q object for member additions
+    add_q = Q()
+    for kw in add_keywords:
+        add_q |= Q(action__icontains=kw) | Q(description__icontains=kw)
+    
+    # Build Q object for member removals
+    remove_q = Q()
+    for kw in remove_keywords:
+        remove_q |= Q(action__icontains=kw) | Q(description__icontains=kw)
+    
+    # Combine: money OR add OR remove
+    combined_q = money_q | add_q | remove_q
+    
+    # Also filter by model name for finance/members operations
+    model_q = Q(
+        model_name__in=['income', 'expense', 'duespayment', 'member', 'members']
+    )
+    
+    final_q = combined_q | model_q
+    
+    return AuditLog.objects.select_related("user").filter(
+        final_q
+    ).order_by("-created_at")[:limit]
+
 
 
 def get_clan_distribution():
