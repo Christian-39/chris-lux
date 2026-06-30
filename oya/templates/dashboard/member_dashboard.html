@@ -2,129 +2,7 @@
 {% load static %}
 {% load humanize %}
 
-{% block title %}Dashboard<style>
-@media (max-width: 768px) {
-  .kpi-value { font-size: 1.5rem !important; }
-  .kpi-label { font-size: 0.9375rem !important; }
-  .kpi-icon { width: 44px !important; height: 44px !important; }
-  .kpi-icon svg { width: 22px !important; height: 22px !important; }
-  .chart-card-title { font-size: 1rem !important; }
-  .chart-card-subtitle { font-size: 0.875rem !important; }
-  .card-header-title { font-size: 1rem !important; }
-  .card-header-subtitle { font-size: 0.875rem !important; }
-  .activity-text { font-size: 0.9375rem !important; }
-  .activity-time { font-size: 0.8125rem !important; }
-  .quick-action-btn { font-size: 0.875rem !important; padding: 1rem 0.75rem !important; }
-  .quick-action-btn svg { width: 24px !important; height: 24px !important; }
-  .badge { font-size: 0.8125rem !important; padding: 0.3rem 0.5rem !important; }
-  .btn { font-size: 0.875rem !important; }
-  .btn-sm { font-size: 0.8125rem !important; }
-  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
-  .form-label { font-size: 0.9375rem; }
-}
-
-@media (max-width: 480px) {
-  .kpi-value { font-size: 1.375rem !important; }
-  .kpi-label { font-size: 0.875rem !important; }
-  .chart-card-title { font-size: 0.9375rem !important; }
-  .chart-card-subtitle { font-size: 0.8125rem !important; }
-  .card-header-title { font-size: 0.9375rem !important; }
-  .card-header-subtitle { font-size: 0.8125rem !important; }
-  .activity-text { font-size: 0.875rem !important; }
-  .activity-time { font-size: 0.75rem !important; }
-  .quick-action-btn { font-size: 0.8125rem !important; }
-  .quick-action-btn svg { width: 22px !important; height: 22px !important; }
-  .badge { font-size: 0.75rem !important; }
-  .btn { font-size: 0.8125rem !important; }
-  .btn-sm { font-size: 0.75rem !important; }
-  .form-control { font-size: 0.875rem; padding: 0.5rem 0.75rem; }
-  .form-label { font-size: 0.875rem; }
-}
-</style>
-
-{% endblock %}
-{% block page_title %}Dashboard<style>
-@media (max-width: 768px) {
-  .kpi-value { font-size: 1.5rem !important; }
-  .kpi-label { font-size: 0.9375rem !important; }
-  .kpi-icon { width: 44px !important; height: 44px !important; }
-  .kpi-icon svg { width: 22px !important; height: 22px !important; }
-  .chart-card-title { font-size: 1rem !important; }
-  .chart-card-subtitle { font-size: 0.875rem !important; }
-  .card-header-title { font-size: 1rem !important; }
-  .card-header-subtitle { font-size: 0.875rem !important; }
-  .activity-text { font-size: 0.9375rem !important; }
-  .activity-time { font-size: 0.8125rem !important; }
-  .quick-action-btn { font-size: 0.875rem !important; padding: 1rem 0.75rem !important; }
-  .quick-action-btn svg { width: 24px !important; height: 24px !important; }
-  .badge { font-size: 0.8125rem !important; padding: 0.3rem 0.5rem !important; }
-  .btn { font-size: 0.875rem !important; }
-  .btn-sm { font-size: 0.8125rem !important; }
-  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
-  .form-label { font-size: 0.9375rem; }
-}
-
-@media (max-width: 480px) {
-  .kpi-value { font-size: 1.375rem !important; }
-  .kpi-label { font-size: 0.875rem !important; }
-  .chart-card-title { font-size: 0.9375rem !important; }
-  .chart-card-subtitle { font-size: 0.8125rem !important; }
-  .card-header-title { font-size: 0.9375rem !important; }
-  .card-header-subtitle { font-size: 0.8125rem !important; }
-  .activity-text { font-size: 0.875rem !important; }
-  .activity-time { font-size: 0.75rem !important; }
-  .quick-action-btn { font-size: 0.8125rem !important; }
-  .quick-action-btn svg { width: 22px !important; height: 22px !important; }
-  .badge { font-size: 0.75rem !important; }
-  .btn { font-size: 0.8125rem !important; }
-  .btn-sm { font-size: 0.75rem !important; }
-  .form-control { font-size: 0.875rem; padding: 0.5rem 0.75rem; }
-  .form-label { font-size: 0.875rem; }
-}
-</style>
-
-{% endblock %}
-{% block breadcrumb %}Overview<style>
-@media (max-width: 768px) {
-  .kpi-value { font-size: 1.5rem !important; }
-  .kpi-label { font-size: 0.9375rem !important; }
-  .kpi-icon { width: 44px !important; height: 44px !important; }
-  .kpi-icon svg { width: 22px !important; height: 22px !important; }
-  .chart-card-title { font-size: 1rem !important; }
-  .chart-card-subtitle { font-size: 0.875rem !important; }
-  .card-header-title { font-size: 1rem !important; }
-  .card-header-subtitle { font-size: 0.875rem !important; }
-  .activity-text { font-size: 0.9375rem !important; }
-  .activity-time { font-size: 0.8125rem !important; }
-  .quick-action-btn { font-size: 0.875rem !important; padding: 1rem 0.75rem !important; }
-  .quick-action-btn svg { width: 24px !important; height: 24px !important; }
-  .badge { font-size: 0.8125rem !important; padding: 0.3rem 0.5rem !important; }
-  .btn { font-size: 0.875rem !important; }
-  .btn-sm { font-size: 0.8125rem !important; }
-  .form-control { font-size: 0.9375rem; padding: 0.625rem 0.875rem; }
-  .form-label { font-size: 0.9375rem; }
-}
-
-@media (max-width: 480px) {
-  .kpi-value { font-size: 1.375rem !important; }
-  .kpi-label { font-size: 0.875rem !important; }
-  .chart-card-title { font-size: 0.9375rem !important; }
-  .chart-card-subtitle { font-size: 0.8125rem !important; }
-  .card-header-title { font-size: 0.9375rem !important; }
-  .card-header-subtitle { font-size: 0.8125rem !important; }
-  .activity-text { font-size: 0.875rem !important; }
-  .activity-time { font-size: 0.75rem !important; }
-  .quick-action-btn { font-size: 0.8125rem !important; }
-  .quick-action-btn svg { width: 22px !important; height: 22px !important; }
-  .badge { font-size: 0.75rem !important; }
-  .btn { font-size: 0.8125rem !important; }
-  .btn-sm { font-size: 0.75rem !important; }
-  .form-control { font-size: 0.875rem; padding: 0.5rem 0.75rem; }
-  .form-label { font-size: 0.875rem; }
-}
-</style>
-
-{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
 
@@ -167,14 +45,14 @@
   </div>
 </div>
 
-<!-- Financial Trend Chart (NEW for members - association-wide) -->
+<!-- Financial Trend Chart (Association-wide) -->
 <div class="dashboard-grid dashboard-grid-1" style="margin-bottom:1.5rem;">
   <div class="chart-card">
     <div class="chart-card-header">
       <div>
         <div class="chart-card-title">Financial Trend</div>
         <div class="chart-card-subtitle">Income vs Expenses ({{ trend_data.year }})</div>
-
+      </div>
       <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:flex-end;">
         <span class="badge" style="background:var(--oya-success-bg);color:var(--oya-success);">Income: &#x20A6;{{ trend_data.total_income_ytd|floatformat:0|intcomma }}</span>
         <span class="badge" style="background:var(--oya-danger-bg);color:var(--oya-danger);">Expenses: &#x20A6;{{ trend_data.total_expenses_ytd|floatformat:0|intcomma }}</span>
@@ -183,6 +61,68 @@
     </div>
     <div class="chart-container">
       <canvas id="financialTrendChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- RECENT ACTIVITIES (Members View - Money & Membership Only) -->
+<div class="dashboard-grid dashboard-grid-1" style="margin-bottom:1.5rem;">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-header-title">Recent Activities</div>
+        <div class="card-header-subtitle">Financial & membership updates</div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <div class="activity-feed" style="padding:0 1.25rem;">
+        {% for activity in recent_activities %}
+        <div class="activity-item" style="padding:0.75rem 0;{% if not forloop.last %}border-bottom:1px solid var(--oya-border);{% endif %}">
+          <div class="activity-icon 
+            {% if 'income' in activity.model_name|lower or 'dues' in activity.model_name|lower or 'payment' in activity.description|lower or '₦' in activity.description %}success
+            {% elif 'expense' in activity.model_name|lower or 'expense' in activity.description|lower %}danger
+            {% elif 'member' in activity.model_name|lower and 'added' in activity.description|lower or 'created' in activity.description|lower or 'new' in activity.description|lower %}primary
+            {% elif 'removed' in activity.description|lower or 'past' in activity.description|lower or 'deactivated' in activity.description|lower %}warning
+            {% else %}primary{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              {% if 'income' in activity.model_name|lower or 'dues' in activity.model_name|lower or 'payment' in activity.description|lower or '₦' in activity.description %}
+                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              {% elif 'expense' in activity.model_name|lower or 'expense' in activity.description|lower %}
+                <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+              {% elif 'removed' in activity.description|lower or 'past' in activity.description|lower or 'deactivated' in activity.description|lower %}
+                <path d="M18 6L6 18M6 6l12 12"/>
+              {% else %}
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              {% endif %}
+            </svg>
+          </div>
+          <div class="activity-content" style="min-width:0;">
+            <div class="activity-text" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:min(220px,50vw);" title="{{ activity.description }}">
+              {{ activity.description|truncatechars:60|default:activity.action }}
+            </div>
+            <div class="activity-time" style="display:flex;justify-content:space-between;align-items:center;">
+              <span>{{ activity.created_at|timesince }} ago</span>
+              {% if 'income' in activity.model_name|lower or 'dues' in activity.model_name|lower or 'payment' in activity.description|lower or '₦' in activity.description %}
+                <span class="badge" style="background:var(--oya-success-bg);color:var(--oya-success);font-size:0.75rem;">Income</span>
+              {% elif 'expense' in activity.model_name|lower or 'expense' in activity.description|lower %}
+                <span class="badge" style="background:var(--oya-danger-bg);color:var(--oya-danger);font-size:0.75rem;">Expense</span>
+              {% elif 'removed' in activity.description|lower or 'past' in activity.description|lower or 'deactivated' in activity.description|lower %}
+                <span class="badge" style="background:var(--oya-warning-bg);color:var(--oya-warning);font-size:0.75rem;">Removed</span>
+              {% elif 'member' in activity.model_name|lower or 'added' in activity.description|lower or 'created' in activity.description|lower or 'new' in activity.description|lower %}
+                <span class="badge" style="background:var(--oya-primary-bg);color:var(--oya-primary);font-size:0.75rem;">New Member</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="activity-item" style="padding:0.75rem 0;">
+          <div class="activity-content">
+            <div class="activity-text">No recent financial or membership activities</div>
+            <div class="activity-time">Check back later for updates</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
     </div>
   </div>
 </div>
@@ -319,6 +259,7 @@
       </div>
     </div>
   </div>
+</div>
 
 <!-- Quick Actions Row -->
 <div class="dashboard-grid dashboard-grid-2">
@@ -601,4 +542,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </style>
 
 {% endblock %}
-
