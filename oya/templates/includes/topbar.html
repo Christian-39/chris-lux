@@ -74,15 +74,16 @@
     </a>
 
     <!-- Profile Dropdown -->
+        <!-- Profile Dropdown -->
     <div class="dropdown">
       <button class="topbar-btn dropdown-toggle" aria-label="User Menu" id="userMenuToggle">
         <div class="avatar avatar-sm" id="topbarAvatar"
-          data-name="{% if user.is_authenticated %}{% if user.full_name %}{{ user.full_name }}{% else %}{{ user.username }}{% endif %}{% else %}Guest{% endif %}">
+          data-name="{% if user.is_authenticated %}{% if user.full_name %}{{ user.full_name }}{% else %}{{ user.serial_number }}{% endif %}{% else %}Guest{% endif %}">
           {% if user.is_authenticated %}
-            {% if user.photo and user.photo.name %}
-              <img src="{{ user.photo.url }}" alt="{{ user.full_name|default:user.username }}" id="topbarAvatarImg">
+            {% if user.photo %}
+              <img src="{{ user.photo.url }}" alt="{{ user.get_full_name|default:user.serial_number }}" id="topbarAvatarImg">
             {% else %}
-              <span id="topbarAvatarInitial">{{ user.get_full_name|first|upper|default:"?" }}</span>
+              <span id="topbarAvatarInitial">{{ user.get_full_name|first|upper|default:user.serial_number|first|upper }}</span>
             {% endif %}
           {% else %}
             <span id="topbarAvatarInitial">?</span>
@@ -92,6 +93,7 @@
           <polyline points="6 9 12 15 18 9"/>
         </svg>
       </button>
+
       <div class="dropdown-menu" id="userDropdownMenu">
         <a href="{% url 'accounts:profile' %}" class="dropdown-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
