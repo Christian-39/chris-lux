@@ -1,563 +1,105 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 
-{% block page_title %}{{ title|default:"Record Income" }}{% endblock %}
-{% block breadcrumb %}{{ title|default:"Record Income" }}{% endblock %}
-
-{% block extra_css %}
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<style>
-  .select2-container--default .select2-selection--single {
-    height: 38px;
-    border: 1px solid var(--oya-border, #d1d5db);
-    border-radius: 0.375rem;
-    background-color: var(--oya-surface, #fff);
-  }
-  .select2-container--default .select2-selection--single .select2-selection__rendered {
-    line-height: 36px;
-    padding-left: 0.75rem;
-    color: var(--oya-text, #374151);
-    font-size: 0.875rem;
-  }
-  .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 36px;
-    width: 36px;
-  }
-  .select2-container--default .select2-selection--single .select2-selection__placeholder {
-    color: var(--oya-text-muted, #9ca3af);
-  }
-  .select2-dropdown {
-    border-color: var(--oya-border, #d1d5db);
-    border-radius: 0.5rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-  }
-  .select2-results__option {
-    padding: 0.625rem 0.875rem;
-    color: var(--oya-text, #374151);
-    font-size: 0.875rem;
-    border-bottom: 1px solid var(--oya-border-light, #f3f4f6);
-  }
-  .select2-results__option:last-child {
-    border-bottom: none;
-  }
-  .select2-results__option--highlighted {
-    background-color: var(--oya-primary-light, #eff6ff) !important;
-    color: var(--oya-primary, #2563eb) !important;
-  }
-  .select2-results__option[aria-selected="true"] {
-    background-color: var(--oya-primary, #2563eb) !important;
-    color: #fff !important;
-  }
-  .select2-search__field {
-    border-color: var(--oya-border, #d1d5db) !important;
-    border-radius: 0.375rem;
-    padding: 0.5rem !important;
-  }
-  .select2-search__field:focus {
-    outline: none;
-    border-color: var(--oya-primary, #2563eb) !important;
-    box-shadow: 0 0 0 3px var(--oya-primary-light, #eff6ff);
-  }
-  .member-result {
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-  }
-  .member-result .member-name {
-    font-weight: 500;
-    color: var(--oya-text, #374151);
-  }
-  .member-result .member-meta {
-    font-size: 0.75rem;
-    color: var(--oya-text-muted, #6b7280);
-  }
-  .select2-results__option--highlighted .member-result .member-name,
-  .select2-results__option--highlighted .member-result .member-meta {
-    color: var(--oya-primary, #2563eb);
-  }
-  .select2-results__option[aria-selected="true"] .member-result .member-name,
-  .select2-results__option[aria-selected="true"] .member-result .member-meta {
-    color: #fff;
-  }
-  @keyframes pulse-subtle {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.85; }
-  }
-  .treasury-pulse {
-    animation: pulse-subtle 2s ease-in-out infinite;
-  }
-  .reason-badge {
-    cursor: pointer;
-    background: var(--oya-surface-alt, #f3f4f6);
-    color: var(--oya-text, #374151);
-    border: 1px solid var(--oya-border, #e5e7eb);
-    font-weight: 400;
-    transition: all 0.15s ease;
-  }
-  .reason-badge:hover {
-    background: var(--oya-primary-light, #eff6ff);
-    border-color: var(--oya-primary, #2563eb);
-    color: var(--oya-primary, #2563eb);
-  }
-</style>
-{% endblock %}
+{% block title %}{% if income %}Edit Income{% else %}Record Income{% endif %}{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-8 col-xl-6" style="padding:0 0.5rem;">
-      
-      <!-- Treasury Balance Card -->
-      <div class="card mb-3 treasury-pulse" style="background: linear-gradient(135deg, var(--oya-primary) 0%, var(--oya-primary-dark, #1d4ed8) 100%); color: #fff; border: none;">
-        <div class="card-body d-flex justify-content-between align-items-center">
-          <div>
-            <div style="font-size: 0.75rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Current Treasury Balance</div>
-            <div style="font-size: clamp(1.25rem, 5vw, 1.75rem); font-weight: 700; margin-top: 0.25rem; font-family: 'Segoe UI', system-ui, sans-serif;">
-              ₦{{ treasury_balance|floatformat:2 }}
-            </div>
-            <div style="font-size: 0.75rem; opacity: 0.75; margin-top: 0.25rem;">
-              {{ total_income|floatformat:2 }} in &middot; {{ total_expenses|floatformat:2 }} out
-            </div>
-          </div>
-          <div style="background: rgba(255,255,255,0.15); border-radius: 0.75rem; padding: 0.75rem;">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
-          </div>
-        </div>
-      </div>
+<div class="page-header">
+    <h1>{% if income %}Edit Income{% else %}Record Income{% endif %}</h1>
+    <p>{% if income %}Update income record{% else %}Add a new income record{% endif %}</p>
+</div>
 
-      <!-- Recent Income Preview -->
-      {% if recent_incomes %}
-      <div class="card mb-3" style="border-left: 3px solid var(--oya-success, #10b981);">
-        <div class="card-body py-2 px-3">
-          <div style="font-size: 0.75rem; color: var(--oya-text-muted, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Most Recent Income</div>
-          <div class="d-flex justify-content-between align-items-center mt-1">
-            <span style="font-weight: 500; color: var(--oya-text, #374151);">
-              {{ recent_incomes.0.reason|truncatechars:30 }}
-            </span>
-            <span style="color: var(--oya-success, #10b981); font-weight: 600;">
-              +₦{{ recent_incomes.0.amount|floatformat:2 }}
-            </span>
-          </div>
-          <div style="font-size: 0.75rem; color: var(--oya-text-muted, #6b7280);">
-            {{ recent_incomes.0.paid_by|default:"Unknown" }} &middot; {{ recent_incomes.0.created_at|timesince }} ago
-          </div>
-        </div>
-      </div>
-      {% endif %}
-
-      <div class="card">
-        <div class="card-header" style="background: var(--oya-surface, #fff); border-bottom: 1px solid var(--oya-border, #e5e7eb);">
-          <h5 class="card-title mb-0" style="font-size: 1rem; font-weight: 600; color: var(--oya-text, #111827);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.5rem; color: var(--oya-primary, #2563eb);">
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
-            </svg>
-            {{ title }}
-          </h5>
-        </div>
-        <div class="card-body">
-          <form method="post" novalidate>
+<div class="oya-card animate-fade-in">
+    <div class="oya-card-body">
+        <form method="post" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
+            
+            <!-- Income Type -->
+            <div class="mb-3">
+                <label class="form-label">Income Type <span class="text-danger">*</span></label>
+                <select name="income_type" class="form-select" required>
+                    <option value="">Select type...</option>
+                    <option value="DUES" {% if form.income_type.value == 'DUES' %}selected{% endif %}>Yearly Dues (₦5,000)</option>
+                    <option value="DONATION" {% if form.income_type.value == 'DONATION' %}selected{% endif %}>Donation</option>
+                    <option value="OTHER" {% if form.income_type.value == 'OTHER' %}selected{% endif %}>Other Income</option>
+                </select>
+            </div>
 
             <!-- Amount -->
             <div class="mb-3">
-              <label for="{{ form.amount.id_for_label }}" class="form-label" style="font-weight: 500; color: var(--oya-text, #374151); font-size: 0.875rem;">
-                Amount <span style="color: var(--oya-danger, #ef4444);">*</span>
-              </label>
-              <div class="input-group">
-                <span class="input-group-text" style="background: var(--oya-surface-alt, #f9fafb); border-color: var(--oya-border, #d1d5db); color: var(--oya-text-muted, #6b7280); font-weight: 600;">₦</span>
-                {{ form.amount }}
-              </div>
-              {% if form.amount.errors %}
-                <div class="invalid-feedback d-block" style="font-size: 0.875rem;">{{ form.amount.errors|join:", " }}</div>
-              {% endif %}
-              <div class="form-text" style="font-size: 0.75rem;">Enter amount in Naira (e.g., 50000.00)</div>
+                <label class="form-label">Amount (₦) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text">₦</span>
+                    <input type="number" name="amount" class="form-control" placeholder="0.00" required min="0" step="0.01" value="{{ form.amount.value|default:'' }}">
+                </div>
             </div>
 
-            <!-- Reason -->
-            <div class="mb-3">
-              <label for="{{ form.reason.id_for_label }}" class="form-label" style="font-weight: 500; color: var(--oya-text, #374151); font-size: 0.875rem;">
-                Reason <span style="color: var(--oya-danger, #ef4444);">*</span>
-              </label>
-              {{ form.reason }}
-              {% if form.reason.errors %}
-                <div class="invalid-feedback d-block" style="font-size: 0.875rem;">{{ form.reason.errors|join:", " }}</div>
-              {% endif %}
-              <div class="form-text" style="font-size: 0.75rem; margin-top: 0.5rem;">
-                Common reasons:
-                {% for reason in common_reasons %}
-                  <span class="badge reason-badge" onclick="document.getElementById('id_reason').value='{{ reason|escapejs }}'">{{ reason }}</span>
-                {% empty %}
-                  <span class="badge reason-badge" onclick="document.getElementById('id_reason').value='Annual Dues'">Annual Dues</span>
-                  <span class="badge reason-badge" onclick="document.getElementById('id_reason').value='Donation'">Donation</span>
-                  <span class="badge reason-badge" onclick="document.getElementById('id_reason').value='Project Fund'">Project Fund</span>
-                  <span class="badge reason-badge" onclick="document.getElementById('id_reason').value='Event Fee'">Event Fee</span>
-                {% endfor %}
-              </div>
+            <!-- Member (for Dues) -->
+            <div class="mb-3" id="memberField" style="display: none;">
+                <label class="form-label">Member <span class="text-danger">*</span></label>
+                <select name="member" class="form-select">
+                    <option value="">Select member...</option>
+                    {% for member in active_members %}
+                    <option value="{{ member.pk }}" {% if form.member.value == member.pk %}selected{% endif %}>{{ member.full_name }} ({{ member.clan.name|default:"No Clan" }})</option>
+                    {% endfor %}
+                </select>
+                <small class="text-muted">Required for dues payments</small>
             </div>
 
-            <!-- Paid By (Auto-suggest from backend) -->
+            <!-- Description -->
             <div class="mb-3">
-              <label for="id_paid_by" class="form-label" style="font-weight: 500; color: var(--oya-text, #374151); font-size: 0.875rem;">
-                Paid By
-              </label>
-              <select name="paid_by" id="id_paid_by" class="form-select" style="width: 100%;">
-                {% if form.paid_by.value %}
-                  <option value="{{ form.paid_by.value }}" selected>{{ form.paid_by.value }}</option>
+                <label class="form-label">Description</label>
+                <input type="text" name="description" class="form-control" placeholder="e.g., 2026 Yearly Dues - John Doe" value="{{ form.description.value|default:'' }}">
+            </div>
+
+            <!-- Date -->
+            <div class="mb-3">
+                <label class="form-label">Date <span class="text-danger">*</span></label>
+                <input type="date" name="date" class="form-control" required value="{{ form.date.value|date:'Y-m-d'|default:today }}">
+            </div>
+
+            <!-- Receipt Upload -->
+            <div class="mb-4">
+                <label class="form-label">Receipt / Proof</label>
+                <input type="file" name="receipt" class="form-control" accept="image/*,.pdf">
+                {% if income and income.receipt %}
+                <div class="mt-2">
+                    <small class="text-muted">Current: <a href="{{ income.receipt.url }}" target="_blank">View Receipt</a></small>
+                </div>
                 {% endif %}
-              </select>
-              {% if form.paid_by.errors %}
-                <div class="invalid-feedback d-block" style="font-size: 0.875rem;">{{ form.paid_by.errors|join:", " }}</div>
-              {% endif %}
-              <div class="form-text" style="font-size: 0.75rem;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.25rem;">
-                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-                Search by name or serial number (e.g., OYA-2026-0001)
-              </div>
+                <small class="text-muted">Upload image or PDF (optional)</small>
             </div>
 
-            <!-- Submit Actions -->
-            <div class="d-flex gap-2 mt-4 pt-2" style="border-top: 1px solid var(--oya-border-light, #f3f4f6);">
-              <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-                {{ action|default:"Save" }}
-              </button>
-              <a href="{% url 'finance:income_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            <!-- Buttons -->
+            <div class="btn-group-mobile">
+                <button type="submit" class="btn btn-oya btn-oya-primary">
+                    <i class="fas fa-save me-2"></i> {% if income %}Update{% else %}Save{% endif %} Record
+                </button>
+                <a href="{% url 'finance:income_list' %}" class="btn btn-oya btn-oya-outline">
+                    <i class="fas fa-times me-2"></i> Cancel
+                </a>
             </div>
-          </form>
-        </div>
-      </div>
+        </form>
     </div>
-  </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-  $(document).ready(function() {
-    // Initialize Select2 for Paid By field with AJAX backend search
-    $('#id_paid_by').select2({
-      placeholder: 'Search member by name or serial number...',
-      allowClear: true,
-      minimumInputLength: 2,
-      ajax: {
-        url: '{% url "finance:search_members" %}',
-        dataType: 'json',
-        delay: 300,
-        data: function(params) {
-          return { q: params.term };
-        },
-        processResults: function(data) {
-          return {
-            results: data.results.map(function(item) {
-              return {
-                id: item.name,
-                text: item.text,
-                html: item.html
-              };
-            })
-          };
-        },
-        cache: true
-      },
-      templateResult: function(data) {
-        if (data.loading) return $('<div class="member-result"><span class="member-name">Searching...</span></div>');
-        if (!data.html) return data.text;
-        return $(data.html);
-      },
-      templateSelection: function(data) {
-        return data.text ? data.text.split('(')[0].trim() : data.id;
-      },
-      language: {
-        inputTooShort: function() {
-          return 'Type at least 2 characters to search members...';
-        },
-        noResults: function() {
-          return '<div class="member-result"><span class="member-name">No member found</span><span class="member-meta">Press Enter to use custom name</span></div>';
-        },
-        searching: function() {
-          return '<div class="member-result"><span class="member-name">Searching members...</span></div>';
+    // Show/hide member field based on income type
+    const incomeTypeSelect = document.querySelector('select[name="income_type"]');
+    const memberField = document.getElementById('memberField');
+    
+    function toggleMemberField() {
+        if (incomeTypeSelect.value === 'DUES') {
+            memberField.style.display = 'block';
+            memberField.querySelector('select').setAttribute('required', 'required');
+        } else {
+            memberField.style.display = 'none';
+            memberField.querySelector('select').removeAttribute('required');
         }
-      },
-      escapeMarkup: function(markup) {
-        return markup;
-      },
-      tags: true,
-      createTag: function(params) {
-        var term = $.trim(params.term);
-        if (term === '') return null;
-        return {
-          id: term,
-          text: term + ' (Custom)',
-          isNew: true
-        };
-      }
-    });
-
-    // Amount input formatting
-    $('#id_amount').on('input', function() {
-      let val = $(this).val();
-      val = val.replace(/[^0-9.]/g, '');
-      const parts = val.split('.');
-      if (parts.length > 2) {
-        val = parts[0] + '.' + parts.slice(1).join('');
-      }
-      if (parts[1] && parts[1].length > 2) {
-        val = parts[0] + '.' + parts[1].substring(0, 2);
-      }
-      $(this).val(val);
-    });
-
-    // Add input-group styling to amount field
-    $('#id_amount').addClass('form-control').css({
-      'border-top-left-radius': '0',
-      'border-bottom-left-radius': '0'
-    });
-
-    // Add form-control class to reason field
-    $('#id_reason').addClass('form-control');
-  });
+    }
+    
+    incomeTypeSelect.addEventListener('change', toggleMemberField);
+    toggleMemberField(); // Run on load
 </script>
-
-
-<style>
-/* ─── Mobile Responsive Overrides ─── */
-@media (max-width: 768px) {
-  .page-header-left h1 { font-size: 1.375rem !important; }
-  .page-header-left p { font-size: 0.9375rem !important; }
-  .form-control, .form-select, .form-input, .form-textarea { font-size: 0.9375rem !important; padding: 0.625rem 0.875rem !important; }
-  .form-label { font-size: 0.9375rem !important; }
-  .form-error, .form-help { font-size: 0.8125rem !important; }
-  .card-header-title { font-size: 1rem !important; }
-  .card-header-subtitle { font-size: 0.875rem !important; }
-  .card-body { padding: 1.25rem !important; }
-  .btn { font-size: 0.875rem !important; padding: 0.625rem 1rem !important; }
-  .btn-sm { font-size: 0.8125rem !important; padding: 0.5rem 0.875rem !important; }
-  .btn-lg { font-size: 0.9375rem !important; padding: 0.75rem 1.25rem !important; }
-  .badge { font-size: 0.8125rem !important; padding: 0.3rem 0.5rem !important; }
-  .data-table { font-size: 0.9375rem !important; }
-  .data-table thead th, .data-table tbody td { padding: 0.75rem 1rem !important; }
-  .cell-name { font-size: 0.9375rem !important; }
-  .cell-muted { font-size: 0.875rem !important; }
-  .table-action-btn { width: 36px !important; height: 36px !important; }
-  .avatar { width: 40px !important; height: 40px !important; font-size: 0.875rem !important; }
-  .avatar-sm { width: 32px !important; height: 32px !important; font-size: 0.8125rem !important; }
-  .avatar-lg { width: 52px !important; height: 52px !important; font-size: 1.125rem !important; }
-  .kpi-value { font-size: 1.5rem !important; }
-  .kpi-label { font-size: 0.9375rem !important; }
-  .kpi-icon { width: 44px !important; height: 44px !important; }
-  .kpi-icon svg { width: 22px !important; height: 22px !important; }
-  .activity-text { font-size: 0.9375rem !important; }
-  .activity-time { font-size: 0.8125rem !important; }
-  .timeline-title { font-size: 0.9375rem !important; }
-  .timeline-desc { font-size: 0.875rem !important; }
-  .timeline-time { font-size: 0.8125rem !important; }
-  .meta-label { font-size: 0.8125rem !important; }
-  .meta-value { font-size: 0.9375rem !important; }
-  .detail-label { font-size: 0.8125rem !important; }
-  .detail-value { font-size: 0.9375rem !important; }
-  .filter-label { font-size: 0.875rem !important; }
-  .page-btn { min-width: 36px !important; height: 36px !important; font-size: 0.875rem !important; }
-  .modal-title { font-size: 1.125rem !important; }
-  .modal-header, .modal-body { padding: 1.25rem !important; }
-  .modal-footer { padding: 1rem 1.25rem !important; }
-  .dropdown-item { font-size: 0.875rem !important; padding: 0.625rem 1rem !important; }
-  .notification-title { font-size: 0.9375rem !important; }
-  .notification-desc { font-size: 0.875rem !important; }
-  .notification-time { font-size: 0.8125rem !important; }
-  .urgent-case-title { font-size: 0.9375rem !important; }
-  .urgent-case-meta { font-size: 0.8125rem !important; }
-  .settings-info h4 { font-size: 1rem !important; }
-  .settings-info p { font-size: 0.875rem !important; }
-  .quick-action-btn { font-size: 0.875rem !important; padding: 1rem 0.75rem !important; }
-  .quick-action-btn svg { width: 24px !important; height: 24px !important; }
-  .chart-card-title { font-size: 1rem !important; }
-  .chart-card-subtitle { font-size: 0.875rem !important; }
-  .tab-btn { font-size: 0.9375rem !important; padding: 0.625rem 1rem !important; }
-  .alert { font-size: 0.9375rem !important; padding: 1rem 1.25rem !important; }
-  .toast { font-size: 0.9375rem !important; padding: 1rem 1.25rem !important; }
-  .empty-state h3 { font-size: 1.0625rem !important; }
-  .empty-state p { font-size: 0.875rem !important; }
-  .toolbar-search input { font-size: 0.9375rem !important; }
-  .pagination-info { font-size: 0.875rem !important; }
-  .progress-bar-label { font-size: 0.875rem !important; }
-  .progress-bar-value { font-size: 0.875rem !important; }
-  .directory-info h4 { font-size: 0.9375rem !important; }
-  .directory-info p { font-size: 0.875rem !important; }
-  .stat-card-value { font-size: 1.375rem !important; }
-  .stat-card-label { font-size: 0.875rem !important; }
-  .stat-card-change { font-size: 0.8125rem !important; }
-  .finance-hero-amount { font-size: 1.75rem !important; }
-  .receipt-dropzone div { font-size: 0.875rem !important; }
-  .category-card div { font-size: 0.8125rem !important; }
-  .export-btn-text { font-size: 0.875rem !important; }
-  .chart-legend { font-size: 0.8125rem !important; }
-  .chart-tooltip { font-size: 0.875rem !important; }
-  .detail-badge { font-size: 0.8125rem !important; }
-  .mobile-nav-link { font-size: 0.875rem !important; }
-  .mobile-bottom-nav-item { font-size: 0.625rem !important; }
-  .mobile-logo-text { font-size: 0.9375rem !important; }
-  .search-dropdown .dropdown-item { font-size: 0.875rem !important; }
-  .search-dropdown .dropdown-header { font-size: 0.75rem !important; }
-  .form-card-title { font-size: 1rem !important; }
-  .form-card-header { padding: 1rem 1.25rem !important; }
-  .form-card-body { padding: 1.25rem !important; }
-  .form-actions .btn { width: 100% !important; justify-content: center !important; }
-  .form-row { grid-template-columns: 1fr !important; gap: 0 !important; }
-  .dashboard-grid-4, .dashboard-grid-3, .dashboard-grid-2 { grid-template-columns: 1fr !important; }
-  .detail-meta-grid { grid-template-columns: 1fr 1fr !important; }
-  .user-detail-grid { grid-template-columns: 1fr !important; }
-  .quick-actions { grid-template-columns: repeat(2, 1fr) !important; }
-  .directory-grid { grid-template-columns: 1fr !important; }
-  .profile-card { flex-direction: column !important; text-align: center !important; }
-  .filters-bar { flex-direction: column !important; align-items: stretch !important; gap: 0.75rem !important; padding: 1rem !important; }
-  .filters-bar form { flex-direction: column !important; align-items: stretch !important; }
-  .filter-group { width: 100% !important; }
-  .filter-group .form-control { width: 100% !important; }
-  .table-toolbar { flex-direction: column !important; align-items: stretch !important; }
-  .toolbar-search { max-width: 100% !important; }
-  .page-header { flex-direction: column !important; align-items: flex-start !important; }
-  .page-header-actions { width: 100% !important; flex-wrap: wrap !important; }
-  .card-header { flex-direction: column !important; align-items: flex-start !important; gap: 0.75rem !important; }
-  .card-header .btn { width: 100% !important; justify-content: center !important; }
-  .detail-header { flex-direction: column !important; align-items: flex-start !important; gap: 1rem !important; }
-  .detail-header .page-header-actions { width: 100% !important; flex-wrap: wrap !important; }
-  .detail-header .page-header-actions .btn { flex: 1 !important; min-width: 120px !important; }
-  .modal-footer { flex-direction: column !important; gap: 0.5rem !important; }
-  .modal-footer .btn { width: 100% !important; justify-content: center !important; }
-  .settings-row { flex-direction: column !important; align-items: flex-start !important; gap: 0.875rem !important; padding: 1.125rem 0 !important; }
-  .radio-group { flex-direction: column !important; align-items: flex-start !important; gap: 0.75rem !important; }
-  .location-section { padding: 0.875rem 1rem !important; }
-  .photo-preview img { max-width: 90px !important; max-height: 90px !important; }
-  .content-area { padding: 1rem !important; padding-bottom: 80px !important; }
-  .app-footer { padding-bottom: 80px !important; font-size: 0.875rem !important; }
-  .hide-mobile { display: none !important; }
-}
-
-@media (max-width: 480px) {
-  .page-header-left h1 { font-size: 1.25rem !important; }
-  .page-header-left p { font-size: 0.875rem !important; }
-  .form-control, .form-select, .form-input, .form-textarea { font-size: 0.875rem !important; padding: 0.5rem 0.75rem !important; }
-  .form-label { font-size: 0.875rem !important; }
-  .form-error, .form-help { font-size: 0.75rem !important; }
-  .card-header-title { font-size: 0.9375rem !important; }
-  .card-header-subtitle { font-size: 0.8125rem !important; }
-  .card-body { padding: 1rem !important; }
-  .btn { font-size: 0.8125rem !important; padding: 0.5rem 0.875rem !important; }
-  .btn-sm { font-size: 0.75rem !important; padding: 0.375rem 0.75rem !important; }
-  .btn-lg { font-size: 0.875rem !important; padding: 0.625rem 1rem !important; }
-  .badge { font-size: 0.75rem !important; padding: 0.25rem 0.4rem !important; }
-  .data-table { font-size: 0.875rem !important; }
-  .data-table thead th, .data-table tbody td { padding: 0.625rem 0.75rem !important; }
-  .cell-name { font-size: 0.875rem !important; }
-  .cell-muted { font-size: 0.8125rem !important; }
-  .table-action-btn { width: 32px !important; height: 32px !important; }
-  .avatar { width: 36px !important; height: 36px !important; font-size: 0.8125rem !important; }
-  .avatar-sm { width: 28px !important; height: 28px !important; font-size: 0.75rem !important; }
-  .avatar-lg { width: 48px !important; height: 48px !important; font-size: 1rem !important; }
-  .kpi-value { font-size: 1.375rem !important; }
-  .kpi-label { font-size: 0.875rem !important; }
-  .kpi-icon { width: 40px !important; height: 40px !important; }
-  .kpi-icon svg { width: 20px !important; height: 20px !important; }
-  .activity-text { font-size: 0.875rem !important; }
-  .activity-time { font-size: 0.75rem !important; }
-  .timeline-title { font-size: 0.875rem !important; }
-  .timeline-desc { font-size: 0.8125rem !important; }
-  .timeline-time { font-size: 0.75rem !important; }
-  .meta-label { font-size: 0.75rem !important; }
-  .meta-value { font-size: 0.875rem !important; }
-  .detail-label { font-size: 0.75rem !important; }
-  .detail-value { font-size: 0.875rem !important; }
-  .filter-label { font-size: 0.8125rem !important; }
-  .page-btn { min-width: 32px !important; height: 32px !important; font-size: 0.8125rem !important; }
-  .modal-title { font-size: 1rem !important; }
-  .modal-header, .modal-body { padding: 1rem !important; }
-  .modal-footer { padding: 0.75rem 1rem !important; }
-  .dropdown-item { font-size: 0.8125rem !important; padding: 0.5rem 0.875rem !important; }
-  .notification-title { font-size: 0.875rem !important; }
-  .notification-desc { font-size: 0.8125rem !important; }
-  .notification-time { font-size: 0.75rem !important; }
-  .urgent-case-title { font-size: 0.875rem !important; }
-  .urgent-case-meta { font-size: 0.75rem !important; }
-  .settings-info h4 { font-size: 0.9375rem !important; }
-  .settings-info p { font-size: 0.8125rem !important; }
-  .quick-action-btn { font-size: 0.8125rem !important; padding: 0.875rem 0.5rem !important; }
-  .quick-action-btn svg { width: 22px !important; height: 22px !important; }
-  .chart-card-title { font-size: 0.9375rem !important; }
-  .chart-card-subtitle { font-size: 0.8125rem !important; }
-  .tab-btn { font-size: 0.875rem !important; padding: 0.5rem 0.75rem !important; }
-  .alert { font-size: 0.875rem !important; padding: 0.75rem 1rem !important; }
-  .toast { font-size: 0.875rem !important; padding: 0.75rem 1rem !important; }
-  .empty-state h3 { font-size: 0.9375rem !important; }
-  .empty-state p { font-size: 0.8125rem !important; }
-  .toolbar-search input { font-size: 0.875rem !important; }
-  .pagination-info { font-size: 0.8125rem !important; }
-  .progress-bar-label { font-size: 0.8125rem !important; }
-  .progress-bar-value { font-size: 0.8125rem !important; }
-  .directory-info h4 { font-size: 0.875rem !important; }
-  .directory-info p { font-size: 0.8125rem !important; }
-  .stat-card-value { font-size: 1.25rem !important; }
-  .stat-card-label { font-size: 0.8125rem !important; }
-  .stat-card-change { font-size: 0.75rem !important; }
-  .finance-hero-amount { font-size: 1.5rem !important; }
-  .receipt-dropzone div { font-size: 0.8125rem !important; }
-  .category-card div { font-size: 0.75rem !important; }
-  .export-btn-text { font-size: 0.8125rem !important; }
-  .chart-legend { font-size: 0.75rem !important; }
-  .chart-tooltip { font-size: 0.8125rem !important; }
-  .detail-badge { font-size: 0.75rem !important; }
-  .mobile-nav-link { font-size: 0.8125rem !important; }
-  .mobile-bottom-nav-item { font-size: 0.5625rem !important; }
-  .mobile-logo-text { font-size: 0.875rem !important; }
-  .search-dropdown .dropdown-item { font-size: 0.8125rem !important; }
-  .search-dropdown .dropdown-header { font-size: 0.6875rem !important; }
-  .form-card-title { font-size: 0.9375rem !important; }
-  .form-card-header { padding: 0.875rem 1rem !important; }
-  .form-card-body { padding: 1rem !important; }
-  .card-footer { padding: 0.75rem 1rem !important; }
-  .detail-meta-grid { grid-template-columns: 1fr !important; }
-  .content-area { padding: 0.75rem !important; padding-bottom: 72px !important; }
-  .app-footer { padding: 0.875rem 1rem !important; padding-bottom: 72px !important; }
-}
-
-@media (max-width: 360px) {
-  .page-header-left h1 { font-size: 1.125rem !important; }
-  .page-header-left p { font-size: 0.8125rem !important; }
-  .form-control, .form-select, .form-input, .form-textarea { font-size: 0.8125rem !important; padding: 0.375rem 0.625rem !important; }
-  .form-label { font-size: 0.8125rem !important; }
-  .card-header-title { font-size: 0.875rem !important; }
-  .card-header-subtitle { font-size: 0.75rem !important; }
-  .btn { font-size: 0.75rem !important; padding: 0.375rem 0.75rem !important; }
-  .btn-sm { font-size: 0.6875rem !important; padding: 0.25rem 0.625rem !important; }
-  .badge { font-size: 0.6875rem !important; padding: 0.2rem 0.35rem !important; }
-  .data-table { font-size: 0.8125rem !important; }
-  .data-table thead th, .data-table tbody td { padding: 0.5rem 0.625rem !important; }
-  .avatar { width: 32px !important; height: 32px !important; font-size: 0.75rem !important; }
-  .kpi-value { font-size: 1.25rem !important; }
-  .kpi-label { font-size: 0.8125rem !important; }
-  .activity-text { font-size: 0.8125rem !important; }
-  .activity-time { font-size: 0.6875rem !important; }
-  .page-btn { min-width: 28px !important; height: 28px !important; font-size: 0.75rem !important; }
-  .modal-title { font-size: 0.9375rem !important; }
-  .dropdown-item { font-size: 0.75rem !important; padding: 0.375rem 0.75rem !important; }
-  .notification-title { font-size: 0.8125rem !important; }
-  .notification-desc { font-size: 0.75rem !important; }
-  .quick-action-btn { font-size: 0.75rem !important; }
-  .tab-btn { font-size: 0.8125rem !important; padding: 0.4rem 0.625rem !important; }
-  .alert { font-size: 0.8125rem !important; }
-  .toast { font-size: 0.8125rem !important; }
-  .empty-state h3 { font-size: 0.875rem !important; }
-  .empty-state p { font-size: 0.75rem !important; }
-  .content-area { padding: 0.625rem !important; padding-bottom: 64px !important; }
-  .app-footer { padding: 0.75rem !important; padding-bottom: 64px !important; font-size: 0.75rem !important; }
-}
-</style>
-
 {% endblock %}
