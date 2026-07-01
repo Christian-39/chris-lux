@@ -816,7 +816,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.namespace == 'finance' %}active{% endif %}" href="{% url 'finance:summary' %}">
+                            <a class="nav-link {% if request.resolver_match.namespace == 'finance' %}active{% endif %}" href="{% url 'finance:finance_summary' %}">
                                 <i class="fas fa-wallet me-1"></i> Finance
                             </a>
                         </li>
@@ -850,7 +850,7 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="fas fa-user me-2 text-muted"></i> Profile</a></li>
-                                <li><a class="dropdown-item" href="{% url 'accounts:pin_reset' %}"><i class="fas fa-key me-2 text-muted"></i> Reset PIN</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:change_pin' %}"><i class="fas fa-key me-2 text-muted"></i> Change PIN</a></li>
                                 {% if user.has_admin_access %}
                                 <li><a class="dropdown-item" href="{% url 'settings:system_settings' %}"><i class="fas fa-cog me-2 text-muted"></i> Settings</a></li>
                                 <li><a class="dropdown-item" href="{% url 'auditlogs:auditlog_list' %}"><i class="fas fa-history me-2 text-muted"></i> Audit Logs</a></li>
@@ -902,7 +902,7 @@
             <i class="fas fa-users"></i>
             <span>Members</span>
         </a>
-        <a href="{% url 'finance:summary' %}" class="bottom-nav-item {% if request.resolver_match.namespace == 'finance' %}active{% endif %}">
+        <a href="{% url 'finance:finance_summary' %}" class="bottom-nav-item {% if request.resolver_match.namespace == 'finance' %}active{% endif %}">
             <i class="fas fa-wallet"></i>
             <span>Finance</span>
         </a>
