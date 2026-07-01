@@ -852,7 +852,7 @@
                                 <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="fas fa-user me-2 text-muted"></i> Profile</a></li>
                                 <li><a class="dropdown-item" href="{% url 'accounts:change_pin' %}"><i class="fas fa-key me-2 text-muted"></i> Change PIN</a></li>
                                 {% if user.has_admin_access %}
-                                <li><a class="dropdown-item" href="{% url 'settings:system_settings' %}"><i class="fas fa-cog me-2 text-muted"></i> Settings</a></li>
+                                <li><a class="dropdown-item" href="{% url 'settingsapp:settings' %}"><i class="fas fa-cog me-2 text-muted"></i> Settings</a></li>
                                 <li><a class="dropdown-item" href="{% url 'auditlogs:auditlog_list' %}"><i class="fas fa-history me-2 text-muted"></i> Audit Logs</a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
