@@ -1,77 +1,514 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
-{% load humanize %}
 
-{% block title %}{% if expense %}Edit Expense{% else %}Record Expense{% endif %}{% endblock %}
+{% block page_title %}{{ title|default:"Record Expense" }}{% endblock %}
+{% block breadcrumb %}{{ title|default:"Record Expense" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  @keyframes pulse-subtle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+  }
+  .treasury-pulse {
+    animation: pulse-subtle 2s ease-in-out infinite;
+  }
+  .category-card {
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 2px solid transparent;
+  }
+  .category-card:hover {
+    border-color: var(--oya-primary, #2563eb);
+    background: var(--oya-primary-light, #eff6ff);
+  }
+  .category-card.active {
+    border-color: var(--oya-primary, #2563eb);
+    background: var(--oya-primary-light, #eff6ff);
+  }
+  .receipt-dropzone {
+    border: 2px dashed var(--oya-border, #d1d5db);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+  .receipt-dropzone:hover, .receipt-dropzone.dragover {
+    border-color: var(--oya-primary, #2563eb);
+    background: var(--oya-primary-light, #eff6ff);
+  }
+  .receipt-dropzone.has-file {
+    border-color: var(--oya-success, #10b981);
+    background: rgba(16, 185, 129, 0.05);
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>{% if expense %}Edit Expense{% else %}Record Expense{% endif %}</h1>
-    <p>{% if expense %}Update expense record{% else %}Add a new expense record{% endif %}</p>
-</div>
-
-<div class="oya-card animate-fade-in">
-    <div class="oya-card-body">
-        <form method="post" enctype="multipart/form-data" novalidate>
-            {% csrf_token %}
-            
-            <!-- Category -->
-            <div class="mb-3">
-                <label class="form-label">Category <span class="text-danger">*</span></label>
-                <select name="category" class="form-select" required>
-                    <option value="">Select category...</option>
-                    <option value="PROJECT" {% if form.category.value == 'PROJECT' %}selected{% endif %}>Project</option>
-                    <option value="OPERATIONS" {% if form.category.value == 'OPERATIONS' %}selected{% endif %}>Operations</option>
-                    <option value="MEETING" {% if form.category.value == 'MEETING' %}selected{% endif %}>Meeting</option>
-                    <option value="ELECTION" {% if form.category.value == 'ELECTION' %}selected{% endif %}>Election</option>
-                    <option value="MAINTENANCE" {% if form.category.value == 'MAINTENANCE' %}selected{% endif %}>Maintenance</option>
-                    <option value="OTHER" {% if form.category.value == 'OTHER' %}selected{% endif %}>Other</option>
-                </select>
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8 col-xl-6" style="padding:0 0.5rem;">
+      
+      <!-- Treasury Balance Card -->
+      <div class="card mb-3 treasury-pulse" style="background: linear-gradient(135deg, var(--oya-danger, #dc2626) 0%, var(--oya-danger-dark, #991b1b) 100%); color: #fff; border: none;">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <div style="font-size: 0.75rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Current Treasury Balance</div>
+            <div style="font-size: clamp(1.25rem, 5vw, 1.75rem); font-weight: 700; margin-top: 0.25rem; font-family: 'Segoe UI', system-ui, sans-serif;">
+              ₦{{ treasury_balance|floatformat:2 }}
             </div>
+            <div style="font-size: 0.75rem; opacity: 0.75; margin-top: 0.25rem;">
+              {{ total_income|floatformat:2 }} in &middot; {{ total_expenses|floatformat:2 }} out
+            </div>
+          </div>
+          <div style="background: rgba(255,255,255,0.15); border-radius: 0.75rem; padding: 0.75rem;">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Expense Preview -->
+      {% if recent_expenses %}
+      <div class="card mb-3" style="border-left: 3px solid var(--oya-danger, #dc2626);">
+        <div class="card-body py-2 px-3">
+          <div style="font-size: 0.75rem; color: var(--oya-text-muted, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;">Most Recent Expense</div>
+          <div class="d-flex justify-content-between align-items-center mt-1">
+            <span style="font-weight: 500; color: var(--oya-text, #374151);">
+              {{ recent_expenses.0.category }}: {{ recent_expenses.0.description|truncatechars:25 }}
+            </span>
+            <span style="color: var(--oya-danger, #dc2626); font-weight: 600;">
+              -₦{{ recent_expenses.0.amount|floatformat:2 }}
+            </span>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--oya-text-muted, #6b7280);">
+            {{ recent_expenses.0.created_by.get_full_name|default:"Unknown" }} &middot; {{ recent_expenses.0.created_at|timesince }} ago
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="card">
+        <div class="card-header" style="background: var(--oya-surface, #fff); border-bottom: 1px solid var(--oya-border, #e5e7eb);">
+          <h5 class="card-title mb-0" style="font-size: 1rem; font-weight: 600; color: var(--oya-text, #111827);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.5rem; color: var(--oya-danger, #dc2626);">
+              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/>
+            </svg>
+            {{ title }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
 
             <!-- Amount -->
             <div class="mb-3">
-                <label class="form-label">Amount (₦) <span class="text-danger">*</span></label>
-                <div class="input-group">
-                    <span class="input-group-text">₦</span>
-                    <input type="number" name="amount" class="form-control" placeholder="0.00" required min="0" step="0.01" value="{{ form.amount.value|default:'' }}">
+              <label for="{{ form.amount.id_for_label }}" class="form-label" style="font-weight: 500; color: var(--oya-text, #374151); font-size: 0.875rem;">
+                Amount <span style="color: var(--oya-danger, #ef4444);">*</span>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text" style="background: var(--oya-surface-alt, #f9fafb); border-color: var(--oya-border, #d1d5db); color: var(--oya-text-muted, #6b7280); font-weight: 600;">₦</span>
+                {{ form.amount }}
+              </div>
+              {% if form.amount.errors %}
+                <div class="invalid-feedback d-block" style="font-size: 0.875rem;">{{ form.amount.errors|join:", " }}</div>
+              {% endif %}
+              <div class="form-text" style="font-size: 0.75rem;">Enter amount in Naira (e.g., 25000.00)</div>
+            </div>
+
+            <!-- Category -->
+            <div class="mb-3">
+              <label for="{{ form.category.id_for_label }}" class="form-label" style="font-weight: 500; color: var(--oya-text, #374151); font-size: 0.875rem;">
+                Category <span style="color: var(--oya-danger, #ef4444);">*</span>
+              </label>
+              {{ form.category }}
+              {% if form.category.errors %}
+                <div class="invalid-feedback d-block" style="font-size: 0.875rem;">{{ form.category.errors|join:", " }}</div>
+              {% endif %}
+              
+              <!-- Quick Category Select -->
+              <div class="row g-2 mt-2" style="--bs-gutter-x:0.5rem;">
+                {% for value, label in form.category.field.choices %}
+                {% if value %}
+                <div class="col-6 col-md-4" style="padding:0.25rem;">
+                  <div class="category-card p-2 rounded text-center" onclick="document.getElementById('id_category').value='{{ value }}'; document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active')); this.classList.add('active');" data-value="{{ value }}">
+                    <div style="font-size: 0.75rem; font-weight: 500; color: var(--oya-text, #374151);">{{ label }}</div>
+                    {% if value == "ADMINISTRATIVE" %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0.25rem; color: var(--oya-primary, #2563eb);"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    {% elif value == "PROJECT" %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0.25rem; color: var(--oya-success, #10b981);"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    {% elif value == "EVENT" %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0.25rem; color: var(--oya-warning, #f59e0b);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    {% elif value == "MAINTENANCE" %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0.25rem; color: var(--oya-danger, #dc2626);"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                    {% elif value == "SALARY" %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0.25rem; color: var(--oya-info, #3b82f6);"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    {% else %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0.25rem; color: var(--oya-text-muted, #6b7280);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {% endif %}
+                  </div>
                 </div>
+                {% endif %}
+                {% endfor %}
+              </div>
             </div>
 
             <!-- Description -->
             <div class="mb-3">
-                <label class="form-label">Description <span class="text-danger">*</span></label>
-                <input type="text" name="description" class="form-control" placeholder="What was this expense for?" required value="{{ form.description.value|default:'' }}">
+              <label for="{{ form.description.id_for_label }}" class="form-label" style="font-weight: 500; color: var(--oya-text, #374151); font-size: 0.875rem;">
+                Description <span style="color: var(--oya-danger, #ef4444);">*</span>
+              </label>
+              {{ form.description }}
+              {% if form.description.errors %}
+                <div class="invalid-feedback d-block" style="font-size: 0.875rem;">{{ form.description.errors|join:", " }}</div>
+              {% endif %}
             </div>
 
-            <!-- Date -->
+            <!-- Receipt File -->
             <div class="mb-3">
-                <label class="form-label">Date <span class="text-danger">*</span></label>
-                <input type="date" name="date" class="form-control" required value="{{ form.date.value|date:'Y-m-d'|default:today }}">
+              <label class="form-label" style="font-weight: 500; color: var(--oya-text, #374151); font-size: 0.875rem;">
+                Receipt <span style="color: var(--oya-danger, #ef4444);">*</span>
+              </label>
+              <div class="receipt-dropzone" id="receiptDropzone" onclick="document.getElementById('id_receipt_file').click()">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--oya-text-muted, #9ca3af); margin-bottom: 0.5rem;">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <div style="font-size: 0.875rem; color: var(--oya-text, #374151); font-weight: 500;">Click to upload receipt</div>
+                <div style="font-size: 0.75rem; color: var(--oya-text-muted, #6b7280);">PDF, JPG, JPEG, PNG (max 10MB)</div>
+                <div id="fileName" style="font-size: 0.75rem; color: var(--oya-success, #10b981); font-weight: 500; margin-top: 0.5rem; display: none;"></div>
+              </div>
+              {{ form.receipt_file }}
+              {% if form.receipt_file.errors %}
+                <div class="invalid-feedback d-block" style="font-size: 0.875rem;">{{ form.receipt_file.errors|join:", " }}</div>
+              {% endif %}
             </div>
 
-            <!-- Receipt Upload (Required) -->
-            <div class="mb-4">
-                <label class="form-label">Receipt / Proof <span class="text-danger">*</span></label>
-                <input type="file" name="receipt" class="form-control" accept="image/*,.pdf" {% if not expense %}required{% endif %}>
-                {% if expense and expense.receipt %}
-                <div class="mt-2">
-                    <small class="text-muted">Current: <a href="{{ expense.receipt.url }}" target="_blank">View Receipt</a></small>
-                </div>
-                {% endif %}
-                <small class="text-muted">Upload image or PDF of receipt (mandatory)</small>
+            <!-- Submit Actions -->
+            <div class="d-flex gap-2 mt-4 pt-2" style="border-top: 1px solid var(--oya-border-light, #f3f4f6);">
+              <button type="submit" class="btn btn-danger" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                {{ action|default:"Save" }}
+              </button>
+              <a href="{% url 'finance:expense_list' %}" class="btn btn-outline-secondary">Cancel</a>
             </div>
-
-            <!-- Buttons -->
-            <div class="btn-group-mobile">
-                <button type="submit" class="btn btn-oya btn-oya-danger">
-                    <i class="fas fa-save me-2"></i> {% if expense %}Update{% else %}Save{% endif %} Record
-                </button>
-                <a href="{% url 'finance:expense_list' %}" class="btn btn-oya btn-oya-outline">
-                    <i class="fas fa-times me-2"></i> Cancel
-                </a>
-            </div>
-        </form>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Amount formatting
+    const amountInput = document.getElementById('id_amount');
+    if (amountInput) {
+      amountInput.addEventListener('input', function() {
+        let val = this.value;
+        val = val.replace(/[^0-9.]/g, '');
+        const parts = val.split('.');
+        if (parts.length > 2) {
+          val = parts[0] + '.' + parts.slice(1).join('');
+        }
+        if (parts[1] && parts[1].length > 2) {
+          val = parts[0] + '.' + parts[1].substring(0, 2);
+        }
+        this.value = val;
+      });
+      amountInput.classList.add('form-control');
+      amountInput.style.borderTopLeftRadius = '0';
+      amountInput.style.borderBottomLeftRadius = '0';
+    }
+
+    // Category styling
+    const categorySelect = document.getElementById('id_category');
+    if (categorySelect) {
+      categorySelect.classList.add('form-select');
+      categorySelect.addEventListener('change', function() {
+        document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+        const card = document.querySelector(`.category-card[data-value="${this.value}"]`);
+        if (card) card.classList.add('active');
+      });
+    }
+
+    // Description styling
+    const descInput = document.getElementById('id_description');
+    if (descInput) {
+      descInput.classList.add('form-control');
+    }
+
+    // Receipt file handling
+    const fileInput = document.getElementById('id_receipt_file');
+    const dropzone = document.getElementById('receiptDropzone');
+    const fileName = document.getElementById('fileName');
+
+    if (fileInput) {
+      fileInput.style.display = 'none';
+      
+      fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          dropzone.classList.add('has-file');
+          fileName.textContent = '✓ ' + this.files[0].name;
+          fileName.style.display = 'block';
+        }
+      });
+
+      // Drag and drop
+      dropzone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+      });
+      dropzone.addEventListener('dragleave', function() {
+        this.classList.remove('dragover');
+      });
+      dropzone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+        fileInput.files = e.dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+      });
+    }
+  });
+</script>
+
+
+<style>
+/* ─── Mobile Responsive Overrides ─── */
+@media (max-width: 768px) {
+  .page-header-left h1 { font-size: 1.375rem !important; }
+  .page-header-left p { font-size: 0.9375rem !important; }
+  .form-control, .form-select, .form-input, .form-textarea { font-size: 0.9375rem !important; padding: 0.625rem 0.875rem !important; }
+  .form-label { font-size: 0.9375rem !important; }
+  .form-error, .form-help { font-size: 0.8125rem !important; }
+  .card-header-title { font-size: 1rem !important; }
+  .card-header-subtitle { font-size: 0.875rem !important; }
+  .card-body { padding: 1.25rem !important; }
+  .btn { font-size: 0.875rem !important; padding: 0.625rem 1rem !important; }
+  .btn-sm { font-size: 0.8125rem !important; padding: 0.5rem 0.875rem !important; }
+  .btn-lg { font-size: 0.9375rem !important; padding: 0.75rem 1.25rem !important; }
+  .badge { font-size: 0.8125rem !important; padding: 0.3rem 0.5rem !important; }
+  .data-table { font-size: 0.9375rem !important; }
+  .data-table thead th, .data-table tbody td { padding: 0.75rem 1rem !important; }
+  .cell-name { font-size: 0.9375rem !important; }
+  .cell-muted { font-size: 0.875rem !important; }
+  .table-action-btn { width: 36px !important; height: 36px !important; }
+  .avatar { width: 40px !important; height: 40px !important; font-size: 0.875rem !important; }
+  .avatar-sm { width: 32px !important; height: 32px !important; font-size: 0.8125rem !important; }
+  .avatar-lg { width: 52px !important; height: 52px !important; font-size: 1.125rem !important; }
+  .kpi-value { font-size: 1.5rem !important; }
+  .kpi-label { font-size: 0.9375rem !important; }
+  .kpi-icon { width: 44px !important; height: 44px !important; }
+  .kpi-icon svg { width: 22px !important; height: 22px !important; }
+  .activity-text { font-size: 0.9375rem !important; }
+  .activity-time { font-size: 0.8125rem !important; }
+  .timeline-title { font-size: 0.9375rem !important; }
+  .timeline-desc { font-size: 0.875rem !important; }
+  .timeline-time { font-size: 0.8125rem !important; }
+  .meta-label { font-size: 0.8125rem !important; }
+  .meta-value { font-size: 0.9375rem !important; }
+  .detail-label { font-size: 0.8125rem !important; }
+  .detail-value { font-size: 0.9375rem !important; }
+  .filter-label { font-size: 0.875rem !important; }
+  .page-btn { min-width: 36px !important; height: 36px !important; font-size: 0.875rem !important; }
+  .modal-title { font-size: 1.125rem !important; }
+  .modal-header, .modal-body { padding: 1.25rem !important; }
+  .modal-footer { padding: 1rem 1.25rem !important; }
+  .dropdown-item { font-size: 0.875rem !important; padding: 0.625rem 1rem !important; }
+  .notification-title { font-size: 0.9375rem !important; }
+  .notification-desc { font-size: 0.875rem !important; }
+  .notification-time { font-size: 0.8125rem !important; }
+  .urgent-case-title { font-size: 0.9375rem !important; }
+  .urgent-case-meta { font-size: 0.8125rem !important; }
+  .settings-info h4 { font-size: 1rem !important; }
+  .settings-info p { font-size: 0.875rem !important; }
+  .quick-action-btn { font-size: 0.875rem !important; padding: 1rem 0.75rem !important; }
+  .quick-action-btn svg { width: 24px !important; height: 24px !important; }
+  .chart-card-title { font-size: 1rem !important; }
+  .chart-card-subtitle { font-size: 0.875rem !important; }
+  .tab-btn { font-size: 0.9375rem !important; padding: 0.625rem 1rem !important; }
+  .alert { font-size: 0.9375rem !important; padding: 1rem 1.25rem !important; }
+  .toast { font-size: 0.9375rem !important; padding: 1rem 1.25rem !important; }
+  .empty-state h3 { font-size: 1.0625rem !important; }
+  .empty-state p { font-size: 0.875rem !important; }
+  .toolbar-search input { font-size: 0.9375rem !important; }
+  .pagination-info { font-size: 0.875rem !important; }
+  .progress-bar-label { font-size: 0.875rem !important; }
+  .progress-bar-value { font-size: 0.875rem !important; }
+  .directory-info h4 { font-size: 0.9375rem !important; }
+  .directory-info p { font-size: 0.875rem !important; }
+  .stat-card-value { font-size: 1.375rem !important; }
+  .stat-card-label { font-size: 0.875rem !important; }
+  .stat-card-change { font-size: 0.8125rem !important; }
+  .finance-hero-amount { font-size: 1.75rem !important; }
+  .receipt-dropzone div { font-size: 0.875rem !important; }
+  .category-card div { font-size: 0.8125rem !important; }
+  .export-btn-text { font-size: 0.875rem !important; }
+  .chart-legend { font-size: 0.8125rem !important; }
+  .chart-tooltip { font-size: 0.875rem !important; }
+  .detail-badge { font-size: 0.8125rem !important; }
+  .mobile-nav-link { font-size: 0.875rem !important; }
+  .mobile-bottom-nav-item { font-size: 0.625rem !important; }
+  .mobile-logo-text { font-size: 0.9375rem !important; }
+  .search-dropdown .dropdown-item { font-size: 0.875rem !important; }
+  .search-dropdown .dropdown-header { font-size: 0.75rem !important; }
+  .form-card-title { font-size: 1rem !important; }
+  .form-card-header { padding: 1rem 1.25rem !important; }
+  .form-card-body { padding: 1.25rem !important; }
+  .form-actions .btn { width: 100% !important; justify-content: center !important; }
+  .form-row { grid-template-columns: 1fr !important; gap: 0 !important; }
+  .dashboard-grid-4, .dashboard-grid-3, .dashboard-grid-2 { grid-template-columns: 1fr !important; }
+  .detail-meta-grid { grid-template-columns: 1fr 1fr !important; }
+  .user-detail-grid { grid-template-columns: 1fr !important; }
+  .quick-actions { grid-template-columns: repeat(2, 1fr) !important; }
+  .directory-grid { grid-template-columns: 1fr !important; }
+  .profile-card { flex-direction: column !important; text-align: center !important; }
+  .filters-bar { flex-direction: column !important; align-items: stretch !important; gap: 0.75rem !important; padding: 1rem !important; }
+  .filters-bar form { flex-direction: column !important; align-items: stretch !important; }
+  .filter-group { width: 100% !important; }
+  .filter-group .form-control { width: 100% !important; }
+  .table-toolbar { flex-direction: column !important; align-items: stretch !important; }
+  .toolbar-search { max-width: 100% !important; }
+  .page-header { flex-direction: column !important; align-items: flex-start !important; }
+  .page-header-actions { width: 100% !important; flex-wrap: wrap !important; }
+  .card-header { flex-direction: column !important; align-items: flex-start !important; gap: 0.75rem !important; }
+  .card-header .btn { width: 100% !important; justify-content: center !important; }
+  .detail-header { flex-direction: column !important; align-items: flex-start !important; gap: 1rem !important; }
+  .detail-header .page-header-actions { width: 100% !important; flex-wrap: wrap !important; }
+  .detail-header .page-header-actions .btn { flex: 1 !important; min-width: 120px !important; }
+  .modal-footer { flex-direction: column !important; gap: 0.5rem !important; }
+  .modal-footer .btn { width: 100% !important; justify-content: center !important; }
+  .settings-row { flex-direction: column !important; align-items: flex-start !important; gap: 0.875rem !important; padding: 1.125rem 0 !important; }
+  .radio-group { flex-direction: column !important; align-items: flex-start !important; gap: 0.75rem !important; }
+  .location-section { padding: 0.875rem 1rem !important; }
+  .photo-preview img { max-width: 90px !important; max-height: 90px !important; }
+  .content-area { padding: 1rem !important; padding-bottom: 80px !important; }
+  .app-footer { padding-bottom: 80px !important; font-size: 0.875rem !important; }
+  .hide-mobile { display: none !important; }
+}
+
+@media (max-width: 480px) {
+  .page-header-left h1 { font-size: 1.25rem !important; }
+  .page-header-left p { font-size: 0.875rem !important; }
+  .form-control, .form-select, .form-input, .form-textarea { font-size: 0.875rem !important; padding: 0.5rem 0.75rem !important; }
+  .form-label { font-size: 0.875rem !important; }
+  .form-error, .form-help { font-size: 0.75rem !important; }
+  .card-header-title { font-size: 0.9375rem !important; }
+  .card-header-subtitle { font-size: 0.8125rem !important; }
+  .card-body { padding: 1rem !important; }
+  .btn { font-size: 0.8125rem !important; padding: 0.5rem 0.875rem !important; }
+  .btn-sm { font-size: 0.75rem !important; padding: 0.375rem 0.75rem !important; }
+  .btn-lg { font-size: 0.875rem !important; padding: 0.625rem 1rem !important; }
+  .badge { font-size: 0.75rem !important; padding: 0.25rem 0.4rem !important; }
+  .data-table { font-size: 0.875rem !important; }
+  .data-table thead th, .data-table tbody td { padding: 0.625rem 0.75rem !important; }
+  .cell-name { font-size: 0.875rem !important; }
+  .cell-muted { font-size: 0.8125rem !important; }
+  .table-action-btn { width: 32px !important; height: 32px !important; }
+  .avatar { width: 36px !important; height: 36px !important; font-size: 0.8125rem !important; }
+  .avatar-sm { width: 28px !important; height: 28px !important; font-size: 0.75rem !important; }
+  .avatar-lg { width: 48px !important; height: 48px !important; font-size: 1rem !important; }
+  .kpi-value { font-size: 1.375rem !important; }
+  .kpi-label { font-size: 0.875rem !important; }
+  .kpi-icon { width: 40px !important; height: 40px !important; }
+  .kpi-icon svg { width: 20px !important; height: 20px !important; }
+  .activity-text { font-size: 0.875rem !important; }
+  .activity-time { font-size: 0.75rem !important; }
+  .timeline-title { font-size: 0.875rem !important; }
+  .timeline-desc { font-size: 0.8125rem !important; }
+  .timeline-time { font-size: 0.75rem !important; }
+  .meta-label { font-size: 0.75rem !important; }
+  .meta-value { font-size: 0.875rem !important; }
+  .detail-label { font-size: 0.75rem !important; }
+  .detail-value { font-size: 0.875rem !important; }
+  .filter-label { font-size: 0.8125rem !important; }
+  .page-btn { min-width: 32px !important; height: 32px !important; font-size: 0.8125rem !important; }
+  .modal-title { font-size: 1rem !important; }
+  .modal-header, .modal-body { padding: 1rem !important; }
+  .modal-footer { padding: 0.75rem 1rem !important; }
+  .dropdown-item { font-size: 0.8125rem !important; padding: 0.5rem 0.875rem !important; }
+  .notification-title { font-size: 0.875rem !important; }
+  .notification-desc { font-size: 0.8125rem !important; }
+  .notification-time { font-size: 0.75rem !important; }
+  .urgent-case-title { font-size: 0.875rem !important; }
+  .urgent-case-meta { font-size: 0.75rem !important; }
+  .settings-info h4 { font-size: 0.9375rem !important; }
+  .settings-info p { font-size: 0.8125rem !important; }
+  .quick-action-btn { font-size: 0.8125rem !important; padding: 0.875rem 0.5rem !important; }
+  .quick-action-btn svg { width: 22px !important; height: 22px !important; }
+  .chart-card-title { font-size: 0.9375rem !important; }
+  .chart-card-subtitle { font-size: 0.8125rem !important; }
+  .tab-btn { font-size: 0.875rem !important; padding: 0.5rem 0.75rem !important; }
+  .alert { font-size: 0.875rem !important; padding: 0.75rem 1rem !important; }
+  .toast { font-size: 0.875rem !important; padding: 0.75rem 1rem !important; }
+  .empty-state h3 { font-size: 0.9375rem !important; }
+  .empty-state p { font-size: 0.8125rem !important; }
+  .toolbar-search input { font-size: 0.875rem !important; }
+  .pagination-info { font-size: 0.8125rem !important; }
+  .progress-bar-label { font-size: 0.8125rem !important; }
+  .progress-bar-value { font-size: 0.8125rem !important; }
+  .directory-info h4 { font-size: 0.875rem !important; }
+  .directory-info p { font-size: 0.8125rem !important; }
+  .stat-card-value { font-size: 1.25rem !important; }
+  .stat-card-label { font-size: 0.8125rem !important; }
+  .stat-card-change { font-size: 0.75rem !important; }
+  .finance-hero-amount { font-size: 1.5rem !important; }
+  .receipt-dropzone div { font-size: 0.8125rem !important; }
+  .category-card div { font-size: 0.75rem !important; }
+  .export-btn-text { font-size: 0.8125rem !important; }
+  .chart-legend { font-size: 0.75rem !important; }
+  .chart-tooltip { font-size: 0.8125rem !important; }
+  .detail-badge { font-size: 0.75rem !important; }
+  .mobile-nav-link { font-size: 0.8125rem !important; }
+  .mobile-bottom-nav-item { font-size: 0.5625rem !important; }
+  .mobile-logo-text { font-size: 0.875rem !important; }
+  .search-dropdown .dropdown-item { font-size: 0.8125rem !important; }
+  .search-dropdown .dropdown-header { font-size: 0.6875rem !important; }
+  .form-card-title { font-size: 0.9375rem !important; }
+  .form-card-header { padding: 0.875rem 1rem !important; }
+  .form-card-body { padding: 1rem !important; }
+  .card-footer { padding: 0.75rem 1rem !important; }
+  .detail-meta-grid { grid-template-columns: 1fr !important; }
+  .content-area { padding: 0.75rem !important; padding-bottom: 72px !important; }
+  .app-footer { padding: 0.875rem 1rem !important; padding-bottom: 72px !important; }
+}
+
+@media (max-width: 360px) {
+  .page-header-left h1 { font-size: 1.125rem !important; }
+  .page-header-left p { font-size: 0.8125rem !important; }
+  .form-control, .form-select, .form-input, .form-textarea { font-size: 0.8125rem !important; padding: 0.375rem 0.625rem !important; }
+  .form-label { font-size: 0.8125rem !important; }
+  .card-header-title { font-size: 0.875rem !important; }
+  .card-header-subtitle { font-size: 0.75rem !important; }
+  .btn { font-size: 0.75rem !important; padding: 0.375rem 0.75rem !important; }
+  .btn-sm { font-size: 0.6875rem !important; padding: 0.25rem 0.625rem !important; }
+  .badge { font-size: 0.6875rem !important; padding: 0.2rem 0.35rem !important; }
+  .data-table { font-size: 0.8125rem !important; }
+  .data-table thead th, .data-table tbody td { padding: 0.5rem 0.625rem !important; }
+  .avatar { width: 32px !important; height: 32px !important; font-size: 0.75rem !important; }
+  .kpi-value { font-size: 1.25rem !important; }
+  .kpi-label { font-size: 0.8125rem !important; }
+  .activity-text { font-size: 0.8125rem !important; }
+  .activity-time { font-size: 0.6875rem !important; }
+  .page-btn { min-width: 28px !important; height: 28px !important; font-size: 0.75rem !important; }
+  .modal-title { font-size: 0.9375rem !important; }
+  .dropdown-item { font-size: 0.75rem !important; padding: 0.375rem 0.75rem !important; }
+  .notification-title { font-size: 0.8125rem !important; }
+  .notification-desc { font-size: 0.75rem !important; }
+  .quick-action-btn { font-size: 0.75rem !important; }
+  .tab-btn { font-size: 0.8125rem !important; padding: 0.4rem 0.625rem !important; }
+  .alert { font-size: 0.8125rem !important; }
+  .toast { font-size: 0.8125rem !important; }
+  .empty-state h3 { font-size: 0.875rem !important; }
+  .empty-state p { font-size: 0.75rem !important; }
+  .content-area { padding: 0.625rem !important; padding-bottom: 64px !important; }
+  .app-footer { padding: 0.75rem !important; padding-bottom: 64px !important; font-size: 0.75rem !important; }
+}
+</style>
+
 {% endblock %}
