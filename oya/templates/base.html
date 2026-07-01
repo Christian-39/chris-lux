@@ -132,7 +132,7 @@
         }
 
         /* ============================================
-           BOTTOM NAVBAR (Mobile only, hidden on login)
+           BOTTOM NAVBAR (Mobile only)
            ============================================ */
         .bottom-nav {
             position: fixed;
@@ -536,78 +536,6 @@
         }
 
         /* ============================================
-           LOGIN PAGE STYLES
-           ============================================ */
-        .login-page {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--oya-green) 0%, var(--oya-green-dark) 100%);
-            padding: 1.5rem;
-        }
-
-        .login-card {
-            background: white;
-            border-radius: 24px;
-            padding: 2rem 1.5rem;
-            width: 100%;
-            max-width: 380px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-
-        .login-logo {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 4px solid var(--oya-gold);
-            margin-bottom: 1rem;
-            background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        }
-
-        .login-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--oya-gray-800);
-            margin-bottom: 0.25rem;
-        }
-
-        .login-subtitle {
-            font-size: 0.875rem;
-            color: var(--oya-gray-600);
-            margin-bottom: 1.5rem;
-        }
-
-        .login-form .form-control {
-            text-align: center;
-            font-size: 1.1rem;
-            letter-spacing: 2px;
-        }
-
-        .login-form .form-control::placeholder {
-            letter-spacing: normal;
-            font-size: 0.95rem;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 0.875rem;
-            font-size: 1rem;
-            border-radius: 12px;
-            margin-top: 0.5rem;
-        }
-
-        .login-footer {
-            margin-top: 1.5rem;
-            font-size: 0.75rem;
-            color: var(--oya-gray-600);
-        }
-
-        /* ============================================
            EMPTY STATES
            ============================================ */
         .empty-state {
@@ -805,15 +733,6 @@
                 height: 36px;
             }
 
-            .login-logo {
-                width: 80px;
-                height: 80px;
-            }
-
-            .login-card {
-                padding: 1.5rem 1.25rem;
-            }
-
             .bottom-nav-item {
                 font-size: 0.6rem;
                 min-width: 48px;
@@ -866,25 +785,25 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    {% if user.is_authenticated %}
-        <!-- Top Navbar -->
-        <nav class="navbar navbar-expand-lg oya-navbar">
-            <div class="container-fluid px-3">
-                <a class="navbar-brand" href="{% url 'dashboard:dashboard' %}">
-                    {% if system_settings and system_settings.logo %}
-                        <img src="{{ system_settings.logo.url }}" alt="OYA Logo" class="oya-logo">
-                    {% else %}
-                        <img src="{% static 'images/oya-logo.png' %}" alt="OYA Logo" class="oya-logo">
-                    {% endif %}
-                    <span>OYA</span>
-                </a>
-                
-                <button class="navbar-toggler oya-navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNavbar">
-                    <i class="fas fa-bars"></i>
-                </button>
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg oya-navbar">
+        <div class="container-fluid px-3">
+            <a class="navbar-brand" href="{% url 'dashboard:dashboard' %}">
+                {% if system_settings and system_settings.logo %}
+                    <img src="{{ system_settings.logo.url }}" alt="OYA Logo" class="oya-logo">
+                {% else %}
+                    <img src="{% static 'images/oya-logo.png' %}" alt="OYA Logo" class="oya-logo">
+                {% endif %}
+                <span>OYA</span>
+            </a>
+            
+            <button class="navbar-toggler oya-navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNavbar">
+                <i class="fas fa-bars"></i>
+            </button>
 
-                <div class="collapse navbar-collapse" id="topNavbar">
-                    <ul class="navbar-nav ms-auto align-items-lg-center">
+            <div class="collapse navbar-collapse" id="topNavbar">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    {% if user.is_authenticated %}
                         {% if user.has_admin_access or user.has_executive_access %}
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.namespace == 'dashboard' %}active{% endif %}" href="{% url 'dashboard:dashboard' %}">
@@ -945,64 +864,57 @@
                                 </li>
                             </ul>
                         </li>
-                    </ul>
-                </div>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:login' %}">
+                                <i class="fas fa-sign-in-alt me-1"></i> Sign In
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
             </div>
-        </nav>
+        </div>
+    </nav>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-oya alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show animate-fade-in" role="alert">
-                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-            
-            {% block content %}{% endblock %}
-        </main>
+    <!-- Main Content -->
+    <main class="main-content">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-oya alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show animate-fade-in" role="alert">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
 
-        <!-- Bottom Navbar (Mobile only) -->
-        <nav class="bottom-nav d-lg-none">
-            <a href="{% url 'dashboard:dashboard' %}" class="bottom-nav-item {% if request.resolver_match.namespace == 'dashboard' %}active{% endif %}">
-                <i class="fas fa-chart-line"></i>
-                <span>Home</span>
-            </a>
-            <a href="{% url 'members:member_list' %}" class="bottom-nav-item {% if request.resolver_match.namespace == 'members' %}active{% endif %}">
-                <i class="fas fa-users"></i>
-                <span>Members</span>
-            </a>
-            <a href="{% url 'finance:summary' %}" class="bottom-nav-item {% if request.resolver_match.namespace == 'finance' %}active{% endif %}">
-                <i class="fas fa-wallet"></i>
-                <span>Finance</span>
-            </a>
-            <a href="{% url 'accounts:profile' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
-                <i class="fas fa-user"></i>
-                <span>Profile</span>
-            </a>
-            <a href="#" class="bottom-nav-item" data-bs-toggle="collapse" data-bs-target="#topNavbar">
-                <i class="fas fa-bars"></i>
-                <span>Menu</span>
-            </a>
-        </nav>
-    {% else %}
-        <!-- NOT AUTHENTICATED: No navbar, no bottom nav -->
-        <main>
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-oya alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert" style="position: fixed; top: 1rem; left: 1rem; right: 1rem; z-index: 9999; border-radius: 12px;">
-                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-            
-            {% block content %}{% endblock %}
-        </main>
+    <!-- Bottom Navbar (Mobile only, only for authenticated users) -->
+    {% if user.is_authenticated %}
+    <nav class="bottom-nav d-lg-none">
+        <a href="{% url 'dashboard:dashboard' %}" class="bottom-nav-item {% if request.resolver_match.namespace == 'dashboard' %}active{% endif %}">
+            <i class="fas fa-chart-line"></i>
+            <span>Home</span>
+        </a>
+        <a href="{% url 'members:member_list' %}" class="bottom-nav-item {% if request.resolver_match.namespace == 'members' %}active{% endif %}">
+            <i class="fas fa-users"></i>
+            <span>Members</span>
+        </a>
+        <a href="{% url 'finance:summary' %}" class="bottom-nav-item {% if request.resolver_match.namespace == 'finance' %}active{% endif %}">
+            <i class="fas fa-wallet"></i>
+            <span>Finance</span>
+        </a>
+        <a href="{% url 'accounts:profile' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+        <a href="#" class="bottom-nav-item" data-bs-toggle="collapse" data-bs-target="#topNavbar">
+            <i class="fas fa-bars"></i>
+            <span>Menu</span>
+        </a>
+    </nav>
     {% endif %}
 
     <!-- Bootstrap JS -->
