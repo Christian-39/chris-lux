@@ -788,7 +788,7 @@
     <!-- Top Navbar -->
     <nav class="navbar navbar-expand-lg oya-navbar">
         <div class="container-fluid px-3">
-            <a class="navbar-brand" href="{% url 'dashboard:dashboard' %}">
+            <a class="navbar-brand" href="{% url 'dashboard:index' %}">
                 {% if system_settings and system_settings.logo %}
                     <img src="{{ system_settings.logo.url }}" alt="OYA Logo" class="oya-logo">
                 {% else %}
@@ -806,7 +806,7 @@
                     {% if user.is_authenticated %}
                         {% if user.has_admin_access or user.has_executive_access %}
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.namespace == 'dashboard' %}active{% endif %}" href="{% url 'dashboard:admin_dashboard' %}">
+                            <a class="nav-link {% if request.resolver_match.namespace == 'dashboard' %}active{% endif %}" href="{% url 'dashboard:index' %}">
                                 <i class="fas fa-chart-line me-1"></i> Dashboard
                             </a>
                         </li>
@@ -894,7 +894,7 @@
     <!-- Bottom Navbar (Mobile only, only for authenticated users) -->
     {% if user.is_authenticated %}
     <nav class="bottom-nav d-lg-none">
-        <a href="{% url 'dashboard:dashboard' %}" class="bottom-nav-item {% if request.resolver_match.namespace == 'dashboard' %}active{% endif %}">
+        <a href="{% url 'dashboard:index' %}" class="bottom-nav-item {% if request.resolver_match.namespace == 'dashboard' %}active{% endif %}">
             <i class="fas fa-chart-line"></i>
             <span>Home</span>
         </a>
