@@ -1,232 +1,106 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ user_obj.full_name|default:user_obj.serial_number }}<style>
-@media (max-width: 768px) {
-  .user-detail-grid { grid-template-columns: 1fr !important; }
-  .detail-meta-grid { grid-template-columns: 1fr 1fr !important; }
-  .card-header-title { font-size: 1rem; }
-  .card-header-subtitle { font-size: 0.875rem; }
-  .detail-avatar { width: 64px !important; height: 64px !important; }
-  .meta-label { font-size: 0.8125rem; }
-  .meta-value { font-size: 0.9375rem; }
-  .page-header-left h1 { font-size: 1.375rem; }
-  .page-header-left p { font-size: 0.9375rem; }
-  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
-  .badge { font-size: 0.8125rem; }
-}
-
-@media (max-width: 480px) {
-  .detail-meta-grid { grid-template-columns: 1fr !important; }
-  .meta-label { font-size: 0.75rem; }
-  .meta-value { font-size: 0.875rem; }
-  .page-header-left h1 { font-size: 1.25rem; }
-  .page-header-left p { font-size: 0.875rem; }
-}
-</style>
-
-{% endblock %}
-{% block page_title %}User Profile<style>
-@media (max-width: 768px) {
-  .user-detail-grid { grid-template-columns: 1fr !important; }
-  .detail-meta-grid { grid-template-columns: 1fr 1fr !important; }
-  .card-header-title { font-size: 1rem; }
-  .card-header-subtitle { font-size: 0.875rem; }
-  .detail-avatar { width: 64px !important; height: 64px !important; }
-  .meta-label { font-size: 0.8125rem; }
-  .meta-value { font-size: 0.9375rem; }
-  .page-header-left h1 { font-size: 1.375rem; }
-  .page-header-left p { font-size: 0.9375rem; }
-  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
-  .badge { font-size: 0.8125rem; }
-}
-
-@media (max-width: 480px) {
-  .detail-meta-grid { grid-template-columns: 1fr !important; }
-  .meta-label { font-size: 0.75rem; }
-  .meta-value { font-size: 0.875rem; }
-  .page-header-left h1 { font-size: 1.25rem; }
-  .page-header-left p { font-size: 0.875rem; }
-}
-</style>
-
-{% endblock %}
-{% block breadcrumb %}Users<style>
-@media (max-width: 768px) {
-  .user-detail-grid { grid-template-columns: 1fr !important; }
-  .detail-meta-grid { grid-template-columns: 1fr 1fr !important; }
-  .card-header-title { font-size: 1rem; }
-  .card-header-subtitle { font-size: 0.875rem; }
-  .detail-avatar { width: 64px !important; height: 64px !important; }
-  .meta-label { font-size: 0.8125rem; }
-  .meta-value { font-size: 0.9375rem; }
-  .page-header-left h1 { font-size: 1.375rem; }
-  .page-header-left p { font-size: 0.9375rem; }
-  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
-  .badge { font-size: 0.8125rem; }
-}
-
-@media (max-width: 480px) {
-  .detail-meta-grid { grid-template-columns: 1fr !important; }
-  .meta-label { font-size: 0.75rem; }
-  .meta-value { font-size: 0.875rem; }
-  .page-header-left h1 { font-size: 1.25rem; }
-  .page-header-left p { font-size: 0.875rem; }
-}
-</style>
-
-{% endblock %}
+{% block title %}{{ user_obj.get_full_name|default:user_obj.serial_number }}{% endblock %}
 
 {% block content %}
-
-<!-- Page Header -->
 <div class="page-header">
-  <div class="page-header-left">
-    <h1>{{ user_obj.full_name|default:"No Name" }}</h1>
-    <p>{{ user_obj.serial_number }} &middot; {{ user_obj.get_role_display|default:user_obj.role }}</p>
-  </div>
-  <div class="page-header-actions">
-    <a href="{% url 'accounts:user_list' %}" class="btn btn-secondary">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-      Back to Users
-    </a>
-    {% if user.is_staff and user_obj.id != request.user.id %}
-    <a href="{% url 'accounts:user_update' user_obj.id %}" class="btn btn-primary">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      Edit User
-    </a>
-    {% endif %}
-  </div>
+    <h1>User Details</h1>
+    <p>{{ user_obj.serial_number }}</p>
 </div>
 
-<div style="display:grid;grid-template-columns:minmax(250px,1fr);gap:1.5rem;">
-  <!-- Responsive: stacks on mobile -->
-  <style>@media(min-width:768px){.user-detail-grid{grid-template-columns:300px 1fr!important;}}</style>
-  <div class="user-detail-grid" style="display:grid;grid-template-columns:1fr;gap:1.5rem;">
-  <!-- Left: Profile Card -->
-  <div class="card" style="height:fit-content;">
-    <div class="card-body" style="text-align:center;padding:2rem;">
-      <div class="avatar" style="width:clamp(72px,20vw,100px);height:clamp(72px,20vw,100px);margin:0 auto 1rem;font-size:clamp(1.5rem,5vw,2rem);background:var(--oya-primary);color:#fff;overflow:hidden;cursor:pointer;" onclick="openImagePreview('{% if user_obj.photo and user_obj.photo.name %}{{ user_obj.photo.url }}{% elif user_obj.member and user_obj.member.photo and user_obj.member.photo.name %}{{ user_obj.member.photo.url }}{% endif %}', '{{ user_obj.full_name|default:user_obj.serial_number }}')">
-        {% if user_obj.photo and user_obj.photo.name %}
-          <img src="{{ user_obj.photo.url }}" alt="{{ user_obj.full_name }}" style="width:100%;height:100%;object-fit:cover;">
-        {% elif user_obj.member and user_obj.member.photo and user_obj.member.photo.name %}
-          <img src="{{ user_obj.member.photo.url }}" alt="{{ user_obj.full_name }}" style="width:100%;height:100%;object-fit:cover;">
-        {% else %}
-          {{ user_obj.get_initials|default:user_obj.serial_number|first }}
-        {% endif %}
-      </div>
-      <h2 style="font-size:clamp(1rem,3vw,1.25rem);margin-bottom:0.25rem;">{{ user_obj.full_name|default:"No Name" }}</h2>
-      <p style="color:var(--oya-text-muted);margin-bottom:1rem;">{{ user_obj.serial_number }}</p>
-      <span class="badge badge-{% if user_obj.role == "ADMIN" %}danger{% elif user_obj.role == "EXECUTIVE" %}primary{% elif user_obj.role == "FLOOR_MEMBER" %}success{% else %}secondary{% endif %}" style="margin-bottom:0.5rem;display:inline-block;">
-        {{ user_obj.get_role_display|default:user_obj.role }}
-      </span>
-      <br>
-      <span class="badge badge-{% if user_obj.is_active %}success{% else %}danger{% endif %}">
-        {% if user_obj.is_active %}Active{% else %}Inactive{% endif %}
-      </span>
-    </div>
-  </div>
-
-  <!-- Right: Details -->
-  <div>
-    <!-- Account Info -->
-    <div class="card" style="margin-bottom:1.5rem;">
-      <div class="card-header">
-        <div>
-          <div class="card-header-title">Account Information</div>
-          <div class="card-header-subtitle">User account details and metadata</div>
+<div class="oya-card animate-fade-in mb-3">
+    <div class="oya-card-body text-center">
+        <div class="mb-3">
+            {% if user_obj.member and user_obj.member.photo %}
+                <img src="{{ user_obj.member.photo.url }}" alt="{{ user_obj.get_full_name }}" class="img-avatar-xl">
+            {% else %}
+                <div class="img-avatar-xl d-inline-flex align-items-center justify-content-center bg-success text-white" style="font-size: 2.5rem; font-weight: 700;">
+                    {{ user_obj.get_initials|default:user_obj.serial_number|first|upper }}
+                </div>
+            {% endif %}
         </div>
-      </div>
-      <div class="card-body">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:1rem;">
-          <div>
-            <div style="font-size:0.75rem;color:var(--oya-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.25rem;">Full Name</div>
-            <div style="font-weight:600;color:var(--oya-text-primary);">{{ user_obj.full_name|default:"—" }}</div>
-          </div>
-          <div>
-            <div style="font-size:0.75rem;color:var(--oya-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.25rem;">Serial Number</div>
-            <div style="font-weight:600;color:var(--oya-text-primary);">{{ user_obj.serial_number }}</div>
-          </div>
-          <div>
-            <div style="font-size:0.75rem;color:var(--oya-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.25rem;">Phone</div>
-            <div style="font-weight:600;color:var(--oya-text-primary);">{{ user_obj.phone|default:"—" }}</div>
-          </div>
-          <div>
-            <div style="font-size:0.75rem;color:var(--oya-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.25rem;">State</div>
-            <div style="font-weight:600;color:var(--oya-text-primary);">{{ user_obj.state|default:"—" }}</div>
-          </div>
-          <div>
-            <div style="font-size:0.75rem;color:var(--oya-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.25rem;">Role</div>
-            <div style="font-weight:600;color:var(--oya-text-primary);">{{ user_obj.get_role_display|default:user_obj.role }}</div>
-          </div>
-          <div>
-            <div style="font-size:0.75rem;color:var(--oya-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.25rem;">Status</div>
-            <div style="font-weight:600;color:var(--oya-text-primary);">
-              <span class="badge badge-{% if user_obj.is_active %}success{% else %}danger{% endif %}">
-                {% if user_obj.is_active %}Active{% else %}Inactive{% endif %}
-              </span>
+        
+        <h3 class="mb-1">{{ user_obj.get_full_name|default:user_obj.serial_number }}</h3>
+        <p class="mb-2">
+            <span class="badge-oya {% if user_obj.role == 'ADMIN' %}badge-oya-danger{% elif user_obj.role == 'EXECUTIVE' %}badge-oya-info{% else %}badge-oya-success{% endif %}">
+                {{ user_obj.get_role_display }}
+            </span>
+        </p>
+        <p class="text-muted mb-0">
+            <i class="fas fa-circle {% if user_obj.is_active %}text-success{% else %}text-danger{% endif %} me-1" style="font-size: 0.5rem;"></i>
+            {% if user_obj.is_active %}Active{% else %}Inactive{% endif %}
+        </p>
+    </div>
+</div>
+
+<div class="oya-card mb-3">
+    <div class="oya-card-header">
+        <h5><i class="fas fa-info-circle me-2"></i>Account Info</h5>
+    </div>
+    <div class="oya-card-body p-0">
+        <div class="list-group-oya">
+            <div class="list-group-item">
+                <span class="text-muted"><i class="fas fa-id-card me-2"></i> Serial Number</span>
+                <span class="fw-semibold">{{ user_obj.serial_number }}</span>
             </div>
-          </div>
-          <div>
-            <div style="font-size:0.75rem;color:var(--oya-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.25rem;">Date Joined</div>
-            <div style="font-weight:600;color:var(--oya-text-primary);">{{ user_obj.date_joined|date:"M j, Y h:i A"|default:"—" }}</div>
-          </div>
-          <div>
-            <div style="font-size:0.75rem;color:var(--oya-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.25rem;">Last Login</div>
-            <div style="font-weight:600;color:var(--oya-text-primary);">{{ user_obj.last_login|date:"M j, Y h:i A"|default:"Never" }}</div>
-          </div>
+            <div class="list-group-item">
+                <span class="text-muted"><i class="fas fa-envelope me-2"></i> Email</span>
+                <span class="fw-semibold">{{ user_obj.email|default:"Not set" }}</span>
+            </div>
+            <div class="list-group-item">
+                <span class="text-muted"><i class="fas fa-phone me-2"></i> Phone</span>
+                <span class="fw-semibold">{{ user_obj.phone|default:"Not set" }}</span>
+            </div>
+            <div class="list-group-item">
+                <span class="text-muted"><i class="fas fa-calendar me-2"></i> Joined</span>
+                <span class="fw-semibold">{{ user_obj.date_joined|date:"M d, Y" }}</span>
+            </div>
+            <div class="list-group-item">
+                <span class="text-muted"><i class="fas fa-clock me-2"></i> Last Login</span>
+                <span class="fw-semibold">{{ user_obj.last_login|date:"M d, Y H:i"|default:"Never" }}</span>
+            </div>
         </div>
-      </div>
     </div>
-
-    <!-- Actions Card -->
-    {% if user.is_staff and user_obj.id != request.user.id %}
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-header-title">Admin Actions</div>
-          <div class="card-header-subtitle">Manage this user account</div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;">
-          <a href="{% url 'accounts:user_update' user_obj.id %}" class="btn btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Edit User
-          </a>
-          <a href="{% url 'accounts:user_delete' user_obj.id %}" class="btn btn-danger">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            Delete User
-          </a>
-        </div>
-      </div>
-    </div>
-    {% endif %}
-  </div>
 </div>
 
-<style>
-@media (max-width: 768px) {
-  .user-detail-grid { grid-template-columns: 1fr !important; }
-  .detail-meta-grid { grid-template-columns: 1fr 1fr !important; }
-  .card-header-title { font-size: 1rem; }
-  .card-header-subtitle { font-size: 0.875rem; }
-  .detail-avatar { width: 64px !important; height: 64px !important; }
-  .meta-label { font-size: 0.8125rem; }
-  .meta-value { font-size: 0.9375rem; }
-  .page-header-left h1 { font-size: 1.375rem; }
-  .page-header-left p { font-size: 0.9375rem; }
-  .btn { font-size: 0.875rem; padding: 0.625rem 1rem; }
-  .badge { font-size: 0.8125rem; }
-}
+{% if user_obj.member %}
+<div class="oya-card mb-3">
+    <div class="oya-card-header">
+        <h5><i class="fas fa-id-badge me-2"></i>Member Record</h5>
+    </div>
+    <div class="oya-card-body">
+        <div class="d-flex align-items-center gap-3 mb-3">
+            {% if user_obj.member.photo %}
+                <img src="{{ user_obj.member.photo.url }}" alt="{{ user_obj.member.full_name }}" class="img-avatar">
+            {% else %}
+                <div class="img-avatar d-flex align-items-center justify-content-center bg-success text-white" style="font-size: 0.875rem; font-weight: 600;">
+                    {{ user_obj.member.get_initials|default:user_obj.member.full_name|first|upper }}
+                </div>
+            {% endif %}
+            <div>
+                <h6 class="mb-0">{{ user_obj.member.full_name }}</h6>
+                <small class="text-muted">{{ user_obj.member.clan.name|default:"No Clan" }}</small>
+            </div>
+        </div>
+        <a href="{% url 'members:member_detail' user_obj.member.pk %}" class="btn btn-oya btn-oya-outline btn-oya-sm w-100">
+            <i class="fas fa-external-link-alt me-2"></i> View Full Member Record
+        </a>
+    </div>
+</div>
+{% endif %}
 
-@media (max-width: 480px) {
-  .detail-meta-grid { grid-template-columns: 1fr !important; }
-  .meta-label { font-size: 0.75rem; }
-  .meta-value { font-size: 0.875rem; }
-  .page-header-left h1 { font-size: 1.25rem; }
-  .page-header-left p { font-size: 0.875rem; }
-}
-</style>
-
+<div class="btn-group-mobile">
+    {% if user.has_admin_access %}
+    <a href="{% url 'accounts:user_update' user_obj.pk %}" class="btn btn-oya btn-oya-secondary">
+        <i class="fas fa-edit me-2"></i> Edit User
+    </a>
+    <a href="{% url 'accounts:pin_reset' %}?user={{ user_obj.pk }}" class="btn btn-oya btn-oya-gold">
+        <i class="fas fa-key me-2"></i> Reset PIN
+    </a>
+    {% endif %}
+    <a href="{% url 'accounts:user_list' %}" class="btn btn-oya btn-oya-outline">
+        <i class="fas fa-arrow-left me-2"></i> Back to List
+    </a>
+</div>
 {% endblock %}
