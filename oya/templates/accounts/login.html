@@ -1,11 +1,184 @@
-{% extends 'base.html' %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a5f2a">
+    <title>Login | Okpo Youths Association</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --oya-green: #1a5f2a;
+            --oya-green-dark: #124a1f;
+            --oya-gold: #d4a843;
+        }
 
-{% block title %}Login{% endblock %}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block content %}
-<div class="login-page">
-    <div class="login-card animate-fade-in">
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--oya-green) 0%, var(--oya-green-dark) 100%);
+            padding: 1.5rem;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem 1.5rem;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .login-logo {
+            width: 110px;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid var(--oya-gold);
+            margin-bottom: 1rem;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .login-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #343a40;
+            margin-bottom: 0.25rem;
+        }
+
+        .login-subtitle {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            border: 1.5px solid #dee2e6;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            min-height: 48px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .form-control:focus {
+            border-color: var(--oya-green);
+            box-shadow: 0 0 0 3px rgba(26, 95, 42, 0.15);
+        }
+
+        .form-control::placeholder {
+            letter-spacing: normal;
+            font-size: 0.95rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #343a40;
+            margin-bottom: 0.4rem;
+            text-align: left;
+            display: block;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.875rem;
+            font-size: 1rem;
+            border-radius: 12px;
+            margin-top: 0.5rem;
+            background: linear-gradient(135deg, var(--oya-green) 0%, var(--oya-green-dark) 100%);
+            color: white;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 2px 8px rgba(26, 95, 42, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(26, 95, 42, 0.4);
+        }
+
+        .login-footer {
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .alert-fixed {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            right: 1rem;
+            z-index: 9999;
+            border-radius: 12px;
+            border: none;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 360px) {
+            .login-logo {
+                width: 90px;
+                height: 90px;
+            }
+            .login-card {
+                padding: 1.5rem 1.25rem;
+            }
+            .login-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show alert-fixed" role="alert">
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="login-card">
         <!-- Logo - Now larger -->
         {% if system_settings and system_settings.logo %}
             <img src="{{ system_settings.logo.url }}" alt="OYA Logo" class="login-logo">
@@ -16,20 +189,20 @@
         <h1 class="login-title">Okpo Youths Association</h1>
         <p class="login-subtitle">Sign in to your account</p>
         
-        <form method="post" action="{% url 'accounts:login' %}" class="login-form">
+        <form method="post" action="{% url 'accounts:login' %}" novalidate>
             {% csrf_token %}
             
-            <div class="mb-3">
+            <div class="mb-3 text-start">
                 <label class="form-label">Serial Number</label>
                 <input type="text" name="serial_number" class="form-control" placeholder="OYA-2026-0001" required autofocus autocomplete="off">
             </div>
             
-            <div class="mb-3">
+            <div class="mb-3 text-start">
                 <label class="form-label">PIN</label>
                 <input type="password" name="pin" class="form-control" placeholder="Enter 6-digit PIN" required maxlength="6" inputmode="numeric" pattern="[0-9]*">
             </div>
             
-            <button type="submit" class="btn btn-oya btn-oya-primary login-btn">
+            <button type="submit" class="login-btn">
                 <i class="fas fa-sign-in-alt me-2"></i> Sign In
             </button>
         </form>
@@ -39,5 +212,18 @@
             <p class="mb-0">Forgot PIN? Contact an Admin</p>
         </div>
     </div>
-</div>
-{% endblock %}
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
