@@ -66,7 +66,7 @@
 <!-- Table -->
 <div class="card">
   <div class="table-container" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-    <table class="data-table" id="taskforceTable" data-sortable>
+    <table class="data-table" id="taskforceTable" data-sortable style="white-space:nowrap;">
       <thead>
         <tr>
           <th style="width:50px;"></th>
@@ -82,7 +82,7 @@
       <tbody>
         {% for tf in taskforce %}
         <tr>
-          <td>
+          <td style="white-space:nowrap;">
             {% if tf.member.photo %}
               <img src="{{ tf.member.photo.url }}" alt="" class="avatar avatar-sm" style="object-fit:cover;">
             {% else %}
@@ -91,20 +91,20 @@
               </div>
             {% endif %}
           </td>
-          <td><span class="cell-name" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">{{ tf.member.full_name }}</span></td>
-          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);">{{ tf.member.serial_number }}</td>
-          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);">{{ tf.member.phone|default:"N/A" }}</td>
-          <td>{{ tf.member.umu_nna_clan.name|default:"N/A" }}</td>
-          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);">{{ tf.assigned_date|date:"M d, Y" }}</td>
-          <td>
+          <td style="white-space:nowrap;"><span class="cell-name" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);white-space:nowrap;">{{ tf.member.full_name }}</span></td>
+          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ tf.member.serial_number }}</td>
+          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ tf.member.phone|default:"N/A" }}</td>
+          <td style="white-space:nowrap;">{{ tf.member.umu_nna_clan.name|default:"N/A" }}</td>
+          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ tf.assigned_date|date:"M d, Y" }}</td>
+          <td style="white-space:nowrap;">
             {% if tf.is_active %}
-              <span class="badge badge-success" style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);">Active</span>
+              <span class="badge badge-success" style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);white-space:nowrap;">Active</span>
             {% else %}
-              <span class="badge badge-secondary">Inactive</span>
+              <span class="badge badge-secondary" style="white-space:nowrap;">Inactive</span>
             {% endif %}
           </td>
-          <td>
-            <div class="table-actions" style="flex-wrap:wrap;">
+          <td style="white-space:nowrap;">
+            <div class="table-actions" style="flex-wrap:nowrap;gap:0.25rem;">
               {% if tf.is_active %}
                 <form method="post" action="{% url 'operations:taskforce_remove' pk=tf.pk %}" style="display:inline;" onsubmit="return confirm('Remove {{ tf.member.full_name }} from task force?');">
                   {% csrf_token %}
