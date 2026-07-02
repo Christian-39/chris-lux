@@ -103,8 +103,8 @@
     </div>
   </div>
   <div class="card-body" style="padding:0;">
-    <div class="table-container">
-      <table class="data-table" id="duesTable">
+    <div class="table-container" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <table class="data-table" id="duesTable" style="white-space:nowrap;">
         <thead>
           <tr>
             <th style="width:40px;"><input type="checkbox" class="form-check-input" id="selectAllDues"></th>
@@ -120,23 +120,23 @@
         <tbody>
           {% for income in dues_incomes %}
           <tr>
-            <td><input type="checkbox" class="form-check-input row-checkbox" value="{{ income.pk }}"></td>
-            <td class="cell-muted">{{ income.created_at|date:"M d, Y" }}</td>
-            <td>
+            <td style="white-space:nowrap;"><input type="checkbox" class="form-check-input row-checkbox" value="{{ income.pk }}"></td>
+            <td class="cell-muted" style="white-space:nowrap;">{{ income.created_at|date:"M d, Y" }}</td>
+            <td style="white-space:nowrap;">
               {% if income.dues_payment %}
-                <a href="{% url 'finance:member_dues_detail' member_id=income.dues_payment.member_id %}" class="cell-name" style="color:var(--oya-primary);">
+                <a href="{% url 'finance:member_dues_detail' member_id=income.dues_payment.member_id %}" class="cell-name" style="color:var(--oya-primary);white-space:nowrap;">
                   {{ income.dues_payment.member.get_full_name }}
                 </a>
               {% else %}
-                <span class="cell-name">{{ income.paid_by|default:"N/A" }}</span>
+                <span class="cell-name" style="white-space:nowrap;">{{ income.paid_by|default:"N/A" }}</span>
               {% endif %}
             </td>
-            <td><span class="badge badge-success">{{ income.dues_payment.year|default:"N/A" }}</span></td>
-            <td style="font-weight:600;color:var(--oya-success);">&#x20A6;{{ income.amount|floatformat:2|intcomma }}</td>
-            <td class="cell-muted">{{ income.created_by.get_full_name|default:"System" }}</td>
-            <td class="cell-muted">{{ income.dues_payment.notes|default:"—"|truncatechars:30 }}</td>
-            <td>
-              <div class="table-actions">
+            <td style="white-space:nowrap;"><span class="badge badge-success" style="white-space:nowrap;">{{ income.dues_payment.year|default:"N/A" }}</span></td>
+            <td style="font-weight:600;color:var(--oya-success);white-space:nowrap;">&#x20A6;{{ income.amount|floatformat:2|intcomma }}</td>
+            <td class="cell-muted" style="white-space:nowrap;">{{ income.created_by.get_full_name|default:"System" }}</td>
+            <td class="cell-muted" style="white-space:nowrap;">{{ income.dues_payment.notes|default:"—"|truncatechars:30 }}</td>
+            <td style="white-space:nowrap;">
+              <div class="table-actions" style="flex-wrap:nowrap;gap:0.25rem;">
                 <a href="{% url 'finance:member_dues_detail' member_id=income.dues_payment.member_id %}" class="table-action-btn" title="View Member Dues">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 </a>
@@ -148,7 +148,7 @@
             <td colspan="8" style="text-align:center;padding:3rem;">
               <div class="empty-state" style="padding:0;">
                 <div class="empty-state-icon" style="width:60px;height:60px;margin-bottom:1rem;">
-                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 </div>
                 <h3 style="font-size:1rem;">No dues payments recorded</h3>
                 <p style="font-size:0.875rem;color:var(--oya-text-muted);">Record dues payments from the Dues Tracker.</p>
@@ -159,8 +159,8 @@
         </tbody>
         <tfoot style="background:var(--oya-surface);border-top:2px solid var(--oya-border);">
           <tr>
-            <td colspan="4" style="text-align:right;font-weight:600;">Total Dues Realized:</td>
-            <td colspan="4" style="font-weight:700;color:var(--oya-success);">&#x20A6;{{ total_dues|floatformat:2|intcomma }}</td>
+            <td colspan="4" style="text-align:right;font-weight:600;white-space:nowrap;">Total Dues Realized:</td>
+            <td colspan="4" style="font-weight:700;color:var(--oya-success);white-space:nowrap;">&#x20A6;{{ total_dues|floatformat:2|intcomma }}</td>
           </tr>
         </tfoot>
       </table>
@@ -194,8 +194,8 @@
       </div>
     </div>
 
-    <div class="table-container">
-      <table class="data-table" id="donationsTable" data-sortable>
+    <div class="table-container" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <table class="data-table" id="donationsTable" data-sortable style="white-space:nowrap;">
         <thead>
           <tr>
             <th style="width:40px;"><input type="checkbox" class="form-check-input" id="selectAllDonations"></th>
@@ -211,23 +211,23 @@
         <tbody>
           {% for income in donation_incomes %}
           <tr>
-            <td><input type="checkbox" class="form-check-input row-checkbox" value="{{ income.pk }}"></td>
-            <td class="cell-muted">{{ income.created_at|date:"M d, Y" }}</td>
-            <td>
+            <td style="white-space:nowrap;"><input type="checkbox" class="form-check-input row-checkbox" value="{{ income.pk }}"></td>
+            <td class="cell-muted" style="white-space:nowrap;">{{ income.created_at|date:"M d, Y" }}</td>
+            <td style="white-space:nowrap;">
               {% if income.income_type == "DONATION" %}
-                <span class="badge badge-info">Donation</span>
+                <span class="badge badge-info" style="white-space:nowrap;">Donation</span>
               {% elif income.income_type == "EVENT" %}
-                <span class="badge badge-warning">Event</span>
+                <span class="badge badge-warning" style="white-space:nowrap;">Event</span>
               {% else %}
-                <span class="badge badge-secondary">Other</span>
+                <span class="badge badge-secondary" style="white-space:nowrap;">Other</span>
               {% endif %}
             </td>
-            <td><span class="cell-name">{{ income.reason }}</span></td>
-            <td>{{ income.paid_by|default:"N/A" }}</td>
-            <td class="cell-muted">{{ income.created_by.get_full_name|default:"System" }}</td>
-            <td style="font-weight:600;color:var(--oya-success);">&#x20A6;{{ income.amount|floatformat:2|intcomma }}</td>
-            <td>
-              <div class="table-actions">
+            <td style="white-space:nowrap;"><span class="cell-name" style="white-space:nowrap;">{{ income.reason }}</span></td>
+            <td style="white-space:nowrap;">{{ income.paid_by|default:"N/A" }}</td>
+            <td class="cell-muted" style="white-space:nowrap;">{{ income.created_by.get_full_name|default:"System" }}</td>
+            <td style="font-weight:600;color:var(--oya-success);white-space:nowrap;">&#x20A6;{{ income.amount|floatformat:2|intcomma }}</td>
+            <td style="white-space:nowrap;">
+              <div class="table-actions" style="flex-wrap:nowrap;gap:0.25rem;">
                 <a href="{% url 'finance:income_detail' pk=income.pk %}" class="table-action-btn" title="View">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 </a>
@@ -256,8 +256,8 @@
         </tbody>
         <tfoot style="background:var(--oya-surface);border-top:2px solid var(--oya-border);">
           <tr>
-            <td colspan="6" style="text-align:right;font-weight:600;">Total Donations Realized:</td>
-            <td colspan="2" style="font-weight:700;color:var(--oya-info);">&#x20A6;{{ total_donations|floatformat:2|intcomma }}</td>
+            <td colspan="6" style="text-align:right;font-weight:600;white-space:nowrap;">Total Donations Realized:</td>
+            <td colspan="2" style="font-weight:700;color:var(--oya-info);white-space:nowrap;">&#x20A6;{{ total_donations|floatformat:2|intcomma }}</td>
           </tr>
         </tfoot>
       </table>
