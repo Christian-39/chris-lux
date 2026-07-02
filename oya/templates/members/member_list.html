@@ -47,7 +47,7 @@
       {% endfor %}
     </select>
   </div>
-  <div style="margin-left:auto;font-size:clamp(0.75rem, 2vw, 0.875rem);color:var(--oya-text-secondary);">
+  <div style="margin-left:auto;font-size:clamp(0.75rem, 2vw, 0.875rem);color:var(--oya-text-secondary);white-space:nowrap;">
     <strong style="color:var(--oya-text-primary);">{{ stats.total }}</strong> total members
     <span style="margin-left:1rem;"><strong style="color:var(--oya-success);">{{ stats.active }}</strong> active</span>
     <span style="margin-left:1rem;"><strong style="color:var(--oya-text-muted);">{{ stats.past }}</strong> past</span>
@@ -89,34 +89,34 @@
         <tr>
           <td><input type="checkbox" class="form-check-input row-checkbox" value="{{ member.pk }}"></td>
           <td>
-            <div style="display:flex;align-items:center;gap:0.75rem;">
-              <div class="avatar avatar-sm" style="{% if not member.photo %}background:{% cycle 'var(--oya-primary)' 'var(--oya-accent)' 'var(--oya-success)' 'var(--oya-warning)' %};color:#fff;{% endif %}overflow:hidden;cursor:pointer;" onclick="openImagePreview('{% if member.photo %}{{ member.photo.url }}{% endif %}', '{{ member.full_name }}')">
-              {% if member.photo %}
+            <div style="display:flex;align-items:center;gap:0.75rem;white-space:nowrap;">
+              <div class="avatar avatar-sm" style="{% if not member.photo or not member.photo.name %}background:{% cycle 'var(--oya-primary)' 'var(--oya-accent)' 'var(--oya-success)' 'var(--oya-warning)' %};color:#fff;{% endif %}overflow:hidden;{% if member.photo and member.photo.name %}cursor:pointer;{% endif %}" {% if member.photo and member.photo.name %}onclick="openImagePreview('{{ member.photo.url }}', '{{ member.full_name }}')"{% endif %}>
+              {% if member.photo and member.photo.name %}
                 <img src="{{ member.photo.url }}" alt="{{ member.full_name }}" style="width:100%;height:100%;object-fit:cover;">
               {% else %}
                 {{ member.full_name|slice:":2"|upper }}
               {% endif %}
             </div>
-              <span class="cell-name" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">{{ member.full_name }}</span>
+              <span class="cell-name" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);white-space:nowrap;">{{ member.full_name }}</span>
             </div>
           </td>
-          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);">{{ member.serial_number }}</td>
-          <td>{{ member.umu_nna_clan.name|default:"—" }}</td>
-          <td>
+          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ member.serial_number }}</td>
+          <td style="white-space:nowrap;">{{ member.umu_nna_clan.name|default:"—" }}</td>
+          <td style="white-space:nowrap;">
             {% if member.status == "ACTIVE" %}
-              <span class="badge badge-success" style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);">Active</span>
+              <span class="badge badge-success" style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);white-space:nowrap;">Active</span>
             {% elif member.status == "PAST_MEMBER" %}
-              <span class="badge badge-warning" style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);">Past Member</span>
+              <span class="badge badge-warning" style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);white-space:nowrap;">Past Member</span>
             {% elif member.status == "REMOVED" %}
-              <span class="badge badge-danger" style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);">Removed</span>
+              <span class="badge badge-danger" style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);white-space:nowrap;">Removed</span>
             {% else %}
-              <span class="badge">{{ member.status }}</span>
+              <span class="badge" style="white-space:nowrap;">{{ member.status }}</span>
             {% endif %}
           </td>
-          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);">{{ member.age }}</td>
-          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);">{{ member.state_or_abroad|default:"—" }}</td>
-          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);">{{ member.created_at|date:"M d, Y" }}</td>
-          <td>
+          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ member.age }}</td>
+          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ member.state_or_abroad|default:"—" }}</td>
+          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ member.created_at|date:"M d, Y" }}</td>
+          <td style="white-space:nowrap;">
             <div class="table-actions" style="flex-wrap:wrap;">
               <a href="{% url 'members:member_detail' pk=member.pk %}" class="table-action-btn" title="View">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -146,7 +146,7 @@
   <!-- Pagination -->
   {% if members.has_other_pages %}
   <div class="card-footer">
-    <span style="font-size:clamp(0.6875rem, 1.5vw, 0.8125rem);color:var(--oya-text-muted);">
+    <span style="font-size:clamp(0.6875rem, 1.5vw, 0.8125rem);color:var(--oya-text-muted);white-space:nowrap;">
       Showing {{ members.start_index }}-{{ members.end_index }} of {{ stats.total }} members
     </span>
     <div class="pagination">
@@ -200,7 +200,7 @@
   .btn-lg { font-size: 0.9375rem !important; padding: 0.75rem 1.25rem !important; }
   .badge { font-size: 0.8125rem !important; padding: 0.3rem 0.5rem !important; }
   .data-table { font-size: 0.9375rem !important; }
-  .data-table thead th, .data-table tbody td { padding: 0.75rem 1rem !important; }
+  .data-table thead th, .data-table tbody td { padding: 0.75rem 1rem !important; white-space: nowrap !important; }
   .cell-name { font-size: 0.9375rem !important; }
   .cell-muted { font-size: 0.875rem !important; }
   .table-action-btn { width: 36px !important; height: 36px !important; }
@@ -312,7 +312,7 @@
   .btn-lg { font-size: 0.875rem !important; padding: 0.625rem 1rem !important; }
   .badge { font-size: 0.75rem !important; padding: 0.25rem 0.4rem !important; }
   .data-table { font-size: 0.875rem !important; }
-  .data-table thead th, .data-table tbody td { padding: 0.625rem 0.75rem !important; }
+  .data-table thead th, .data-table tbody td { padding: 0.625rem 0.75rem !important; white-space: nowrap !important; }
   .cell-name { font-size: 0.875rem !important; }
   .cell-muted { font-size: 0.8125rem !important; }
   .table-action-btn { width: 32px !important; height: 32px !important; }
@@ -395,7 +395,7 @@
   .btn-sm { font-size: 0.6875rem !important; padding: 0.25rem 0.625rem !important; }
   .badge { font-size: 0.6875rem !important; padding: 0.2rem 0.35rem !important; }
   .data-table { font-size: 0.8125rem !important; }
-  .data-table thead th, .data-table tbody td { padding: 0.5rem 0.625rem !important; }
+  .data-table thead th, .data-table tbody td { padding: 0.5rem 0.625rem !important; white-space: nowrap !important; }
   .avatar { width: 32px !important; height: 32px !important; font-size: 0.75rem !important; }
   .kpi-value { font-size: 1.25rem !important; }
   .kpi-label { font-size: 0.8125rem !important; }
