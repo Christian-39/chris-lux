@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}Projects{% endblock %}
 {% block page_title %}Projects{% endblock %}
@@ -128,7 +129,7 @@
               <span class="badge badge-success" style="white-space:nowrap;">Completed</span>
             {% endif %}
           </td>
-          <td style="font-weight:600;white-space:nowrap;">&#x20A6;{{ project.budget|floatformat:2 }}</td>
+          <td style="font-weight:600;white-space:nowrap;">&#x20A6;{{ project.budget|floatformat:2 | intcomma }}</td>
           <td style="white-space:nowrap;">
             <div style="display:flex;align-items:center;gap:0.5rem;white-space:nowrap;">
               <div class="progress-bar" style="flex:1;min-width:60px;">
