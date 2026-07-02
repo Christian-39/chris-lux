@@ -12,12 +12,21 @@ class SystemSettingsForm(forms.ModelForm):
         model = SystemSettings
         fields = [
             "association_name", "motto",
+            "logo", "favicon",
             "yearly_dues", "minimum_age", "past_member_age",
             "primary_color", "accent_color", "theme_mode"
         ]
         widgets = {
             "association_name": forms.TextInput(attrs={"class": "form-control"}),
             "motto": forms.TextInput(attrs={"class": "form-control"}),
+            "logo": forms.ClearableFileInput(attrs={
+                "class": "form-control",
+                "accept": "image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
+            }),
+            "favicon": forms.ClearableFileInput(attrs={
+                "class": "form-control",
+                "accept": "image/x-icon,image/png,image/svg+xml"
+            }),
             "yearly_dues": forms.NumberInput(attrs={
                 "class": "form-control",
                 "step": "0.01",
@@ -43,6 +52,26 @@ class SystemSettingsForm(forms.ModelForm):
             }),
             "theme_mode": forms.Select(attrs={"class": "form-select"}),
         }
+
+    def clean_logo(self):
+        logo = self.cleaned_data.get("logo")
+        if logo:
+            if logo.size > 2 * 1024 * 1024:
+                raise forms.ValidationError("Logo must be under 2MB.")
+            ext = logo.name.split(".")[-1].lower()
+            if ext not in ["png", "jpg", "jpeg", "svg", "webp"]:
+                raise forms.ValidationError("Logo must be PNG, JPG, SVG, or WEBP.")
+        return logo
+
+    def clean_favicon(self):
+        favicon = self.cleaned_data.get("favicon")
+        if favicon:
+            if favicon.size > 1 * 1024 * 1024:
+                raise forms.ValidationError("Favicon must be under 1MB.")
+            ext = favicon.name.split(".")[-1].lower()
+            if ext not in ["ico", "png", "svg"]:
+                raise forms.ValidationError("Favicon must be ICO, PNG, or SVG.")
+        return favicon
 
     def clean(self):
         cleaned_data = super().clean()
