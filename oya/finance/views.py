@@ -1,21 +1,21 @@
-"""
-Updated views for OYA finance with dues tracking and donation separation.
-"""
+"""Updated views for OYA finance with smart dues allocation."""
 import logging
 from datetime import datetime, timedelta
+from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum, Count
+from django.db.models import Q, Sum, Count, Max
 from django.utils import timezone
 from django.http import JsonResponse
 from django.db.models.functions import Coalesce
 from django.db.models import Value, DecimalField
+from django.db import transaction
 from auditlogs.services import log_action
 from accounts.models import User
-from .models import Income, Expense, DuesPayment
-from .forms import IncomeForm, ExpenseForm, DuesPaymentForm
+from .models import Income, Expense, DuesPayment, DuesPaymentTransaction
+from .forms import IncomeForm, ExpenseForm, DuesPaymentAllocationForm
 
 logger = logging.getLogger("oya")
 
@@ -93,39 +93,59 @@ def dues_tracker(request):
 
     members = User.objects.filter(is_active=True).order_by("full_name")
 
+    # Build a lookup of all dues payments
     dues_map = {}
     for dp in DuesPayment.objects.select_related("member").all():
         key = (dp.member_id, dp.year)
         dues_map[key] = dp
 
     member_rows = []
-    total_dues_collected = 0
-    total_dues_expected = 0
+    total_dues_collected = Decimal("0")
+    total_dues_expected = Decimal("0")
 
     for member in members:
         row = {"member": member, "years": {}}
         member_debt = DuesPayment.get_member_debt(member)
         row["total_debt"] = member_debt["debt_owed"]
         row["years_paid_count"] = len(member_debt["years_paid"])
+        row["years_partial_count"] = len(member_debt.get("years_partial", []))
 
         for year in years:
             key = (member.id, year)
             if key in dues_map:
-                row["years"][year] = {"status": "PAID", "payment": dues_map[key]}
-                total_dues_collected += YEARLY_DUES
+                dp = dues_map[key]
+                row["years"][year] = {
+                    "status": dp.status,
+                    "payment": dp,
+                    "amount_paid": dp.amount_paid,
+                    "remaining": dp.remaining_balance,
+                }
+                total_dues_collected += dp.amount_paid
             else:
-                row["years"][year] = {"status": "OWED", "payment": None}
+                row["years"][year] = {
+                    "status": DuesPayment.STATUS_OWED,
+                    "payment": None,
+                    "amount_paid": Decimal("0"),
+                    "remaining": Decimal(str(YEARLY_DUES)),
+                }
                 total_dues_expected += YEARLY_DUES
 
         member_rows.append(row)
 
     active_members_count = members.count()
     total_possible_dues = active_members_count * len(years) * YEARLY_DUES
-    collection_rate = round((total_dues_collected / total_possible_dues * 100), 1) if total_possible_dues > 0 else 0
+    collection_rate = round(
+        (float(total_dues_collected) / total_possible_dues * 100), 1
+    ) if total_possible_dues > 0 else 0
 
-    this_year_paid = DuesPayment.objects.filter(year=current_year).count()
+    this_year_paid = DuesPayment.objects.filter(
+        year=current_year,
+        amount_paid__gte=YEARLY_DUES,
+    ).count()
     this_year_expected = active_members_count
-    this_year_rate = round((this_year_paid / this_year_expected * 100), 1) if this_year_expected > 0 else 0
+    this_year_rate = round(
+        (this_year_paid / this_year_expected * 100), 1
+    ) if this_year_expected > 0 else 0
 
     context = {
         "years": years,
@@ -145,36 +165,68 @@ def dues_tracker(request):
 
 
 @login_required
-def dues_create(request):
-    """Record a member's yearly dues payment."""
+def dues_allocate(request):
+    """Smart dues payment allocation — auto-distributes across years."""
     if not request.user.has_executive_access():
         messages.error(request, "Executive access required.")
         return redirect("finance:dues_tracker")
 
     if request.method == "POST":
-        form = DuesPaymentForm(request.POST, recorded_by=request.user)
+        form = DuesPaymentAllocationForm(request.POST, recorded_by=request.user)
         if form.is_valid():
-            dues = form.save()
-            log_action(
-                user=request.user,
-                action="CREATE",
-                object_type="DuesPayment",
-                object_id=dues.id,
-                ip_address=getattr(request, "client_ip", ""),
-                description=f"Recorded dues: {dues.member.get_full_name()} - {dues.year} (₦{dues.amount_paid:,.2f})"
-            )
-            messages.success(request, f"Dues recorded for {dues.member.get_full_name()} - {dues.year}.")
-            return redirect("finance:dues_tracker")
+            try:
+                with transaction.atomic():
+                    result = form.allocate()
+
+                # Log the action
+                tx = result["transaction"]
+                allocation_summary = ", ".join(
+                    f"{a['year']}: ₦{a['allocated']:,.2f}"
+                    for a in result["allocations"]
+                )
+                log_action(
+                    user=request.user,
+                    action="CREATE",
+                    object_type="DuesPaymentTransaction",
+                    object_id=tx.id,
+                    ip_address=getattr(request, "client_ip", ""),
+                    description=(
+                        f"Allocated dues payment: {tx.member.get_full_name()} — "
+                        f"₦{tx.total_amount:,.2f} → [{allocation_summary}]"
+                    ),
+                )
+
+                # Show user-friendly messages
+                for msg in result["messages"]:
+                    messages.info(request, msg)
+
+                messages.success(
+                    request,
+                    f"Successfully allocated ₦{result['total_allocated']:,.2f} "
+                    f"for {tx.member.get_full_name()}."
+                )
+                if result["remaining"] > 0:
+                    messages.warning(
+                        request,
+                        f"₦{result['remaining']:,.2f} could not be allocated."
+                    )
+
+                return redirect("finance:dues_tracker")
+
+            except Exception as e:
+                logger.exception("Dues allocation failed")
+                messages.error(request, f"Allocation failed: {str(e)}")
         else:
-            for error in form.errors.values():
-                messages.error(request, error)
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
-        form = DuesPaymentForm(recorded_by=request.user)
+        form = DuesPaymentAllocationForm(recorded_by=request.user)
 
     return render(request, "finance/dues_form.html", {
         "form": form,
         "title": "Record Dues Payment",
-        "action": "Record Payment",
+        "action": "Allocate Payment",
         "yearly_dues": YEARLY_DUES,
     })
 
@@ -184,25 +236,47 @@ def member_dues_detail(request, member_id):
     """Show detailed dues history and debt for a single member."""
     member = get_object_or_404(User, pk=member_id, is_active=True)
     current_year = timezone.now().year
-    years = list(range(PLATFORM_START_YEAR, current_year + 1))
+
+    # Get join year to determine range
+    join_year = DuesPayment.get_member_join_year(member)
+    start_year = max(join_year, PLATFORM_START_YEAR)
+
+    # Include future prepaid years in the display
+    max_year = max(
+        current_year,
+        DuesPayment.objects.filter(member=member).aggregate(
+            max_year=Coalesce(Max("year"), Value(current_year))
+        )["max_year"]
+    )
+
+    years = list(range(start_year, max_year + 1))
 
     debt_info = DuesPayment.get_member_debt(member)
-    payments = DuesPayment.objects.filter(member=member).select_related("recorded_by").order_by("-year")
+    payments = DuesPayment.objects.filter(member=member).select_related(
+        "recorded_by", "income"
+    ).order_by("-year")
 
     year_status = []
     for year in years:
         payment = payments.filter(year=year).first()
         year_status.append({
             "year": year,
-            "status": "PAID" if payment else "OWED",
+            "status": payment.status if payment else DuesPayment.STATUS_OWED,
             "payment": payment,
+            "is_future": year > current_year,
         })
+
+    # Get payment transactions for this member
+    transactions = DuesPaymentTransaction.objects.filter(
+        member=member
+    ).select_related("recorded_by").order_by("-payment_date")[:20]
 
     context = {
         "member": member,
         "year_status": year_status,
         "debt_info": debt_info,
         "payments": payments,
+        "transactions": transactions,
         "yearly_dues": YEARLY_DUES,
         "current_year": current_year,
     }
@@ -211,7 +285,7 @@ def member_dues_detail(request, member_id):
 
 @login_required
 def dues_delete(request, pk):
-    """Delete a dues payment record."""
+    """Delete a dues payment record (and its linked income)."""
     if not request.user.has_admin_access():
         messages.error(request, "Admin access required.")
         return redirect("finance:dues_tracker")
@@ -573,7 +647,10 @@ def finance_summary(request):
     total_dues_possible = active_members * years_count * YEARLY_DUES
     dues_collection_rate = round((total_dues / total_dues_possible * 100), 1) if total_dues_possible > 0 else 0
 
-    this_year_dues_paid = DuesPayment.objects.filter(year=current_year).count()
+    this_year_dues_paid = DuesPayment.objects.filter(
+        year=current_year,
+        amount_paid__gte=YEARLY_DUES,
+    ).count()
     this_year_dues_rate = round((this_year_dues_paid / active_members * 100), 1) if active_members > 0 else 0
 
     expenses_raw = Expense.objects.values("category").annotate(
@@ -617,6 +694,17 @@ def finance_summary(request):
     debtor_list.sort(key=lambda x: x["debt"], reverse=True)
     top_debtors = debtor_list[:5]
 
+    # Additional stats for dashboard
+    partial_payments = DuesPayment.objects.filter(
+        amount_paid__gt=0,
+        amount_paid__lt=YEARLY_DUES,
+    ).count()
+
+    prepaid_count = DuesPayment.objects.filter(
+        year__gt=current_year,
+        amount_paid__gte=YEARLY_DUES,
+    ).count()
+
     context = {
         "treasury_balance": treasury_balance,
         "total_income": total_income,
@@ -632,6 +720,8 @@ def finance_summary(request):
         "this_year_dues_rate": this_year_dues_rate,
         "top_debtors": top_debtors,
         "current_year": current_year,
+        "partial_payments": partial_payments,
+        "prepaid_count": prepaid_count,
     }
     return render(request, "finance/finance_summary.html", context)
 
@@ -671,3 +761,28 @@ def search_members(request):
         })
 
     return JsonResponse({"results": results})
+
+
+@login_required
+def member_dues_preview(request):
+    """AJAX endpoint for dues allocation preview."""
+    member_id = request.GET.get("member_id")
+    if not member_id:
+        return JsonResponse({"outstanding": []})
+
+    try:
+        member = User.objects.get(pk=member_id, is_active=True)
+    except User.DoesNotExist:
+        return JsonResponse({"outstanding": []})
+
+    outstanding = DuesPayment.get_outstanding_years(member)
+    data = []
+    for item in outstanding:
+        data.append({
+            "year": item["year"],
+            "amount_paid": float(item["amount_paid"]),
+            "remaining_balance": float(item["remaining_balance"]),
+            "status": item["status"],
+        })
+
+    return JsonResponse({"outstanding": data})
