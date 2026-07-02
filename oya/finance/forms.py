@@ -1,10 +1,9 @@
-"""
-Forms for OYA finance.
-"""
+"""Forms for OYA finance."""
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from .models import Income, Expense, DuesPayment
+from decimal import Decimal
+from .models import Income, Expense, DuesPayment, DuesPaymentTransaction
 
 
 class IncomeForm(forms.ModelForm):
@@ -44,10 +43,10 @@ class IncomeForm(forms.ModelForm):
         return amount
 
 
-class DuesPaymentForm(forms.ModelForm):
+class DuesPaymentAllocationForm(forms.ModelForm):
     """
-    Form for recording yearly dues payments.
-    Auto-creates the linked Income record.
+    Form for recording smart dues payment allocations.
+    Administrator enters total amount; system auto-allocates across years.
     """
     member_search = forms.CharField(
         required=False,
@@ -55,71 +54,76 @@ class DuesPaymentForm(forms.ModelForm):
     )
 
     class Meta:
-        model = DuesPayment
-        fields = ["member", "year", "notes"]
+        model = DuesPaymentTransaction
+        fields = ["member", "total_amount", "payment_method", "receipt_reference", "payment_date", "notes"]
         widgets = {
             "member": forms.Select(attrs={
                 "class": "form-select",
                 "data-search": "members",
             }),
-            "year": forms.NumberInput(attrs={
+            "total_amount": forms.NumberInput(attrs={
                 "class": "form-control",
-                "min": "2020",
-                "max": str(timezone.now().year),
-                "placeholder": "e.g., 2024",
+                "step": "0.01",
+                "min": "0.01",
+                "placeholder": "0.00",
+            }),
+            "payment_method": forms.Select(attrs={"class": "form-select"}),
+            "receipt_reference": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "e.g., TRX-123456, Receipt #001",
+            }),
+            "payment_date": forms.DateInput(attrs={
+                "class": "form-control",
+                "type": "date",
             }),
             "notes": forms.Textarea(attrs={
                 "class": "form-control",
                 "rows": 2,
-                "placeholder": "Payment method, reference number, etc.",
+                "placeholder": "Payment method details, reference number, etc.",
             }),
         }
 
     def __init__(self, *args, **kwargs):
         self.recorded_by = kwargs.pop("recorded_by", None)
         super().__init__(*args, **kwargs)
-        self.fields["year"].initial = timezone.now().year
+        self.fields["payment_date"].initial = timezone.now().date()
 
-    def clean_year(self):
-        year = self.cleaned_data.get("year")
-        current_year = timezone.now().year
-        if year < 2020:
-            raise ValidationError("Dues year cannot be before 2020.")
-        if year > current_year:
-            raise ValidationError("Cannot record dues for future years.")
-        return year
+    def clean_total_amount(self):
+        amount = self.cleaned_data.get("total_amount")
+        if not amount or amount <= 0:
+            raise ValidationError("Payment amount must be greater than zero.")
+        return amount
 
-    def clean(self):
-        cleaned_data = super().clean()
-        member = cleaned_data.get("member")
-        year = cleaned_data.get("year")
+    def clean_payment_date(self):
+        payment_date = self.cleaned_data.get("payment_date")
+        if payment_date and payment_date > timezone.now().date():
+            raise ValidationError("Payment date cannot be in the future.")
+        return payment_date
 
-        if member and year:
-            existing = DuesPayment.objects.filter(member=member, year=year)
-            if self.instance.pk:
-                existing = existing.exclude(pk=self.instance.pk)
-            if existing.exists():
-                raise ValidationError(
-                    f"Dues for {year} have already been recorded for {member.get_full_name()}."
-                )
-        return cleaned_data
+    def allocate(self):
+        """
+        Execute the allocation logic. Must be called after form is_valid().
+        Returns the allocation result dict from DuesPayment.allocate_payment().
+        """
+        if not self.is_valid():
+            raise ValidationError("Form must be valid before allocation.")
 
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        instance.amount_paid = DuesPayment.YEARLY_DUES_AMOUNT
-        instance.recorded_by = self.recorded_by
+        member = self.cleaned_data["member"]
+        total_amount = self.cleaned_data["total_amount"]
+        payment_method = self.cleaned_data.get("payment_method", "CASH")
+        receipt_reference = self.cleaned_data.get("receipt_reference", "")
+        payment_date = self.cleaned_data.get("payment_date", timezone.now().date())
+        notes = self.cleaned_data.get("notes", "")
 
-        if commit:
-            income = Income.objects.create(
-                income_type="DUES",
-                amount=DuesPayment.YEARLY_DUES_AMOUNT,
-                reason=f"Yearly Dues \u2014 {instance.year}",
-                paid_by=instance.member.get_full_name(),
-                created_by=self.recorded_by,
-            )
-            instance.income = income
-            instance.save()
-        return instance
+        return DuesPayment.allocate_payment(
+            member=member,
+            total_amount=total_amount,
+            payment_method=payment_method,
+            receipt_reference=receipt_reference,
+            payment_date=payment_date,
+            notes=notes,
+            recorded_by=self.recorded_by,
+        )
 
 
 class ExpenseForm(forms.ModelForm):
