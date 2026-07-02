@@ -4,7 +4,11 @@
 
   <!-- Header -->
   <div class="sidebar-header">
-    <img src="{% static 'images/oya_logo.png' %}" alt="OYA Logo" class="sidebar-logo">
+    {% if settings_logo_url %}
+      <img src="{{ settings_logo_url }}" alt="OYA Logo" class="sidebar-logo" style="max-height:36px;max-width:120px;object-fit:contain;">
+    {% else %}
+      <img src="{% static 'images/oya_logo.png' %}" alt="OYA Logo" class="sidebar-logo">
+    {% endif %}
     <span class="sidebar-brand">OYA System</span>
     <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
