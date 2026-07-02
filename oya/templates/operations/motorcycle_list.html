@@ -97,7 +97,7 @@
   </div>
 
   <div class="table-container" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-    <table class="data-table" id="motorcycleTable" data-sortable>
+    <table class="data-table" id="motorcycleTable" data-sortable style="white-space:nowrap;">
       <thead>
         <tr>
           <th style="width:40px;"><input type="checkbox" class="form-check-input" id="selectAll"></th>
@@ -113,29 +113,29 @@
       <tbody>
         {% for mc in motorcycles %}
         <tr>
-          <td><input type="checkbox" class="form-check-input row-checkbox" value="{{ mc.pk }}"></td>
-          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);">{{ mc.asset_tag }}</td>
-          <td><span class="cell-name" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">{{ mc.brand|default:"N/A" }}</span></td>
-          <td>{{ mc.model|default:"N/A" }}</td>
-          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);">{{ mc.year|default:"N/A" }}</td>
-          <td>
+          <td style="white-space:nowrap;"><input type="checkbox" class="form-check-input row-checkbox" value="{{ mc.pk }}"></td>
+          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ mc.asset_tag }}</td>
+          <td style="white-space:nowrap;"><span class="cell-name" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);white-space:nowrap;">{{ mc.brand|default:"N/A" }}</span></td>
+          <td style="white-space:nowrap;">{{ mc.model|default:"N/A" }}</td>
+          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ mc.year|default:"N/A" }}</td>
+          <td style="white-space:nowrap;">
             {% if mc.condition == "EXCELLENT" %}
-              <span class="badge badge-success">Excellent</span>
+              <span class="badge badge-success" style="white-space:nowrap;">Excellent</span>
             {% elif mc.condition == "NEEDS_SERVICE" %}
-              <span class="badge badge-warning">Needs Service</span>
+              <span class="badge badge-warning" style="white-space:nowrap;">Needs Service</span>
             {% elif mc.condition == "GROUNDED" %}
-              <span class="badge badge-danger">Grounded</span>
+              <span class="badge badge-danger" style="white-space:nowrap;">Grounded</span>
             {% endif %}
           </td>
-          <td>
+          <td style="white-space:nowrap;">
             {% if mc.assigned_to %}
               {{ mc.assigned_to.full_name }}
             {% else %}
-              <span class="cell-muted">Unassigned</span>
+              <span class="cell-muted" style="white-space:nowrap;">Unassigned</span>
             {% endif %}
           </td>
-          <td>
-            <div class="table-actions" style="flex-wrap:wrap;">
+          <td style="white-space:nowrap;">
+            <div class="table-actions" style="flex-wrap:nowrap;gap:0.25rem;">
               {% if user.is_staff %}
               <a href="{% url 'operations:motorcycle_update' pk=mc.pk %}" class="table-action-btn" title="Edit">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
