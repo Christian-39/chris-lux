@@ -97,7 +97,7 @@
   </div>
 
   <div class="table-container" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-    <table class="data-table" id="casesTable" data-sortable>
+    <table class="data-table" id="casesTable" data-sortable style="white-space:nowrap;">
       <thead>
         <tr>
           <th style="width:40px;"><input type="checkbox" class="form-check-input" id="selectAll"></th>
@@ -114,10 +114,10 @@
         {% for case in cases %}
         <tr>
           <td><input type="checkbox" class="form-check-input row-checkbox" value="{{ case.pk }}"></td>
-          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);">{{ case.case_number }}</td>
-          <td><span class="cell-name" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">{{ case.title }}</span></td>
-          <td>{{ case.respondent.full_name }}</td>
-          <td>
+          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ case.case_number }}</td>
+          <td><span class="cell-name" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);white-space:nowrap;">{{ case.title }}</span></td>
+          <td style="white-space:nowrap;">{{ case.respondent.full_name }}</td>
+          <td style="white-space:nowrap;">
             {% if case.status == "OPEN" %}
               <span class="badge badge-info">Open</span>
             {% elif case.status == "IN_PROGRESS" %}
@@ -126,10 +126,10 @@
               <span class="badge badge-success">Resolved</span>
             {% endif %}
           </td>
-          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);">&#x20A6;{{ case.fine_amount|floatformat:2 }}</td>
-          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);">{{ case.created_at|date:"M d, Y" }}</td>
-          <td>
-            <div class="table-actions" style="flex-wrap:wrap;">
+          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">&#x20A6;{{ case.fine_amount|floatformat:2 }}</td>
+          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ case.created_at|date:"M d, Y" }}</td>
+          <td style="white-space:nowrap;">
+            <div class="table-actions" style="flex-wrap:nowrap;gap:0.25rem;">
               <a href="{% url 'operations:case_detail' pk=case.pk %}" class="table-action-btn" title="View">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </a>
