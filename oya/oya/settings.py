@@ -14,13 +14,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config(
     "DJANGO_SECRET_KEY",
-    "django-insecure-change-me-in-production-oy4-kp0-y0uth5-@550c!@t!0n",
+    default="django-insecure-change-me-in-production-oy4-kp0-y0uth5-@550c!@t!0n",
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DJANGO_DEBUG", "True").lower() == "true"
+DEBUG = config("DJANGO_DEBUG", default="True").lower() == "true"
 
-ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS", default="localhost,127.0.0.1").split(",")
 
 # Application definition
 DJANGO_APPS = [
@@ -48,7 +48,9 @@ LOCAL_APPS = [
     "settingsapp",
 ]
 
-THIRD_PARTY_APPS = []
+THIRD_PARTY_APPS = [
+    "storages",  # django-storages
+]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 
@@ -90,21 +92,19 @@ ASGI_APPLICATION = "oya.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
-    'default': {
-        'ENGINE': config('DB_ENGINE', default='django.db.backends.sqlite3'),
-        'NAME': config('DB_NAME', default=BASE_DIR / 'db.sqlite3'),
-        'USER': config('DB_USER', default=''),
-        'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default=''),
-        'PORT': config('DB_PORT', default=''),
+    "default": {
+        "ENGINE": config("DB_ENGINE", default="django.db.backends.sqlite3"),
+        "NAME": config("DB_NAME", default=BASE_DIR / "db.sqlite3"),
+        "USER": config("DB_USER", default=""),
+        "PASSWORD": config("DB_PASSWORD", default=""),
+        "HOST": config("DB_HOST", default=""),
+        "PORT": config("DB_PORT", default=""),
     }
 }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -131,7 +131,6 @@ AUTHENTICATION_BACKENDS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "Africa/Lagos"
@@ -151,18 +150,18 @@ STATICFILES_DIRS = [
 # BACKBLAZE B2 / S3 COMPATIBLE STORAGE
 # ============================================
 
-MEDIA_STORAGE_MODE = config("MEDIA_STORAGE_MODE", "local")
+MEDIA_STORAGE_MODE = config("MEDIA_STORAGE_MODE", default="local")
 
 if MEDIA_STORAGE_MODE == "b2":
-    # B2 Credentials
+    # B2 Credentials (from your Railway env vars)
     B2_KEY_ID = config("B2_KEY_ID")
     B2_APPLICATION_KEY = config("B2_APPLICATION_KEY")
     B2_BUCKET_NAME = config("B2_BUCKET_NAME")
-    B2_BUCKET_REGION = config("B2_BUCKET_REGION", "us-west-004")
-    B2_ENDPOINT_URL = config("B2_ENDPOINT_URL", "https://s3.us-west-004.backblazeb2.com")
-    B2_CUSTOM_DOMAIN = config("B2_CUSTOM_DOMAIN", None)
+    B2_BUCKET_REGION = config("B2_BUCKET_REGION", default="us-west-004")
+    B2_ENDPOINT_URL = config("B2_ENDPOINT_URL", default="https://s3.us-west-004.backblazeb2.com")
+    B2_CUSTOM_DOMAIN = config("B2_CUSTOM_DOMAIN", default=None)
 
-    # Map to AWS S3-compatible settings
+    # Map to AWS S3-compatible settings for the custom backend
     AWS_ACCESS_KEY_ID = B2_KEY_ID
     AWS_SECRET_ACCESS_KEY = B2_APPLICATION_KEY
     AWS_STORAGE_BUCKET_NAME = B2_BUCKET_NAME
@@ -173,7 +172,7 @@ if MEDIA_STORAGE_MODE == "b2":
     AWS_S3_ADDRESSING_STYLE = "virtual"  # CRITICAL - Without this B2 fails!
     AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_QUERYSTRING_AUTH = False
-    AWS_DEFAULT_ACL = 'public-read'
+    AWS_DEFAULT_ACL = None  # CRITICAL: B2 does NOT support ACLs
     AWS_S3_FILE_OVERWRITE = True
 
     # Media URL
@@ -183,9 +182,10 @@ if MEDIA_STORAGE_MODE == "b2":
     else:
         MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.backblazeb2.com/media/"
 
+    # Use custom B2 storage backend (handles 403 errors + no ACL)
     STORAGES = {
         "default": {
-            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "BACKEND": "oya.storage_backends.BackblazeB2Storage",
         },
         "staticfiles": {
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
@@ -304,8 +304,8 @@ CACHES = {
 }
 
 # Celery settings
-CELERY_BROKER_URL = config("CELERY_BROKER_URL", "redis://localhost:6379/0")
-CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default="redis://localhost:6379/0")
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
@@ -316,6 +316,6 @@ OYA_SETTINGS = {
     "MEMBER_MIN_AGE": 18,
     "PAST_MEMBER_AGE": 56,
     "ELECTION_CYCLE_YEARS": 4,
-    "CURRENCY_SYMBOL": "\u20a6",  # Naira symbol
+    "CURRENCY_SYMBOL": "₦",  # Naira symbol
     "SERIAL_NUMBER_PREFIX": "OYA",
 }
