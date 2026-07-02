@@ -1,9 +1,9 @@
-"""
-Models for OYA finance.
-"""
-from django.db import models
+"""Models for OYA finance."""
+from django.db import models, transaction
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+from decimal import Decimal
 from core.models import BaseModel
 
 
@@ -28,7 +28,7 @@ class Income(BaseModel):
     amount = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(0.01)],
+        validators=[MinValueValidator(Decimal("0.01"))],
         verbose_name="Amount"
     )
     reason = models.CharField(max_length=255, verbose_name="Reason")
@@ -56,15 +56,92 @@ class Income(BaseModel):
         ]
 
     def __str__(self):
-        return f"\u20a6{self.amount:,.2f} - {self.reason}"
+        return f"₦{self.amount:,.2f} - {self.reason}"
+
+
+class DuesPaymentTransaction(BaseModel):
+    """
+    Represents a single dues payment event from an administrator.
+    A single transaction may be allocated across multiple years.
+    """
+    PAYMENT_METHOD_CHOICES = [
+        ("CASH", "Cash"),
+        ("BANK_TRANSFER", "Bank Transfer"),
+        ("MOBILE_MONEY", "Mobile Money"),
+        ("CHECK", "Check"),
+        ("OTHER", "Other"),
+    ]
+
+    id = models.BigAutoField(primary_key=True)
+    member = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+        related_name="dues_transactions",
+        verbose_name="Member",
+        limit_choices_to={"is_active": True},
+    )
+    total_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))],
+        verbose_name="Total Amount Paid",
+    )
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PAYMENT_METHOD_CHOICES,
+        default="CASH",
+        verbose_name="Payment Method",
+    )
+    receipt_reference = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Receipt / Reference Number",
+        help_text="Bank transfer reference, receipt number, or any proof of payment ID.",
+    )
+    payment_date = models.DateField(
+        verbose_name="Payment Date",
+        default=timezone.now,
+    )
+    notes = models.TextField(
+        blank=True,
+        verbose_name="Notes",
+    )
+    recorded_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="dues_transactions_recorded",
+        verbose_name="Recorded By",
+    )
+
+    class Meta:
+        db_table = "finance_dues_payment_transaction"
+        verbose_name = "Dues Payment Transaction"
+        verbose_name_plural = "Dues Payment Transactions"
+        ordering = ["-payment_date", "-created_at"]
+
+    def __str__(self):
+        return f"{self.member.get_full_name()} — ₦{self.total_amount:,.2f} on {self.payment_date}"
 
 
 class DuesPayment(BaseModel):
     """
-    Tracks yearly dues payments per member.
-    Platform started 2020. Dues = \u20a65,000/year (fixed).
+    Tracks the payment status for a single member for a single year.
+    Platform started 2020. Dues = ₦5,000/year (fixed).
+    amount_paid accumulates across multiple payment transactions.
     """
-    YEARLY_DUES_AMOUNT = 5000
+    YEARLY_DUES_AMOUNT = Decimal("5000")
+
+    STATUS_PAID = "PAID"
+    STATUS_PARTIAL = "PARTIAL"
+    STATUS_OWED = "OWED"
+    STATUS_PREPAID = "PREPAID"
+    STATUS_CHOICES = [
+        (STATUS_PAID, "Paid"),
+        (STATUS_PARTIAL, "Partially Paid"),
+        (STATUS_OWED, "Owed"),
+        (STATUS_PREPAID, "Prepaid"),
+    ]
 
     id = models.BigAutoField(primary_key=True)
     member = models.ForeignKey(
@@ -82,8 +159,9 @@ class DuesPayment(BaseModel):
     amount_paid = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        default=YEARLY_DUES_AMOUNT,
+        default=Decimal("0"),
         verbose_name="Amount Paid",
+        help_text="Cumulative amount paid for this year. May be partial.",
     )
     income = models.OneToOneField(
         Income,
@@ -105,6 +183,13 @@ class DuesPayment(BaseModel):
         related_name="dues_recorded",
         verbose_name="Recorded By",
     )
+    # Track which transaction(s) contributed to this record
+    transactions = models.ManyToManyField(
+        DuesPaymentTransaction,
+        related_name="dues_allocations",
+        blank=True,
+        verbose_name="Source Transactions",
+    )
 
     class Meta:
         db_table = "finance_dues_payment"
@@ -117,31 +202,108 @@ class DuesPayment(BaseModel):
                 check=models.Q(year__gte=2020),
                 name="year_gte_2020",
             ),
+            models.CheckConstraint(
+                check=models.Q(amount_paid__gte=0),
+                name="amount_paid_gte_zero",
+            ),
         ]
 
     def __str__(self):
-        return f"{self.member.get_full_name()} \u2014 {self.year} Dues"
+        status = self.get_status_display()
+        return f"{self.member.get_full_name()} — {self.year} Dues ({status})"
 
     def clean(self):
         if self.year < 2020:
             raise ValidationError({"year": "Dues year cannot be before platform creation (2020)."})
-        if self.amount_paid != self.YEARLY_DUES_AMOUNT:
-            raise ValidationError({"amount_paid": f"Yearly dues must be exactly \u20a6{self.YEARLY_DUES_AMOUNT:,}."})
+        if self.amount_paid < 0:
+            raise ValidationError({"amount_paid": "Amount paid cannot be negative."})
 
     @property
     def status(self):
-        return "PAID" if self.amount_paid >= self.YEARLY_DUES_AMOUNT else "PARTIAL"
+        current_year = timezone.now().year
+        if self.amount_paid >= self.YEARLY_DUES_AMOUNT:
+            if self.year > current_year:
+                return self.STATUS_PREPAID
+            return self.STATUS_PAID
+        elif self.amount_paid > 0:
+            return self.STATUS_PARTIAL
+        return self.STATUS_OWED
+
+    @property
+    def remaining_balance(self):
+        """Amount still needed to fully pay this year's dues."""
+        return max(self.YEARLY_DUES_AMOUNT - self.amount_paid, Decimal("0"))
+
+    @property
+    def is_fully_paid(self):
+        return self.amount_paid >= self.YEARLY_DUES_AMOUNT
+
+    @classmethod
+    def get_member_join_year(cls, member):
+        """Determine the first year a member should owe dues."""
+        platform_start = 2020
+        join_year = getattr(member, "year_joined", None)
+        if join_year and isinstance(join_year, int) and join_year >= platform_start:
+            return join_year
+        # Fallback: try to extract from serial number (e.g., OYA-2024-0001)
+        serial = getattr(member, "serial_number", "")
+        if serial:
+            parts = serial.split("-")
+            if len(parts) >= 2:
+                try:
+                    year_from_serial = int(parts[1])
+                    if year_from_serial >= platform_start:
+                        return year_from_serial
+                except (ValueError, IndexError):
+                    pass
+        return platform_start
+
+    @classmethod
+    def get_outstanding_years(cls, member):
+        """
+        Return a list of years the member owes dues for, sorted oldest first.
+        Each item is a dict with year, amount_paid, remaining_balance, status.
+        """
+        current_year = timezone.now().year
+        join_year = cls.get_member_join_year(member)
+        start_year = max(join_year, 2020)
+
+        # Get all existing payment records for this member
+        existing = {
+            dp.year: dp
+            for dp in cls.objects.filter(member=member)
+        }
+
+        outstanding = []
+        for year in range(start_year, current_year + 1):
+            dp = existing.get(year)
+            if dp:
+                if not dp.is_fully_paid:
+                    outstanding.append({
+                        "year": year,
+                        "amount_paid": dp.amount_paid,
+                        "remaining_balance": dp.remaining_balance,
+                        "status": dp.status,
+                        "record": dp,
+                    })
+            else:
+                outstanding.append({
+                    "year": year,
+                    "amount_paid": Decimal("0"),
+                    "remaining_balance": cls.YEARLY_DUES_AMOUNT,
+                    "status": cls.STATUS_OWED,
+                    "record": None,
+                })
+        return outstanding
 
     @classmethod
     def get_member_debt(cls, member):
         """
         Calculate total dues debt for a member.
-        Debt = (years_from_joining_to_now \u00d7 5000) \u2212 total_paid
+        Debt = sum of remaining balances for all years from join_year to current_year.
         """
-        from datetime import datetime
-        current_year = datetime.now().year
-
-        join_year = getattr(member, 'year_joined', None) or 2020
+        current_year = timezone.now().year
+        join_year = cls.get_member_join_year(member)
         start_year = max(join_year, 2020)
 
         expected_years = list(range(start_year, current_year + 1))
@@ -149,15 +311,206 @@ class DuesPayment(BaseModel):
 
         total_paid = cls.objects.filter(
             member=member,
-            year__in=expected_years
-        ).aggregate(total=models.Sum("amount_paid"))["total"] or 0
+            year__in=expected_years,
+        ).aggregate(total=models.Sum("amount_paid"))["total"] or Decimal("0")
+
+        # Also include prepaid amounts as "paid" (they reduce debt)
+        prepaid_paid = cls.objects.filter(
+            member=member,
+            year__gt=current_year,
+        ).aggregate(total=models.Sum("amount_paid"))["total"] or Decimal("0")
+
+        years_paid_qs = cls.objects.filter(
+            member=member,
+            amount_paid__gte=cls.YEARLY_DUES_AMOUNT,
+        ).values_list("year", flat=True)
 
         return {
             "total_expected": total_expected,
             "total_paid": total_paid,
-            "debt_owed": max(total_expected - total_paid, 0),
+            "prepaid_amount": prepaid_paid,
+            "debt_owed": max(total_expected - total_paid, Decimal("0")),
             "years_expected": expected_years,
-            "years_paid": list(cls.objects.filter(member=member).values_list("year", flat=True)),
+            "years_paid": list(years_paid_qs),
+            "years_partial": list(
+                cls.objects.filter(
+                    member=member,
+                    amount_paid__gt=0,
+                    amount_paid__lt=cls.YEARLY_DUES_AMOUNT,
+                ).values_list("year", flat=True)
+            ),
+        }
+
+    @classmethod
+    @transaction.atomic
+    def allocate_payment(cls, member, total_amount, payment_method, receipt_reference,
+                         payment_date, notes, recorded_by):
+        """
+        Allocate a dues payment across outstanding years (oldest first),
+        then to future years if there's excess.
+        Returns a dict with: transaction, allocations list, messages list.
+        """
+        from decimal import Decimal
+
+        total_amount = Decimal(str(total_amount))
+        if total_amount <= 0:
+            raise ValidationError("Payment amount must be greater than zero.")
+
+        current_year = timezone.now().year
+        join_year = cls.get_member_join_year(member)
+        start_year = max(join_year, 2020)
+        yearly_dues = cls.YEARLY_DUES_AMOUNT
+
+        # Create the transaction record
+        transaction_obj = DuesPaymentTransaction.objects.create(
+            member=member,
+            total_amount=total_amount,
+            payment_method=payment_method,
+            receipt_reference=receipt_reference or "",
+            payment_date=payment_date,
+            notes=notes or "",
+            recorded_by=recorded_by,
+        )
+
+        remaining = total_amount
+        allocations = []
+        messages_list = []
+
+        # Phase 1: Allocate to outstanding years (oldest first)
+        for year in range(start_year, current_year + 1):
+            if remaining <= 0:
+                break
+
+            dp, created = cls.objects.get_or_create(
+                member=member,
+                year=year,
+                defaults={
+                    "amount_paid": Decimal("0"),
+                    "notes": "",
+                    "recorded_by": recorded_by,
+                },
+            )
+
+            needed = yearly_dues - dp.amount_paid
+            if needed > 0:
+                allocate = min(needed, remaining)
+                dp.amount_paid += allocate
+                dp.recorded_by = recorded_by  # Update to latest recorder
+                if notes:
+                    dp.notes = notes if not dp.notes else f"{dp.notes}; {notes}"
+                dp.save()
+                dp.transactions.add(transaction_obj)
+
+                # Create/update linked Income record
+                if dp.income:
+                    dp.income.amount = dp.amount_paid
+                    dp.income.reason = f"Yearly Dues — {year}"
+                    dp.income.paid_by = member.get_full_name()
+                    dp.income.created_by = recorded_by
+                    dp.income.save()
+                else:
+                    income = Income.objects.create(
+                        income_type="DUES",
+                        amount=dp.amount_paid,
+                        reason=f"Yearly Dues — {year}",
+                        paid_by=member.get_full_name(),
+                        created_by=recorded_by,
+                    )
+                    dp.income = income
+                    dp.save(update_fields=["income"])
+
+                remaining -= allocate
+                allocations.append({
+                    "year": year,
+                    "allocated": allocate,
+                    "total_paid_for_year": dp.amount_paid,
+                    "status": dp.status,
+                    "is_new": created,
+                })
+
+                if dp.is_fully_paid:
+                    messages_list.append(f"Year {year} fully paid (₦{dp.amount_paid:,.2f}).")
+                else:
+                    messages_list.append(
+                        f"Year {year} partially paid (₦{dp.amount_paid:,.2f} of ₦{yearly_dues:,.2f}). "
+                        f"Remaining: ₦{dp.remaining_balance:,.2f}."
+                    )
+
+        # Phase 2: Allocate remaining to future years (prepaid)
+        future_year = current_year + 1
+        while remaining > 0:
+            dp, created = cls.objects.get_or_create(
+                member=member,
+                year=future_year,
+                defaults={
+                    "amount_paid": Decimal("0"),
+                    "notes": "",
+                    "recorded_by": recorded_by,
+                },
+            )
+
+            needed = yearly_dues - dp.amount_paid
+            if needed > 0:
+                allocate = min(needed, remaining)
+                dp.amount_paid += allocate
+                dp.recorded_by = recorded_by
+                if notes:
+                    dp.notes = notes if not dp.notes else f"{dp.notes}; {notes}"
+                dp.save()
+                dp.transactions.add(transaction_obj)
+
+                # Create/update linked Income record
+                if dp.income:
+                    dp.income.amount = dp.amount_paid
+                    dp.income.reason = f"Yearly Dues — {future_year} (Prepaid)"
+                    dp.income.paid_by = member.get_full_name()
+                    dp.income.created_by = recorded_by
+                    dp.income.save()
+                else:
+                    income = Income.objects.create(
+                        income_type="DUES",
+                        amount=dp.amount_paid,
+                        reason=f"Yearly Dues — {future_year} (Prepaid)",
+                        paid_by=member.get_full_name(),
+                        created_by=recorded_by,
+                    )
+                    dp.income = income
+                    dp.save(update_fields=["income"])
+
+                remaining -= allocate
+                allocations.append({
+                    "year": future_year,
+                    "allocated": allocate,
+                    "total_paid_for_year": dp.amount_paid,
+                    "status": dp.status,
+                    "is_new": created,
+                    "is_prepaid": True,
+                })
+
+                if dp.is_fully_paid:
+                    messages_list.append(
+                        f"Year {future_year} prepaid (₦{dp.amount_paid:,.2f}). "
+                        f"Will activate automatically when {future_year} begins."
+                    )
+                else:
+                    messages_list.append(
+                        f"Year {future_year} partially prepaid (₦{dp.amount_paid:,.2f} of ₦{yearly_dues:,.2f})."
+                    )
+
+            future_year += 1
+
+        # Handle any tiny remainder (shouldn't happen with proper amounts)
+        if remaining > 0:
+            messages_list.append(
+                f"Note: ₦{remaining:,.2f} could not be allocated (remainder after full allocations)."
+            )
+
+        return {
+            "transaction": transaction_obj,
+            "allocations": allocations,
+            "messages": messages_list,
+            "total_allocated": total_amount - remaining,
+            "remaining": remaining,
         }
 
 
@@ -177,7 +530,7 @@ class Expense(BaseModel):
     amount = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(0.01)],
+        validators=[MinValueValidator(Decimal("0.01"))],
         verbose_name="Amount"
     )
     category = models.CharField(
@@ -209,7 +562,7 @@ class Expense(BaseModel):
         ]
 
     def __str__(self):
-        return f"\u20a6{self.amount:,.2f} - {self.category}"
+        return f"₦{self.amount:,.2f} - {self.category}"
 
     def clean(self):
         if not self.receipt_file:
