@@ -7,6 +7,13 @@
     <meta name="theme-color" content="#0a3d62">
     <title>Login | Okpo Youths Association</title>
 
+    <!-- Dynamic Favicon -->
+    {% if settings_favicon_url %}
+    <link rel="icon" type="image/png" href="{{ settings_favicon_url }}">
+    {% else %}
+    <link rel="icon" type="image/png" href="{% static 'images/oya_logo.png' %}">
+    {% endif %}
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -155,6 +162,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
         .logo-wrapper img {
@@ -355,8 +363,8 @@
         <!-- Logo -->
         <div class="logo-section">
             <div class="logo-wrapper">
-                {% if system_settings and system_settings.logo %}
-                    <img src="{{ system_settings.logo.url }}" alt="OYA Logo">
+                {% if settings_logo_url %}
+                    <img src="{{ settings_logo_url }}" alt="OYA Logo">
                 {% else %}
                     <img src="{% static 'images/oya_logo.png' %}" alt="OYA Logo">
                 {% endif %}
