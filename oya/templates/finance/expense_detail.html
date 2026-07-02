@@ -25,6 +25,9 @@
     font-weight: 800;
     letter-spacing: -0.025em;
     text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .expense-detail .hero-words {
     font-size: 0.875rem;
@@ -88,6 +91,17 @@
     font-size: 0.875rem;
     margin-left: 0.75rem;
   }
+  .expense-detail .receipt-missing {
+    background: var(--oya-warning-bg);
+    border: 1px solid var(--oya-warning);
+    color: var(--oya-warning);
+    padding: 0.75rem 1rem;
+    border-radius: var(--oya-radius);
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
   .expense-detail .timeline-title {
     font-size: 0.875rem;
     font-weight: 600;
@@ -144,6 +158,9 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 0.5rem;
+    }
+    .expense-detail .hero-amount {
+      font-size: 1.75rem;
     }
   }
 </style>
@@ -325,31 +342,44 @@
 
       <!-- Receipt Section -->
       {% if expense.receipt_file %}
-      <div class="card mb-4 receipt-section">
-        <div class="card-body">
-          <div class="receipt-header">
-            <h6 class="receipt-title">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem; color: var(--oya-primary);">
-                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
-                <polyline points="13 2 13 9 20 9"/>
+        {% if expense.receipt_file.storage.exists expense.receipt_file.name %}
+        <div class="card mb-4 receipt-section">
+          <div class="card-body">
+            <div class="receipt-header">
+              <h6 class="receipt-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem; color: var(--oya-primary);">
+                  <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                  <polyline points="13 2 13 9 20 9"/>
+                </svg>
+                Attached Receipt
+              </h6>
+              <span class="badge badge-success">{{ expense.receipt_file.size|filesizeformat }}</span>
+            </div>
+            <a href="{{ expense.receipt_file.url }}" target="_blank" class="btn btn-primary btn-sm">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              Attached Receipt
-            </h6>
-            <span class="badge badge-success">{{ expense.receipt_file.size|filesizeformat }}</span>
+              Download Receipt
+            </a>
+            <span class="receipt-filename">
+              {{ expense.receipt_file.name|cut:"finance/receipts/" }}
+            </span>
           </div>
-          <a href="{{ expense.receipt_file.url }}" target="_blank" class="btn btn-primary btn-sm">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Download Receipt
-          </a>
-          <span class="receipt-filename">
-            {{ expense.receipt_file.name|cut:"finance/receipts/" }}
-          </span>
         </div>
-      </div>
+        {% else %}
+        <div class="card mb-4 receipt-section">
+          <div class="card-body">
+            <div class="receipt-missing">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              Receipt file is missing from storage. It may have been deleted or the server storage was reset.
+            </div>
+          </div>
+        </div>
+        {% endif %}
       {% endif %}
 
       <!-- Timeline -->
