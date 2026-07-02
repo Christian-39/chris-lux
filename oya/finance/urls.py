@@ -1,6 +1,4 @@
-"""
-URL patterns for finance app.
-"""
+"""URL patterns for finance app."""
 from django.urls import path
 from . import views
 
@@ -13,7 +11,10 @@ urlpatterns = [
 
     # Dues Tracker
     path("dues/", views.dues_tracker, name="dues_tracker"),
-    path("dues/create/", views.dues_create, name="dues_create"),
+    # Smart allocation (replaces old single-year dues_create)
+    path("dues/allocate/", views.dues_allocate, name="dues_allocate"),
+    # Legacy single-year create (kept for backward compatibility, redirects to allocate)
+    path("dues/create/", views.dues_allocate, name="dues_create"),
     path("dues/<int:pk>/delete/", views.dues_delete, name="dues_delete"),
     path("members/<int:member_id>/dues/", views.member_dues_detail, name="member_dues_detail"),
 
@@ -37,4 +38,5 @@ urlpatterns = [
 
     # AJAX
     path("api/search-members/", views.search_members, name="search_members"),
+    path("api/member-dues-preview/", views.member_dues_preview, name="member_dues_preview"),
 ]
