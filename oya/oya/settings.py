@@ -49,7 +49,7 @@ LOCAL_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    "storages",  # django-storages
+    "storages",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -91,7 +91,6 @@ WSGI_APPLICATION = "oya.wsgi.application"
 ASGI_APPLICATION = "oya.asgi.application"
 
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 DATABASES = {
     "default": {
         "ENGINE": config("DB_ENGINE", default="django.db.backends.sqlite3"),
@@ -104,7 +103,6 @@ DATABASES = {
 }
 
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -130,16 +128,12 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "Africa/Lagos"
-
 USE_I18N = True
-
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# Static files
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
@@ -150,63 +144,37 @@ STATICFILES_DIRS = [
 # BACKBLAZE B2 / S3 COMPATIBLE STORAGE
 # ============================================
 
-MEDIA_STORAGE_MODE = config("MEDIA_STORAGE_MODE", default="local")
+# Use S3Boto3Storage directly — same as your Gadgets Store
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
-if MEDIA_STORAGE_MODE == "b2":
-    # B2 Credentials (from your Railway env vars)
-    B2_KEY_ID = config("B2_KEY_ID")
-    B2_APPLICATION_KEY = config("B2_APPLICATION_KEY")
-    B2_BUCKET_NAME = config("B2_BUCKET_NAME")
-    B2_BUCKET_REGION = config("B2_BUCKET_REGION", default="us-west-004")
-    B2_ENDPOINT_URL = config("B2_ENDPOINT_URL", default="https://s3.us-west-004.backblazeb2.com")
-    B2_CUSTOM_DOMAIN = config("B2_CUSTOM_DOMAIN", default=None)
+# B2 Credentials (from Railway env vars)
+AWS_ACCESS_KEY_ID = config("B2_KEY_ID")
+AWS_SECRET_ACCESS_KEY = config("B2_APPLICATION_KEY")
+AWS_STORAGE_BUCKET_NAME = config("B2_BUCKET_NAME")
+AWS_S3_REGION_NAME = config("B2_BUCKET_REGION", default="us-east-005")
+AWS_S3_ENDPOINT_URL = config("B2_ENDPOINT_URL", default="https://s3.us-east-005.backblazeb2.com")
 
-    # Map to AWS S3-compatible settings for the custom backend
-    AWS_ACCESS_KEY_ID = B2_KEY_ID
-    AWS_SECRET_ACCESS_KEY = B2_APPLICATION_KEY
-    AWS_STORAGE_BUCKET_NAME = B2_BUCKET_NAME
-    AWS_S3_REGION_NAME = B2_BUCKET_REGION
-    AWS_S3_ENDPOINT_URL = B2_ENDPOINT_URL
+# CRITICAL B2 Settings
+AWS_S3_ADDRESSING_STYLE = "virtual"
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_QUERYSTRING_AUTH = False
+AWS_DEFAULT_ACL = "public-read"  # Must match bucket's public ACL
+AWS_S3_FILE_OVERWRITE = True
 
-    # CRITICAL B2 Settings
-    AWS_S3_ADDRESSING_STYLE = "virtual"  # CRITICAL - Without this B2 fails!
-    AWS_S3_SIGNATURE_VERSION = "s3v4"
-    AWS_QUERYSTRING_AUTH = False
-    AWS_DEFAULT_ACL = None  # CRITICAL: B2 does NOT support ACLs
-    AWS_S3_FILE_OVERWRITE = True
+# Media URL
+MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.backblazeb2.com/"
 
-    # Media URL
-    if B2_CUSTOM_DOMAIN:
-        AWS_S3_CUSTOM_DOMAIN = B2_CUSTOM_DOMAIN.replace("https://", "").replace("http://", "")
-        MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
-    else:
-        MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.backblazeb2.com/media/"
+# ============================================
+# WHITENOISE (Production)
+# ============================================
 
-    # Use custom B2 storage backend (handles 403 errors + no ACL)
-    STORAGES = {
-        "default": {
-            "BACKEND": "oya.storage_backends.BackblazeB2Storage",
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
-
-else:
-    # Local storage for development
-    MEDIA_URL = "/media/"
-    MEDIA_ROOT = BASE_DIR / "media"
-
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
-
-# Whitenoise for static files in production
 if not DEBUG:
     MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
     STORAGES["staticfiles"] = {
@@ -227,7 +195,7 @@ if not DEBUG:
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Session settings
-SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_COOKIE_AGE = 86400
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 # Login settings
@@ -262,7 +230,7 @@ LOGGING = {
             "level": "INFO",
             "class": "logging.handlers.RotatingFileHandler",
             "filename": LOGS_DIR / "oya.log",
-            "maxBytes": 10485760,  # 10MB
+            "maxBytes": 10485760,
             "backupCount": 10,
             "formatter": "verbose",
         },
@@ -270,7 +238,7 @@ LOGGING = {
             "level": "ERROR",
             "class": "logging.handlers.RotatingFileHandler",
             "filename": LOGS_DIR / "oya_errors.log",
-            "maxBytes": 10485760,  # 10MB
+            "maxBytes": 10485760,
             "backupCount": 10,
             "formatter": "verbose",
         },
@@ -299,7 +267,7 @@ CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         "LOCATION": "oya-cache",
-        "TIMEOUT": 300,  # 5 minutes
+        "TIMEOUT": 300,
     }
 }
 
@@ -316,6 +284,6 @@ OYA_SETTINGS = {
     "MEMBER_MIN_AGE": 18,
     "PAST_MEMBER_AGE": 56,
     "ELECTION_CYCLE_YEARS": 4,
-    "CURRENCY_SYMBOL": "₦",  # Naira symbol
+    "CURRENCY_SYMBOL": "₦",
     "SERIAL_NUMBER_PREFIX": "OYA",
 }
