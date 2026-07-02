@@ -22,6 +22,7 @@
   .expense-list .amount-out {
     color: var(--oya-danger);
     font-weight: 600;
+    white-space: nowrap;
   }
   .expense-list .receipt-link {
     color: var(--oya-primary);
@@ -62,8 +63,35 @@
     color: var(--oya-text-muted);
   }
 
-  /* Mobile: make table horizontally scrollable, keep layout clean */
+  /* KPI cards: prevent text wrapping, allow horizontal scroll on very small screens */
+  .expense-list .kpi-card {
+    min-width: 0;
+  }
+  .expense-list .kpi-value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .expense-list .kpi-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Mobile: stack KPIs vertically so they have full width */
   @media (max-width: 768px) {
+    .expense-list .dashboard-grid-4 {
+      grid-template-columns: 1fr 1fr !important;
+    }
+    .expense-list .kpi-card {
+      padding: 1rem;
+    }
+    .expense-list .kpi-value {
+      font-size: 1.25rem;
+    }
+    .expense-list .kpi-label {
+      font-size: 0.75rem;
+    }
     .expense-list .page-header {
       flex-direction: column;
       align-items: flex-start;
@@ -97,6 +125,15 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .expense-list .dashboard-grid-4 {
+      grid-template-columns: 1fr !important;
+    }
+    .expense-list .kpi-value {
+      font-size: 1.5rem;
     }
   }
 </style>
