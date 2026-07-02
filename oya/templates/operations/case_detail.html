@@ -39,7 +39,7 @@
   </div>
 </div>
 
-<div class="dashboard-grid dashboard-grid-2" style="grid-template-columns:repeat(auto-fit, minmax(min(100%, 320px), 1fr));" style="margin-bottom:clamp(0.75rem, 3vw, 1.5rem);">
+<div class="dashboard-grid dashboard-grid-2" style="grid-template-columns:repeat(auto-fit, minmax(min(100%, 320px), 1fr));margin-bottom:clamp(0.75rem, 3vw, 1.5rem);">
 
   <!-- Case Information -->
   <div class="card">
@@ -111,7 +111,7 @@
           <div class="timeline-dot" style="background:var(--oya-success);"></div>
           <div class="timeline-content" style="padding:clamp(0.625rem, 2vw, 0.875rem);">
             <div class="timeline-title" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Case Filed</div>
-            <div class="timeline-desc" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);">{{ case.created_by.get_full_name|default:case.created_by.username }} created this case</div>
+            <div class="timeline-desc" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);">{{ case.created_by.get_full_name|default:case.created_by.serial_number }} created this case</div>
             <div class="timeline-time" style="font-size:clamp(0.6875rem, 1.5vw, 0.75rem);">{{ case.created_at|date:"M d, Y \a\t h:i A" }}</div>
           </div>
         </div>
