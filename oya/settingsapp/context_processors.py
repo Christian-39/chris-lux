@@ -15,6 +15,8 @@ def system_settings(request):
             "primary_color": settings_obj.primary_color,
             "accent_color": settings_obj.accent_color,
             "theme_mode": settings_obj.theme_mode,
+            "settings_logo_url": settings_obj.logo_url,
+            "settings_favicon_url": settings_obj.favicon_url,
         }
     except Exception:
         return {
@@ -24,4 +26,6 @@ def system_settings(request):
             "primary_color": "#1a237e",
             "accent_color": "#ff6f00",
             "theme_mode": "LIGHT",
+            "settings_logo_url": "",
+            "settings_favicon_url": "",
         }
