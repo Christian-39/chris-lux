@@ -22,7 +22,7 @@
       {% endif %}
     </div>
     <p style="color:var(--oya-text-secondary);font-size:clamp(0.8125rem, 2.5vw, 0.9375rem);">
-      Filed by {{ case.created_by.get_full_name|default:case.created_by.username }} on {{ case.created_at|date:"F d, Y" }}
+      Filed by {{ case.created_by.get_full_name|default:case.created_by.serial_number }} on {{ case.created_at|date:"F d, Y" }}
     </p>
   </div>
   <div class="page-header-actions" style="flex-wrap:wrap;gap:0.5rem;">
