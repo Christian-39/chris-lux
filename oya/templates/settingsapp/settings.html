@@ -55,7 +55,7 @@
 </div>
 
 <div class="form-responsive-wrapper">
-<form method="post" action="{% url "settingsapp:settings" %}" id="settingsForm">
+<form method="post" action="{% url 'settingsapp:settings' %}" id="settingsForm" enctype="multipart/form-data">
   {% csrf_token %}
 
   <!-- Tabs -->
@@ -68,453 +68,524 @@
       <button type="button" class="tab-btn" data-tab="tab-finance">Finance & Theme</button>
     </div>
 
-    <!-- System Config Tab -->
-    <div class="tab-content active" id="tab-system">
-      <div class="card" style="margin-top:0;">
-        <div class="card-header">
-          <div>
-            <div class="card-header-title">Organization Information</div>
-            <div class="card-header-subtitle">Basic details about Okpo Youths Association</div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
-            <div class="form-group">
-              <label for="{{ form.association_name.id_for_label }}" class="form-label">Organization Name</label>
-              {{ form.association_name }}
-              {% if form.association_name.errors %}
-                <div class="form-error">{{ form.association_name.errors.0 }}</div>
-              {% endif %}
-            </div>
-            <div class="form-group">
-              <label class="form-label">Short Name (Abbreviation)</label>
-              <input type="text" class="form-control" value="OYA" readonly style="background:var(--oya-bg);cursor:not-allowed;">
-            </div>
-          </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label for="{{ form.motto.id_for_label }}" class="form-label">Motto</label>
-            {{ form.motto }}
-            {% if form.motto.errors %}
-              <div class="form-error">{{ form.motto.errors.0 }}</div>
-            {% endif %}
-          </div>
+  <!-- System Config Tab -->
+  <div class="tab-content active" id="tab-system">
+    <div class="card" style="margin-top:0;">
+      <div class="card-header">
+        <div>
+          <div class="card-header-title">Organization Information</div>
+          <div class="card-header-subtitle">Basic details about Okpo Youths Association</div>
         </div>
       </div>
-
-      <div class="card" style="margin-top:1.25rem;">
-        <div class="card-header">
-          <div>
-            <div class="card-header-title">System Configuration</div>
-            <div class="card-header-subtitle">Core system behavior settings</div>
+      <div class="card-body">
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+          <div class="form-group">
+            <label for="{{ form.association_name.id_for_label }}" class="form-label">Organization Name</label>
+            {{ form.association_name }}
+            {% if form.association_name.errors %}
+              <div class="form-error">{{ form.association_name.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Short Name (Abbreviation)</label>
+            <input type="text" class="form-control" value="OYA" readonly style="background:var(--oya-bg);cursor:not-allowed;">
           </div>
         </div>
-        <div class="card-body">
-          <div class="settings-row">
-            <div class="settings-info">
-              <h4>Auto-Generate Member IDs</h4>
-              <p>Automatically assign sequential member IDs on registration</p>
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label for="{{ form.motto.id_for_label }}" class="form-label">Motto</label>
+          {{ form.motto }}
+          {% if form.motto.errors %}
+            <div class="form-error">{{ form.motto.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Branding / Logo & Favicon -->
+    <div class="card" style="margin-top:1.25rem;">
+      <div class="card-header">
+        <div>
+          <div class="card-header-title">Branding</div>
+          <div class="card-header-subtitle">Upload organization logo and browser favicon</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:0;">
+          <!-- Logo -->
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="{{ form.logo.id_for_label }}" class="form-label">Organization Logo</label>
+            <div style="display:flex;align-items:center;gap:1rem;margin-bottom:0.5rem;">
+              <div style="width:80px;height:80px;border:2px dashed var(--oya-border);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--oya-bg);">
+                {% if settings.logo and settings.logo.name %}
+                  <img src="{{ settings.logo.url }}" alt="Logo" style="max-width:100%;max-height:100%;object-fit:contain;padding:4px;">
+                {% else %}
+                  <span style="font-size:0.7rem;color:var(--oya-text-muted);text-align:center;padding:4px;">No Logo</span>
+                {% endif %}
+              </div>
+              <div style="flex:1;">
+                {{ form.logo }}
+                <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-top:0.25rem;">PNG, JPG, SVG, WEBP. Max 2MB. Recommended: transparent background.</div>
+                {% if form.logo.errors %}
+                  <div class="form-error">{{ form.logo.errors.0 }}</div>
+                {% endif %}
+                {% if settings.logo and settings.logo.name %}
+                <div style="margin-top:0.5rem;">
+                  <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:var(--oya-text-muted);cursor:pointer;">
+                    <input type="checkbox" name="logo-clear" id="logo-clear_id">
+                    Remove current logo
+                  </label>
+                </div>
+                {% endif %}
+              </div>
             </div>
-            <label class="toggle">
-              <input type="checkbox" checked disabled>
-              <span class="toggle-slider"></span>
-            </label>
           </div>
-          <div class="settings-row">
-            <div class="settings-info">
-              <h4>Require Approval for New Members</h4>
-              <p>New registrations need executive approval before activation</p>
+          <!-- Favicon -->
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="{{ form.favicon.id_for_label }}" class="form-label">Browser Favicon</label>
+            <div style="display:flex;align-items:center;gap:1rem;margin-bottom:0.5rem;">
+              <div style="width:48px;height:48px;border:2px dashed var(--oya-border);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--oya-bg);">
+                {% if settings.favicon and settings.favicon.name %}
+                  <img src="{{ settings.favicon.url }}" alt="Favicon" style="max-width:100%;max-height:100%;object-fit:contain;padding:4px;">
+                {% else %}
+                  <span style="font-size:0.6rem;color:var(--oya-text-muted);text-align:center;padding:4px;">No Icon</span>
+                {% endif %}
+              </div>
+              <div style="flex:1;">
+                {{ form.favicon }}
+                <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-top:0.25rem;">ICO, PNG, SVG. Max 1MB. Recommended: 32x32 or 64x64.</div>
+                {% if form.favicon.errors %}
+                  <div class="form-error">{{ form.favicon.errors.0 }}</div>
+                {% endif %}
+                {% if settings.favicon and settings.favicon.name %}
+                <div style="margin-top:0.5rem;">
+                  <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:var(--oya-text-muted);cursor:pointer;">
+                    <input type="checkbox" name="favicon-clear" id="favicon-clear_id">
+                    Remove current favicon
+                  </label>
+                </div>
+                {% endif %}
+              </div>
             </div>
-            <label class="toggle">
-              <input type="checkbox" disabled>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="settings-row">
-            <div class="settings-info">
-              <h4>Enable SMS Notifications</h4>
-              <p>Send SMS alerts for important announcements and reminders</p>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" checked disabled>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="settings-row">
-            <div class="settings-info">
-              <h4>Email Notifications</h4>
-              <p>Send email notifications for system events and updates</p>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" checked disabled>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="settings-row">
-            <div class="settings-info">
-              <h4>Session Timeout (minutes)</h4>
-              <p>Automatically log out inactive users after specified time</p>
-            </div>
-            <input type="number" class="form-control" value="30" style="width:80px;text-align:center;" disabled>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Users & Access Tab -->
-    <div class="tab-content" id="tab-users">
-      <div class="card" style="margin-top:0;">
-        <div class="card-header">
-          <div>
-            <div class="card-header-title">User Management</div>
-            <div class="card-header-subtitle">All system users and their access levels</div>
+    <div class="card" style="margin-top:1.25rem;">
+      <div class="card-header">
+        <div>
+          <div class="card-header-title">System Configuration</div>
+          <div class="card-header-subtitle">Core system behavior settings</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="settings-row">
+          <div class="settings-info">
+            <h4>Auto-Generate Member IDs</h4>
+            <p>Automatically assign sequential member IDs on registration</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked disabled>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <div class="settings-info">
+            <h4>Require Approval for New Members</h4>
+            <p>New registrations need executive approval before activation</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" disabled>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <div class="settings-info">
+            <h4>Enable SMS Notifications</h4>
+            <p>Send SMS alerts for important announcements and reminders</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked disabled>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <div class="settings-info">
+            <h4>Email Notifications</h4>
+            <p>Send email notifications for system events and updates</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked disabled>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <div class="settings-info">
+            <h4>Session Timeout (minutes)</h4>
+            <p>Automatically log out inactive users after specified time</p>
+          </div>
+          <input type="number" class="form-control" value="30" style="width:80px;text-align:center;" disabled>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users & Access Tab -->
+  <div class="tab-content" id="tab-users">
+    <div class="card" style="margin-top:0;">
+      <div class="card-header">
+        <div>
+          <div class="card-header-title">User Management</div>
+          <div class="card-header-subtitle">All system users and their access levels</div>
+        </div>
+        {% if user.is_staff %}
+        <a href="{% url 'accounts:user_list' %}" class="btn btn-primary btn-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Manage Users
+        </a>
+        {% endif %}
+      </div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-container">
+        <div class="table-responsive-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Serial Number</th>
+                <th>Role</th>
+                <th>Last Login</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in all_users %}
+              <tr>
+                <td>
+                  <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <div class="avatar avatar-sm" style="background:var(--oya-primary);color:#fff;overflow:hidden;cursor:pointer;" onclick="openImagePreview('{% if u.photo and u.photo.name %}{{ u.photo.url }}{% elif u.member and u.member.photo and u.member.photo.name %}{{ u.member.photo.url }}{% endif %}', '{{ u.full_name|default:u.serial_number }}')">
+                      {% if u.photo and u.photo.name %}
+                        <img src="{{ u.photo.url }}" alt="{{ u.full_name }}" style="width:100%;height:100%;object-fit:cover;">
+                      {% elif u.member and u.member.photo and u.member.photo.name %}
+                        <img src="{{ u.member.photo.url }}" alt="{{ u.full_name }}" style="width:100%;height:100%;object-fit:cover;">
+                      {% else %}
+                        {{ u.get_initials|default:u.serial_number|first }}
+                      {% endif %}
+                    </div>
+                    <span class="cell-name">{{ u.full_name|default:"No Name" }}</span>
+                  </div>
+                </td>
+                <td class="cell-muted">{{ u.serial_number }}</td>
+                <td><span class="badge badge-{% if u.role == 'ADMIN' %}danger{% elif u.role == 'EXECUTIVE' %}primary{% elif u.role == 'FLOOR_MEMBER' %}success{% else %}secondary{% endif %}">{{ u.get_role_display|default:u.role }}</span></td>
+                <td class="cell-muted">{{ u.last_login|default:"Never"|date:"M j, Y h:i A" }}</td>
+                <td><span class="badge badge-{% if u.is_active %}success{% else %}danger{% endif %}">{% if u.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+                <td>
+                  <div class="table-actions">
+                    <a href="{% url 'accounts:user_update' u.id %}" class="table-action-btn" title="Edit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" style="text-align:center;padding:2rem;color:var(--oya-text-muted);">No users found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Members Tab -->
+  <div class="tab-content" id="tab-members">
+    <div class="card" style="margin-top:0;">
+      <div class="card-header">
+        <div>
+          <div class="card-header-title">Member Management</div>
+          <div class="card-header-subtitle">All OYA members and their status</div>
+        </div>
+        <div style="display:flex;gap:0.75rem;align-items:center;">
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <span class="badge badge-success">{{ member_stats.active }} Active</span>
+            <span class="badge badge-warning">{{ member_stats.past }} Past</span>
+            <span class="badge badge-danger">{{ member_stats.removed }} Removed</span>
+            <span class="badge badge-secondary">{{ member_stats.total }} Total</span>
           </div>
           {% if user.is_staff %}
-          <a href="{% url "accounts:user_list" %}" class="btn btn-primary btn-sm">
+          <a href="{% url 'members:member_create' %}" class="btn btn-primary btn-sm">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Manage Users
+            Add Member
           </a>
           {% endif %}
         </div>
-        <div class="card-body" style="padding:0;">
-          <div class="table-container">
-          <div class="table-responsive-wrapper">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Serial Number</th>
-                  <th>Role</th>
-                  <th>Last Login</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for u in all_users %}
-                <tr>
-                  <td>
-                    <div style="display:flex;align-items:center;gap:0.75rem;">
-                      <div class="avatar avatar-sm" style="background:var(--oya-primary);color:#fff;overflow:hidden;cursor:pointer;" onclick="openImagePreview('{% if u.photo and u.photo.name %}{{ u.photo.url }}{% elif u.member and u.member.photo and u.member.photo.name %}{{ u.member.photo.url }}{% endif %}', '{{ u.full_name|default:u.serial_number }}')">
-                        {% if u.photo and u.photo.name %}
-                          <img src="{{ u.photo.url }}" alt="{{ u.full_name }}" style="width:100%;height:100%;object-fit:cover;">
-                        {% elif u.member and u.member.photo and u.member.photo.name %}
-                          <img src="{{ u.member.photo.url }}" alt="{{ u.full_name }}" style="width:100%;height:100%;object-fit:cover;">
-                        {% else %}
-                          {{ u.get_initials|default:u.serial_number|first }}
-                        {% endif %}
-                      </div>
-                      <span class="cell-name">{{ u.full_name|default:"No Name" }}</span>
-                    </div>
-                  </td>
-                  <td class="cell-muted">{{ u.serial_number }}</td>
-                  <td><span class="badge badge-{% if u.role == "ADMIN" %}danger{% elif u.role == "EXECUTIVE" %}primary{% elif u.role == "FLOOR_MEMBER" %}success{% else %}secondary{% endif %}">{{ u.get_role_display|default:u.role }}</span></td>
-                  <td class="cell-muted">{{ u.last_login|default:"Never"|date:"M j, Y h:i A" }}</td>
-                  <td><span class="badge badge-{% if u.is_active %}success{% else %}danger{% endif %}">{% if u.is_active %}Active{% else %}Inactive{% endif %}</span></td>
-                  <td>
-                    <div class="table-actions">
-                      <a href="{% url "accounts:user_update" u.id %}" class="table-action-btn" title="Edit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></a>
-                    </div>
-                  </td>
-                </tr>
-                {% empty %}
-                <tr>
-                  <td colspan="6" style="text-align:center;padding:2rem;color:var(--oya-text-muted);">No users found.</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          </div>
-        </div>
       </div>
-    </div>
-
-    <!-- Members Tab -->
-    <div class="tab-content" id="tab-members">
-      <div class="card" style="margin-top:0;">
-        <div class="card-header">
-          <div>
-            <div class="card-header-title">Member Management</div>
-            <div class="card-header-subtitle">All OYA members and their status</div>
-          </div>
-          <div style="display:flex;gap:0.75rem;align-items:center;">
-            <div style="display:flex;gap:0.5rem;align-items:center;">
-              <span class="badge badge-success">{{ member_stats.active }} Active</span>
-              <span class="badge badge-warning">{{ member_stats.past }} Past</span>
-              <span class="badge badge-danger">{{ member_stats.removed }} Removed</span>
-              <span class="badge badge-secondary">{{ member_stats.total }} Total</span>
-            </div>
-            {% if user.is_staff %}
-            <a href="{% url "members:member_create" %}" class="btn btn-primary btn-sm">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Add Member
-            </a>
-            {% endif %}
-          </div>
-        </div>
-        <div class="card-body" style="padding:0;">
-          <div class="table-container">
-          <div class="table-responsive-wrapper">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Member</th>
-                  <th>Serial</th>
-                  <th>Clan</th>
-                  <th>Age</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for member in all_members %}
-                <tr>
-                  <td>
-                    <div style="display:flex;align-items:center;gap:0.75rem;">
-                      <div class="avatar avatar-sm" style="background:var(--oya-accent);color:#fff;overflow:hidden;cursor:pointer;" onclick="openImagePreview('{% if member.photo and member.photo.name %}{{ member.photo.url }}{% endif %}', '{{ member.full_name }}')">
-                        {% if member.photo and member.photo.name %}
-                          <img src="{{ member.photo.url }}" alt="{{ member.full_name }}" style="width:100%;height:100%;object-fit:cover;">
-                        {% else %}
-                          {{ member.full_name|first }}
-                        {% endif %}
-                      </div>
-                      <span class="cell-name">{{ member.full_name }}</span>
-                    </div>
-                  </td>
-                  <td class="cell-muted">{{ member.serial_number }}</td>
-                  <td><span class="badge badge-info">{{ member.umu_nna_clan.name|default:"No Clan" }}</span></td>
-                  <td class="cell-muted">{{ member.age }}</td>
-                  <td><span class="badge badge-{% if member.status == "ACTIVE" %}success{% elif member.status == "PAST_MEMBER" %}warning{% elif member.status == "REMOVED" %}danger{% else %}secondary{% endif %}">{{ member.get_status_display|default:member.status }}</span></td>
-                  <td>
-                    <div class="table-actions">
-                      <a href="{% url "members:member_detail" member.pk %}" class="table-action-btn" title="View">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                      </a>
-                      {% if user.is_staff %}
-                      <a href="{% url "members:member_update" member.pk %}" class="table-action-btn" title="Edit">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                      </a>
+      <div class="card-body" style="padding:0;">
+        <div class="table-container">
+        <div class="table-responsive-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Member</th>
+                <th>Serial</th>
+                <th>Clan</th>
+                <th>Age</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for member in all_members %}
+              <tr>
+                <td>
+                  <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <div class="avatar avatar-sm" style="background:var(--oya-accent);color:#fff;overflow:hidden;cursor:pointer;" onclick="openImagePreview('{% if member.photo and member.photo.name %}{{ member.photo.url }}{% endif %}', '{{ member.full_name }}')">
+                      {% if member.photo and member.photo.name %}
+                        <img src="{{ member.photo.url }}" alt="{{ member.full_name }}" style="width:100%;height:100%;object-fit:cover;">
+                      {% else %}
+                        {{ member.full_name|first }}
                       {% endif %}
                     </div>
-                  </td>
-                </tr>
-                {% empty %}
-                <tr>
-                  <td colspan="6" style="text-align:center;padding:2rem;color:var(--oya-text-muted);">No members found.</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+                    <span class="cell-name">{{ member.full_name }}</span>
+                  </div>
+                </td>
+                <td class="cell-muted">{{ member.serial_number }}</td>
+                <td><span class="badge badge-info">{{ member.umu_nna_clan.name|default:"No Clan" }}</span></td>
+                <td class="cell-muted">{{ member.age }}</td>
+                <td><span class="badge badge-{% if member.status == 'ACTIVE' %}success{% elif member.status == 'PAST_MEMBER' %}warning{% elif member.status == 'REMOVED' %}danger{% else %}secondary{% endif %}">{{ member.get_status_display|default:member.status }}</span></td>
+                <td>
+                  <div class="table-actions">
+                    <a href="{% url 'members:member_detail' member.pk %}" class="table-action-btn" title="View">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </a>
+                    {% if user.is_staff %}
+                    <a href="{% url 'members:member_update' member.pk %}" class="table-action-btn" title="Edit">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </a>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" style="text-align:center;padding:2rem;color:var(--oya-text-muted);">No members found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clans Tab -->
+  <div class="tab-content" id="tab-clans">
+    <div class="card" style="margin-top:0;">
+      <div class="card-header">
+        <div>
+          <div class="card-header-title">Umu Nna Clans</div>
+          <div class="card-header-subtitle">Manage clan groups and view member distribution</div>
+        </div>
+        {% if user.is_staff %}
+        <button type="button" class="btn btn-primary btn-sm" onclick="openClanModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Clan
+        </button>
+        {% endif %}
+      </div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-container">
+        <div class="table-responsive-wrapper">
+          <table class="data-table" id="clansTable">
+            <thead>
+              <tr>
+                <th style="width:50px;">#</th>
+                <th>Clan Name</th>
+                <th style="width:100px;">Members</th>
+                <th style="width:80px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="clansTableBody">
+              {% for clan in clans %}
+              <tr data-clan-id="{{ clan.id }}">
+                <td class="cell-muted">{{ forloop.counter }}</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <div class="avatar avatar-sm" style="background:{% cycle 'var(--oya-primary)' 'var(--oya-accent)' 'var(--oya-success)' 'var(--oya-warning)' 'var(--oya-danger)' 'var(--oya-info)' %};color:#fff;">
+                      {{ clan.name|first|upper }}
+                    </div>
+                    <span class="cell-name clan-name-text">{{ clan.name }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge badge-info">{{ clan.member_count|default:0 }}</span>
+                </td>
+                <td>
+                  <div class="table-actions">
+                    <a href="{% url 'members:member_list' %}?clan={{ clan.id }}" class="table-action-btn" title="View Members">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr id="noClansRow">
+                <td colspan="4" style="text-align:center;padding:2rem;color:var(--oya-text-muted);">
+                  No clans found. Click "Add Clan" to create one.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Finance & Theme Tab -->
+  <div class="tab-content" id="tab-finance">
+    <!-- Theme Switcher -->
+    <div class="card" style="margin-top:0;">
+      <div class="card-header">
+        <div>
+          <div class="card-header-title">Appearance</div>
+          <div class="card-header-subtitle">Choose your preferred theme mode</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="theme-options">
+          <label class="theme-card {% if settings.theme_mode == 'LIGHT' %}active{% endif %}" data-theme-option="light">
+            <div class="theme-preview theme-preview-light"></div>
+            <div class="theme-label">Light</div>
+            <input type="radio" name="theme_mode" value="LIGHT" {% if settings.theme_mode == 'LIGHT' %}checked{% endif %} style="display:none;">
+          </label>
+          <label class="theme-card {% if settings.theme_mode == 'DARK' %}active{% endif %}" data-theme-option="dark">
+            <div class="theme-preview theme-preview-dark"></div>
+            <div class="theme-label">Dark</div>
+            <input type="radio" name="theme_mode" value="DARK" {% if settings.theme_mode == 'DARK' %}checked{% endif %} style="display:none;">
+          </label>
+          <label class="theme-card {% if settings.theme_mode == 'AUTO' %}active{% endif %}" data-theme-option="system">
+            <div class="theme-preview theme-preview-system"></div>
+            <div class="theme-label">System</div>
+            <input type="radio" name="theme_mode" value="AUTO" {% if settings.theme_mode == 'AUTO' %}checked{% endif %} style="display:none;">
+          </label>
+        </div>
+        {% if form.theme_mode.errors %}
+          <div class="form-error" style="margin-top:0.5rem;">{{ form.theme_mode.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Live Preview Card -->
+    <div class="card" style="margin-top:1.25rem;">
+      <div class="card-header">
+        <div>
+          <div class="card-header-title">Preview</div>
+          <div class="card-header-subtitle">How cards and components look with selected colors</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="dashboard-grid dashboard-grid-3">
+          <div class="kpi-card" style="margin:0;">
+            <div class="kpi-header">
+              <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+              <span class="kpi-badge up">+12%</span>
+            </div>
+            <div class="kpi-value">342</div>
+            <div class="kpi-label">Active Members</div>
           </div>
+          <div class="kpi-card accent-success" style="margin:0;">
+            <div class="kpi-header">
+              <div class="kpi-icon" style="background:var(--oya-success-bg);color:var(--oya-success);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            </div>
+            <div class="kpi-value" style="color:var(--oya-success);">&#x20A6;2.45M</div>
+            <div class="kpi-label">Treasury Balance</div>
           </div>
+          <div class="kpi-card accent-gold" style="margin:0;">
+            <div class="kpi-header">
+              <div class="kpi-icon" style="background:var(--oya-accent-50);color:var(--oya-accent-dark);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></svg></div>
+            </div>
+            <div class="kpi-value" style="color:var(--oya-accent-dark);">7</div>
+            <div class="kpi-label">Projects</div>
+          </div>
+        </div>
+        <div style="margin-top:1.25rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+          <button class="btn btn-primary" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Primary</button>
+          <button class="btn btn-success" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Success</button>
+          <button class="btn btn-danger" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Danger</button>
+          <button class="btn btn-warning" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Warning</button>
+          <span class="badge badge-success">Badge</span>
+          <span class="badge badge-primary">Primary</span>
+          <span class="badge badge-accent">Accent</span>
         </div>
       </div>
     </div>
 
-    <!-- Clans Tab -->
-    <div class="tab-content" id="tab-clans">
-      <div class="card" style="margin-top:0;">
-        <div class="card-header">
-          <div>
-            <div class="card-header-title">Umu Nna Clans</div>
-            <div class="card-header-subtitle">Manage clan groups and view member distribution</div>
-          </div>
-          {% if user.is_staff %}
-          <button type="button" class="btn btn-primary btn-sm" onclick="openClanModal()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add Clan
-          </button>
-          {% endif %}
-        </div>
-        <div class="card-body" style="padding:0;">
-          <div class="table-container">
-          <div class="table-responsive-wrapper">
-            <table class="data-table" id="clansTable">
-              <thead>
-                <tr>
-                  <th style="width:50px;">#</th>
-                  <th>Clan Name</th>
-                  <th style="width:100px;">Members</th>
-                  <th style="width:80px;">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="clansTableBody">
-                {% for clan in clans %}
-                <tr data-clan-id="{{ clan.id }}">
-                  <td class="cell-muted">{{ forloop.counter }}</td>
-                  <td>
-                    <div style="display:flex;align-items:center;gap:0.75rem;">
-                      <div class="avatar avatar-sm" style="background:{% cycle 'var(--oya-primary)' 'var(--oya-accent)' 'var(--oya-success)' 'var(--oya-warning)' 'var(--oya-danger)' 'var(--oya-info)' %};color:#fff;">
-                        {{ clan.name|first|upper }}
-                      </div>
-                      <span class="cell-name clan-name-text">{{ clan.name }}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="badge badge-info">{{ clan.member_count|default:0 }}</span>
-                  </td>
-                  <td>
-                    <div class="table-actions">
-                      <a href="{% url 'members:member_list' %}?clan={{ clan.id }}" class="table-action-btn" title="View Members">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                      </a>
-                    </div>
-                  </td>
-                </tr>
-                {% empty %}
-                <tr id="noClansRow">
-                  <td colspan="4" style="text-align:center;padding:2rem;color:var(--oya-text-muted);">
-                    No clans found. Click "Add Clan" to create one.
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          </div>
+    <!-- Financial Settings -->
+    <div class="card" style="margin-top:1.25rem;">
+      <div class="card-header">
+        <div>
+          <div class="card-header-title">Financial Settings</div>
+          <div class="card-header-subtitle">Configure default amounts and payment options</div>
         </div>
       </div>
-    </div>
-
-    <!-- Finance & Theme Tab -->
-    <div class="tab-content" id="tab-finance">
-      <!-- Theme Switcher -->
-      <div class="card" style="margin-top:0;">
-        <div class="card-header">
-          <div>
-            <div class="card-header-title">Appearance</div>
-            <div class="card-header-subtitle">Choose your preferred theme mode</div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="theme-options">
-            <label class="theme-card {% if settings.theme_mode == "LIGHT" %}active{% endif %}" data-theme-option="light">
-              <div class="theme-preview theme-preview-light"></div>
-              <div class="theme-label">Light</div>
-              <input type="radio" name="theme_mode" value="LIGHT" {% if settings.theme_mode == "LIGHT" %}checked{% endif %} style="display:none;">
-            </label>
-            <label class="theme-card {% if settings.theme_mode == "DARK" %}active{% endif %}" data-theme-option="dark">
-              <div class="theme-preview theme-preview-dark"></div>
-              <div class="theme-label">Dark</div>
-              <input type="radio" name="theme_mode" value="DARK" {% if settings.theme_mode == "DARK" %}checked{% endif %} style="display:none;">
-            </label>
-            <label class="theme-card {% if settings.theme_mode == "AUTO" %}active{% endif %}" data-theme-option="system">
-              <div class="theme-preview theme-preview-system"></div>
-              <div class="theme-label">System</div>
-              <input type="radio" name="theme_mode" value="AUTO" {% if settings.theme_mode == "AUTO" %}checked{% endif %} style="display:none;">
-            </label>
-          </div>
-          {% if form.theme_mode.errors %}
-            <div class="form-error" style="margin-top:0.5rem;">{{ form.theme_mode.errors.0 }}</div>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- Live Preview Card -->
-      <div class="card" style="margin-top:1.25rem;">
-        <div class="card-header">
-          <div>
-            <div class="card-header-title">Preview</div>
-            <div class="card-header-subtitle">How cards and components look with selected colors</div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="dashboard-grid dashboard-grid-3">
-            <div class="kpi-card" style="margin:0;">
-              <div class="kpi-header">
-                <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-                <span class="kpi-badge up">+12%</span>
-              </div>
-              <div class="kpi-value">342</div>
-              <div class="kpi-label">Active Members</div>
-            </div>
-            <div class="kpi-card accent-success" style="margin:0;">
-              <div class="kpi-header">
-                <div class="kpi-icon" style="background:var(--oya-success-bg);color:var(--oya-success);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-              </div>
-              <div class="kpi-value" style="color:var(--oya-success);">&#x20A6;2.45M</div>
-              <div class="kpi-label">Treasury Balance</div>
-            </div>
-            <div class="kpi-card accent-gold" style="margin:0;">
-              <div class="kpi-header">
-                <div class="kpi-icon" style="background:var(--oya-accent-50);color:var(--oya-accent-dark);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></svg></div>
-              </div>
-              <div class="kpi-value" style="color:var(--oya-accent-dark);">7</div>
-              <div class="kpi-label">Projects</div>
-            </div>
-          </div>
-          <div style="margin-top:1.25rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
-            <button class="btn btn-primary" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Primary</button>
-            <button class="btn btn-success" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Success</button>
-            <button class="btn btn-danger" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Danger</button>
-            <button class="btn btn-warning" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Warning</button>
-            <span class="badge badge-success">Badge</span>
-            <span class="badge badge-primary">Primary</span>
-            <span class="badge badge-accent">Accent</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Financial Settings -->
-      <div class="card" style="margin-top:1.25rem;">
-        <div class="card-header">
-          <div>
-            <div class="card-header-title">Financial Settings</div>
-            <div class="card-header-subtitle">Configure default amounts and payment options</div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
-            <div class="form-group">
-              <label for="{{ form.yearly_dues.id_for_label }}" class="form-label">Annual Membership Dues (&#x20A6;)</label>
-              {{ form.yearly_dues }}
-              <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-top:0.25rem;">Standard annual dues for all active members</div>
-              {% if form.yearly_dues.errors %}
-                <div class="form-error">{{ form.yearly_dues.errors.0 }}</div>
-              {% endif %}
-            </div>
-            <div class="form-group">
-              <label for="{{ form.minimum_age.id_for_label }}" class="form-label">Minimum Member Age</label>
-              {{ form.minimum_age }}
-              <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-top:0.25rem;">Minimum age required for membership</div>
-              {% if form.minimum_age.errors %}
-                <div class="form-error">{{ form.minimum_age.errors.0 }}</div>
-              {% endif %}
-            </div>
-          </div>
-          <div class="form-group" style="margin-bottom:1rem;">
-            <label for="{{ form.past_member_age.id_for_label }}" class="form-label">Past Member Age</label>
-            {{ form.past_member_age }}
-            <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-top:0.25rem;">Age at which members become past members</div>
-            {% if form.past_member_age.errors %}
-              <div class="form-error">{{ form.past_member_age.errors.0 }}</div>
+      <div class="card-body">
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+          <div class="form-group">
+            <label for="{{ form.yearly_dues.id_for_label }}" class="form-label">Annual Membership Dues (&#x20A6;)</label>
+            {{ form.yearly_dues }}
+            <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-top:0.25rem;">Standard annual dues for all active members</div>
+            {% if form.yearly_dues.errors %}
+              <div class="form-error">{{ form.yearly_dues.errors.0 }}</div>
             {% endif %}
           </div>
-          <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0;">
-            <div class="form-group">
-              <label for="{{ form.primary_color.id_for_label }}" class="form-label">Primary Color</label>
-              <div style="display:flex;align-items:center;gap:0.75rem;">
-                {{ form.primary_color }}
-                <span style="font-size:0.75rem;color:var(--oya-text-muted);">Used for headers, buttons, and primary actions</span>
-              </div>
-              {% if form.primary_color.errors %}
-                <div class="form-error">{{ form.primary_color.errors.0 }}</div>
-              {% endif %}
+          <div class="form-group">
+            <label for="{{ form.minimum_age.id_for_label }}" class="form-label">Minimum Member Age</label>
+            {{ form.minimum_age }}
+            <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-top:0.25rem;">Minimum age required for membership</div>
+            {% if form.minimum_age.errors %}
+              <div class="form-error">{{ form.minimum_age.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label for="{{ form.past_member_age.id_for_label }}" class="form-label">Past Member Age</label>
+          {{ form.past_member_age }}
+          <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-top:0.25rem;">Age at which members become past members</div>
+          {% if form.past_member_age.errors %}
+            <div class="form-error">{{ form.past_member_age.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0;">
+          <div class="form-group">
+            <label for="{{ form.primary_color.id_for_label }}" class="form-label">Primary Color</label>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              {{ form.primary_color }}
+              <span style="font-size:0.75rem;color:var(--oya-text-muted);">Used for headers, buttons, and primary actions</span>
             </div>
-            <div class="form-group">
-              <label for="{{ form.accent_color.id_for_label }}" class="form-label">Accent Color</label>
-              <div style="display:flex;align-items:center;gap:0.75rem;">
-                {{ form.accent_color }}
-                <span style="font-size:0.75rem;color:var(--oya-text-muted);">Used for highlights, badges, and special elements</span>
-              </div>
-              {% if form.accent_color.errors %}
-                <div class="form-error">{{ form.accent_color.errors.0 }}</div>
-              {% endif %}
+            {% if form.primary_color.errors %}
+              <div class="form-error">{{ form.primary_color.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.accent_color.id_for_label }}" class="form-label">Accent Color</label>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              {{ form.accent_color }}
+              <span style="font-size:0.75rem;color:var(--oya-text-muted);">Used for highlights, badges, and special elements</span>
             </div>
+            {% if form.accent_color.errors %}
+              <div class="form-error">{{ form.accent_color.errors.0 }}</div>
+            {% endif %}
           </div>
         </div>
       </div>
     </div>
+  </div>
+
   </div>
 
   {% if user.is_staff %}
@@ -545,8 +616,8 @@
         {% csrf_token %}
         <div class="form-group" style="margin-bottom:1.5rem;">
           <label for="clanName" class="form-label">Clan Name <span style="color:var(--oya-danger);">*</span></label>
-          <input type="text" id="clanName" name="name" class="form-control" 
-                 placeholder="Enter clan name (e.g., Umu Onoja)" 
+          <input type="text" id="clanName" name="name" class="form-control"
+                 placeholder="Enter clan name (e.g., Umu Onoja)"
                  maxlength="100" required autofocus>
           <div id="clanError" class="form-error" style="display:none;margin-top:0.5rem;"></div>
         </div>
