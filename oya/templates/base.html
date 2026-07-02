@@ -33,7 +33,7 @@
   </script>
 
   {% block extra_css %}{% endblock %}
-  <link rel="icon" type="image/png" href="{% static 'images/oya_logo.png' %}">
+  <link rel="icon" type="image/png" href="{% if settings_favicon_url %}{{ settings_favicon_url }}{% else %}{% static 'images/oya_logo.png' %}{% endif %}">
 </head>
 <body class="no-transition">
 
@@ -42,7 +42,11 @@
   <!-- ===== MOBILE TOP HEADER ===== -->
   <header class="mobile-top-header" id="mobileTopHeader">
     <a href="{% url 'dashboard:index' %}" class="mobile-brand">
-      <img src="{% static 'images/oya_logo.png' %}" alt="OYA" class="mobile-logo-img">
+      {% if settings_logo_url %}
+        <img src="{{ settings_logo_url }}" alt="OYA" class="mobile-logo-img" style="max-height:32px;max-width:120px;object-fit:contain;">
+      {% else %}
+        <img src="{% static 'images/oya_logo.png' %}" alt="OYA" class="mobile-logo-img">
+      {% endif %}
       <span class="mobile-logo-text">OYA</span>
     </a>
     <div class="mobile-header-actions">
@@ -78,7 +82,11 @@
   <aside id="mobileSidebar" class="mobile-sidebar">
     <div class="mobile-sidebar-header">
       <a href="{% url 'dashboard:index' %}" class="mobile-brand">
-        <img src="{% static 'images/oya_logo.png' %}" alt="OYA" class="mobile-logo-img">
+        {% if settings_logo_url %}
+          <img src="{{ settings_logo_url }}" alt="OYA" class="mobile-logo-img" style="max-height:32px;max-width:120px;object-fit:contain;">
+        {% else %}
+          <img src="{% static 'images/oya_logo.png' %}" alt="OYA" class="mobile-logo-img">
+        {% endif %}
         <span class="mobile-logo-text">OYA System</span>
       </a>
       <button type="button" id="mobileSidebarClose" class="mobile-sidebar-close" aria-label="Close Menu">
@@ -183,7 +191,7 @@
       </div>
 
         </nav>
-    
+
     <!-- Mobile Sidebar Footer -->
     {% if user.is_authenticated %}
     <div style="padding:1rem 1.25rem;border-top:1px solid var(--oya-border);margin-top:auto;">
@@ -195,8 +203,6 @@
       </a>
     </div>
     {% endif %}
-  </aside>
-
   </aside>
 
   <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay"></div>
