@@ -12,15 +12,15 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
+SECRET_KEY = config(
     "DJANGO_SECRET_KEY",
-    "django-insecure-change-me-in-production-oy4-kp0-y0uth5-@550c!@t!0n",
+    default="django-insecure-change-me-in-production-oy4-kp0-y0uth5-@550c!@t!0n",
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() == "true"
+DEBUG = config("DJANGO_DEBUG", default="True").lower() == "true"
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS", default="localhost,127.0.0.1").split(",")
 
 # Application definition
 DJANGO_APPS = [
@@ -91,22 +91,18 @@ WSGI_APPLICATION = "oya.wsgi.application"
 ASGI_APPLICATION = "oya.asgi.application"
 
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
-    'default': {
-        'ENGINE': config('DB_ENGINE', default='django.db.backends.sqlite3'),
-        'NAME': config('DB_NAME', default=BASE_DIR / 'db.sqlite3'),
-        'USER': config('DB_USER', default=''),
-        'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default=''),
-        'PORT': config('DB_PORT', default=''),
+    "default": {
+        "ENGINE": config("DB_ENGINE", default="django.db.backends.sqlite3"),
+        "NAME": config("DB_NAME", default=BASE_DIR / "db.sqlite3"),
+        "USER": config("DB_USER", default=""),
+        "PASSWORD": config("DB_PASSWORD", default=""),
+        "HOST": config("DB_HOST", default=""),
+        "PORT": config("DB_PORT", default=""),
     }
 }
 
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -132,72 +128,53 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "Africa/Lagos"
-
 USE_I18N = True
-
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# Static files
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-# Media & Storage Configuration
-MEDIA_STORAGE_MODE = os.environ.get("MEDIA_STORAGE_MODE", "local")
+# ============================================
+# BACKBLAZE B2 / S3 COMPATIBLE STORAGE
+# ============================================
 
-if MEDIA_STORAGE_MODE == "b2":
-    # Backblaze B2 Production Settings
-    B2_KEY_ID = os.environ.get("B2_KEY_ID")
-    B2_APPLICATION_KEY = os.environ.get("B2_APPLICATION_KEY")
-    B2_BUCKET_NAME = os.environ.get("B2_BUCKET_NAME")
-    B2_BUCKET_REGION = os.environ.get("B2_BUCKET_REGION", "us-west-004")
-    B2_ENDPOINT_URL = os.environ.get("B2_ENDPOINT_URL")
-    B2_CUSTOM_DOMAIN = os.environ.get("B2_CUSTOM_DOMAIN", None)
+# Use S3Boto3Storage directly — same as your Gadgets Store
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
-    AWS_ACCESS_KEY_ID = B2_KEY_ID
-    AWS_SECRET_ACCESS_KEY = B2_APPLICATION_KEY
-    AWS_STORAGE_BUCKET_NAME = B2_BUCKET_NAME
-    AWS_S3_REGION_NAME = B2_BUCKET_REGION
-    AWS_S3_ENDPOINT_URL = B2_ENDPOINT_URL
-    AWS_S3_SIGNATURE_VERSION = "s3v4"
-    AWS_DEFAULT_ACL = None
-    AWS_S3_VERIFY = True
+# B2 Credentials (from Railway env vars)
+AWS_ACCESS_KEY_ID = config("B2_KEY_ID")
+AWS_SECRET_ACCESS_KEY = config("B2_APPLICATION_KEY")
+AWS_STORAGE_BUCKET_NAME = config("B2_BUCKET_NAME")
+AWS_S3_REGION_NAME = config("B2_BUCKET_REGION", default="us-east-005")
+AWS_S3_ENDPOINT_URL = config("B2_ENDPOINT_URL", default="https://s3.us-east-005.backblazeb2.com")
 
-    if B2_CUSTOM_DOMAIN:
-        AWS_S3_CUSTOM_DOMAIN = B2_CUSTOM_DOMAIN.replace("https://", "").replace("http://", "")
+# CRITICAL B2 Settings
+AWS_S3_ADDRESSING_STYLE = "virtual"
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_QUERYSTRING_AUTH = False
+AWS_DEFAULT_ACL = "public-read"  # Must match bucket's public ACL
+AWS_S3_FILE_OVERWRITE = True
 
-    MEDIA_URL = f"https://{B2_CUSTOM_DOMAIN}/media/" if B2_CUSTOM_DOMAIN else f"{B2_ENDPOINT_URL}/{B2_BUCKET_NAME}/media/"
+# Media URL
+MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.backblazeb2.com/"
 
-    STORAGES = {
-        "default": {
-            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
-else:
-    # Local storage for development
-    MEDIA_URL = "/media/"
-    MEDIA_ROOT = BASE_DIR / "media"
+# ============================================
+# WHITENOISE (Production)
+# ============================================
 
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
-
-# Whitenoise for static files in production
 if not DEBUG:
     MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
     STORAGES["staticfiles"] = {
@@ -218,7 +195,7 @@ if not DEBUG:
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Session settings
-SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_COOKIE_AGE = 86400
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 # Login settings
@@ -253,7 +230,7 @@ LOGGING = {
             "level": "INFO",
             "class": "logging.handlers.RotatingFileHandler",
             "filename": LOGS_DIR / "oya.log",
-            "maxBytes": 10485760,  # 10MB
+            "maxBytes": 10485760,
             "backupCount": 10,
             "formatter": "verbose",
         },
@@ -261,7 +238,7 @@ LOGGING = {
             "level": "ERROR",
             "class": "logging.handlers.RotatingFileHandler",
             "filename": LOGS_DIR / "oya_errors.log",
-            "maxBytes": 10485760,  # 10MB
+            "maxBytes": 10485760,
             "backupCount": 10,
             "formatter": "verbose",
         },
@@ -290,13 +267,13 @@ CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         "LOCATION": "oya-cache",
-        "TIMEOUT": 300,  # 5 minutes
+        "TIMEOUT": 300,
     }
 }
 
 # Celery settings
-CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379/0")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default="redis://localhost:6379/0")
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
@@ -307,6 +284,6 @@ OYA_SETTINGS = {
     "MEMBER_MIN_AGE": 18,
     "PAST_MEMBER_AGE": 56,
     "ELECTION_CYCLE_YEARS": 4,
-    "CURRENCY_SYMBOL": "\u20a6",  # Naira symbol
+    "CURRENCY_SYMBOL": "₦",
     "SERIAL_NUMBER_PREFIX": "OYA",
 }
