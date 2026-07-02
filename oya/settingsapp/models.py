@@ -4,6 +4,18 @@ Models for OYA system settings.
 from django.db import models
 
 
+def logo_upload_path(instance, filename):
+    """Upload path for organization logo."""
+    ext = filename.split('.')[-1].lower()
+    return f"settings/logo.{ext}"
+
+
+def favicon_upload_path(instance, filename):
+    """Upload path for organization favicon."""
+    ext = filename.split('.')[-1].lower()
+    return f"settings/favicon.{ext}"
+
+
 class SystemSettings(models.Model):
     """
     Singleton model for system-wide settings.
@@ -66,6 +78,22 @@ class SystemSettings(models.Model):
         verbose_name="Motto"
     )
 
+    # Branding
+    logo = models.ImageField(
+        upload_to=logo_upload_path,
+        blank=True,
+        null=True,
+        verbose_name="Organization Logo",
+        help_text="Recommended: PNG with transparent background, max 2MB. Used in header, login page, and emails."
+    )
+    favicon = models.ImageField(
+        upload_to=favicon_upload_path,
+        blank=True,
+        null=True,
+        verbose_name="Browser Favicon",
+        help_text="Recommended: 32x32 or 64x64 ICO/PNG, max 1MB. Shown in browser tab."
+    )
+
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -90,3 +118,17 @@ class SystemSettings(models.Model):
 
     def __str__(self):
         return "System Settings"
+
+    @property
+    def logo_url(self):
+        """Return logo URL or empty string."""
+        if self.logo and self.logo.name:
+            return self.logo.url
+        return ""
+
+    @property
+    def favicon_url(self):
+        """Return favicon URL or empty string."""
+        if self.favicon and self.favicon.name:
+            return self.favicon.url
+        return ""
