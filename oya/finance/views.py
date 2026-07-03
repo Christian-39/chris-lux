@@ -408,22 +408,28 @@ def income_create(request):
     if request.method == "POST":
         form = IncomeForm(request.POST)
         if form.is_valid():
-            income = form.save(commit=False)
-            income.created_by = request.user
-            income.save()
-            log_action(
-                user=request.user,
-                action="CREATE",
-                object_type="Income",
-                object_id=income.id,
-                ip_address=getattr(request, "client_ip", ""),
-                description=f"Recorded {income.get_income_type_display()}: ₦{income.amount:,.2f} - {income.reason} (by {income.get_payer_display()})"
-            )
-            messages.success(request, "Income recorded successfully.")
-            return redirect("finance:donation_list")
+            try:
+                with transaction.atomic():
+                    income = form.save(commit=False)
+                    income.created_by = request.user
+                    income.save()
+                    
+                log_action(
+                    user=request.user,
+                    action="CREATE",
+                    object_type="Income",
+                    object_id=income.id,
+                    ip_address=getattr(request, "client_ip", ""),
+                    description=f"Recorded {income.get_income_type_display()}: ₦{income.amount:,.2f} - {income.reason} (by {income.get_payer_display()})"
+                )
+                messages.success(request, "Income recorded successfully.")
+                return redirect("finance:donation_list")
+            except Exception as e:
+                messages.error(request, f"An error occurred while saving: {str(e)}")
         else:
+            # Syncs directly with template component error blocks
             for field, errors in form.errors.items():
-                label = "Form" if field == "__all__" else field
+                label = "Form" if field == "__all__" else field.replace('_', ' ').title()
                 for error in errors:
                     messages.error(request, f"{label}: {error}")
     else:
@@ -432,13 +438,14 @@ def income_create(request):
     return render(request, "finance/income_form.html", {
         "form": form,
         "title": "Record Contribution",
-        "action": "Save",
+        "action": "Save Contribution",
         "treasury_balance": treasury_balance,
         "total_income": total_income,
         "total_expenses": total_expenses,
         "recent_incomes": recent_incomes,
         "common_reasons": list(common_reasons),
     })
+
 
 
 @login_required
