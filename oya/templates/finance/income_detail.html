@@ -7,13 +7,17 @@
 {% block extra_css %}
 <style>
   .detail-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-  .detail-label { font-size: .75rem; text-transform: uppercase; color: #6c757d; letter-spacing: .5px; margin-bottom: .25rem; }
-  .detail-value { font-size: 1.1rem; font-weight: 600; color: #1a1a2e; }
+  .detail-label { font-size: .75rem; text-transform: uppercase; color: var(--oya-text-muted); letter-spacing: .5px; margin-bottom: .25rem; }
+  .detail-value { font-size: 1.1rem; font-weight: 600; color: var(--oya-text); }
   .amount-display { font-size: 2.5rem; font-weight: 800; }
   .badge-dues { background: #e3f2fd; color: #1565c0; }
   .badge-donation { background: #e8f5e9; color: #2e7d32; }
   .badge-event { background: #fff3e0; color: #ef6c00; }
   .badge-other { background: #f3e5f5; color: #6a1b9a; }
+
+  [data-theme="dark"] .detail-card { background: var(--oya-card); box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+  [data-theme="dark"] .detail-value { color: var(--oya-text); }
+  [data-theme="dark"] .btn-outline-secondary { color: var(--oya-text); border-color: var(--oya-border); }
 </style>
 {% endblock %}
 
@@ -22,7 +26,7 @@
   <div class="row justify-content-center">
     <div class="col-lg-8">
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <div><h2 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-receipt me-2"></i>Income Detail</h2></div>
+        <div><h2 class="fw-bold mb-0" style="color:var(--oya-primary);"><i class="bi bi-receipt me-2"></i>Income Detail</h2></div>
         <div class="d-flex gap-2">
           <a href="{% url 'finance:donation_list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Back</a>
           {% if user.has_admin_access %}<a href="{% url 'finance:income_delete' income.pk %}" class="btn btn-outline-danger"><i class="bi bi-trash me-1"></i> Delete</a>{% endif %}
