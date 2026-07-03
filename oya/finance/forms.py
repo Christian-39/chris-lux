@@ -11,7 +11,7 @@ class IncomeForm(forms.ModelForm):
 
     class Meta:
         model = Income
-        fields = ["income_type", "amount", "reason", "paid_by"]
+        fields = ["income_type", "amount", "reason", "member", "paid_by"]
         widgets = {
             "income_type": forms.Select(attrs={"class": "form-select"}),
             "amount": forms.NumberInput(attrs={
@@ -24,9 +24,10 @@ class IncomeForm(forms.ModelForm):
                 "class": "form-control",
                 "placeholder": "e.g., Donation for project, Event ticket sales"
             }),
+            "member": forms.HiddenInput(),  # Set via JS search
             "paid_by": forms.TextInput(attrs={
                 "class": "form-control",
-                "placeholder": "Name of payer / contributor"
+                "placeholder": "Name of payer / contributor (if not a member)"
             }),
         }
 
@@ -35,12 +36,32 @@ class IncomeForm(forms.ModelForm):
         self.fields["income_type"].initial = "DONATION"
         choices = [c for c in Income.INCOME_TYPE_CHOICES if c[0] != "DUES"]
         self.fields["income_type"].choices = choices
+        self.fields["member"].required = False
+        self.fields["paid_by"].required = False
 
     def clean_amount(self):
         amount = self.cleaned_data.get("amount")
         if amount and amount <= 0:
             raise ValidationError("Amount must be greater than zero.")
         return amount
+
+    def clean(self):
+        cleaned = super().clean()
+        member = cleaned.get("member")
+        paid_by = cleaned.get("paid_by")
+        
+        # Auto-fill paid_by from member name
+        if member and not paid_by:
+            cleaned["paid_by"] = member.get_full_name()
+        
+        # Require at least one payer identifier
+        if not member and not paid_by:
+            raise ValidationError({
+                "paid_by": "Please either select a member or enter a payer name."
+            })
+        
+        return cleaned
+
 
 
 class DuesPaymentAllocationForm(forms.ModelForm):
