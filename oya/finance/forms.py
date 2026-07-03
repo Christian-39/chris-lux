@@ -24,7 +24,7 @@ class IncomeForm(forms.ModelForm):
                 "class": "form-control",
                 "placeholder": "e.g., Donation for project, Event ticket sales"
             }),
-            "member": forms.HiddenInput(),  # Set via JS search
+            "member": forms.HiddenInput(),
             "paid_by": forms.TextInput(attrs={
                 "class": "form-control",
                 "placeholder": "Name of payer / contributor (if not a member)"
@@ -72,10 +72,7 @@ class DuesPaymentAllocationForm(forms.ModelForm):
         model = DuesPaymentTransaction
         fields = ["member", "total_amount", "payment_method", "receipt_reference", "payment_date", "notes"]
         widgets = {
-            "member": forms.Select(attrs={
-                "class": "form-select",
-                "data-search": "members",
-            }),
+            "member": forms.HiddenInput(),
             "total_amount": forms.NumberInput(attrs={
                 "class": "form-control",
                 "step": "0.01",
