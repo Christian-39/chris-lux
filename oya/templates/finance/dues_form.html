@@ -8,6 +8,7 @@
 <div class="container py-4">
   <div class="row justify-content-center">
     <div class="col-lg-8">
+
       <!-- Page Header -->
       <div class="page-header mb-4">
         <div class="page-header-left">
@@ -111,7 +112,10 @@
 
             <!-- Allocation Preview -->
             <div class="preview-box mb-4" id="allocationPreview">
-              <h6 class="fw-bold mb-3"><i class="bi bi-eye me-2"></i>Allocation Preview</h6>
+              <h6 class="fw-bold mb-3">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:0.5rem;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Allocation Preview
+              </h6>
               <div id="previewContent">
                 <p class="text-muted mb-0">Select a member and enter an amount to see how it will be allocated.</p>
               </div>
@@ -218,7 +222,6 @@
     document.getElementById('selectedMeta').textContent = item.serial + ' · ' + item.role;
     document.getElementById('selectedAvatar').textContent = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     updatePreview();
-    checkFormValidity();
   }
 
   changeMemberBtn.addEventListener('click', function() {
@@ -226,7 +229,6 @@
     memberSearchContainer.classList.remove('d-none');
     memberSelected.classList.remove('show');
     previewBox.classList.remove('show');
-    checkFormValidity();
   });
 
   document.addEventListener('click', function(e) {
@@ -290,30 +292,25 @@
     previewContent.innerHTML = html;
   }
 
-  totalAmountInput.addEventListener('input', function() { updatePreview(); checkFormValidity(); });
+  totalAmountInput.addEventListener('input', function() { updatePreview(); });
 
-  function checkFormValidity() {
-    const amount = parseFloat(totalAmountInput.value);
-    const isValid = selectedMemberId && amount && amount > 0;
-    submitBtn.disabled = !isValid;
-    if (isValid) {
-      submitBtn.classList.remove('disabled');
-    }
-  }
-
-  // Form submission
+  // Form submission — validate before submit
   duesForm.addEventListener('submit', function(e) {
     const amount = parseFloat(totalAmountInput.value);
     if (!selectedMemberId || !amount || amount <= 0) {
       e.preventDefault();
+      if (!selectedMemberId) {
+        searchInput.focus();
+        searchInput.classList.add('is-invalid');
+      }
+      if (!amount || amount <= 0) {
+        totalAmountInput.classList.add('is-invalid');
+      }
       return false;
     }
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing...';
   });
-
-  // Initial check
-  checkFormValidity();
 })();
 </script>
 {% endblock %}
