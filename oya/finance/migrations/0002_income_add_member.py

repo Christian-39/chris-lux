@@ -19,9 +19,8 @@ class Migration(migrations.Migration):
                 ('member', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='members.member')), 
             ],
             options={
-                # CHANGED HERE: Point directly to the actual table name
-                'db_table': 'finance_dues_payment',
-                'managed': False,  
+                'db_table': 'finance_association_dues',  # A fresh, clean table name
+                'managed': True,  # FORCE Django to build it from scratch!
             },
         ),
     ]
