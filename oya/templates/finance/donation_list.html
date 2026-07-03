@@ -9,13 +9,36 @@
   .donation-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
   .stat-mini { text-align: center; padding: 1rem; border-radius: 10px; }
   .stat-mini-value { font-size: 1.4rem; font-weight: 700; }
-  .stat-mini-label { font-size: .75rem; color: #6c757d; text-transform: uppercase; }
-  .filter-bar { background: #fff; border-radius: 10px; padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .stat-mini-label { font-size: .75rem; color: var(--oya-text-muted); text-transform: uppercase; }
+  .filter-bar { background: var(--oya-surface); border-radius: 10px; padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--oya-border); }
   .badge-donation { background: #e8f5e9; color: #2e7d32; }
   .badge-event { background: #fff3e0; color: #ef6c00; }
   .badge-other { background: #f3e5f5; color: #6a1b9a; }
   .txn-row { transition: background .15s; }
-  .txn-row:hover { background: #f8f9fa; }
+  .txn-row:hover { background: var(--oya-surface-hover); }
+
+  /* TABLE FIX: no wrap, horizontal scroll */
+  .donation-card .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .donation-card table { min-width: 900px; }
+  .donation-card table th,
+  .donation-card table td { white-space: nowrap !important; vertical-align: middle; }
+  .donation-card table td:nth-child(2) { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+
+  [data-theme="dark"] .donation-card { background: var(--oya-card); box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+  [data-theme="dark"] .filter-bar { background: var(--oya-card); border-color: var(--oya-border); }
+  [data-theme="dark"] .table-light { --bs-table-bg: var(--oya-surface); --bs-table-color: var(--oya-text); --bs-table-border-color: var(--oya-border); }
+  [data-theme="dark"] .table-hover > tbody > tr:hover { --bs-table-bg-state: var(--oya-surface-hover); }
+  [data-theme="dark"] .card-footer { background: var(--oya-card) !important; border-color: var(--oya-border) !important; }
+  [data-theme="dark"] .page-link { background: var(--oya-card); color: var(--oya-text); border-color: var(--oya-border); }
+  [data-theme="dark"] .page-item.active .page-link { background: var(--oya-primary); border-color: var(--oya-primary); color: #fff; }
+  [data-theme="dark"] .page-item.disabled .page-link { background: var(--oya-surface); color: var(--oya-text-muted); border-color: var(--oya-border); }
+  [data-theme="dark"] .text-muted { color: var(--oya-text-muted) !important; }
+  [data-theme="dark"] .form-control,
+  [data-theme="dark"] .form-select { background: var(--oya-surface); color: var(--oya-text); border-color: var(--oya-border); }
+  [data-theme="dark"] .input-group-text { background: var(--oya-surface); color: var(--oya-text); border-color: var(--oya-border); }
+  [data-theme="dark"] .btn-outline-secondary { color: var(--oya-text); border-color: var(--oya-border); }
+  [data-theme="dark"] .btn-outline-primary { color: var(--oya-primary); border-color: var(--oya-primary); }
+  [data-theme="dark"] .btn-outline-danger { color: var(--oya-danger); border-color: var(--oya-danger); }
 </style>
 {% endblock %}
 
@@ -23,7 +46,7 @@
 <div class="container-fluid py-4">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
-      <h2 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-gift me-2"></i>Donations & Contributions</h2>
+      <h2 class="fw-bold mb-0" style="color:var(--oya-primary);"><i class="bi bi-gift me-2"></i>Donations & Contributions</h2>
       <p class="text-muted mb-0">Track all non-dues income</p>
     </div>
     <div class="d-flex gap-2">
