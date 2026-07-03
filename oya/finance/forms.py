@@ -49,19 +49,18 @@ class IncomeForm(forms.ModelForm):
         cleaned = super().clean()
         member = cleaned.get("member")
         paid_by = cleaned.get("paid_by")
-        
+
         # Auto-fill paid_by from member name
         if member and not paid_by:
             cleaned["paid_by"] = member.get_full_name()
-        
+
         # Require at least one payer identifier
         if not member and not paid_by:
-            raise ValidationError({
-                "paid_by": "Please either select a member or enter a payer name."
-            })
-        
-        return cleaned
+            raise ValidationError(
+                "Please either select a member from the search or enter a payer name."
+            )
 
+        return cleaned
 
 
 class DuesPaymentAllocationForm(forms.ModelForm):
@@ -69,11 +68,6 @@ class DuesPaymentAllocationForm(forms.ModelForm):
     Form for recording smart dues payment allocations.
     Administrator enters total amount; system auto-allocates across years.
     """
-    member_search = forms.CharField(
-        required=False,
-        widget=forms.HiddenInput(),
-    )
-
     class Meta:
         model = DuesPaymentTransaction
         fields = ["member", "total_amount", "payment_method", "receipt_reference", "payment_date", "notes"]
