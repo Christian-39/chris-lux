@@ -4,52 +4,22 @@
 
 {% block title %}{{ title }} — OYA Finance{% endblock %}
 
-{% block extra_css %}
-<style>
-  .allocation-card { border-radius: 12px; border: none; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-  .allocation-item { padding: .75rem 1rem; border-radius: 8px; background: var(--oya-surface); margin-bottom: .5rem; display: flex; justify-content: space-between; align-items: center; }
-  .allocation-item.prepaid { background: #e3f2fd; border-left: 4px solid #1565c0; }
-  .allocation-item.paid { background: #e8f5e9; border-left: 4px solid #2e7d32; }
-  .allocation-item.partial { background: #fff3e0; border-left: 4px solid #ef6c00; }
-  .search-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: var(--oya-card); border: 1px solid var(--oya-border); border-radius: 0 0 8px 8px; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-  .search-result-item { padding: .75rem 1rem; cursor: pointer; border-bottom: 1px solid var(--oya-border); transition: background .15s; }
-  .search-result-item:hover { background: var(--oya-surface-hover); }
-  .search-result-name { font-weight: 600; color: var(--oya-text); }
-  .search-result-meta { font-size: .75rem; color: var(--oya-text-muted); }
-  .member-selected { background: #e8f5e9; border-radius: 8px; padding: .75rem 1rem; display: none; }
-  .member-selected.show { display: flex; align-items: center; gap: .75rem; }
-  .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--oya-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: .85rem; }
-  .preview-box { background: var(--oya-surface); border-radius: 12px; padding: 1.25rem; display: none; }
-  .preview-box.show { display: block; }
-  .amount-display { font-size: 1.8rem; font-weight: 700; color: var(--oya-text); }
-  .form-section { background: var(--oya-card); border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-
-  [data-theme="dark"] .allocation-card { background: var(--oya-card); box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
-  [data-theme="dark"] .allocation-item { background: var(--oya-surface); }
-  [data-theme="dark"] .form-section { background: var(--oya-card); box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
-  [data-theme="dark"] .form-control,
-  [data-theme="dark"] .form-select { background: var(--oya-surface); color: var(--oya-text); border-color: var(--oya-border); }
-  [data-theme="dark"] .input-group-text { background: var(--oya-surface); color: var(--oya-text); border-color: var(--oya-border); }
-  [data-theme="dark"] .btn-outline-secondary { color: var(--oya-text); border-color: var(--oya-border); }
-  [data-theme="dark"] .text-muted { color: var(--oya-text-muted) !important; }
-  [data-theme="dark"] .search-results { background: var(--oya-card); border-color: var(--oya-border); }
-  [data-theme="dark"] .search-result-item { border-color: var(--oya-border); }
-  [data-theme="dark"] .search-result-item:hover { background: var(--oya-surface-hover); }
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="container py-4">
   <div class="row justify-content-center">
     <div class="col-lg-8">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h2 class="fw-bold mb-0" style="color:var(--oya-primary);"><i class="bi bi-cash-coin me-2"></i>{{ title }}</h2>
-          <p class="text-muted mb-0">Smart allocation across outstanding years</p>
+      <!-- Page Header -->
+      <div class="page-header mb-4">
+        <div class="page-header-left">
+          <h1 style="font-size:clamp(1.125rem,3vw,1.5rem);">{{ title }}</h1>
+          <p>Smart allocation across outstanding years</p>
         </div>
-        <a href="{% url 'finance:dues_tracker' %}" class="btn btn-outline-secondary">
-          <i class="bi bi-arrow-left me-1"></i> Back to Tracker
-        </a>
+        <div class="page-header-actions">
+          <a href="{% url 'finance:dues_tracker' %}" class="btn btn-ghost">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            Back to Tracker
+          </a>
+        </div>
       </div>
 
       {% if messages %}
@@ -63,99 +33,123 @@
       </div>
       {% endif %}
 
-      <!-- LOADING SPINNER REMOVED - form section is clean now -->
-      <div class="form-section" id="formSection">
-        <form method="post" id="duesForm" novalidate>
-          {% csrf_token %}
+      <div class="card">
+        <div class="card-body p-4">
+          <form method="post" id="duesForm" novalidate>
+            {% csrf_token %}
 
-          <div class="mb-4 position-relative">
-            <label class="form-label fw-semibold">Member <span class="text-danger">*</span></label>
-            <div id="memberSearchContainer">
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control" id="memberSearchInput" placeholder="Type member name or serial number..." autocomplete="off">
+            <!-- Member Search -->
+            <div class="mb-4 position-relative">
+              <label class="form-label fw-semibold">Member <span class="text-danger">*</span></label>
+              <div id="memberSearchContainer">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" id="memberSearchInput" placeholder="Type member name or serial number..." autocomplete="off">
+                </div>
+                <div class="search-results d-none" id="searchResults"></div>
               </div>
-              <div class="search-results d-none" id="searchResults"></div>
-            </div>
-            <div class="member-selected mt-2" id="memberSelected">
-              <div class="member-avatar" id="selectedAvatar">AB</div>
-              <div>
-                <div class="fw-semibold" id="selectedName"></div>
-                <div class="small text-muted" id="selectedMeta"></div>
+              <div class="member-selected mt-2" id="memberSelected">
+                <div class="member-avatar" id="selectedAvatar">AB</div>
+                <div>
+                  <div class="fw-semibold" id="selectedName"></div>
+                  <div class="small text-muted" id="selectedMeta"></div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" id="changeMember">Change</button>
               </div>
-              <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" id="changeMember">Change</button>
+              {{ form.member }}
+              {% if form.member.errors %}
+              <div class="invalid-feedback d-block">{{ form.member.errors.0 }}</div>
+              {% endif %}
             </div>
-            {{ form.member }}
-            {% if form.member.errors %}
-            <div class="invalid-feedback d-block">{{ form.member.errors.0 }}</div>
-            {% endif %}
-          </div>
 
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">Payment Amount <span class="text-danger">*</span></label>
-              <div class="input-group">
-                <span class="input-group-text">&#8358;</span>
-                {{ form.total_amount }}
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Payment Amount <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text">&#8358;</span>
+                  {{ form.total_amount }}
+                </div>
+                <div class="form-text">Enter total amount received. System will auto-allocate across years.</div>
+                {% if form.total_amount.errors %}
+                <div class="invalid-feedback d-block">{{ form.total_amount.errors.0 }}</div>
+                {% endif %}
               </div>
-              <div class="form-text">Enter total amount received. System will auto-allocate across years.</div>
-              {% if form.total_amount.errors %}
-              <div class="invalid-feedback d-block">{{ form.total_amount.errors.0 }}</div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Payment Method</label>
+                {{ form.payment_method }}
+                {% if form.payment_method.errors %}
+                <div class="invalid-feedback d-block">{{ form.payment_method.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Receipt / Reference Number</label>
+                {{ form.receipt_reference }}
+                <div class="form-text">Optional. Bank transfer ref, receipt number, etc.</div>
+                {% if form.receipt_reference.errors %}
+                <div class="invalid-feedback d-block">{{ form.receipt_reference.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Payment Date <span class="text-danger">*</span></label>
+                {{ form.payment_date }}
+                {% if form.payment_date.errors %}
+                <div class="invalid-feedback d-block">{{ form.payment_date.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Notes</label>
+              {{ form.notes }}
+              {% if form.notes.errors %}
+              <div class="invalid-feedback d-block">{{ form.notes.errors.0 }}</div>
               {% endif %}
             </div>
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">Payment Method</label>
-              {{ form.payment_method }}
-              {% if form.payment_method.errors %}
-              <div class="invalid-feedback d-block">{{ form.payment_method.errors.0 }}</div>
-              {% endif %}
-            </div>
-          </div>
 
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">Receipt / Reference Number</label>
-              {{ form.receipt_reference }}
-              <div class="form-text">Optional. Bank transfer ref, receipt number, etc.</div>
-              {% if form.receipt_reference.errors %}
-              <div class="invalid-feedback d-block">{{ form.receipt_reference.errors.0 }}</div>
-              {% endif %}
+            <!-- Allocation Preview -->
+            <div class="preview-box mb-4" id="allocationPreview">
+              <h6 class="fw-bold mb-3"><i class="bi bi-eye me-2"></i>Allocation Preview</h6>
+              <div id="previewContent">
+                <p class="text-muted mb-0">Select a member and enter an amount to see how it will be allocated.</p>
+              </div>
             </div>
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">Payment Date <span class="text-danger">*</span></label>
-              {{ form.payment_date }}
-              {% if form.payment_date.errors %}
-              <div class="invalid-feedback d-block">{{ form.payment_date.errors.0 }}</div>
-              {% endif %}
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary" id="submitBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                {{ action }}
+              </button>
+              <a href="{% url 'finance:dues_tracker' %}" class="btn btn-ghost">Cancel</a>
             </div>
-          </div>
-
-          <div class="mb-4">
-            <label class="form-label fw-semibold">Notes</label>
-            {{ form.notes }}
-            {% if form.notes.errors %}
-            <div class="invalid-feedback d-block">{{ form.notes.errors.0 }}</div>
-            {% endif %}
-          </div>
-
-          <div class="preview-box mb-4" id="allocationPreview">
-            <h6 class="fw-bold mb-3"><i class="bi bi-eye me-2"></i>Allocation Preview</h6>
-            <div id="previewContent">
-              <p class="text-muted mb-0">Select a member and enter an amount to see how it will be allocated.</p>
-            </div>
-          </div>
-
-          <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
-              <i class="bi bi-check-lg me-1"></i> {{ action }}
-            </button>
-            <a href="{% url 'finance:dues_tracker' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .search-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: var(--oya-card); border: 1px solid var(--oya-border); border-radius: 0 0 8px 8px; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .search-result-item { padding: .75rem 1rem; cursor: pointer; border-bottom: 1px solid var(--oya-border); transition: background .15s; }
+  .search-result-item:hover { background: var(--oya-surface-hover); }
+  .search-result-name { font-weight: 600; color: var(--oya-text); }
+  .search-result-meta { font-size: .75rem; color: var(--oya-text-muted); }
+  .member-selected { background: var(--oya-success-bg); border-radius: 8px; padding: .75rem 1rem; display: none; align-items: center; gap: .75rem; }
+  .member-selected.show { display: flex; }
+  .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--oya-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: .85rem; }
+  .preview-box { background: var(--oya-surface); border-radius: 12px; padding: 1.25rem; display: none; }
+  .preview-box.show { display: block; }
+  .amount-display { font-size: 1.8rem; font-weight: 700; color: var(--oya-text); }
+  .allocation-item { padding: .75rem 1rem; border-radius: 8px; background: var(--oya-surface); margin-bottom: .5rem; display: flex; justify-content: space-between; align-items: center; }
+  .allocation-item.prepaid { background: var(--oya-info-bg); border-left: 4px solid var(--oya-info); }
+  .allocation-item.paid { background: var(--oya-success-bg); border-left: 4px solid var(--oya-success); }
+  .allocation-item.partial { background: var(--oya-warning-bg); border-left: 4px solid var(--oya-warning); }
+</style>
 {% endblock %}
 
 {% block extra_js %}
@@ -171,9 +165,15 @@
   const previewBox = document.getElementById('allocationPreview');
   const previewContent = document.getElementById('previewContent');
   const submitBtn = document.getElementById('submitBtn');
+  const duesForm = document.getElementById('duesForm');
 
   let searchTimeout;
   let selectedMemberId = null;
+
+  // Initialize: check if member already selected (edit mode)
+  if (memberSelect.value) {
+    selectedMemberId = memberSelect.value;
+  }
 
   searchInput.addEventListener('input', function() {
     const q = this.value.trim();
@@ -190,7 +190,7 @@
           data.results.forEach(function(item) {
             const div = document.createElement('div');
             div.className = 'search-result-item';
-            div.innerHTML = item.html;
+            div.innerHTML = '<div class="search-result-name">' + item.name + '</div><div class="search-result-meta">' + item.serial + ' · ' + item.role + '</div>';
             div.addEventListener('click', function() { selectMember(item); });
             searchResults.appendChild(div);
           });
@@ -210,7 +210,7 @@
   function selectMember(item) {
     selectedMemberId = item.id;
     memberSelect.value = item.id;
-    searchInput.value = item.text;
+    searchInput.value = item.name;
     searchResults.classList.add('d-none');
     memberSearchContainer.classList.add('d-none');
     memberSelected.classList.add('show');
@@ -294,14 +294,26 @@
 
   function checkFormValidity() {
     const amount = parseFloat(totalAmountInput.value);
-    submitBtn.disabled = !(selectedMemberId && amount && amount > 0);
+    const isValid = selectedMemberId && amount && amount > 0;
+    submitBtn.disabled = !isValid;
+    if (isValid) {
+      submitBtn.classList.remove('disabled');
+    }
   }
 
-  // Form submission — no spinner overlay, just disable button
-  document.getElementById('duesForm').addEventListener('submit', function() {
+  // Form submission
+  duesForm.addEventListener('submit', function(e) {
+    const amount = parseFloat(totalAmountInput.value);
+    if (!selectedMemberId || !amount || amount <= 0) {
+      e.preventDefault();
+      return false;
+    }
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing...';
   });
+
+  // Initial check
+  checkFormValidity();
 })();
 </script>
 {% endblock %}
