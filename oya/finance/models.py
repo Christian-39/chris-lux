@@ -32,8 +32,8 @@ class Income(BaseModel):
         verbose_name="Amount"
     )
     reason = models.CharField(max_length=255, verbose_name="Reason")
-    
-    # NEW: Link to member for searchable contributions
+
+    # Link to member for searchable contributions
     member = models.ForeignKey(
         "accounts.User",
         on_delete=models.SET_NULL,
@@ -44,7 +44,7 @@ class Income(BaseModel):
         limit_choices_to={"is_active": True},
         help_text="Select if the contributor is a registered member"
     )
-    
+
     paid_by = models.CharField(
         max_length=255,
         blank=True,
@@ -67,7 +67,7 @@ class Income(BaseModel):
         indexes = [
             models.Index(fields=["created_at"]),
             models.Index(fields=["income_type"]),
-            models.Index(fields=["member"]),  # NEW
+            models.Index(fields=["member"]),
         ]
 
     def __str__(self):
@@ -78,7 +78,6 @@ class Income(BaseModel):
         if self.member:
             return self.member.get_full_name()
         return self.paid_by or "Anonymous"
-
 
 
 class DuesPaymentTransaction(BaseModel):
@@ -428,7 +427,8 @@ class DuesPayment(BaseModel):
                     dp.income.amount = dp.amount_paid
                     dp.income.reason = f"Yearly Dues — {year}"
                     dp.income.paid_by = member.get_full_name()
-                    dp.income.created_by = recorded_by
+                    dp.income.member = member  # Link income to member
+                    # Preserve original creator — do NOT overwrite created_by
                     dp.income.save()
                 else:
                     income = Income.objects.create(
@@ -436,6 +436,7 @@ class DuesPayment(BaseModel):
                         amount=dp.amount_paid,
                         reason=f"Yearly Dues — {year}",
                         paid_by=member.get_full_name(),
+                        member=member,  # Link income to member
                         created_by=recorded_by,
                     )
                     dp.income = income
@@ -486,7 +487,8 @@ class DuesPayment(BaseModel):
                     dp.income.amount = dp.amount_paid
                     dp.income.reason = f"Yearly Dues — {future_year} (Prepaid)"
                     dp.income.paid_by = member.get_full_name()
-                    dp.income.created_by = recorded_by
+                    dp.income.member = member  # Link income to member
+                    # Preserve original creator — do NOT overwrite created_by
                     dp.income.save()
                 else:
                     income = Income.objects.create(
@@ -494,6 +496,7 @@ class DuesPayment(BaseModel):
                         amount=dp.amount_paid,
                         reason=f"Yearly Dues — {future_year} (Prepaid)",
                         paid_by=member.get_full_name(),
+                        member=member,  # Link income to member
                         created_by=recorded_by,
                     )
                     dp.income = income
