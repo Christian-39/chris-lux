@@ -5,11 +5,16 @@ from .models import Income, Expense, DuesPayment, DuesPaymentTransaction
 
 @admin.register(Income)
 class IncomeAdmin(admin.ModelAdmin):
-    list_display = ["reason", "amount", "paid_by", "created_by", "created_at"]
+    list_display = ["reason", "amount", "income_type", "get_payer", "created_by", "created_at"]
     list_filter = ["created_at", "income_type"]
-    search_fields = ["reason", "paid_by"]
+    search_fields = ["reason", "paid_by", "member__full_name", "member__serial_number"]
     ordering = ["-created_at"]
     date_hierarchy = "created_at"
+    autocomplete_fields = ["member", "created_by"]
+    
+    def get_payer(self, obj):
+        return obj.get_payer_display()
+    get_payer.short_description = "Paid By"
 
 
 @admin.register(DuesPaymentTransaction)
