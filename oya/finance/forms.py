@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from decimal import Decimal
 from .models import Income, Expense, DuesPayment, DuesPaymentTransaction
+from accounts.models import User  # Ensure this import matches your user model path
 
 
 class IncomeForm(forms.ModelForm):
@@ -24,8 +25,8 @@ class IncomeForm(forms.ModelForm):
                 "class": "form-control",
                 "placeholder": "e.g., Donation for project, Event ticket sales"
             }),
-            # Added explicit ID attribute here so JS can easily hook into it
-            "member": forms.HiddenInput(attrs={"id": "id_member"}),  
+            # CHANGED: Swapped from HiddenInput to a structural Form Select widget
+            "member": forms.Select(attrs={"class": "form-select", "id": "id_member"}),  
             "paid_by": forms.TextInput(attrs={
                 "class": "form-control",
                 "placeholder": "Name of payer / contributor (if not a member)"
@@ -37,6 +38,11 @@ class IncomeForm(forms.ModelForm):
         self.fields["income_type"].initial = "DONATION"
         choices = [c for c in Income.INCOME_TYPE_CHOICES if c[0] != "DUES"]
         self.fields["income_type"].choices = choices
+        
+        # CHANGED: Load all active members directly into the choices queryset for the dropdown
+        self.fields["member"].queryset = User.objects.filter(is_active=True).order_by("full_name")
+        self.fields["member"].empty_label = "--------- Select Active Member ---------"
+        
         self.fields["member"].required = False
         self.fields["paid_by"].required = False
 
@@ -51,17 +57,17 @@ class IncomeForm(forms.ModelForm):
         member = cleaned.get("member")
         paid_by = cleaned.get("paid_by")
 
-        # Auto-fill paid_by from member name if missing
+        # Auto-fill paid_by text representation from member object attributes if dropped down
         if member and not paid_by:
             cleaned["paid_by"] = member.get_full_name()
 
-        # Require at least one payer identifier
         if not member and not paid_by:
             raise ValidationError(
-                "Please either select a member from the search or enter a payer name."
+                "Please either select a member from the dropdown or enter a payer name."
             )
 
         return cleaned
+
 
 
 
