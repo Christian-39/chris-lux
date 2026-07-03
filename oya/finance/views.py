@@ -325,16 +325,19 @@ def income_list(request):
     ).order_by("-created_at")
 
     # --- DONATIONS & OTHER (non-dues income) ---
-    donation_qs = Income.objects.exclude(income_type="DUES").select_related("created_by")
+        # --- DONATIONS & OTHER (non-dues income) ---
+    donation_qs = Income.objects.exclude(income_type="DUES").select_related("created_by", "member")
 
     # Search/filter for donations
     search_term = request.GET.get("search", "")
-    if search_term:
+        if search_term:
         donation_qs = donation_qs.filter(
             Q(reason__icontains=search_term) |
             Q(paid_by__icontains=search_term) |
+            Q(member__full_name__icontains=search_term) |
             Q(created_by__full_name__icontains=search_term)
         )
+
 
     type_filter = request.GET.get("type", "")
     if type_filter:
