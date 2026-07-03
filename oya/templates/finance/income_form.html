@@ -34,6 +34,15 @@
       </div>
       {% endif %}
 
+      <!-- Non-field errors -->
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger mb-3">
+        {% for error in form.non_field_errors %}
+        <div>{{ error }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
       <div class="card">
         <div class="card-body p-4">
           <form method="post" id="incomeForm" novalidate>
@@ -78,7 +87,7 @@
             <!-- Paid By Section: Member Search OR External -->
             <div class="mb-4">
               <label class="form-label fw-semibold">Paid By <span class="text-danger">*</span></label>
-              
+
               <!-- Toggle -->
               <div class="btn-group w-100 mb-2" role="group">
                 <input type="radio" class="btn-check" name="payer_type" id="payerMember" value="member" checked onchange="togglePayerType()">
@@ -118,7 +127,7 @@
                 {{ form.paid_by }}
                 <div class="form-text">Name of the person or organization who made the payment.</div>
               </div>
-              
+
               {% if form.paid_by.errors %}
               <div class="invalid-feedback d-block">{{ form.paid_by.errors.0 }}</div>
               {% endif %}
@@ -174,6 +183,7 @@
 
 {% block extra_css %}
 <style>
+  #memberSearchWrapper { position: relative; }
   .search-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: var(--oya-card); border: 1px solid var(--oya-border); border-radius: 0 0 8px 8px; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
   .search-result-item { padding: .75rem 1rem; cursor: pointer; border-bottom: 1px solid var(--oya-border); transition: background .15s; }
   .search-result-item:hover { background: var(--oya-surface-hover); }
@@ -208,7 +218,7 @@
     const isMember = document.getElementById('payerMember').checked;
     if (isMember) {
       memberSearchWrapper.classList.remove('d-none');
-      if (selectedMemberId) memberSelected.classList.add('show');
+      if (selectedMemberId || memberSelect.value) memberSelected.classList.add('show');
       externalPayerWrapper.classList.add('d-none');
       if (paidByInput) paidByInput.value = '';
     } else {
@@ -217,6 +227,7 @@
       externalPayerWrapper.classList.remove('d-none');
       memberSelect.value = '';
       selectedMemberId = null;
+      if (paidByInput) paidByInput.value = '';
     }
   };
 
@@ -268,12 +279,14 @@
     document.getElementById('selectedMeta').textContent = item.serial + ' · ' + item.role;
     document.getElementById('selectedAvatar').textContent = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     if (paidByInput) paidByInput.value = item.name;
+    searchInput.classList.remove('is-invalid');
   }
 
   changeMemberBtn.addEventListener('click', function() {
     selectedMemberId = null; memberSelect.value = ''; searchInput.value = '';
     memberSearchWrapper.classList.remove('d-none');
     memberSelected.classList.remove('show');
+    if (paidByInput) paidByInput.value = '';
   });
 
   document.addEventListener('click', function(e) {
@@ -291,7 +304,45 @@
       searchInput.classList.add('is-invalid');
       return false;
     }
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Saving...';
   });
+
+  // Initialize: restore selected member UI on validation-error re-render
+  function initSelectedMember() {
+    if (memberSelect.value) {
+      selectedMemberId = memberSelect.value;
+      // Try to fetch member details using ID as search query
+      fetch('{% url "finance:search_members" %}?q=' + encodeURIComponent(memberSelect.value), {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.results && data.results.length) {
+          const item = data.results.find(function(r) { return String(r.id) === String(memberSelect.value); });
+          if (item) {
+            selectMember(item);
+            return;
+          }
+        }
+        // Fallback: show generic selected state
+        showGenericSelected();
+      })
+      .catch(function() {
+        showGenericSelected();
+      });
+    }
+  }
+
+  function showGenericSelected() {
+    memberSearchWrapper.classList.add('d-none');
+    memberSelected.classList.add('show');
+    document.getElementById('selectedName').textContent = 'Member #' + memberSelect.value;
+    document.getElementById('selectedMeta').textContent = 'Re-select to confirm';
+    document.getElementById('selectedAvatar').textContent = '?';
+  }
+
+  initSelectedMember();
 })();
 </script>
 {% endblock %}
