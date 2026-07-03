@@ -8,6 +8,7 @@
 <div class="container py-4">
   <div class="row justify-content-center">
     <div class="col-lg-8">
+
       <!-- Page Header -->
       <div class="page-header mb-4">
         <div class="page-header-left">
@@ -35,7 +36,7 @@
 
       <div class="card">
         <div class="card-body p-4">
-          <form method="post" id="donationForm" novalidate>
+          <form method="post" id="incomeForm" novalidate>
             {% csrf_token %}
 
             <!-- Income Type -->
@@ -45,10 +46,11 @@
               {% if form.income_type.errors %}
               <div class="invalid-feedback d-block">{{ form.income_type.errors.0 }}</div>
               {% endif %}
-              <div class="form-text mt-1">Quick select: 
+              <div class="form-text mt-2">
+                <span class="me-2">Quick select:</span>
                 <button type="button" class="btn btn-sm btn-outline-success" onclick="setType('DONATION')">Donation</button>
-                <button type="button" class="btn btn-sm btn-outline-warning" onclick="setType('EVENT')">Event</button>
-                <button type="button" class="btn btn-sm btn-outline-info" onclick="setType('OTHER')">Other</button>
+                <button type="button" class="btn btn-sm btn-outline-warning ms-1" onclick="setType('EVENT')">Event</button>
+                <button type="button" class="btn btn-sm btn-outline-info ms-1" onclick="setType('OTHER')">Other</button>
               </div>
             </div>
 
@@ -73,11 +75,11 @@
               {% endif %}
             </div>
 
-            <!-- Paid By - Member Search -->
-            <div class="mb-4 position-relative">
-              <label class="form-label fw-semibold">Paid By</label>
+            <!-- Paid By Section: Member Search OR External -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Paid By <span class="text-danger">*</span></label>
               
-              <!-- Toggle: Member vs Non-Member -->
+              <!-- Toggle -->
               <div class="btn-group w-100 mb-2" role="group">
                 <input type="radio" class="btn-check" name="payer_type" id="payerMember" value="member" checked onchange="togglePayerType()">
                 <label class="btn btn-outline-primary" for="payerMember">
@@ -92,13 +94,15 @@
               </div>
 
               <!-- Member Search -->
-              <div id="memberSearchContainer">
+              <div id="memberSearchWrapper" class="position-relative">
                 <div class="input-group">
                   <span class="input-group-text"><i class="bi bi-search"></i></span>
                   <input type="text" class="form-control" id="memberSearchInput" placeholder="Search member by name or serial number..." autocomplete="off">
                 </div>
                 <div class="search-results d-none" id="searchResults"></div>
               </div>
+
+              <!-- Selected Member Display -->
               <div class="member-selected mt-2" id="memberSelected">
                 <div class="member-avatar" id="selectedAvatar">AB</div>
                 <div>
@@ -108,9 +112,9 @@
                 <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" id="changeMember">Change</button>
               </div>
               {{ form.member }}
-              
-              <!-- External Payer (free text) -->
-              <div id="externalPayerContainer" class="d-none">
+
+              <!-- External Payer Input -->
+              <div id="externalPayerWrapper" class="d-none">
                 {{ form.paid_by }}
                 <div class="form-text">Name of the person or organization who made the payment.</div>
               </div>
@@ -120,44 +124,49 @@
               {% endif %}
             </div>
 
-            <!-- Payment Method -->
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Payment Method</label>
-              {{ form.payment_method }}
-              {% if form.payment_method.errors %}
-              <div class="invalid-feedback d-block">{{ form.payment_method.errors.0 }}</div>
-              {% endif %}
-            </div>
-
-            <!-- Receipt Reference -->
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Receipt / Reference Number</label>
-              {{ form.receipt_reference }}
-              <div class="form-text">Optional. Bank transfer ref, receipt number, etc.</div>
-              {% if form.receipt_reference.errors %}
-              <div class="invalid-feedback d-block">{{ form.receipt_reference.errors.0 }}</div>
-              {% endif %}
-            </div>
-
-            <!-- Notes -->
-            <div class="mb-4">
-              <label class="form-label fw-semibold">Notes</label>
-              {{ form.notes }}
-              {% if form.notes.errors %}
-              <div class="invalid-feedback d-block">{{ form.notes.errors.0 }}</div>
-              {% endif %}
-            </div>
-
             <div class="d-flex gap-2">
               <button type="submit" class="btn btn-primary" id="submitBtn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                Save
+                {{ action }}
               </button>
               <a href="{% url 'finance:donation_list' %}" class="btn btn-ghost">Cancel</a>
             </div>
           </form>
         </div>
       </div>
+
+      <!-- Recent Contributions -->
+      {% if recent_incomes %}
+      <div class="card mt-4">
+        <div class="card-header">
+          <div class="card-header-title">Recent Contributions</div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="data-table">
+              <tbody>
+                {% for item in recent_incomes %}
+                <tr>
+                  <td>
+                    {% if item.income_type == 'DONATION' %}
+                    <span class="badge badge-donation">Donation</span>
+                    {% elif item.income_type == 'EVENT' %}
+                    <span class="badge badge-event">Event</span>
+                    {% else %}
+                    <span class="badge badge-other">Other</span>
+                    {% endif %}
+                  </td>
+                  <td class="fw-medium">{{ item.reason|truncatechars:35 }}</td>
+                  <td class="text-end fw-bold text-success">&#8358;{{ item.amount|floatformat:0|intcomma }}</td>
+                  <td class="small text-muted">{{ item.created_at|date:"M d" }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -173,6 +182,9 @@
   .member-selected { background: var(--oya-success-bg); border-radius: 8px; padding: .75rem 1rem; display: none; align-items: center; gap: .75rem; }
   .member-selected.show { display: flex; }
   .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--oya-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: .85rem; }
+  .badge-donation { background: var(--oya-success-bg); color: var(--oya-success); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+  .badge-event { background: var(--oya-warning-bg); color: var(--oya-warning); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+  .badge-other { background: var(--oya-info-bg); color: var(--oya-info); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
 </style>
 {% endblock %}
 
@@ -183,31 +195,31 @@
   const searchResults = document.getElementById('searchResults');
   const memberSelect = document.getElementById('id_member');
   const memberSelected = document.getElementById('memberSelected');
-  const memberSearchContainer = document.getElementById('memberSearchContainer');
-  const externalPayerContainer = document.getElementById('externalPayerContainer');
+  const memberSearchWrapper = document.getElementById('memberSearchWrapper');
+  const externalPayerWrapper = document.getElementById('externalPayerWrapper');
   const changeMemberBtn = document.getElementById('changeMember');
   const paidByInput = document.getElementById('id_paid_by');
-  const donationForm = document.getElementById('donationForm');
+  const incomeForm = document.getElementById('incomeForm');
 
   let searchTimeout;
   let selectedMemberId = null;
 
-  function togglePayerType() {
+  window.togglePayerType = function() {
     const isMember = document.getElementById('payerMember').checked;
     if (isMember) {
-      memberSearchContainer.classList.remove('d-none');
-      externalPayerContainer.classList.add('d-none');
+      memberSearchWrapper.classList.remove('d-none');
+      if (selectedMemberId) memberSelected.classList.add('show');
+      externalPayerWrapper.classList.add('d-none');
       if (paidByInput) paidByInput.value = '';
     } else {
-      memberSearchContainer.classList.add('d-none');
+      memberSearchWrapper.classList.add('d-none');
       memberSelected.classList.remove('show');
-      externalPayerContainer.classList.remove('d-none');
+      externalPayerWrapper.classList.remove('d-none');
       memberSelect.value = '';
       selectedMemberId = null;
     }
-  }
+  };
 
-  window.togglePayerType = togglePayerType;
   window.setType = function(type) {
     const select = document.getElementById('id_income_type');
     if (select) select.value = type;
@@ -250,7 +262,7 @@
     memberSelect.value = item.id;
     searchInput.value = item.name;
     searchResults.classList.add('d-none');
-    memberSearchContainer.classList.add('d-none');
+    memberSearchWrapper.classList.add('d-none');
     memberSelected.classList.add('show');
     document.getElementById('selectedName').textContent = item.name;
     document.getElementById('selectedMeta').textContent = item.serial + ' · ' + item.role;
@@ -260,7 +272,7 @@
 
   changeMemberBtn.addEventListener('click', function() {
     selectedMemberId = null; memberSelect.value = ''; searchInput.value = '';
-    memberSearchContainer.classList.remove('d-none');
+    memberSearchWrapper.classList.remove('d-none');
     memberSelected.classList.remove('show');
   });
 
@@ -271,7 +283,7 @@
   });
 
   // Form validation
-  donationForm.addEventListener('submit', function(e) {
+  incomeForm.addEventListener('submit', function(e) {
     const isMember = document.getElementById('payerMember').checked;
     if (isMember && !selectedMemberId && !memberSelect.value) {
       e.preventDefault();
@@ -280,9 +292,6 @@
       return false;
     }
   });
-
-  // Initialize
-  togglePayerType();
 })();
 </script>
 {% endblock %}
