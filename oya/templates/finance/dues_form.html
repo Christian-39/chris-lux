@@ -7,23 +7,34 @@
 {% block extra_css %}
 <style>
   .allocation-card { border-radius: 12px; border: none; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-  .allocation-item { padding: .75rem 1rem; border-radius: 8px; background: #f8f9fa; margin-bottom: .5rem; display: flex; justify-content: space-between; align-items: center; }
+  .allocation-item { padding: .75rem 1rem; border-radius: 8px; background: var(--oya-surface); margin-bottom: .5rem; display: flex; justify-content: space-between; align-items: center; }
   .allocation-item.prepaid { background: #e3f2fd; border-left: 4px solid #1565c0; }
   .allocation-item.paid { background: #e8f5e9; border-left: 4px solid #2e7d32; }
   .allocation-item.partial { background: #fff3e0; border-left: 4px solid #ef6c00; }
-  .search-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: #fff; border: 1px solid #dee2e6; border-radius: 0 0 8px 8px; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-  .search-result-item { padding: .75rem 1rem; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background .15s; }
-  .search-result-item:hover { background: #f8f9fa; }
-  .search-result-name { font-weight: 600; color: #1a1a2e; }
-  .search-result-meta { font-size: .75rem; color: #6c757d; }
+  .search-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: var(--oya-card); border: 1px solid var(--oya-border); border-radius: 0 0 8px 8px; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .search-result-item { padding: .75rem 1rem; cursor: pointer; border-bottom: 1px solid var(--oya-border); transition: background .15s; }
+  .search-result-item:hover { background: var(--oya-surface-hover); }
+  .search-result-name { font-weight: 600; color: var(--oya-text); }
+  .search-result-meta { font-size: .75rem; color: var(--oya-text-muted); }
   .member-selected { background: #e8f5e9; border-radius: 8px; padding: .75rem 1rem; display: none; }
   .member-selected.show { display: flex; align-items: center; gap: .75rem; }
-  .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: #1a1a2e; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: .85rem; }
-  .preview-box { background: #f8f9fa; border-radius: 12px; padding: 1.25rem; display: none; }
+  .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--oya-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: .85rem; }
+  .preview-box { background: var(--oya-surface); border-radius: 12px; padding: 1.25rem; display: none; }
   .preview-box.show { display: block; }
-  .amount-display { font-size: 1.8rem; font-weight: 700; color: #1a1a2e; }
-  .spinner-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; border-radius: 12px; z-index: 10; }
-  .form-section { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .amount-display { font-size: 1.8rem; font-weight: 700; color: var(--oya-text); }
+  .form-section { background: var(--oya-card); border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+  [data-theme="dark"] .allocation-card { background: var(--oya-card); box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+  [data-theme="dark"] .allocation-item { background: var(--oya-surface); }
+  [data-theme="dark"] .form-section { background: var(--oya-card); box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+  [data-theme="dark"] .form-control,
+  [data-theme="dark"] .form-select { background: var(--oya-surface); color: var(--oya-text); border-color: var(--oya-border); }
+  [data-theme="dark"] .input-group-text { background: var(--oya-surface); color: var(--oya-text); border-color: var(--oya-border); }
+  [data-theme="dark"] .btn-outline-secondary { color: var(--oya-text); border-color: var(--oya-border); }
+  [data-theme="dark"] .text-muted { color: var(--oya-text-muted) !important; }
+  [data-theme="dark"] .search-results { background: var(--oya-card); border-color: var(--oya-border); }
+  [data-theme="dark"] .search-result-item { border-color: var(--oya-border); }
+  [data-theme="dark"] .search-result-item:hover { background: var(--oya-surface-hover); }
 </style>
 {% endblock %}
 
@@ -33,7 +44,7 @@
     <div class="col-lg-8">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h2 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-cash-coin me-2"></i>{{ title }}</h2>
+          <h2 class="fw-bold mb-0" style="color:var(--oya-primary);"><i class="bi bi-cash-coin me-2"></i>{{ title }}</h2>
           <p class="text-muted mb-0">Smart allocation across outstanding years</p>
         </div>
         <a href="{% url 'finance:dues_tracker' %}" class="btn btn-outline-secondary">
@@ -52,11 +63,8 @@
       </div>
       {% endif %}
 
-      <div class="form-section position-relative" id="formSection">
-        <div class="spinner-overlay d-none" id="formSpinner">
-          <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
-        </div>
-
+      <!-- LOADING SPINNER REMOVED - form section is clean now -->
+      <div class="form-section" id="formSection">
         <form method="post" id="duesForm" novalidate>
           {% csrf_token %}
 
@@ -163,7 +171,6 @@
   const previewBox = document.getElementById('allocationPreview');
   const previewContent = document.getElementById('previewContent');
   const submitBtn = document.getElementById('submitBtn');
-  const formSpinner = document.getElementById('formSpinner');
 
   let searchTimeout;
   let selectedMemberId = null;
@@ -290,8 +297,10 @@
     submitBtn.disabled = !(selectedMemberId && amount && amount > 0);
   }
 
+  // Form submission — no spinner overlay, just disable button
   document.getElementById('duesForm').addEventListener('submit', function() {
-    formSpinner.classList.remove('d-none'); submitBtn.disabled = true;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing...';
   });
 })();
 </script>
