@@ -9,12 +9,38 @@
   .income-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
   .stat-mini { text-align: center; padding: 1rem; border-radius: 10px; }
   .stat-mini-value { font-size: 1.4rem; font-weight: 700; }
-  .stat-mini-label { font-size: .75rem; color: #6c757d; text-transform: uppercase; }
-  .filter-bar { background: #fff; border-radius: 10px; padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .stat-mini-label { font-size: .75rem; color: var(--oya-text-muted); text-transform: uppercase; }
+  .filter-bar { background: var(--oya-surface); border-radius: 10px; padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--oya-border); }
   .badge-dues { background: #e3f2fd; color: #1565c0; }
   .badge-donation { background: #e8f5e9; color: #2e7d32; }
   .badge-event { background: #fff3e0; color: #ef6c00; }
   .badge-other { background: #f3e5f5; color: #6a1b9a; }
+
+  /* TABLE FIX: no wrap, horizontal scroll */
+  .income-card .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .income-card table { min-width: 900px; }
+  .income-card table th,
+  .income-card table td { white-space: nowrap !important; vertical-align: middle; }
+  .income-card table td:nth-child(1) { max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+  .income-card table td:nth-child(2) { max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+
+  [data-theme="dark"] .income-card { background: var(--oya-card); box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+  [data-theme="dark"] .filter-bar { background: var(--oya-card); border-color: var(--oya-border); }
+  [data-theme="dark"] .table-light { --bs-table-bg: var(--oya-surface); --bs-table-color: var(--oya-text); --bs-table-border-color: var(--oya-border); }
+  [data-theme="dark"] .table-hover > tbody > tr:hover { --bs-table-bg-state: var(--oya-surface-hover); }
+  [data-theme="dark"] .card-footer { background: var(--oya-card) !important; border-color: var(--oya-border) !important; }
+  [data-theme="dark"] .card-header { background: var(--oya-card) !important; border-color: var(--oya-border) !important; }
+  [data-theme="dark"] .page-link { background: var(--oya-card); color: var(--oya-text); border-color: var(--oya-border); }
+  [data-theme="dark"] .page-item.active .page-link { background: var(--oya-primary); border-color: var(--oya-primary); color: #fff; }
+  [data-theme="dark"] .page-item.disabled .page-link { background: var(--oya-surface); color: var(--oya-text-muted); border-color: var(--oya-border); }
+  [data-theme="dark"] .text-muted { color: var(--oya-text-muted) !important; }
+  [data-theme="dark"] .form-control,
+  [data-theme="dark"] .form-select { background: var(--oya-surface); color: var(--oya-text); border-color: var(--oya-border); }
+  [data-theme="dark"] .input-group-text { background: var(--oya-surface); color: var(--oya-text); border-color: var(--oya-border); }
+  [data-theme="dark"] .btn-outline-secondary { color: var(--oya-text); border-color: var(--oya-border); }
+  [data-theme="dark"] .btn-outline-primary { color: var(--oya-primary); border-color: var(--oya-primary); }
+  [data-theme="dark"] .btn-outline-danger { color: var(--oya-danger); border-color: var(--oya-danger); }
+  [data-theme="dark"] .badge.bg-light { background: var(--oya-surface) !important; color: var(--oya-text) !important; border: 1px solid var(--oya-border); }
 </style>
 {% endblock %}
 
@@ -22,7 +48,7 @@
 <div class="container-fluid py-4">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
-      <h2 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-cash-stack me-2"></i>Income Records</h2>
+      <h2 class="fw-bold mb-0" style="color:var(--oya-primary);"><i class="bi bi-cash-stack me-2"></i>Income Records</h2>
       <p class="text-muted mb-0">All dues and donation records</p>
     </div>
     <div class="d-flex gap-2">
@@ -62,68 +88,143 @@
     </form>
   </div>
 
+  <!-- DUES INCOME TABLE -->
   <div class="income-card card mb-4">
     <div class="card-header bg-white border-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
-      <h5 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-calendar-check me-2 text-primary"></i>Dues Income</h5>
+      <h5 class="fw-bold mb-0" style="color:var(--oya-primary);"><i class="bi bi-calendar-check me-2 text-primary"></i>Dues Income</h5>
     </div>
     <div class="card-body p-0">
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
-          <thead class="table-light"><tr><th>Reason</th><th>Member</th><th class="text-end">Amount</th><th>Recorded By</th><th>Date</th><th class="text-end">Actions</th></tr></thead>
+          <thead class="table-light">
+            <tr>
+              <th>Reason</th>
+              <th>Member</th>
+              <th class="text-end">Amount</th>
+              <th>Recorded By</th>
+              <th>Date</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
           <tbody>
             {% for income in dues_incomes %}
             <tr>
-              <td><span class="badge badge-dues me-1">Dues</span><a href="{% url 'finance:income_detail' income.pk %}" class="text-decoration-none fw-medium">{{ income.reason }}</a></td>
-              <td>{% if income.dues_payment and income.dues_payment.member %}<a href="{% url 'finance:member_dues_detail' income.dues_payment.member.id %}" class="text-decoration-none">{{ income.dues_payment.member.get_full_name }}</a>{% else %}<span class="text-muted">{{ income.paid_by|default:"—" }}</span>{% endif %}</td>
+              <td>
+                <span class="badge badge-dues me-1">Dues</span>
+                <a href="{% url 'finance:income_detail' income.pk %}" class="text-decoration-none fw-medium">{{ income.reason }}</a>
+              </td>
+              <td>
+                {% if income.dues_payment and income.dues_payment.member %}
+                <a href="{% url 'finance:member_dues_detail' income.dues_payment.member.id %}" class="text-decoration-none">{{ income.dues_payment.member.get_full_name }}</a>
+                {% else %}
+                <span class="text-muted">{{ income.paid_by|default:"—" }}</span>
+                {% endif %}
+              </td>
               <td class="text-end fw-bold text-success">&#8358;{{ income.amount|floatformat:0|intcomma }}</td>
               <td class="small">{% if income.created_by %}{{ income.created_by.get_full_name }}{% else %}—{% endif %}</td>
               <td class="small text-muted">{{ income.created_at|date:"M d, Y" }}</td>
               <td class="text-end">
                 <a href="{% url 'finance:income_detail' income.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
-                {% if user.has_admin_access %}<a href="{% url 'finance:income_delete' income.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>{% endif %}
+                {% if user.has_admin_access %}
+                <a href="{% url 'finance:income_delete' income.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                {% endif %}
               </td>
             </tr>
-            {% empty %}<tr><td colspan="6" class="text-center py-4 text-muted">No dues income records found.</td></tr>{% endfor %}
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">No dues income records found.</td>
+            </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
     </div>
   </div>
 
+  <!-- DONATIONS TABLE -->
   <div class="income-card card">
     <div class="card-header bg-white border-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
-      <h5 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-gift me-2 text-success"></i>Donations & Contributions</h5>
+      <h5 class="fw-bold mb-0" style="color:var(--oya-primary);"><i class="bi bi-gift me-2 text-success"></i>Donations & Contributions</h5>
       <span class="badge bg-light text-dark">{{ donation_incomes.paginator.count|default:0 }} records</span>
     </div>
     <div class="card-body p-0">
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
-          <thead class="table-light"><tr><th>Type</th><th>Reason</th><th>Paid By</th><th class="text-end">Amount</th><th>Recorded By</th><th>Date</th><th class="text-end">Actions</th></tr></thead>
+          <thead class="table-light">
+            <tr>
+              <th>Type</th>
+              <th>Reason</th>
+              <th>Paid By</th>
+              <th class="text-end">Amount</th>
+              <th>Recorded By</th>
+              <th>Date</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
           <tbody>
             {% for income in donation_incomes %}
             <tr>
-              <td>{% if income.income_type == "DONATION" %}<span class="badge badge-donation">Donation</span>{% elif income.income_type == "EVENT" %}<span class="badge badge-event">Event</span>{% else %}<span class="badge badge-other">Other</span>{% endif %}</td>
-              <td><a href="{% url 'finance:income_detail' income.pk %}" class="text-decoration-none fw-medium">{{ income.reason|truncatechars:40 }}</a></td>
+              <td>
+                {% if income.income_type == "DONATION" %}
+                <span class="badge badge-donation">Donation</span>
+                {% elif income.income_type == "EVENT" %}
+                <span class="badge badge-event">Event</span>
+                {% else %}
+                <span class="badge badge-other">Other</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'finance:income_detail' income.pk %}" class="text-decoration-none fw-medium">{{ income.reason|truncatechars:40 }}</a>
+              </td>
               <td class="small">{{ income.paid_by|default:"—" }}</td>
               <td class="text-end fw-bold text-success">&#8358;{{ income.amount|floatformat:0|intcomma }}</td>
               <td class="small">{% if income.created_by %}{{ income.created_by.get_full_name }}{% else %}—{% endif %}</td>
               <td class="small text-muted">{{ income.created_at|date:"M d, Y" }}</td>
               <td class="text-end">
                 <a href="{% url 'finance:income_detail' income.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
-                {% if user.has_admin_access %}<a href="{% url 'finance:income_delete' income.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>{% endif %}
+                {% if user.has_admin_access %}
+                <a href="{% url 'finance:income_delete' income.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                {% endif %}
               </td>
             </tr>
-            {% empty %}<tr><td colspan="7" class="text-center py-4 text-muted">No donation records found.</td></tr>{% endfor %}
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">No donation records found.</td>
+            </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
+
       {% if donation_incomes.has_other_pages %}
       <div class="card-footer bg-white border-0">
         <nav aria-label="Page navigation">
           <ul class="pagination justify-content-center mb-0">
-            {% if donation_incomes.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ donation_incomes.previous_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">Previous</a></li>{% else %}<li class="page-item disabled"><span class="page-link">Previous</span></li>{% endif %}
-            {% for num in donation_incomes.paginator.page_range %}{% if donation_incomes.number == num %}<li class="page-item active"><span class="page-link">{{ num }}</span></li>{% elif num > donation_incomes.number|add:-3 and num < donation_incomes.number|add:3 %}<li class="page-item"><a class="page-link" href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">{{ num }}</a></li>{% endif %}{% endfor %}
-            {% if donation_incomes.has_next %}<li class="page-item"><a class="page-link" href="?page={{ donation_incomes.next_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">Next</a></li>{% else %}<li class="page-item disabled"><span class="page-link">Next</span></li>{% endif %}
+            {% if donation_incomes.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ donation_incomes.previous_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">Previous</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Previous</span></li>
+            {% endif %}
+
+            {% for num in donation_incomes.paginator.page_range %}
+              {% if donation_incomes.number == num %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+              {% elif num > donation_incomes.number|add:-3 and num < donation_incomes.number|add:3 %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">{{ num }}</a>
+              </li>
+              {% endif %}
+            {% endfor %}
+
+            {% if donation_incomes.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ donation_incomes.next_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">Next</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Next</span></li>
+            {% endif %}
           </ul>
         </nav>
       </div>
