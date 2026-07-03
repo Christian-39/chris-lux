@@ -218,8 +218,9 @@ def dues_allocate(request):
                 messages.error(request, f"Allocation failed: {str(e)}")
         else:
             for field, errors in form.errors.items():
+                label = "Form" if field == "__all__" else field
                 for error in errors:
-                    messages.error(request, f"{field}: {error}")
+                    messages.error(request, f"{label}: {error}")
     else:
         form = DuesPaymentAllocationForm(recorded_by=request.user)
 
@@ -422,8 +423,9 @@ def income_create(request):
             return redirect("finance:donation_list")
         else:
             for field, errors in form.errors.items():
+                label = "Form" if field == "__all__" else field
                 for error in errors:
-                    messages.error(request, f"{field}: {error}")
+                    messages.error(request, f"{label}: {error}")
     else:
         form = IncomeForm()
 
@@ -739,10 +741,16 @@ def search_members(request):
     if len(q) < 2:
         return JsonResponse({"results": []})
 
+    # Also allow exact ID lookup for init/rehydration
+    id_filter = Q()
+    if q.isdigit():
+        id_filter = Q(id=int(q))
+
     users = User.objects.filter(
         Q(full_name__icontains=q) |
         Q(serial_number__icontains=q) |
-        Q(phone__icontains=q)
+        Q(phone__icontains=q) |
+        id_filter
     ).filter(is_active=True).distinct()[:10]
 
     results = []
