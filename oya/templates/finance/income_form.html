@@ -12,7 +12,7 @@
       <div class="page-header mb-4">
         <div class="page-header-left">
           <h1 style="font-size:clamp(1.125rem,3vw,1.5rem);">{{ title }}</h1>
-          <p class="text-muted">Record non-dues income streams with live association database lookup</p>
+          <p class="text-muted">Record association revenue stream records</p>
         </div>
         <div class="page-header-actions">
           <a href="{% url 'finance:donation_list' %}" class="btn btn-ghost">
@@ -46,45 +46,25 @@
           <form method="post" id="incomeForm" novalidate>
             {% csrf_token %}
 
-            <div class="mb-4">
-              <label class="form-label fw-bold" style="color: var(--oya-text, #212529);">
-                Is the contributor a registered member?
-              </label>
-              <div id="memberSearchContainer" class="position-relative">
-                <div class="input-group">
-                  <span class="input-group-text" style="background: var(--oya-surface, #f8f9fa); border-color: var(--oya-border, #dee2e6);"><i class="bi bi-search"></i></span>
-                  <input type="text" class="form-control" id="memberSearchInput" placeholder="Type name or serial number to search association database..." autocomplete="off" style="border-color: var(--oya-border, #dee2e6);">
-                </div>
-                <div class="search-results d-none" id="searchResults"></div>
-              </div>
+            {{ form.member }}
 
-              <div class="member-selected mt-2" id="memberSelected">
-                <div class="member-avatar" id="selectedAvatar">--</div>
-                <div>
-                  <div class="fw-bold" id="selectedName" style="color: var(--oya-text, #212529);"></div>
-                  <div class="small text-muted" id="selectedMeta"></div>
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-danger ms-auto px-3" id="changeMember">Clear Selection</button>
+            <div class="mb-4 position-relative" id="payerFieldContainer">
+              <label class="form-label fw-bold" style="color: var(--oya-text, #212529);">Payer / Contributor Name <span class="text-danger">*</span></label>
+              
+              <div class="input-group">
+                <span class="input-group-text" style="background: var(--oya-surface, #f8f9fa); border-color: var(--oya-border, #dee2e6);"><i class="bi bi-person"></i></span>
+                {{ form.paid_by }}
+                <button class="btn btn-outline-secondary d-none" type="button" id="clearMemberBtn">
+                  <i class="bi bi-x-circle-fill text-danger"></i> Clear
+                </button>
               </div>
               
-              {{ form.member }}
-              {% if form.member.errors %}
-              <div class="invalid-feedback d-block">{{ form.member.errors.0 }}</div>
-              {% endif %}
-            </div>
-
-            <div class="mb-4">
-              <label class="form-label fw-bold" style="color: var(--oya-text, #212529);">Payer / Contributor Name <span class="text-danger">*</span></label>
-              {{ form.paid_by }}
               <div class="form-text text-muted" id="paidByHelpText">
-                If the person is an outside guest/non-member, type their name directly here.
+                Type to drop down and select a registered member, or type a custom name for non-members.
               </div>
-              {% if form.paid_by.errors %}
-              <div class="invalid-feedback d-block">{{ form.paid_by.errors.0 }}</div>
-              {% endif %}
-            </div>
 
-            <hr class="my-4" style="border-color: var(--oya-border, #dee2e6);">
+              <div class="search-results d-none" id="searchResults"></div>
+            </div>
 
             <div class="row g-3 mb-4">
               <div class="col-md-6">
@@ -116,8 +96,6 @@
               {% if common_reasons %}
               <div class="mt-2 d-flex flex-wrap gap-1 align-items-center">
                 <span class="small text-muted me-1">Quick reasons:</span>
-                {% for r in common_reasons %}
-                <button type="button" class="badge bg-light text-dark border quick-reason-btn" data-reason="{{ r }}" style="cursor:pointer; padding: 0.4rem 0.6rem;">{{ r }}</button>
                 {% endfor %}
               </div>
               {% endif %}
@@ -140,42 +118,44 @@
 
 {% block extra_css %}
 <style>
-  #memberSearchContainer { position: relative; }
-  .search-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 1050; background: var(--oya-card, #fff); border: 1px solid var(--oya-border, #dee2e6); border-radius: 0 0 8px 8px; max-height: 280px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  #payerFieldContainer { position: relative; }
+  .search-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 1050; background: var(--oya-card, #fff); border: 1px solid var(--oya-border, #dee2e6); border-radius: 0 0 8px 8px; max-height: 250px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
   .search-result-item { padding: .75rem 1rem; cursor: pointer; border-bottom: 1px solid var(--oya-border, #dee2e6); transition: background .15s ease-in-out; }
   .search-result-item:last-child { border-bottom: none; }
   .search-result-item:hover { background: var(--oya-surface-hover, #f1f3f5); }
   .search-result-name { font-weight: 600; color: var(--oya-text, #212529); }
   .search-result-meta { font-size: .75rem; color: var(--oya-text-muted, #6c757d); }
-  
-  .member-selected { background: var(--oya-success-bg, #e8f5e9); border: 1px solid var(--oya-success, #a5d6a7); border-radius: 8px; padding: .75rem 1rem; display: none; align-items: center; gap: .75rem; }
-  .member-selected.show { display: flex; }
-  .member-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--oya-primary, #0d6efd); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .9rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  .quick-reason-btn { cursor: pointer; transition: background 0.2s; }
+  .quick-reason-btn:hover { background: #e2e6ea !important; }
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 (function() {
-  const searchInput = document.getElementById('memberSearchInput');
+  const paidByInput = document.getElementById('id_paid_by');
   const searchResults = document.getElementById('searchResults');
   const memberSelect = document.getElementById('id_member');
-  const memberSelected = document.getElementById('memberSelected');
-  const memberSearchContainer = document.getElementById('memberSearchContainer');
-  const changeMemberBtn = document.getElementById('changeMember');
-  const paidByInput = document.getElementById('id_paid_by');
+  const clearMemberBtn = document.getElementById('clearMemberBtn');
+  const paidByHelpText = document.getElementById('paidByHelpText');
   const reasonInput = document.getElementById('id_reason');
   const amountInput = document.getElementById('id_amount');
   const submitBtn = document.getElementById('submitBtn');
   const incomeForm = document.getElementById('incomeForm');
-  const paidByHelpText = document.getElementById('paidByHelpText');
 
   let searchTimeout;
 
-  // Real-time Database Search Lookup Trigger
-  searchInput.addEventListener('input', function() {
+  // Intercept the text field and treat it as a live search drop-down
+  paidByInput.addEventListener('input', function() {
     const q = this.value.trim();
     clearTimeout(searchTimeout);
+    
+    // If the admin alters the text, clear any linked member ID state
+    if (!q) {
+      clearLinkedMember();
+      return;
+    }
+    
     if (q.length < 2) { searchResults.classList.add('d-none'); return; }
     
     searchTimeout = setTimeout(function() {
@@ -195,53 +175,46 @@
           });
           searchResults.classList.remove('d-none');
         } else {
-          searchResults.innerHTML = '<div class="search-result-item text-muted">No registered members matched query.</div>';
+          searchResults.innerHTML = '<div class="search-result-item text-muted">No matching member found (Will save as custom non-member text).</div>';
           searchResults.classList.remove('d-none');
         }
       })
       .catch(function() {
-        searchResults.innerHTML = '<div class="search-result-item text-danger">Database connection timed out. Retry.</div>';
+        searchResults.innerHTML = '<div class="search-result-item text-danger">Database lookup error.</div>';
         searchResults.classList.remove('d-none');
       });
     }, 250);
   });
 
-  // Action: Bind Member data on Select Action
+  // When a member option is clicked from the dropdown menu list
   function selectMember(item) {
     memberSelect.value = item.id;
-    searchInput.value = '';
-    
-    // Auto-populate structural requirements
     paidByInput.value = item.name;
-    paidByInput.readOnly = true; // Protect identity record mapping integrity
-    paidByHelpText.innerHTML = '<span class="text-success fw-bold"><i class="bi bi-shield-check"></i> Linked to association account. Name locked.</span>';
     
+    // Style adjustments to show successful account association link
+    paidByInput.classList.add('is-valid');
+    clearMemberBtn.classList.remove('d-none');
     searchResults.classList.add('d-none');
-    memberSearchContainer.classList.add('d-none');
-    memberSelected.classList.add('show');
-    
-    document.getElementById('selectedName').textContent = item.name;
-    document.getElementById('selectedMeta').textContent = item.serial + ' · ' + item.role;
-    document.getElementById('selectedAvatar').textContent = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-    
-    searchInput.classList.remove('is-invalid');
+    paidByHelpText.innerHTML = '<span class="text-success fw-bold"><i class="bi bi-shield-check"></i> Connected to account: ' + item.serial + '</span>';
   }
 
-  // Action: Clear selection and unlock input forms
-  changeMemberBtn.addEventListener('click', function() {
-    memberSelect.value = ''; 
+  // Clear connection utility function
+  function clearLinkedMember() {
+    memberSelect.value = '';
+    paidByInput.classList.remove('is-valid');
+    clearMemberBtn.classList.add('d-none');
+    paidByHelpText.textContent = "Type to drop down and select a registered member, or type a custom name for non-members.";
+  }
+
+  clearMemberBtn.addEventListener('click', function() {
     paidByInput.value = '';
-    paidByInput.readOnly = false;
-    paidByHelpText.textContent = "If the person is an outside guest/non-member, type their name directly here.";
-    
-    memberSearchContainer.classList.remove('d-none');
-    memberSelected.classList.remove('show');
-    searchInput.focus();
+    clearLinkedMember();
+    paidByInput.focus();
   });
 
-  // Structural execution: Close dynamic anchors on blank focus clicks
+  // Close results element dropdown panel if clicking anywhere else on page
   document.addEventListener('click', function(e) {
-    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+    if (!paidByInput.contains(e.target) && !searchResults.contains(e.target)) {
       searchResults.classList.add('d-none');
     }
   });
@@ -253,7 +226,7 @@
     });
   });
 
-  // Integrity Check: Form Client Validation Rules
+  // Client Validation Handling Form Submits
   incomeForm.addEventListener('submit', function(e) {
     let isValid = true;
     const amount = parseFloat(amountInput.value);
@@ -278,10 +251,10 @@
     }
 
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing Ledger Entry...';
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Recording Entry...';
   });
 
-  // Hydrate Search Identity UI on validation return errors
+  // If page returns from backend validation error, re-apply UI links
   function initSelectedMember() {
     if (memberSelect.value) {
       fetch('{% url "finance:search_members" %}?q=' + encodeURIComponent(memberSelect.value), {
