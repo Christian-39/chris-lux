@@ -12,12 +12,12 @@
       <div class="page-header mb-4">
         <div class="page-header-left">
           <h1 style="font-size:clamp(1.125rem,3vw,1.5rem);">{{ title }}</h1>
-          <p>Record a new contribution or donation</p>
+          <p>Record miscellaneous income, donations, and event contributions</p>
         </div>
         <div class="page-header-actions">
           <a href="{% url 'finance:donation_list' %}" class="btn btn-ghost">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-            Back to List
+            Back to Contributions
           </a>
         </div>
       </div>
@@ -46,65 +46,17 @@
           <form method="post" id="incomeForm" novalidate>
             {% csrf_token %}
 
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Contribution Type <span class="text-danger">*</span></label>
-              {{ form.income_type }}
-              {% if form.income_type.errors %}
-              <div class="invalid-feedback d-block">{{ form.income_type.errors.0 }}</div>
-              {% endif %}
-              <div class="form-text mt-2">
-                <span class="me-2">Quick select:</span>
-                <button type="button" class="btn btn-sm btn-outline-success" onclick="setType('DONATION')">Donation</button>
-                <button type="button" class="btn btn-sm btn-outline-warning ms-1" onclick="setType('EVENT')">Event</button>
-                <button type="button" class="btn btn-sm btn-outline-info ms-1" onclick="setType('OTHER')">Other</button>
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Amount <span class="text-danger">*</span></label>
-              <div class="input-group">
-                <span class="input-group-text">&#8358;</span>
-                {{ form.amount }}
-              </div>
-              {% if form.amount.errors %}
-              <div class="invalid-feedback d-block">{{ form.amount.errors.0 }}</div>
-              {% endif %}
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Reason / Description <span class="text-danger">*</span></label>
-              {{ form.reason }}
-              {% if form.reason.errors %}
-              <div class="invalid-feedback d-block">{{ form.reason.errors.0 }}</div>
-              {% endif %}
-            </div>
-
-            <div class="mb-4">
-              <label class="form-label fw-semibold">Paid By <span class="text-danger">*</span></label>
-
-              <div class="btn-group w-100 mb-2" role="group">
-                <input type="radio" class="btn-check" name="payer_type" id="payerMember" value="member" checked onchange="togglePayerType()">
-                <label class="btn btn-outline-primary" for="payerMember">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:0.25rem;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                  Member
-                </label>
-                <input type="radio" class="btn-check" name="payer_type" id="payerExternal" value="external" onchange="togglePayerType()">
-                <label class="btn btn-outline-secondary" for="payerExternal">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:0.25rem;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="22" y1="2" x2="16" y2="8"/><line x1="16" y1="2" x2="22" y2="8"/></svg>
-                  External
-                </label>
-              </div>
-
-              <div id="memberSearchWrapper" class="position-relative">
+            <div class="mb-4 position-relative">
+              <label class="form-label fw-semibold">Associated Member <span class="text-muted">(Optional)</span></label>
+              <div id="memberSearchContainer" class="position-relative">
                 <div class="input-group">
                   <span class="input-group-text"><i class="bi bi-search"></i></span>
-                  <input type="text" class="form-control" id="memberSearchInput" placeholder="Search member by name or serial number..." autocomplete="off">
+                  <input type="text" class="form-control" id="memberSearchInput" placeholder="Type member name or serial number..." autocomplete="off">
                 </div>
                 <div class="search-results d-none" id="searchResults"></div>
               </div>
-
               <div class="member-selected mt-2" id="memberSelected">
-                <div class="member-avatar" id="selectedAvatar">?</div>
+                <div class="member-avatar" id="selectedAvatar">AB</div>
                 <div>
                   <div class="fw-semibold" id="selectedName"></div>
                   <div class="small text-muted" id="selectedMeta"></div>
@@ -112,14 +64,54 @@
                 <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" id="changeMember">Change</button>
               </div>
               {{ form.member }}
+              {% if form.member.errors %}
+              <div class="invalid-feedback d-block">{{ form.member.errors.0 }}</div>
+              {% endif %}
+            </div>
 
-              <div id="externalPayerWrapper" class="d-none">
-                {{ form.paid_by }}
-                <div class="form-text">Name of the person or organization who made the payment.</div>
-              </div>
-
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Payer / Contributor Name <span class="text-danger">*</span></label>
+              {{ form.paid_by }}
+              <div class="form-text">Populates automatically when a member is selected, or can be filled manually for external entities.</div>
               {% if form.paid_by.errors %}
               <div class="invalid-feedback d-block">{{ form.paid_by.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Income Type <span class="text-danger">*</span></label>
+                {{ form.income_type }}
+                {% if form.income_type.errors %}
+                <div class="invalid-feedback d-block">{{ form.income_type.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Amount <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text">&#8358;</span>
+                  {{ form.amount }}
+                </div>
+                {% if form.amount.errors %}
+                <div class="invalid-feedback d-block">{{ form.amount.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Reason / Description <span class="text-danger">*</span></label>
+              {{ form.reason }}
+              {% if form.reason.errors %}
+              <div class="invalid-feedback d-block">{{ form.reason.errors.0 }}</div>
+              {% endif %}
+
+              {% if common_reasons %}
+              <div class="mt-2">
+                <span class="small text-muted me-2">Recent reasons:</span>
+                {% for r in common_reasons %}
+                <button type="button" class="badge bg-light text-dark border quick-reason-btn my-1" data-reason="{{ r }}">{{ r }}</button>
+                {% endfor %}
+              </div>
               {% endif %}
             </div>
 
@@ -133,38 +125,6 @@
           </form>
         </div>
       </div>
-
-      {% if recent_incomes %}
-      <div class="card mt-4">
-        <div class="card-header">
-          <div class="card-header-title">Recent Contributions</div>
-        </div>
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="data-table">
-              <tbody>
-                {% for item in recent_incomes %}
-                <tr>
-                  <td>
-                    {% if item.income_type == 'DONATION' %}
-                    <span class="badge badge-donation">Donation</span>
-                    {% elif item.income_type == 'EVENT' %}
-                    <span class="badge badge-event">Event</span>
-                    {% else %}
-                    <span class="badge badge-other">Other</span>
-                    {% endif %}
-                  </td>
-                  <td class="fw-medium">{{ item.reason|truncatechars:35 }}</td>
-                  <td class="text-end fw-bold text-success">&#8358;{{ item.amount|floatformat:0|intcomma }}</td>
-                  <td class="small text-muted">{{ item.created_at|date:"M d" }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      {% endif %}
     </div>
   </div>
 </div>
@@ -172,18 +132,17 @@
 
 {% block extra_css %}
 <style>
-  #memberSearchWrapper { position: relative; }
+  #memberSearchContainer { position: relative; }
   .search-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: var(--oya-card, #fff); border: 1px solid var(--oya-border, #dee2e6); border-radius: 0 0 8px 8px; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-  .search-result-item { padding: .75rem 1rem; cursor: pointer; border-bottom: 1px solid var(--oya-border, #dee2e6); transition: background .15s; text-align: left; }
+  .search-result-item { padding: .75rem 1rem; cursor: pointer; border-bottom: 1px solid var(--oya-border, #dee2e6); transition: background .15s; }
   .search-result-item:hover { background: var(--oya-surface-hover, #f8f9fa); }
   .search-result-name { font-weight: 600; color: var(--oya-text, #212529); }
   .search-result-meta { font-size: .75rem; color: var(--oya-text-muted, #6c757d); }
-  .member-selected { background: #d1e7dd; color: #0f5132; border-radius: 8px; padding: .75rem 1rem; display: none; align-items: center; gap: .75rem; }
+  .member-selected { background: var(--oya-success-bg, #d1e7dd); border-radius: 8px; padding: .75rem 1rem; display: none; align-items: center; gap: .75rem; }
   .member-selected.show { display: flex; }
-  .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: #0d6efd; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: .85rem; }
-  .badge-donation { background: #d1e7dd; color: #0f5132; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
-  .badge-event { background: #fff3cd; color: #664d03; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
-  .badge-other { background: #cff4fc; color: #055160; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+  .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--oya-primary, #0d6efd); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: .85rem; }
+  .quick-reason-btn { cursor: pointer; transition: background 0.2s; }
+  .quick-reason-btn:hover { background: #e2e6ea !important; }
 </style>
 {% endblock %}
 
@@ -194,45 +153,21 @@
   const searchResults = document.getElementById('searchResults');
   const memberSelect = document.getElementById('id_member');
   const memberSelected = document.getElementById('memberSelected');
-  const memberSearchWrapper = document.getElementById('memberSearchWrapper');
-  const externalPayerWrapper = document.getElementById('externalPayerWrapper');
+  const memberSearchContainer = document.getElementById('memberSearchContainer');
   const changeMemberBtn = document.getElementById('changeMember');
   const paidByInput = document.getElementById('id_paid_by');
-  const incomeForm = document.getElementById('incomeForm');
+  const reasonInput = document.getElementById('id_reason');
   const submitBtn = document.getElementById('submitBtn');
+  const incomeForm = document.getElementById('incomeForm');
 
   let searchTimeout;
-  let selectedMemberId = null;
 
-  window.togglePayerType = function() {
-    const isMember = document.getElementById('payerMember').checked;
-    if (isMember) {
-      memberSearchWrapper.classList.remove('d-none');
-      if (selectedMemberId || memberSelect.value) {
-        memberSelected.classList.add('show');
-        memberSearchWrapper.classList.add('d-none');
-      }
-      externalPayerWrapper.classList.add('d-none');
-      if (paidByInput) paidByInput.value = '';
-    } else {
-      memberSearchWrapper.classList.add('d-none');
-      memberSelected.classList.remove('show');
-      externalPayerWrapper.classList.remove('d-none');
-      memberSelect.value = '';
-      selectedMemberId = null;
-      if (paidByInput) paidByInput.value = '';
-    }
-  };
-
-  window.setType = function(type) {
-    const select = document.getElementById('id_income_type');
-    if (select) select.value = type;
-  };
-
+  // Search Input Handler
   searchInput.addEventListener('input', function() {
     const q = this.value.trim();
     clearTimeout(searchTimeout);
     if (q.length < 2) { searchResults.classList.add('d-none'); return; }
+    
     searchTimeout = setTimeout(function() {
       fetch('{% url "finance:search_members" %}?q=' + encodeURIComponent(q), {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -261,84 +196,92 @@
     }, 300);
   });
 
+  // Select Member Action
   function selectMember(item) {
-    selectedMemberId = item.id;
     memberSelect.value = item.id;
     searchInput.value = item.name;
+    paidByInput.value = item.name; // Auto-populate Payer Name
     searchResults.classList.add('d-none');
-    memberSearchWrapper.classList.add('d-none');
+    memberSearchContainer.classList.add('d-none');
     memberSelected.classList.add('show');
+    
     document.getElementById('selectedName').textContent = item.name;
     document.getElementById('selectedMeta').textContent = item.serial + ' · ' + item.role;
     document.getElementById('selectedAvatar').textContent = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-    if (paidByInput) paidByInput.value = item.name;
     searchInput.classList.remove('is-invalid');
   }
 
+  // Change / Clear Selected Member
   changeMemberBtn.addEventListener('click', function() {
-    selectedMemberId = null; 
     memberSelect.value = ''; 
     searchInput.value = '';
-    memberSearchWrapper.classList.remove('d-none');
+    memberSearchContainer.classList.remove('d-none');
     memberSelected.classList.remove('show');
-    if (paidByInput) paidByInput.value = '';
-    setTimeout(() => searchInput.focus(), 50);
   });
 
+  // Hide dropdown lists when clicking elsewhere
   document.addEventListener('click', function(e) {
     if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
       searchResults.classList.add('d-none');
     }
   });
 
-  // Form validation
-  incomeForm.addEventListener('submit', function(e) {
-    const isMember = document.getElementById('payerMember').checked;
-    if (isMember && !selectedMemberId && !memberSelect.value) {
-      e.preventDefault();
-      searchInput.focus();
-      searchInput.classList.add('is-invalid');
-      return false;
-    }
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Saving...';
-    }
+  // Quick Tags Integration
+  document.querySelectorAll('.quick-reason-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      reasonInput.value = this.getAttribute('data-reason');
+    });
   });
 
-  // Initialize: handles initial selected member UI state accurately on form reload
+  // Form Client-side clean validation 
+  incomeForm.addEventListener('submit', function(e) {
+    let isValid = true;
+    const amount = parseFloat(document.getElementById('id_amount').value);
+    
+    if (!paidByInput.value.trim()) {
+      paidByInput.classList.add('is-invalid');
+      isValid = false;
+    } else {
+      paidByInput.classList.remove('is-invalid');
+    }
+
+    if (!amount || amount <= 0) {
+      document.getElementById('id_amount').class_list.add('is-invalid');
+      isValid = false;
+    }
+
+    if (!isValid) {
+      e.preventDefault();
+      return false;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Saving...';
+  });
+
+  // Handle errors / postback preservation values
   function initSelectedMember() {
     if (memberSelect.value) {
-      selectedMemberId = memberSelect.value;
       fetch('{% url "finance:search_members" %}?q=' + encodeURIComponent(memberSelect.value), {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
       })
       .then(r => r.json())
       .then(data => {
         if (data.results && data.results.length) {
-          // Strict search for item with matching ID 
-          const item = data.results.find(function(r) { return String(r.id) === String(memberSelect.value); });
+          const item = data.results.find(r => String(r.id) === String(memberSelect.value));
           if (item) {
-            selectMember(item);
+            searchInput.value = item.name;
+            memberSearchContainer.classList.add('d-none');
+            memberSelected.classList.add('show');
+            document.getElementById('selectedName').textContent = item.name;
+            document.getElementById('selectedMeta').textContent = item.serial + ' · ' + item.role;
+            document.getElementById('selectedAvatar').textContent = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
             return;
           }
         }
-        showGenericSelected();
-      })
-      .catch(function() {
-        showGenericSelected();
       });
     }
   }
-
-  function showGenericSelected() {
-    memberSearchWrapper.classList.add('d-none');
-    memberSelected.classList.add('show');
-    document.getElementById('selectedName').textContent = 'Member ID: #' + memberSelect.value;
-    document.getElementById('selectedMeta').textContent = 'Re-select to confirm details';
-    document.getElementById('selectedAvatar').textContent = '?';
-  }
-
   initSelectedMember();
 })();
 </script>
