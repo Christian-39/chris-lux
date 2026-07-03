@@ -34,6 +34,15 @@
       </div>
       {% endif %}
 
+      <!-- Non-field errors -->
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger mb-3">
+        {% for error in form.non_field_errors %}
+        <div>{{ error }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
       <div class="card">
         <div class="card-body p-4">
           <form method="post" id="duesForm" novalidate>
@@ -42,7 +51,7 @@
             <!-- Member Search -->
             <div class="mb-4 position-relative">
               <label class="form-label fw-semibold">Member <span class="text-danger">*</span></label>
-              <div id="memberSearchContainer">
+              <div id="memberSearchContainer" class="position-relative">
                 <div class="input-group">
                   <span class="input-group-text"><i class="bi bi-search"></i></span>
                   <input type="text" class="form-control" id="memberSearchInput" placeholder="Type member name or serial number..." autocomplete="off">
@@ -138,6 +147,7 @@
 
 {% block extra_css %}
 <style>
+  #memberSearchContainer { position: relative; }
   .search-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: var(--oya-card); border: 1px solid var(--oya-border); border-radius: 0 0 8px 8px; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
   .search-result-item { padding: .75rem 1rem; cursor: pointer; border-bottom: 1px solid var(--oya-border); transition: background .15s; }
   .search-result-item:hover { background: var(--oya-surface-hover); }
@@ -173,11 +183,6 @@
 
   let searchTimeout;
   let selectedMemberId = null;
-
-  // Initialize: check if member already selected (edit mode)
-  if (memberSelect.value) {
-    selectedMemberId = memberSelect.value;
-  }
 
   searchInput.addEventListener('input', function() {
     const q = this.value.trim();
@@ -221,6 +226,7 @@
     document.getElementById('selectedName').textContent = item.name;
     document.getElementById('selectedMeta').textContent = item.serial + ' · ' + item.role;
     document.getElementById('selectedAvatar').textContent = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    searchInput.classList.remove('is-invalid');
     updatePreview();
   }
 
@@ -239,13 +245,17 @@
 
   function updatePreview() {
     const amount = parseFloat(totalAmountInput.value);
-    if (!selectedMemberId || !amount || amount <= 0) {
+    if (!selectedMemberId && !memberSelect.value) {
       previewBox.classList.remove('show'); return;
     }
+    if (!amount || amount <= 0) {
+      previewBox.classList.remove('show'); return;
+    }
+    const memberId = selectedMemberId || memberSelect.value;
     previewBox.classList.add('show');
     previewContent.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div> Calculating allocation...</div>';
 
-    fetch('{% url "finance:member_dues_preview" %}?member_id=' + encodeURIComponent(selectedMemberId), {
+    fetch('{% url "finance:member_dues_preview" %}?member_id=' + encodeURIComponent(memberId), {
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(r => r.json())
@@ -297,9 +307,10 @@
   // Form submission — validate before submit
   duesForm.addEventListener('submit', function(e) {
     const amount = parseFloat(totalAmountInput.value);
-    if (!selectedMemberId || !amount || amount <= 0) {
+    const hasMember = selectedMemberId || memberSelect.value;
+    if (!hasMember || !amount || amount <= 0) {
       e.preventDefault();
-      if (!selectedMemberId) {
+      if (!hasMember) {
         searchInput.focus();
         searchInput.classList.add('is-invalid');
       }
@@ -311,6 +322,46 @@
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing...';
   });
+
+  // Initialize: restore selected member UI on validation-error re-render
+  function initSelectedMember() {
+    if (memberSelect.value) {
+      selectedMemberId = memberSelect.value;
+      fetch('{% url "finance:search_members" %}?q=' + encodeURIComponent(memberSelect.value), {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.results && data.results.length) {
+          const item = data.results.find(function(r) { return String(r.id) === String(memberSelect.value); });
+          if (item) {
+            searchInput.value = item.name;
+            memberSearchContainer.classList.add('d-none');
+            memberSelected.classList.add('show');
+            document.getElementById('selectedName').textContent = item.name;
+            document.getElementById('selectedMeta').textContent = item.serial + ' · ' + item.role;
+            document.getElementById('selectedAvatar').textContent = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            updatePreview();
+            return;
+          }
+        }
+        showGenericSelected();
+      })
+      .catch(function() {
+        showGenericSelected();
+      });
+    }
+  }
+
+  function showGenericSelected() {
+    memberSearchContainer.classList.add('d-none');
+    memberSelected.classList.add('show');
+    document.getElementById('selectedName').textContent = 'Member #' + memberSelect.value;
+    document.getElementById('selectedMeta').textContent = 'Re-select to confirm';
+    document.getElementById('selectedAvatar').textContent = '?';
+  }
+
+  initSelectedMember();
 })();
 </script>
 {% endblock %}
