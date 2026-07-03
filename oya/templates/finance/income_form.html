@@ -55,12 +55,12 @@
                 <span class="input-group-text" style="background: var(--oya-surface, #f8f9fa); border-color: var(--oya-border, #dee2e6);"><i class="bi bi-person"></i></span>
                 {{ form.paid_by }}
                 <button class="btn btn-outline-secondary d-none" type="button" id="clearMemberBtn">
-                  <i class="bi bi-x-circle-fill text-danger"></i> Clear
+                  Clear
                 </button>
               </div>
               
               <div class="form-text text-muted" id="paidByHelpText">
-                Type to drop down and select a registered member, or type a custom name for non-members.
+                Type to search and select a registered member, or type a custom name for non-members.
               </div>
 
               <div class="search-results d-none" id="searchResults"></div>
@@ -96,6 +96,8 @@
               {% if common_reasons %}
               <div class="mt-2 d-flex flex-wrap gap-1 align-items-center">
                 <span class="small text-muted me-1">Quick reasons:</span>
+                {% for r in common_reasons %}
+                <button type="button" class="badge bg-light text-dark border quick-reason-btn" data-reason="{{ r }}" style="cursor:pointer; padding: 0.4rem 0.6rem;">{{ r }}</button>
                 {% endfor %}
               </div>
               {% endif %}
@@ -145,12 +147,11 @@
 
   let searchTimeout;
 
-  // Intercept the text field and treat it as a live search drop-down
+  // Search logic on input element change hooks
   paidByInput.addEventListener('input', function() {
     const q = this.value.trim();
     clearTimeout(searchTimeout);
     
-    // If the admin alters the text, clear any linked member ID state
     if (!q) {
       clearLinkedMember();
       return;
@@ -175,7 +176,7 @@
           });
           searchResults.classList.remove('d-none');
         } else {
-          searchResults.innerHTML = '<div class="search-result-item text-muted">No matching member found (Will save as custom non-member text).</div>';
+          searchResults.innerHTML = '<div class="search-result-item text-muted">No matching member found (Custom input allowed).</div>';
           searchResults.classList.remove('d-none');
         }
       })
@@ -186,24 +187,21 @@
     }, 250);
   });
 
-  // When a member option is clicked from the dropdown menu list
   function selectMember(item) {
     memberSelect.value = item.id;
     paidByInput.value = item.name;
     
-    // Style adjustments to show successful account association link
     paidByInput.classList.add('is-valid');
     clearMemberBtn.classList.remove('d-none');
     searchResults.classList.add('d-none');
     paidByHelpText.innerHTML = '<span class="text-success fw-bold"><i class="bi bi-shield-check"></i> Connected to account: ' + item.serial + '</span>';
   }
 
-  // Clear connection utility function
   function clearLinkedMember() {
     memberSelect.value = '';
     paidByInput.classList.remove('is-valid');
     clearMemberBtn.classList.add('d-none');
-    paidByHelpText.textContent = "Type to drop down and select a registered member, or type a custom name for non-members.";
+    paidByHelpText.textContent = "Type to search and select a registered member, or type a custom name for non-members.";
   }
 
   clearMemberBtn.addEventListener('click', function() {
@@ -212,21 +210,20 @@
     paidByInput.focus();
   });
 
-  // Close results element dropdown panel if clicking anywhere else on page
   document.addEventListener('click', function(e) {
     if (!paidByInput.contains(e.target) && !searchResults.contains(e.target)) {
       searchResults.classList.add('d-none');
     }
   });
 
-  // Quick Description Helper Bindings
+  // Quick Description Target Hooks
   document.querySelectorAll('.quick-reason-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       reasonInput.value = this.getAttribute('data-reason');
     });
   });
 
-  // Client Validation Handling Form Submits
+  // Validation intercept workflow fixed to allow transmission to Django View context
   incomeForm.addEventListener('submit', function(e) {
     let isValid = true;
     const amount = parseFloat(amountInput.value);
@@ -238,7 +235,7 @@
       paidByInput.classList.remove('is-invalid');
     }
 
-    if (!amount || amount <= 0) {
+    if (isNaN(amount) || amount <= 0) {
       amountInput.classList.add('is-invalid');
       isValid = false;
     } else {
@@ -250,11 +247,11 @@
       return false;
     }
 
+    // Lock button down to prevent execution race conditions
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Recording Entry...';
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving Entry...';
   });
 
-  // If page returns from backend validation error, re-apply UI links
   function initSelectedMember() {
     if (memberSelect.value) {
       fetch('{% url "finance:search_members" %}?q=' + encodeURIComponent(memberSelect.value), {
