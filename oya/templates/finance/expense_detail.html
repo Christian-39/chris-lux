@@ -1,458 +1,100 @@
 {% extends "base.html" %}
-{% load static humanize %}
+{% load humanize %}
+{% load static %}
 
-{% block title %}Expense Details{% endblock %}
-{% block page_title %}Expense Details{% endblock %}
-{% block breadcrumb %}Finance / Expenses / Detail{% endblock %}
+{% block title %}{{ expense.description|truncatechars:30 }} — Expense Detail{% endblock %}
 
 {% block extra_css %}
 <style>
-  .expense-detail .hero-card {
-    background: linear-gradient(135deg, var(--oya-danger) 0%, var(--oya-danger-dark, #991b1b) 100%);
-    border: none;
-    color: #fff;
-  }
-  .expense-detail .hero-label {
-    font-size: 0.75rem;
-    opacity: 0.85;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-  }
-  .expense-detail .hero-amount {
-    font-size: clamp(1.75rem, 6vw, 2.75rem);
-    font-weight: 800;
-    letter-spacing: -0.025em;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .expense-detail .hero-words {
-    font-size: 0.875rem;
-    opacity: 0.85;
-    margin-top: 0.5rem;
-  }
-  .expense-detail .hero-badge {
-    background: rgba(255,255,255,0.2);
-    color: #fff;
-    font-size: 0.75rem;
-    padding: 0.5rem 1rem;
-  }
-  .expense-detail .hero-time {
-    font-size: 0.75rem;
-    opacity: 0.7;
-    margin-top: 0.75rem;
-  }
-  .expense-detail .action-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  .expense-detail .detail-grid .card-body {
-    padding: clamp(1rem, 3vw, 1.5rem);
-  }
-  .expense-detail .detail-grid .kpi-icon {
-    flex-shrink: 0;
-  }
-  .expense-detail .detail-label {
-    font-size: 0.75rem;
-    color: var(--oya-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 600;
-    margin-bottom: 0.375rem;
-  }
-  .expense-detail .detail-value {
-    font-weight: 600;
-    color: var(--oya-text);
-    line-height: 1.5;
-  }
-  .expense-detail .receipt-section .receipt-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.75rem;
-  }
-  .expense-detail .receipt-section .receipt-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--oya-text);
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  .expense-detail .receipt-section .receipt-filename {
-    color: var(--oya-text-muted);
-    font-size: 0.875rem;
-    margin-left: 0.75rem;
-  }
-  .expense-detail .receipt-missing {
-    background: var(--oya-warning-bg);
-    border: 1px solid var(--oya-warning);
-    color: var(--oya-warning);
-    padding: 0.75rem 1rem;
-    border-radius: var(--oya-radius);
-    font-size: 0.875rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .expense-detail .timeline-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--oya-text);
-    margin-bottom: 1.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  .expense-detail .timeline-item {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-  }
-  .expense-detail .timeline-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    margin-top: 0.375rem;
-  }
-  .expense-detail .timeline-content {
-    flex: 1;
-  }
-  .expense-detail .timeline-content .event-title {
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: var(--oya-text);
-  }
-  .expense-detail .timeline-content .event-time {
-    font-size: 0.75rem;
-    color: var(--oya-text-muted);
-    margin-top: 0.25rem;
-  }
-  .expense-detail .meta-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--oya-border-light);
-  }
-
-  /* Mobile */
-  @media (max-width: 768px) {
-    .expense-detail .action-bar {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    .expense-detail .action-bar .btn {
-      width: 100%;
-      justify-content: center;
-    }
-    .expense-detail .receipt-section .receipt-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
-    }
-    .expense-detail .hero-amount {
-      font-size: 1.75rem;
-    }
-  }
+  .detail-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .detail-label { font-size: .75rem; text-transform: uppercase; color: #6c757d; letter-spacing: .5px; margin-bottom: .25rem; }
+  .detail-value { font-size: 1.1rem; font-weight: 600; color: #1a1a2e; }
+  .amount-display { font-size: 2.5rem; font-weight: 800; }
+  .receipt-box { border: 1px solid #e9ecef; border-radius: 12px; overflow: hidden; background: #f8f9fa; }
+  .receipt-img { max-height: 500px; object-fit: contain; }
+  .receipt-pdf { height: 500px; }
+  .download-btn { position: absolute; top: 1rem; right: 1rem; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="expense-detail">
+<div class="container py-4">
   <div class="row justify-content-center">
-    <div class="col-12 col-lg-8 col-xl-7">
+    <div class="col-lg-8">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-receipt me-2"></i>Expense Detail</h2>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'finance:expense_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back
+          </a>
+          {% if user.has_admin_access %}
+          <a href="{% url 'finance:expense_delete' expense.pk %}" class="btn btn-outline-danger">
+            <i class="bi bi-trash me-1"></i> Delete
+          </a>
+          {% endif %}
+        </div>
+      </div>
 
-      <!-- Hero Amount Card -->
-      <div class="card mb-4 hero-card">
-        <div class="card-body" style="padding: 2rem;">
-          <div class="row align-items-center">
-            <div class="col-md-8">
-              <div class="hero-label">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.375rem;">
-                  <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
-                  <polyline points="17 18 23 18 23 12"/>
-                </svg>
-                Expense Incurred
-              </div>
-              <div class="hero-amount">
-                &#x20A6;{{ expense.amount|intcomma:2 }}
-              </div>
-              <div class="hero-words">
-                {{ expense.amount|intword }} Naira
-              </div>
+      <div class="detail-card card mb-4">
+        <div class="card-body p-4 text-center">
+          <span class="badge bg-light text-dark fs-6 px-3 py-2 mb-2">{{ expense.get_category_display }}</span>
+          <div class="amount-display text-danger">&#8358;{{ expense.amount|floatformat:0|intcomma }}</div>
+          <p class="text-muted mb-0">{{ expense.description }}</p>
+        </div>
+      </div>
+
+      <div class="detail-card card mb-4">
+        <div class="card-body p-4">
+          <div class="row g-4">
+            <div class="col-sm-6">
+              <div class="detail-label">Category</div>
+              <div class="detail-value">{{ expense.get_category_display }}</div>
             </div>
-            <div class="col-md-4 text-md-end mt-3 mt-md-0">
-              <span class="badge hero-badge">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.375rem;">
-                  {% if expense.category == 'ADMINISTRATIVE' %}
-                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-                  {% elif expense.category == 'PROJECT' %}
-                    <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
-                  {% elif expense.category == 'EVENT' %}
-                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                  {% elif expense.category == 'MAINTENANCE' %}
-                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-                  {% elif expense.category == 'SALARY' %}
-                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                  {% else %}
-                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                  {% endif %}
-                </svg>
-                {{ expense.get_category_display }}
-              </span>
-              <div class="hero-time">
-                Recorded {{ expense.created_at|naturaltime }}
-              </div>
+            <div class="col-sm-6">
+              <div class="detail-label">Recorded By</div>
+              <div class="detail-value">{% if expense.created_by %}{{ expense.created_by.get_full_name }}{% else %}—{% endif %}</div>
+            </div>
+            <div class="col-sm-6">
+              <div class="detail-label">Date Recorded</div>
+              <div class="detail-value">{{ expense.created_at|date:"F d, Y" }} at {{ expense.created_at|time:"g:i A" }}</div>
+            </div>
+            <div class="col-sm-6">
+              <div class="detail-label">Last Updated</div>
+              <div class="detail-value">{{ expense.updated_at|date:"F d, Y" }} at {{ expense.updated_at|time:"g:i A" }}</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Action Bar -->
-      <div class="action-bar">
-        <a href="{% url 'finance:expense_list' %}" class="btn btn-secondary btn-sm">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"/>
-            <polyline points="12 19 5 12 12 5"/>
-          </svg>
-          Back to List
-        </a>
-        {% if user.is_staff %}
-        <a href="{% url 'finance:expense_delete' expense.pk %}" class="btn btn-danger btn-sm">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6"/>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-          </svg>
-          Delete Record
-        </a>
-        {% endif %}
-      </div>
-
-      <!-- Details Grid -->
-      <div class="row g-3 detail-grid mb-3">
-        <!-- Category -->
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <div class="d-flex align-items-start gap-3">
-                <div class="kpi-icon" style="background: var(--oya-primary-50); color: var(--oya-primary);">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-                  </svg>
-                </div>
-                <div>
-                  <div class="detail-label">Category</div>
-                  <span class="badge badge-danger">{{ expense.get_category_display }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Description -->
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <div class="d-flex align-items-start gap-3">
-                <div class="kpi-icon" style="background: var(--oya-info-bg); color: var(--oya-info);">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <line x1="16" y1="13" x2="8" y2="13"/>
-                    <line x1="16" y1="17" x2="8" y2="17"/>
-                  </svg>
-                </div>
-                <div>
-                  <div class="detail-label">Description</div>
-                  <div class="detail-value">{{ expense.description }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Recorded By -->
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <div class="d-flex align-items-start gap-3">
-                <div class="kpi-icon" style="background: var(--oya-warning-bg); color: var(--oya-warning);">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                  </svg>
-                </div>
-                <div>
-                  <div class="detail-label">Recorded By</div>
-                  {% if expense.created_by %}
-                    <div class="d-flex align-items-center gap-2">
-                      <div class="avatar avatar-sm" style="background: var(--oya-primary); color: #fff;">
-                        {{ expense.created_by.get_initials }}
-                      </div>
-                      <div>
-                        <div class="detail-value">{{ expense.created_by.get_full_name }}</div>
-                        <div style="font-size: 0.75rem; color: var(--oya-text-muted);">{{ expense.created_by.serial_number }}</div>
-                      </div>
-                    </div>
-                  {% else %}
-                    <span style="color: var(--oya-text-muted); font-style: italic;">System Generated</span>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Date -->
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <div class="d-flex align-items-start gap-3">
-                <div class="kpi-icon" style="background: var(--oya-success-bg); color: var(--oya-success);">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                  </svg>
-                </div>
-                <div>
-                  <div class="detail-label">Date Recorded</div>
-                  <div class="detail-value">{{ expense.created_at|date:"l, F j, Y" }}</div>
-                  <div style="font-size: 0.875rem; color: var(--oya-text-muted);">
-                    {{ expense.created_at|time:"g:i A" }} &middot; {{ expense.created_at|naturalday }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Receipt Section -->
       {% if expense.receipt_file %}
-        {% if expense.receipt_file.storage.exists expense.receipt_file.name %}
-        <div class="card mb-4 receipt-section">
-          <div class="card-body">
-            <div class="receipt-header">
-              <h6 class="receipt-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem; color: var(--oya-primary);">
-                  <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
-                  <polyline points="13 2 13 9 20 9"/>
-                </svg>
-                Attached Receipt
-              </h6>
-              <span class="badge badge-success">{{ expense.receipt_file.size|filesizeformat }}</span>
-            </div>
-            <a href="{{ expense.receipt_file.url }}" target="_blank" class="btn btn-primary btn-sm">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              Download Receipt
-            </a>
-            <span class="receipt-filename">
-              {{ expense.receipt_file.name|cut:"finance/receipts/" }}
-            </span>
-          </div>
+      <div class="detail-card card">
+        <div class="card-header bg-white border-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-file-earmark-text me-2"></i>Receipt</h5>
+          <a href="{{ expense.receipt_file.url }}" target="_blank" class="btn btn-sm btn-outline-primary" download>
+            <i class="bi bi-download me-1"></i> Download
+          </a>
         </div>
-        {% else %}
-        <div class="card mb-4 receipt-section">
-          <div class="card-body">
-            <div class="receipt-missing">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-              </svg>
-              Receipt file is missing from storage. It may have been deleted or the server storage was reset.
-            </div>
-          </div>
-        </div>
-        {% endif %}
-      {% endif %}
-
-      <!-- Timeline -->
-      <div class="card">
         <div class="card-body">
-          <h6 class="timeline-title">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem; color: var(--oya-primary);">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
-            </svg>
-            Activity Timeline
-          </h6>
-
-          <div class="timeline">
-            <!-- Created -->
-            <div class="timeline-item">
-              <div class="timeline-dot" style="background: var(--oya-danger); box-shadow: 0 0 0 2px var(--oya-danger-bg);"></div>
-              <div class="timeline-content">
-                <div class="event-title">Record Created</div>
-                <div class="event-time">
-                  {{ expense.created_at|naturaltime }} &middot; {{ expense.created_at|date:"M j, Y g:i A" }}
-                </div>
-              </div>
-            </div>
-
-            <!-- Updated (if different) -->
-            {% if expense.updated_at != expense.created_at %}
-            <div class="timeline-item">
-              <div class="timeline-dot" style="background: var(--oya-warning); box-shadow: 0 0 0 2px var(--oya-warning-bg);"></div>
-              <div class="timeline-content">
-                <div class="event-title">Last Updated</div>
-                <div class="event-time">
-                  {{ expense.updated_at|naturaltime }} &middot; {{ expense.updated_at|date:"M j, Y g:i A" }}
-                </div>
-              </div>
-            </div>
+          <div class="receipt-box position-relative">
+            {% if expense.receipt_file.url|lower|slice:"-4:" == ".pdf" or expense.receipt_file.url|lower|slice:"-4:" == ".PDF" %}
+            <iframe src="{{ expense.receipt_file.url }}" class="receipt-pdf w-100" frameborder="0"></iframe>
             {% else %}
-            <div class="timeline-item">
-              <div class="timeline-dot" style="background: var(--oya-border); box-shadow: 0 0 0 2px var(--oya-border-light);"></div>
-              <div class="timeline-content">
-                <div style="font-size: 0.875rem; color: var(--oya-text-muted);">No updates since creation</div>
-              </div>
-            </div>
+            <img src="{{ expense.receipt_file.url }}" alt="Receipt" class="receipt-img w-100">
             {% endif %}
           </div>
-
-          <!-- Metadata Badges -->
-          <div class="meta-badges">
-            <span class="badge badge-secondary">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.375rem;">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                <line x1="9" y1="3" x2="9" y2="21"/>
-              </svg>
-              ID: {{ expense.id|ordinal }}
-            </span>
-            <span class="badge badge-danger">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.375rem;">
-                <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
-                <polyline points="17 18 23 18 23 12"/>
-              </svg>
-              EXPENSE
-            </span>
-            <span class="badge badge-primary">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.375rem;">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-              </svg>
-              {{ expense.created_at|timesince }} old
-            </span>
+          <div class="mt-2 small text-muted">
+            <i class="bi bi-info-circle me-1"></i>
+            File: {{ expense.receipt_file.name|default:"Unknown" }}
           </div>
         </div>
       </div>
-
+      {% else %}
+      <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>No receipt file uploaded for this expense.
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
