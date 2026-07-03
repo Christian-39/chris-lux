@@ -136,7 +136,7 @@ class DuesPaymentTransaction(BaseModel):
     )
 
     class Meta:
-        db_table = "finance_dues_payment_transaction"
+        db_table = "finance_association_dues"
         verbose_name = "Dues Payment Transaction"
         verbose_name_plural = "Dues Payment Transactions"
         ordering = ["-payment_date", "-created_at"]
