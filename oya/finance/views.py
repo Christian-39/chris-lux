@@ -9,8 +9,8 @@ from django.core.paginator import Paginator
 from django.db.models import Q, Sum, Count, Max
 from django.utils import timezone
 from django.http import JsonResponse
-from django.db.models.functions import Coalesce
 from django.db.models import Value, DecimalField
+from django.db.models import Coalesce
 from django.db import transaction
 from auditlogs.services import log_action
 from accounts.models import User
@@ -30,13 +30,14 @@ YEARLY_DUES = 5000
 @login_required
 def donation_list(request):
     """List all non-dues income (donations, events, other)."""
-    queryset = Income.objects.exclude(income_type="DUES").select_related("created_by")
+    queryset = Income.objects.exclude(income_type="DUES").select_related("created_by", "member")
 
     search_term = request.GET.get("search", "")
     if search_term:
         queryset = queryset.filter(
             Q(reason__icontains=search_term) |
             Q(paid_by__icontains=search_term) |
+            Q(member__full_name__icontains=search_term) |
             Q(created_by__full_name__icontains=search_term)
         )
 
@@ -325,19 +326,17 @@ def income_list(request):
     ).order_by("-created_at")
 
     # --- DONATIONS & OTHER (non-dues income) ---
-        # --- DONATIONS & OTHER (non-dues income) ---
     donation_qs = Income.objects.exclude(income_type="DUES").select_related("created_by", "member")
 
     # Search/filter for donations
     search_term = request.GET.get("search", "")
-        if search_term:
+    if search_term:
         donation_qs = donation_qs.filter(
             Q(reason__icontains=search_term) |
             Q(paid_by__icontains=search_term) |
             Q(member__full_name__icontains=search_term) |
             Q(created_by__full_name__icontains=search_term)
         )
-
 
     type_filter = request.GET.get("type", "")
     if type_filter:
@@ -441,11 +440,10 @@ def income_create(request):
     })
 
 
-
 @login_required
 def income_detail(request, pk):
     """Display income details."""
-    income = get_object_or_404(Income.objects.select_related("created_by"), pk=pk)
+    income = get_object_or_404(Income.objects.select_related("created_by", "member"), pk=pk)
     return render(request, "finance/income_detail.html", {"income": income})
 
 
