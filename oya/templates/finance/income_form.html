@@ -157,6 +157,7 @@
   const changeMemberBtn = document.getElementById('changeMember');
   const paidByInput = document.getElementById('id_paid_by');
   const reasonInput = document.getElementById('id_reason');
+  const amountInput = document.getElementById('id_amount');
   const submitBtn = document.getElementById('submitBtn');
   const incomeForm = document.getElementById('incomeForm');
 
@@ -200,7 +201,7 @@
   function selectMember(item) {
     memberSelect.value = item.id;
     searchInput.value = item.name;
-    paidByInput.value = item.name; // Auto-populate Payer Name
+    paidByInput.value = item.name; // Auto-fill payer name block
     searchResults.classList.add('d-none');
     memberSearchContainer.classList.add('d-none');
     memberSelected.classList.add('show');
@@ -211,7 +212,7 @@
     searchInput.classList.remove('is-invalid');
   }
 
-  // Change / Clear Selected Member
+  // Change Selected Member
   changeMemberBtn.addEventListener('click', function() {
     memberSelect.value = ''; 
     searchInput.value = '';
@@ -219,24 +220,24 @@
     memberSelected.classList.remove('show');
   });
 
-  // Hide dropdown lists when clicking elsewhere
+  // Close elements when clicking outside field
   document.addEventListener('click', function(e) {
     if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
       searchResults.classList.add('d-none');
     }
   });
 
-  // Quick Tags Integration
+  // Quick Description Click Targets
   document.querySelectorAll('.quick-reason-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       reasonInput.value = this.getAttribute('data-reason');
     });
   });
 
-  // Form Client-side clean validation 
+  // Form submission and styling error assignment rules
   incomeForm.addEventListener('submit', function(e) {
     let isValid = true;
-    const amount = parseFloat(document.getElementById('id_amount').value);
+    const amount = parseFloat(amountInput.value);
     
     if (!paidByInput.value.trim()) {
       paidByInput.classList.add('is-invalid');
@@ -246,8 +247,10 @@
     }
 
     if (!amount || amount <= 0) {
-      document.getElementById('id_amount').class_list.add('is-invalid');
+      amountInput.classList.add('is-invalid');
       isValid = false;
+    } else {
+      amountInput.classList.remove('is-invalid');
     }
 
     if (!isValid) {
@@ -259,7 +262,7 @@
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Saving...';
   });
 
-  // Handle errors / postback preservation values
+  // Rehydrate UI if page refreshes with validation errors
   function initSelectedMember() {
     if (memberSelect.value) {
       fetch('{% url "finance:search_members" %}?q=' + encodeURIComponent(memberSelect.value), {
@@ -276,7 +279,6 @@
             document.getElementById('selectedName').textContent = item.name;
             document.getElementById('selectedMeta').textContent = item.serial + ' · ' + item.role;
             document.getElementById('selectedAvatar').textContent = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-            return;
           }
         }
       });
