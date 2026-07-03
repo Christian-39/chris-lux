@@ -29,14 +29,13 @@ YEARLY_DUES = 5000
 @login_required
 def donation_list(request):
     """List all non-dues income (donations, events, other)."""
-    queryset = Income.objects.exclude(income_type="DUES").select_related("created_by", "member")
+    queryset = Income.objects.exclude(income_type="DUES").select_related("created_by")
 
     search_term = request.GET.get("search", "")
     if search_term:
         queryset = queryset.filter(
             Q(reason__icontains=search_term) |
             Q(paid_by__icontains=search_term) |
-            Q(member__full_name__icontains=search_term) |
             Q(created_by__full_name__icontains=search_term)
         )
 
@@ -325,7 +324,7 @@ def income_list(request):
     ).order_by("-created_at")
 
     # --- DONATIONS & OTHER (non-dues income) ---
-    donation_qs = Income.objects.exclude(income_type="DUES").select_related("created_by", "member")
+    donation_qs = Income.objects.exclude(income_type="DUES").select_related("created_by")
 
     # Search/filter for donations
     search_term = request.GET.get("search", "")
@@ -333,7 +332,6 @@ def income_list(request):
         donation_qs = donation_qs.filter(
             Q(reason__icontains=search_term) |
             Q(paid_by__icontains=search_term) |
-            Q(member__full_name__icontains=search_term) |
             Q(created_by__full_name__icontains=search_term)
         )
 
@@ -393,7 +391,7 @@ def income_create(request):
     total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or 0
     treasury_balance = total_income - total_expenses
 
-    recent_incomes = Income.objects.exclude(income_type="DUES").select_related("created_by", "member").order_by("-created_at")[:5]
+    recent_incomes = Income.objects.exclude(income_type="DUES").select_related("created_by").order_by("-created_at")[:5]
 
     thirty_days_ago = timezone.now() - timedelta(days=30)
     common_reasons = (
@@ -442,7 +440,7 @@ def income_create(request):
 @login_required
 def income_detail(request, pk):
     """Display income details."""
-    income = get_object_or_404(Income.objects.select_related("created_by", "member"), pk=pk)
+    income = get_object_or_404(Income.objects.select_related("created_by"), pk=pk)
     return render(request, "finance/income_detail.html", {"income": income})
 
 
