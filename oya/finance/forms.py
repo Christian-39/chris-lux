@@ -24,7 +24,8 @@ class IncomeForm(forms.ModelForm):
                 "class": "form-control",
                 "placeholder": "e.g., Donation for project, Event ticket sales"
             }),
-            "member": forms.HiddenInput(),  # Set via JS search
+            # Added explicit ID attribute here so JS can easily hook into it
+            "member": forms.HiddenInput(attrs={"id": "id_member"}),  
             "paid_by": forms.TextInput(attrs={
                 "class": "form-control",
                 "placeholder": "Name of payer / contributor (if not a member)"
@@ -50,7 +51,7 @@ class IncomeForm(forms.ModelForm):
         member = cleaned.get("member")
         paid_by = cleaned.get("paid_by")
 
-        # Auto-fill paid_by from member name
+        # Auto-fill paid_by from member name if missing
         if member and not paid_by:
             cleaned["paid_by"] = member.get_full_name()
 
@@ -61,6 +62,7 @@ class IncomeForm(forms.ModelForm):
             )
 
         return cleaned
+
 
 
 class DuesPaymentAllocationForm(forms.ModelForm):
