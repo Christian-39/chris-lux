@@ -2,158 +2,161 @@
 {% load static %}
 {% load humanize %}
 
-{% block title %}{{ member.get_full_name }} — Dues{% endblock %}
-{% block page_title %}Member Dues Detail{% endblock %}
-{% block breadcrumb %}Finance / Dues / {{ member.get_full_name }}{% endblock %}
+{% block title %}{{ member.get_full_name }} — Dues Details{% endblock %}
+
+{% block extra_css %}
+<style>
+  .profile-header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #fff; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .profile-avatar { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.15); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.4rem; border: 3px solid rgba(255,255,255,0.3); }
+  .stat-pill { background: rgba(255,255,255,0.1); border-radius: 8px; padding: .5rem 1rem; text-align: center; }
+  .stat-pill-value { font-size: 1.2rem; font-weight: 700; }
+  .stat-pill-label { font-size: .7rem; opacity: .8; text-transform: uppercase; }
+  .timeline-year { position: relative; padding-left: 2rem; padding-bottom: 1.5rem; border-left: 3px solid #e9ecef; }
+  .timeline-year:last-child { border-left: 3px solid transparent; padding-bottom: 0; }
+  .timeline-dot { position: absolute; left: -9px; top: 0; width: 16px; height: 16px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px #dee2e6; }
+  .timeline-dot.paid { background: #2e7d32; box-shadow: 0 0 0 2px #2e7d32; }
+  .timeline-dot.partial { background: #ef6c00; box-shadow: 0 0 0 2px #ef6c00; }
+  .timeline-dot.owed { background: #c62828; box-shadow: 0 0 0 2px #c62828; }
+  .timeline-dot.prepaid { background: #1565c0; box-shadow: 0 0 0 2px #1565c0; }
+  .year-card { border-radius: 10px; border: 1px solid #e9ecef; padding: 1rem; background: #fff; }
+  .year-card.paid { border-left: 4px solid #2e7d32; }
+  .year-card.partial { border-left: 4px solid #ef6c00; }
+  .year-card.owed { border-left: 4px solid #c62828; }
+  .year-card.prepaid { border-left: 4px solid #1565c0; }
+  .txn-card { border-radius: 10px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .receipt-badge { font-size: .75rem; background: #e3f2fd; color: #1565c0; padding: 2px 8px; border-radius: 4px; }
+</style>
+{% endblock %}
 
 {% block content %}
-
-<!-- Page Header -->
-<div class="page-header detail-header">
-  <div class="page-header-left">
-    <h1 style="font-size:clamp(1.125rem,3vw,1.5rem);">{{ member.get_full_name }}</h1>
-    <p>Dues payment history and outstanding balance</p>
-  </div>
-  <div class="page-header-actions">
-    <a href="{% url 'finance:dues_tracker' %}" class="btn btn-ghost">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-      Back to Tracker
-    </a>
-    {% if user.is_staff %}
-    <a href="{% url 'finance:dues_create' %}" class="btn btn-primary">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Record Dues
-    </a>
-    {% endif %}
-  </div>
-</div>
-
-<!-- Debt Summary Card -->
-<div class="card" style="margin-bottom:1.5rem;">
-  <div class="card-body">
-    <div class="detail-meta-grid" style="grid-template-columns: repeat(4, 1fr);">
+<div class="container-fluid py-4">
+  <div class="profile-header">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <div class="profile-avatar">{{ member.get_initials }}</div>
       <div>
-        <div class="meta-label">Total Expected</div>
-        <div class="meta-value">&#x20A6;{{ debt_info.total_expected|floatformat:0|intcomma }}</div>
+        <h3 class="fw-bold mb-0">{{ member.get_full_name }}</h3>
+        <p class="mb-0 opacity-75">{{ member.serial_number }} · {{ member.get_role_display }}</p>
       </div>
-      <div>
-        <div class="meta-label">Total Paid</div>
-        <div class="meta-value" style="color:var(--oya-success);">&#x20A6;{{ debt_info.total_paid|floatformat:0|intcomma }}</div>
+      <div class="ms-auto">
+        <a href="{% url 'finance:dues_tracker' %}" class="btn btn-outline-light btn-sm">
+          <i class="bi bi-arrow-left me-1"></i> Back to Tracker
+        </a>
       </div>
-      <div>
-        <div class="meta-label">Outstanding Debt</div>
-        <div class="meta-value" style="{% if debt_info.debt_owed > 0 %}color:var(--oya-danger);{% else %}color:var(--oya-success);{% endif %}">
-          {% if debt_info.debt_owed > 0 %}
-          &#x20A6;{{ debt_info.debt_owed|floatformat:0|intcomma }}
-          {% else %}
-          Paid Up &#10003;
-          {% endif %}
+    </div>
+    <div class="row g-2">
+      <div class="col-6 col-md-3"><div class="stat-pill"><div class="stat-pill-value">&#8358;{{ debt_info.total_expected|floatformat:0|intcomma }}</div><div class="stat-pill-label">Total Expected</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-pill"><div class="stat-pill-value">&#8358;{{ debt_info.total_paid|floatformat:0|intcomma }}</div><div class="stat-pill-label">Total Paid</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-pill"><div class="stat-pill-value {% if debt_info.debt_owed > 0 %}text-danger{% else %}text-success{% endif %}">&#8358;{{ debt_info.debt_owed|floatformat:0|intcomma }}</div><div class="stat-pill-label">Debt Owed</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-pill"><div class="stat-pill-value text-info">&#8358;{{ debt_info.prepaid_amount|default:0|floatformat:0|intcomma }}</div><div class="stat-pill-label">Prepaid</div></div></div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 pt-3 pb-0">
+          <h5 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-calendar3 me-2 text-primary"></i>Yearly Timeline</h5>
         </div>
-      </div>
-      <div>
-        <div class="meta-label">Years Active</div>
-        <div class="meta-value">{{ debt_info.years_expected|length }} years</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Year-by-Year Status -->
-<div class="dashboard-grid dashboard-grid-2" style="margin-bottom:1.5rem;">
-  <div class="card">
-    <div class="card-header">
-      <div>
-        <div class="card-header-title">Year-by-Year Status</div>
-        <div class="card-header-subtitle">Payment status for each dues year</div>
-      </div>
-    </div>
-    <div class="card-body" style="padding:0;">
-      <div class="activity-feed" style="padding:0 1.25rem;">
-        {% for ys in year_status %}
-        <div class="activity-item">
-          {% if ys.status == "PAID" %}
-          <div class="activity-icon success">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <div class="activity-content">
-            <div class="activity-text"><strong>{{ ys.year }} Dues</strong> — Paid</div>
-            <div class="activity-time">
-              Recorded {{ ys.payment.created_at|date:"M d, Y" }}
-              {% if ys.payment.recorded_by %}by {{ ys.payment.recorded_by.get_full_name }}{% endif %}
-              {% if ys.payment.notes %}&bull; {{ ys.payment.notes }}{% endif %}
+        <div class="card-body">
+          {% for ys in year_status %}
+          <div class="timeline-year">
+            <div class="timeline-dot {{ ys.status|lower }}"></div>
+            <div class="year-card {{ ys.status|lower }}">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="fw-bold">{{ ys.year }}</span>
+                    {% if ys.is_future %}<span class="badge bg-info">Future</span>{% endif %}
+                    {% if ys.status == "PAID" %}<span class="badge bg-success">Paid</span>
+                    {% elif ys.status == "PARTIAL" %}<span class="badge bg-warning">Partial</span>
+                    {% elif ys.status == "PREPAID" %}<span class="badge bg-info">Prepaid</span>
+                    {% else %}<span class="badge bg-danger">Owed</span>{% endif %}
+                  </div>
+                  {% if ys.payment %}
+                  <div class="small text-muted mt-1">Paid: &#8358;{{ ys.payment.amount_paid|floatformat:0|intcomma }}{% if ys.payment.remaining_balance > 0 %} · Remaining: &#8358;{{ ys.payment.remaining_balance|floatformat:0|intcomma }}{% endif %}</div>
+                  {% else %}<div class="small text-muted mt-1">Amount: &#8358;{{ yearly_dues|floatformat:0|intcomma }}</div>{% endif %}
+                </div>
+                <div class="text-end">
+                  {% if ys.payment and user.has_admin_access %}
+                  <form method="post" action="{% url 'finance:dues_delete' ys.payment.pk %}" class="d-inline" onsubmit="return confirm('Delete this dues record?');">
+                    {% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                  </form>{% endif %}
+                </div>
+              </div>
             </div>
           </div>
-          <span class="badge badge-success">&#x20A6;{{ yearly_dues|intcomma }}</span>
-          {% else %}
-          <div class="activity-icon danger">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </div>
-          <div class="activity-content">
-            <div class="activity-text"><strong>{{ ys.year }} Dues</strong> — Outstanding</div>
-            <div class="activity-time">&#x20A6;{{ yearly_dues|intcomma }} due</div>
-          </div>
-          <span class="badge badge-danger">Owed</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-receipt me-2 text-success"></i>Payment Transactions</h5>
+          {% if user.has_executive_access %}
+          <a href="{% url 'finance:dues_allocate' %}" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg me-1"></i> Record Payment</a>
           {% endif %}
         </div>
-        {% endfor %}
+        <div class="card-body p-0">
+          {% if transactions %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light"><tr><th>Date</th><th>Amount</th><th>Method</th><th>Reference</th><th>Recorded By</th><th>Notes</th></tr></thead>
+              <tbody>
+                {% for tx in transactions %}
+                <tr>
+                  <td class="text-nowrap">{{ tx.payment_date|date:"M d, Y" }}</td>
+                  <td class="fw-bold text-success">&#8358;{{ tx.total_amount|floatformat:0|intcomma }}</td>
+                  <td><span class="badge bg-light text-dark">{{ tx.get_payment_method_display }}</span></td>
+                  <td>{% if tx.receipt_reference %}<span class="receipt-badge">{{ tx.receipt_reference }}</span>{% else %}<span class="text-muted">—</span>{% endif %}</td>
+                  <td class="small">{% if tx.recorded_by %}{{ tx.recorded_by.get_full_name }}{% else %}—{% endif %}</td>
+                  <td class="small text-muted">{{ tx.notes|truncatechars:30|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-5 text-muted"><i class="bi bi-receipt display-4 mb-2"></i><p class="mb-0">No payment transactions recorded yet.</p></div>
+          {% endif %}
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Payment History -->
-  <div class="card">
-    <div class="card-header">
-      <div>
-        <div class="card-header-title">Payment History</div>
-        <div class="card-header-subtitle">All recorded dues payments</div>
-      </div>
-    </div>
-    <div class="card-body" style="padding:0;">
-      <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Year</th>
-              <th>Amount</th>
-              <th>Recorded</th>
-              <th>By</th>
-              <th>Notes</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for payment in payments %}
-            <tr>
-              <td><span class="cell-name">{{ payment.year }}</span></td>
-              <td style="font-weight:600;color:var(--oya-success);">&#x20A6;{{ payment.amount_paid|floatformat:2|intcomma }}</td>
-              <td class="cell-muted">{{ payment.created_at|date:"M d, Y" }}</td>
-              <td class="cell-muted">{{ payment.recorded_by.get_full_name|default:"System" }}</td>
-              <td class="cell-muted">{{ payment.notes|default:"&mdash;"|truncatechars:40 }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-              <td colspan="5" style="text-align:center;padding:2rem;">
-                <p style="color:var(--oya-text-muted);">No dues payments recorded yet.</p>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-0 pt-3 pb-0">
+          <h5 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-journal-check me-2 text-primary"></i>Dues Payment Records</h5>
+        </div>
+        <div class="card-body p-0">
+          {% if payments %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light"><tr><th>Year</th><th>Amount Paid</th><th>Status</th><th>Remaining</th><th>Recorded By</th><th>Date</th></tr></thead>
+              <tbody>
+                {% for p in payments %}
+                <tr>
+                  <td class="fw-bold">{{ p.year }}</td>
+                  <td>&#8358;{{ p.amount_paid|floatformat:0|intcomma }}</td>
+                  <td>
+                    {% if p.status == "PAID" %}<span class="badge bg-success">Paid</span>
+                    {% elif p.status == "PARTIAL" %}<span class="badge bg-warning">Partial</span>
+                    {% elif p.status == "PREPAID" %}<span class="badge bg-info">Prepaid</span>
+                    {% else %}<span class="badge bg-danger">Owed</span>{% endif %}
+                  </td>
+                  <td class="{% if p.remaining_balance > 0 %}text-danger{% else %}text-success{% endif %}">&#8358;{{ p.remaining_balance|floatformat:0|intcomma }}</td>
+                  <td class="small">{% if p.recorded_by %}{{ p.recorded_by.get_full_name }}{% else %}—{% endif %}</td>
+                  <td class="small text-muted">{{ p.created_at|date:"M d, Y" }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-5 text-muted"><i class="bi bi-inbox display-4 mb-2"></i><p class="mb-0">No dues payment records found.</p></div>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
 </div>
-
-<style>
-@media (max-width: 768px) {
-  .detail-meta-grid { grid-template-columns: 1fr 1fr !important; }
-  .dashboard-grid-2 { grid-template-columns: 1fr !important; }
-  .page-header { flex-direction: column !important; align-items: flex-start !important; }
-  .page-header-actions { width: 100% !important; flex-wrap: wrap !important; }
-  .detail-header .page-header-actions .btn { flex: 1 !important; min-width: 120px !important; }
-}
-@media (max-width: 480px) {
-  .detail-meta-grid { grid-template-columns: 1fr !important; }
-}
-</style>
-
 {% endblock %}
