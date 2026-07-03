@@ -6,11 +6,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum, Count, Max
+from django.db.models import Q, Sum, Count, Max, Value, DecimalField
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.http import JsonResponse
-from django.db.models import Value, DecimalField
-from django.db.models import Coalesce
 from django.db import transaction
 from auditlogs.services import log_action
 from accounts.models import User
