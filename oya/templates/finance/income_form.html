@@ -12,12 +12,12 @@
       <div class="page-header mb-4">
         <div class="page-header-left">
           <h1 style="font-size:clamp(1.125rem,3vw,1.5rem);">{{ title }}</h1>
-          <p class="text-muted">Record revenue allocations linked directly to individual profile tracking</p>
+          <p class="text-muted">Record revenue records directly to active profile tracking channels</p>
         </div>
         <div class="page-header-actions">
           <a href="{% url 'finance:donation_list' %}" class="btn btn-ghost">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-            Back to Tracker
+            Back to Contributions
           </a>
         </div>
       </div>
@@ -46,37 +46,22 @@
           <form method="post" id="incomeForm" novalidate>
             {% csrf_token %}
 
-            <div class="mb-4 position-relative">
-              <label class="form-label fw-semibold" style="color: var(--oya-text, #212529);">Contributor Member <span class="text-danger">*</span></label>
-              <div id="memberSearchContainer" class="position-relative">
-                <div class="input-group">
-                  <span class="input-group-text" style="background: var(--oya-surface, #f8f9fa); border-color: var(--oya-border, #dee2e6);"><i class="bi bi-search"></i></span>
-                  <input type="text" class="form-control" id="memberSearchInput" placeholder="Type member name or serial number to link payment..." autocomplete="off" style="border-color: var(--oya-border, #dee2e6);">
-                </div>
-                <div class="search-results d-none" id="searchResults"></div>
-              </div>
-
-              <div class="member-selected mt-2" id="memberSelected">
-                <div class="member-avatar" id="selectedAvatar">--</div>
-                <div>
-                  <div class="fw-semibold" id="selectedName" style="color: var(--oya-text, #212529);"></div>
-                  <div class="small text-muted" id="selectedMeta"></div>
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" id="changeMember">Change</button>
-              </div>
-
-              <div class="d-none">
+            <div class="mb-4">
+              <label class="form-label fw-bold" style="color: var(--oya-text, #212529);">Select Association Member</label>
+              <div class="input-group">
+                <span class="input-group-text" style="background: var(--oya-surface, #f8f9fa); border-color: var(--oya-border, #dee2e6);"><i class="bi bi-people"></i></span>
                 {{ form.member }}
               </div>
+              <div class="form-text text-muted">Click to open choices panel containing all active member accounts.</div>
               {% if form.member.errors %}
               <div class="invalid-feedback d-block">{{ form.member.errors.0 }}</div>
               {% endif %}
             </div>
 
             <div class="mb-4">
-              <label class="form-label fw-semibold" style="color: var(--oya-text, #212529);">Payer/Contributor Name Text <span class="text-danger">*</span></label>
+              <label class="form-label fw-bold" style="color: var(--oya-text, #212529);">Payer / Contributor Name <span class="text-danger">*</span></label>
               {{ form.paid_by }}
-              <div class="form-text text-muted">Auto-fills when selecting a member profile above. Modify manually if recording a custom external entry.</div>
+              <div class="form-text text-muted">Auto-populates upon selecting a member dropdown index, or type a custom name for non-members manually.</div>
               {% if form.paid_by.errors %}
               <div class="invalid-feedback d-block">{{ form.paid_by.errors.0 }}</div>
               {% endif %}
@@ -86,14 +71,14 @@
 
             <div class="row g-3 mb-4">
               <div class="col-md-6">
-                <label class="form-label fw-semibold" style="color: var(--oya-text, #212529);">Income Allocation Type <span class="text-danger">*</span></label>
+                <label class="form-label fw-bold" style="color: var(--oya-text, #212529);">Income Allocation Type <span class="text-danger">*</span></label>
                 {{ form.income_type }}
                 {% if form.income_type.errors %}
                 <div class="invalid-feedback d-block">{{ form.income_type.errors.0 }}</div>
                 {% endif %}
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-semibold" style="color: var(--oya-text, #212529);">Payment Amount <span class="text-danger">*</span></label>
+                <label class="form-label fw-bold" style="color: var(--oya-text, #212529);">Payment Amount <span class="text-danger">*</span></label>
                 <div class="input-group">
                   <span class="input-group-text" style="background: var(--oya-surface, #f8f9fa); border-color: var(--oya-border, #dee2e6); color: var(--oya-text, #212529);">&#8358;</span>
                   {{ form.amount }}
@@ -105,7 +90,7 @@
             </div>
 
             <div class="mb-4">
-              <label class="form-label fw-semibold" style="color: var(--oya-text, #212529);">Payment Reason / Description <span class="text-danger">*</span></label>
+              <label class="form-label fw-bold" style="color: var(--oya-text, #212529);">Payment Reason / Description <span class="text-danger">*</span></label>
               {{ form.reason }}
               {% if form.reason.errors %}
               <div class="invalid-feedback d-block">{{ form.reason.errors.0 }}</div>
@@ -138,15 +123,6 @@
 
 {% block extra_css %}
 <style>
-  #memberSearchContainer { position: relative; }
-  .search-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 1050; background: var(--oya-card, #fff); border: 1px solid var(--oya-border, #dee2e6); border-radius: 0 0 8px 8px; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-  .search-result-item { padding: .75rem 1rem; cursor: pointer; border-bottom: 1px solid var(--oya-border, #dee2e6); transition: background .15s; }
-  .search-result-item:hover { background: var(--oya-surface-hover, #f8f9fa); }
-  .search-result-name { font-weight: 600; color: var(--oya-text, #212529); }
-  .search-result-meta { font-size: .75rem; color: var(--oya-text-muted, #6c757d); }
-  .member-selected { background: var(--oya-success-bg, #e8f5e9); border-radius: 8px; padding: .75rem 1rem; display: none; align-items: center; gap: .75rem; border: 1px solid var(--oya-border, #dee2e6); }
-  .member-selected.show { display: flex; }
-  .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--oya-primary, #0d6efd); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: .85rem; }
   .quick-reason-btn { cursor: pointer; transition: background 0.2s; }
   .quick-reason-btn:hover { background: #e2e6ea !important; }
 </style>
@@ -155,111 +131,40 @@
 {% block extra_js %}
 <script>
 (function() {
-  const searchInput = document.getElementById('memberSearchInput');
-  const searchResults = document.getElementById('searchResults');
   const memberSelect = document.getElementById('id_member');
-  const memberSelected = document.getElementById('memberSelected');
-  const memberSearchContainer = document.getElementById('memberSearchContainer');
-  const changeMemberBtn = document.getElementById('changeMember');
   const paidByInput = document.getElementById('id_paid_by');
-  const reasonInput = document.getElementById('id_reason');
   const amountInput = document.getElementById('id_amount');
+  const reasonInput = document.getElementById('id_reason');
   const submitBtn = document.getElementById('submitBtn');
   const incomeForm = document.getElementById('incomeForm');
 
-  let searchTimeout;
-  let selectedMemberId = null;
-
-  // Real-time Database Search Lookup Trigger
-  searchInput.addEventListener('input', function() {
-    const q = this.value.trim();
-    clearTimeout(searchTimeout);
-    if (q.length < 2) { searchResults.classList.add('d-none'); return; }
-    
-    searchTimeout = setTimeout(function() {
-      fetch('{% url "finance:search_members" %}?q=' + encodeURIComponent(q), {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      })
-      .then(r => r.json())
-      .then(data => {
-        searchResults.innerHTML = '';
-        if (data.results && data.results.length) {
-          data.results.forEach(function(item) {
-            const div = document.createElement('div');
-            div.className = 'search-result-item';
-            div.innerHTML = '<div class="search-result-name">' + item.name + '</div><div class="search-result-meta">' + item.serial + ' · ' + item.role + '</div>';
-            div.addEventListener('click', function() { selectMember(item); });
-            searchResults.appendChild(div);
-          });
-          searchResults.classList.remove('d-none');
-        } else {
-          searchResults.innerHTML = '<div class="search-result-item text-muted">No members found.</div>';
-          searchResults.classList.remove('d-none');
-        }
-      })
-      .catch(function() {
-        searchResults.innerHTML = '<div class="search-result-item text-danger">Search failed. Please try again.</div>';
-        searchResults.classList.remove('d-none');
-      });
-    }, 300);
-  });
-
-  function selectMember(item) {
-    selectedMemberId = item.id;
-    memberSelect.value = item.id;
-    searchInput.value = item.name;
-    
-    // Mirror tracking profile targets - auto populates text fields cleanly
-    if (paidByInput) {
-      paidByInput.value = item.name;
-    }
-    
-    searchResults.classList.add('d-none');
-    memberSearchContainer.classList.add('d-none');
-    memberSelected.classList.add('show');
-    
-    document.getElementById('selectedName').textContent = item.name;
-    document.getElementById('selectedMeta').textContent = item.serial + ' · ' + item.role;
-    document.getElementById('selectedAvatar').textContent = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-    searchInput.classList.remove('is-invalid');
-  }
-
-  changeMemberBtn.addEventListener('click', function() {
-    selectedMemberId = null; 
-    memberSelect.value = ''; 
-    searchInput.value = '';
-    if (paidByInput) { paidByInput.value = ''; }
-    
-    memberSearchContainer.classList.remove('d-none');
-    memberSelected.classList.remove('show');
-    searchInput.focus();
-  });
-
-  document.addEventListener('click', function(e) {
-    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-      searchResults.classList.add('d-none');
+  // When a user selects a profile from the dropdown, extract the clean name text string
+  memberSelect.addEventListener('change', function() {
+    if (this.selectedIndex > 0) {
+      const selectedText = this.options[this.selectedIndex].text;
+      // Clean up choice data names out of standard formatting blocks
+      const cleanName = selectedText.split(' (')[0].trim();
+      paidByInput.value = cleanName;
     }
   });
 
-  // Quick Description Helper Bindings
+  // Handle Quick Description selection badge targets
   document.querySelectorAll('.quick-reason-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-      if (reasonInput) reasonInput.value = this.getAttribute('data-reason');
+      reasonInput.value = this.getAttribute('data-reason');
     });
   });
 
-  // Clean Form Submissions - Stops submission freezing bugs completely
+  // Safe client validation routing intercepts — prevents freeze/hang errors
   incomeForm.addEventListener('submit', function(e) {
-    const amount = parseFloat(amountInput.value);
-    const hasMember = selectedMemberId || memberSelect.value;
-    
     let isFormValid = true;
+    const amount = parseFloat(amountInput.value);
 
-    if (!hasMember) {
-      searchInput.classList.add('is-invalid');
+    if (!paidByInput.value.trim()) {
+      paidByInput.classList.add('is-invalid');
       isFormValid = false;
     } else {
-      searchInput.classList.remove('is-invalid');
+      paidByInput.classList.remove('is-invalid');
     }
 
     if (isNaN(amount) || amount <= 0) {
@@ -271,53 +176,13 @@
 
     if (!isFormValid) {
       e.preventDefault();
-      if (!hasMember) searchInput.focus();
       return false;
     }
 
-    // Safely execute transition mechanics
+    // Lock transaction down safely on confirmation dispatch
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing...';
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving Entry...';
   });
-
-  // Rehydration recovery state pattern
-  function initSelectedMember() {
-    if (memberSelect && memberSelect.value) {
-      selectedMemberId = memberSelect.value;
-      fetch('{% url "finance:search_members" %}?q=' + encodeURIComponent(memberSelect.value), {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (data.results && data.results.length) {
-          const item = data.results.find(function(r) { return String(r.id) === String(memberSelect.value); });
-          if (item) {
-            searchInput.value = item.name;
-            memberSearchContainer.classList.add('d-none');
-            memberSelected.classList.add('show');
-            document.getElementById('selectedName').textContent = item.name;
-            document.getElementById('selectedMeta').textContent = item.serial + ' · ' + item.role;
-            document.getElementById('selectedAvatar').textContent = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-            return;
-          }
-        }
-        showGenericSelected();
-      })
-      .catch(function() {
-        showGenericSelected();
-      });
-    }
-  }
-
-  function showGenericSelected() {
-    memberSearchContainer.classList.add('d-none');
-    memberSelected.classList.add('show');
-    document.getElementById('selectedName').textContent = 'Linked Profile ID: #' + memberSelect.value;
-    document.getElementById('selectedMeta').textContent = 'Change to modify connection link';
-    document.getElementById('selectedAvatar').textContent = '✓';
-  }
-
-  initSelectedMember();
 })();
 </script>
 {% endblock %}
