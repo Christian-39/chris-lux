@@ -383,7 +383,7 @@ def income_list(request):
 
 @login_required
 def income_create(request):
-    """Create a new non-dues income record."""
+    """Create a new non-dues income record with member search."""
     if not request.user.has_executive_access():
         messages.error(request, "Executive access required.")
         return redirect("finance:donation_list")
@@ -392,7 +392,7 @@ def income_create(request):
     total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or 0
     treasury_balance = total_income - total_expenses
 
-    recent_incomes = Income.objects.exclude(income_type="DUES").select_related("created_by").order_by("-created_at")[:5]
+    recent_incomes = Income.objects.exclude(income_type="DUES").select_related("created_by", "member").order_by("-created_at")[:5]
 
     thirty_days_ago = timezone.now() - timedelta(days=30)
     common_reasons = (
@@ -415,13 +415,14 @@ def income_create(request):
                 object_type="Income",
                 object_id=income.id,
                 ip_address=getattr(request, "client_ip", ""),
-                description=f"Recorded {income.get_income_type_display()}: ₦{income.amount:,.2f} - {income.reason}"
+                description=f"Recorded {income.get_income_type_display()}: ₦{income.amount:,.2f} - {income.reason} (by {income.get_payer_display()})"
             )
             messages.success(request, "Income recorded successfully.")
             return redirect("finance:donation_list")
         else:
-            for error in form.errors.values():
-                messages.error(request, error)
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
         form = IncomeForm()
 
@@ -435,6 +436,7 @@ def income_create(request):
         "recent_incomes": recent_incomes,
         "common_reasons": list(common_reasons),
     })
+
 
 
 @login_required
