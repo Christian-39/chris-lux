@@ -1,108 +1,298 @@
 {% extends "base.html" %}
-{% load static %}
 {% load humanize %}
+{% load static %}
 
-{% block title %}Record Dues Payment{% endblock %}
-{% block page_title %}Record Dues Payment{% endblock %}
-{% block breadcrumb %}Finance / Dues / Record{% endblock %}
+{% block title %}{{ title }} — OYA Finance{% endblock %}
+
+{% block extra_css %}
+<style>
+  .allocation-card { border-radius: 12px; border: none; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .allocation-item { padding: .75rem 1rem; border-radius: 8px; background: #f8f9fa; margin-bottom: .5rem; display: flex; justify-content: space-between; align-items: center; }
+  .allocation-item.prepaid { background: #e3f2fd; border-left: 4px solid #1565c0; }
+  .allocation-item.paid { background: #e8f5e9; border-left: 4px solid #2e7d32; }
+  .allocation-item.partial { background: #fff3e0; border-left: 4px solid #ef6c00; }
+  .search-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: #fff; border: 1px solid #dee2e6; border-radius: 0 0 8px 8px; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .search-result-item { padding: .75rem 1rem; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background .15s; }
+  .search-result-item:hover { background: #f8f9fa; }
+  .search-result-name { font-weight: 600; color: #1a1a2e; }
+  .search-result-meta { font-size: .75rem; color: #6c757d; }
+  .member-selected { background: #e8f5e9; border-radius: 8px; padding: .75rem 1rem; display: none; }
+  .member-selected.show { display: flex; align-items: center; gap: .75rem; }
+  .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: #1a1a2e; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: .85rem; }
+  .preview-box { background: #f8f9fa; border-radius: 12px; padding: 1.25rem; display: none; }
+  .preview-box.show { display: block; }
+  .amount-display { font-size: 1.8rem; font-weight: 700; color: #1a1a2e; }
+  .spinner-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; border-radius: 12px; z-index: 10; }
+  .form-section { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+</style>
+{% endblock %}
 
 {% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-cash-coin me-2"></i>{{ title }}</h2>
+          <p class="text-muted mb-0">Smart allocation across outstanding years</p>
+        </div>
+        <a href="{% url 'finance:dues_tracker' %}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Back to Tracker
+        </a>
+      </div>
 
-<!-- Page Header -->
-<div class="page-header">
-  <div class="page-header-left">
-    <h1 style="font-size:clamp(1.125rem,3vw,1.5rem);">Record Dues Payment</h1>
-    <p>Mark a member's yearly dues as paid — &#x20A6;{{ yearly_dues|intcomma }} per year</p>
-  </div>
-  <div class="page-header-actions">
-    <a href="{% url 'finance:dues_tracker' %}" class="btn btn-ghost">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-      Back to Tracker
-    </a>
-  </div>
-</div>
-
-<!-- Form Card -->
-<div class="card" style="max-width:640px;">
-  <div class="form-card-header">
-    <h3 class="form-card-title">Dues Payment Details</h3>
-    <p style="font-size:0.875rem;color:var(--oya-text-muted);margin:0;">Yearly dues are fixed at &#x20A6;{{ yearly_dues|intcomma }}</p>
-  </div>
-  <div class="form-card-body">
-    <form method="post" novalidate>
-      {% csrf_token %}
-
-      {% if form.non_field_errors %}
-      <div class="alert alert-danger" style="margin-bottom:1.5rem;">
-        {% for error in form.non_field_errors %}
-        <p style="margin:0;">{{ error }}</p>
+      {% if messages %}
+      <div class="mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
         {% endfor %}
       </div>
       {% endif %}
 
-      <div class="form-row" style="grid-template-columns: 1fr; gap: 1.5rem;">
-        <!-- Member -->
-        <div class="form-group">
-          <label for="{{ form.member.id_for_label }}" class="form-label">
-            Member <span style="color:var(--oya-danger);">*</span>
-          </label>
-          {{ form.member }}
-          {% if form.member.errors %}
-          <div class="form-error">{{ form.member.errors.0 }}</div>
-          {% endif %}
-          <div class="form-help">Select the member who paid their dues</div>
+      <div class="form-section position-relative" id="formSection">
+        <div class="spinner-overlay d-none" id="formSpinner">
+          <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
         </div>
 
-        <!-- Year -->
-        <div class="form-group">
-          <label for="{{ form.year.id_for_label }}" class="form-label">
-            Dues Year <span style="color:var(--oya-danger);">*</span>
-          </label>
-          {{ form.year }}
-          {% if form.year.errors %}
-          <div class="form-error">{{ form.year.errors.0 }}</div>
-          {% endif %}
-          <div class="form-help">The calendar year this payment covers (2020 — present)</div>
-        </div>
+        <form method="post" id="duesForm" novalidate>
+          {% csrf_token %}
 
-        <!-- Amount (read-only display) -->
-        <div class="form-group">
-          <label class="form-label">Amount</label>
-          <div class="form-control" style="background:var(--oya-surface);color:var(--oya-text-secondary);cursor:not-allowed;">
-            &#x20A6;{{ yearly_dues|intcomma }}
+          <div class="mb-4 position-relative">
+            <label class="form-label fw-semibold">Member <span class="text-danger">*</span></label>
+            <div id="memberSearchContainer">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="memberSearchInput" placeholder="Type member name or serial number..." autocomplete="off">
+              </div>
+              <div class="search-results d-none" id="searchResults"></div>
+            </div>
+            <div class="member-selected mt-2" id="memberSelected">
+              <div class="member-avatar" id="selectedAvatar">AB</div>
+              <div>
+                <div class="fw-semibold" id="selectedName"></div>
+                <div class="small text-muted" id="selectedMeta"></div>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" id="changeMember">Change</button>
+            </div>
+            {{ form.member }}
+            {% if form.member.errors %}
+            <div class="invalid-feedback d-block">{{ form.member.errors.0 }}</div>
+            {% endif %}
           </div>
-          <div class="form-help">Yearly dues amount is fixed</div>
-        </div>
 
-        <!-- Notes -->
-        <div class="form-group">
-          <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
-          {{ form.notes }}
-          {% if form.notes.errors %}
-          <div class="form-error">{{ form.notes.errors.0 }}</div>
-          {% endif %}
-          <div class="form-help">Payment method, reference number, or any additional info</div>
-        </div>
-      </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Payment Amount <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text">&#8358;</span>
+                {{ form.total_amount }}
+              </div>
+              <div class="form-text">Enter total amount received. System will auto-allocate across years.</div>
+              {% if form.total_amount.errors %}
+              <div class="invalid-feedback d-block">{{ form.total_amount.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Payment Method</label>
+              {{ form.payment_method }}
+              {% if form.payment_method.errors %}
+              <div class="invalid-feedback d-block">{{ form.payment_method.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
 
-      <div class="form-actions" style="margin-top:2rem;display:flex;gap:0.75rem;">
-        <button type="submit" class="btn btn-primary">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          {{ action|default:"Record Payment" }}
-        </button>
-        <a href="{% url 'finance:dues_tracker' %}" class="btn btn-ghost">Cancel</a>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Receipt / Reference Number</label>
+              {{ form.receipt_reference }}
+              <div class="form-text">Optional. Bank transfer ref, receipt number, etc.</div>
+              {% if form.receipt_reference.errors %}
+              <div class="invalid-feedback d-block">{{ form.receipt_reference.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Payment Date <span class="text-danger">*</span></label>
+              {{ form.payment_date }}
+              {% if form.payment_date.errors %}
+              <div class="invalid-feedback d-block">{{ form.payment_date.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Notes</label>
+            {{ form.notes }}
+            {% if form.notes.errors %}
+            <div class="invalid-feedback d-block">{{ form.notes.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="preview-box mb-4" id="allocationPreview">
+            <h6 class="fw-bold mb-3"><i class="bi bi-eye me-2"></i>Allocation Preview</h6>
+            <div id="previewContent">
+              <p class="text-muted mb-0">Select a member and enter an amount to see how it will be allocated.</p>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
+              <i class="bi bi-check-lg me-1"></i> {{ action }}
+            </button>
+            <a href="{% url 'finance:dues_tracker' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
   </div>
 </div>
+{% endblock %}
 
-<style>
-@media (max-width: 768px) {
-  .page-header { flex-direction: column !important; align-items: flex-start !important; }
-  .page-header-actions { width: 100% !important; flex-wrap: wrap !important; }
-  .form-actions .btn { width: 100% !important; justify-content: center !important; }
-  .form-row { grid-template-columns: 1fr !important; gap: 0 !important; }
-}
-</style>
+{% block extra_js %}
+<script>
+(function() {
+  const searchInput = document.getElementById('memberSearchInput');
+  const searchResults = document.getElementById('searchResults');
+  const memberSelect = document.getElementById('id_member');
+  const memberSelected = document.getElementById('memberSelected');
+  const memberSearchContainer = document.getElementById('memberSearchContainer');
+  const changeMemberBtn = document.getElementById('changeMember');
+  const totalAmountInput = document.getElementById('id_total_amount');
+  const previewBox = document.getElementById('allocationPreview');
+  const previewContent = document.getElementById('previewContent');
+  const submitBtn = document.getElementById('submitBtn');
+  const formSpinner = document.getElementById('formSpinner');
 
+  let searchTimeout;
+  let selectedMemberId = null;
+
+  searchInput.addEventListener('input', function() {
+    const q = this.value.trim();
+    clearTimeout(searchTimeout);
+    if (q.length < 2) { searchResults.classList.add('d-none'); return; }
+    searchTimeout = setTimeout(function() {
+      fetch('{% url "finance:search_members" %}?q=' + encodeURIComponent(q), {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(r => r.json())
+      .then(data => {
+        searchResults.innerHTML = '';
+        if (data.results && data.results.length) {
+          data.results.forEach(function(item) {
+            const div = document.createElement('div');
+            div.className = 'search-result-item';
+            div.innerHTML = item.html;
+            div.addEventListener('click', function() { selectMember(item); });
+            searchResults.appendChild(div);
+          });
+          searchResults.classList.remove('d-none');
+        } else {
+          searchResults.innerHTML = '<div class="search-result-item text-muted">No members found.</div>';
+          searchResults.classList.remove('d-none');
+        }
+      })
+      .catch(function() {
+        searchResults.innerHTML = '<div class="search-result-item text-danger">Search failed. Please try again.</div>';
+        searchResults.classList.remove('d-none');
+      });
+    }, 300);
+  });
+
+  function selectMember(item) {
+    selectedMemberId = item.id;
+    memberSelect.value = item.id;
+    searchInput.value = item.text;
+    searchResults.classList.add('d-none');
+    memberSearchContainer.classList.add('d-none');
+    memberSelected.classList.add('show');
+    document.getElementById('selectedName').textContent = item.name;
+    document.getElementById('selectedMeta').textContent = item.serial + ' · ' + item.role;
+    document.getElementById('selectedAvatar').textContent = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    updatePreview();
+    checkFormValidity();
+  }
+
+  changeMemberBtn.addEventListener('click', function() {
+    selectedMemberId = null; memberSelect.value = ''; searchInput.value = '';
+    memberSearchContainer.classList.remove('d-none');
+    memberSelected.classList.remove('show');
+    previewBox.classList.remove('show');
+    checkFormValidity();
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+      searchResults.classList.add('d-none');
+    }
+  });
+
+  function updatePreview() {
+    const amount = parseFloat(totalAmountInput.value);
+    if (!selectedMemberId || !amount || amount <= 0) {
+      previewBox.classList.remove('show'); return;
+    }
+    previewBox.classList.add('show');
+    previewContent.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div> Calculating allocation...</div>';
+
+    fetch('{% url "finance:member_dues_preview" %}?member_id=' + encodeURIComponent(selectedMemberId), {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => { renderPreview(data.outstanding, amount); })
+    .catch(function() {
+      previewContent.innerHTML = '<div class="alert alert-danger">Failed to load preview. Please try again.</div>';
+    });
+  }
+
+  function renderPreview(outstanding, totalAmount) {
+    if (!outstanding || !outstanding.length) {
+      previewContent.innerHTML = '<p class="text-muted">No outstanding years found for this member.</p>'; return;
+    }
+    let remaining = totalAmount;
+    let html = '<div class="mb-2"><span class="amount-display">&#8358;' + totalAmount.toLocaleString() + '</span> <span class="text-muted">received</span></div><hr class="my-2">';
+    let hasAllocation = false;
+    outstanding.forEach(function(item) {
+      if (remaining <= 0) return;
+      const needed = item.remaining_balance;
+      if (needed <= 0) return;
+      const allocate = Math.min(needed, remaining);
+      remaining -= allocate; hasAllocation = true;
+      const cls = allocate >= needed ? 'paid' : 'partial';
+      html += '<div class="allocation-item ' + cls + '"><div><strong>' + item.year + '</strong>';
+      if (item.status === 'OWED') html += ' <span class="badge bg-danger">Owed</span>';
+      else if (item.status === 'PARTIAL') html += ' <span class="badge bg-warning">Partial</span>';
+      html += '</div><div class="text-end"><div class="fw-bold">&#8358;' + allocate.toLocaleString() + '</div>';
+      html += '<div class="small text-muted">of &#8358;' + item.remaining_balance.toLocaleString() + ' needed</div></div></div>';
+    });
+    let futureYear = new Date().getFullYear() + 1;
+    while (remaining > 0) {
+      const allocate = Math.min(5000, remaining); remaining -= allocate; hasAllocation = true;
+      html += '<div class="allocation-item prepaid"><div><strong>' + futureYear + '</strong> <span class="badge bg-info">Prepaid</span></div>';
+      html += '<div class="text-end"><div class="fw-bold">&#8358;' + allocate.toLocaleString() + '</div></div></div>';
+      futureYear++;
+    }
+    html += '<hr class="my-2"><div class="d-flex justify-content-between fw-bold">';
+    html += '<span>Total Allocated:</span><span>&#8358;' + (totalAmount - remaining).toLocaleString() + '</span></div>';
+    if (remaining > 0) {
+      html += '<div class="d-flex justify-content-between text-warning fw-bold"><span>Remaining:</span><span>&#8358;' + remaining.toLocaleString() + '</span></div>';
+    } else {
+      html += '<div class="d-flex justify-content-between text-success fw-bold"><span>Remaining:</span><span>&#8358;0</span></div>';
+    }
+    previewContent.innerHTML = html;
+  }
+
+  totalAmountInput.addEventListener('input', function() { updatePreview(); checkFormValidity(); });
+
+  function checkFormValidity() {
+    const amount = parseFloat(totalAmountInput.value);
+    submitBtn.disabled = !(selectedMemberId && amount && amount > 0);
+  }
+
+  document.getElementById('duesForm').addEventListener('submit', function() {
+    formSpinner.classList.remove('d-none'); submitBtn.disabled = true;
+  });
+})();
+</script>
 {% endblock %}
