@@ -7,13 +7,29 @@
 {% block extra_css %}
 <style>
   .form-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-  .treasury-bar { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #fff; border-radius: 12px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; }
-  .receipt-preview { border: 2px dashed #dee2e6; border-radius: 12px; padding: 2rem; text-align: center; transition: all .2s; }
-  .receipt-preview.dragover { border-color: #0d6efd; background: #e7f1ff; }
+  .treasury-bar { background: linear-gradient(135deg, var(--oya-primary) 0%, var(--oya-primary-dark, #16213e) 100%); color: #fff; border-radius: 12px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; }
+  .receipt-preview { border: 2px dashed var(--oya-border); border-radius: 12px; padding: 2rem; text-align: center; transition: all .2s; }
+  .receipt-preview.dragover { border-color: var(--oya-primary); background: var(--oya-primary-bg, #e7f1ff); }
   .quick-cat { cursor: pointer; transition: all .15s; }
   .quick-cat:hover { background: #ffebee !important; }
-  .file-info { background: #f8f9fa; border-radius: 8px; padding: .75rem 1rem; margin-top: .5rem; display: none; }
+  .file-info { background: var(--oya-surface); border-radius: 8px; padding: .75rem 1rem; margin-top: .5rem; display: none; }
   .file-info.show { display: flex; align-items: center; gap: .5rem; }
+
+  /* TABLE FIX for recent expenses */
+  .form-card .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .form-card table { min-width: 600px; }
+  .form-card table th,
+  .form-card table td { white-space: nowrap !important; vertical-align: middle; }
+
+  [data-theme="dark"] .form-card { background: var(--oya-card); box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+  [data-theme="dark"] .card-header { background: var(--oya-card) !important; border-color: var(--oya-border) !important; }
+  [data-theme="dark"] .form-control,
+  [data-theme="dark"] .form-select { background: var(--oya-surface); color: var(--oya-text); border-color: var(--oya-border); }
+  [data-theme="dark"] .input-group-text { background: var(--oya-surface); color: var(--oya-text); border-color: var(--oya-border); }
+  [data-theme="dark"] .btn-outline-secondary { color: var(--oya-text); border-color: var(--oya-border); }
+  [data-theme="dark"] .file-info { background: var(--oya-surface); }
+  [data-theme="dark"] .text-muted { color: var(--oya-text-muted) !important; }
+  [data-theme="dark"] .badge.bg-light { background: var(--oya-surface) !important; color: var(--oya-text) !important; border: 1px solid var(--oya-border); }
 </style>
 {% endblock %}
 
@@ -23,7 +39,7 @@
     <div class="col-lg-8">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h2 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-receipt me-2"></i>{{ title }}</h2>
+          <h2 class="fw-bold mb-0" style="color:var(--oya-primary);"><i class="bi bi-receipt me-2"></i>{{ title }}</h2>
           <p class="text-muted mb-0">Record a new expenditure</p>
         </div>
         <a href="{% url 'finance:expense_list' %}" class="btn btn-outline-secondary">
@@ -129,7 +145,7 @@
       {% if recent_expenses %}
       <div class="form-card card mt-4">
         <div class="card-header bg-white border-0 pt-3 pb-0">
-          <h6 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-clock-history me-2"></i>Recent Expenses</h6>
+          <h6 class="fw-bold mb-0" style="color:var(--oya-primary);"><i class="bi bi-clock-history me-2"></i>Recent Expenses</h6>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
