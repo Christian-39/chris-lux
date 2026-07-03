@@ -3,10 +3,10 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        # This points back to your previous valid migration file
-                ('finance', '0002_income_add_member'), 
+        # Link it straight to 0001 to bypass the 0002 node error
+        ('finance', '0001_initial'),
     ]
 
     operations = [
-        # Left empty on purpose to bypass trying to create your manual table!
+        # Kept completely empty so it doesn't create any tables
     ]
