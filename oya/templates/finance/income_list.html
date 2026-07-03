@@ -1,383 +1,134 @@
 {% extends "base.html" %}
-{% load static %}
 {% load humanize %}
+{% load static %}
 
-{% block title %}Income Records{% endblock %}
-{% block page_title %}Income Records{% endblock %}
-{% block breadcrumb %}Finance / Income{% endblock %}
+{% block title %}Income Records — OYA Finance{% endblock %}
+
+{% block extra_css %}
+<style>
+  .income-card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .stat-mini { text-align: center; padding: 1rem; border-radius: 10px; }
+  .stat-mini-value { font-size: 1.4rem; font-weight: 700; }
+  .stat-mini-label { font-size: .75rem; color: #6c757d; text-transform: uppercase; }
+  .filter-bar { background: #fff; border-radius: 10px; padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .badge-dues { background: #e3f2fd; color: #1565c0; }
+  .badge-donation { background: #e8f5e9; color: #2e7d32; }
+  .badge-event { background: #fff3e0; color: #ef6c00; }
+  .badge-other { background: #f3e5f5; color: #6a1b9a; }
+</style>
+{% endblock %}
 
 {% block content %}
-
-<!-- Page Header -->
-<div class="page-header">
-  <div class="page-header-left">
-    <h1 style="font-size:clamp(1.125rem,3vw,1.5rem);">Income Records</h1>
-    <p>Track and manage all income and revenue sources</p>
-  </div>
-  <div class="page-header-actions">
-    <button class="btn btn-secondary" data-export="incomeTable">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Export
-    </button>
-    {% if user.is_staff %}
-    <a href="{% url 'finance:income_create' %}" class="btn btn-success">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Record Income
-    </a>
-    {% endif %}
-  </div>
-</div>
-
-<!-- Summary KPIs -->
-<div class="dashboard-grid dashboard-grid-4" style="margin-bottom:1.5rem;">
-  <div class="kpi-card">
-    <div class="kpi-header">
-      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-    </div>
-    <div class="kpi-value" style="font-size:clamp(1.25rem,4vw,1.75rem);">&#x20A6;{{ total_income|floatformat:0|intcomma }}</div>
-    <div class="kpi-label">Total Income</div>
-  </div>
-  <div class="kpi-card accent-success">
-    <div class="kpi-header">
-      <div class="kpi-icon" style="background:var(--oya-success-bg);color:var(--oya-success);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
-    </div>
-    <div class="kpi-value" style="color:var(--oya-success);font-size:clamp(1.25rem,4vw,1.75rem);">&#x20A6;{{ total_dues|floatformat:0|intcomma }}</div>
-    <div class="kpi-label">Total Dues</div>
-  </div>
-  <div class="kpi-card accent-info">
-    <div class="kpi-header">
-      <div class="kpi-icon" style="background:var(--oya-info-bg);color:var(--oya-info);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
-    </div>
-    <div class="kpi-value" style="color:var(--oya-info);font-size:clamp(1.25rem,4vw,1.75rem);">&#x20A6;{{ total_donations|floatformat:0|intcomma }}</div>
-    <div class="kpi-label">Total Donations</div>
-  </div>
-  <div class="kpi-card accent-warning">
-    <div class="kpi-header">
-      <div class="kpi-icon" style="background:var(--oya-warning-bg);color:var(--oya-warning);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
-    </div>
-    <div class="kpi-value" style="color:var(--oya-warning);font-size:clamp(1.25rem,4vw,1.75rem);">{{ total_records }}</div>
-    <div class="kpi-label">Transactions</div>
-  </div>
-</div>
-
-<!-- Filters -->
-<div class="filters-bar">
-  <form method="get" style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
-    <div class="filter-group">
-      <span class="filter-label">From:</span>
-      <input type="date" name="date_from" class="form-control" style="width:140px;" value="{{ date_from|default:'' }}">
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">To:</span>
-      <input type="date" name="date_to" class="form-control" style="width:140px;" value="{{ date_to|default:'' }}">
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">Type:</span>
-      <select name="type" class="form-control" style="width:140px;">
-        <option value="">All Types</option>
-        <option value="DUES" {% if type_filter == 'DUES' %}selected{% endif %}>Dues</option>
-        <option value="DONATION" {% if type_filter == 'DONATION' %}selected{% endif %}>Donation</option>
-        <option value="EVENT" {% if type_filter == 'EVENT' %}selected{% endif %}>Event</option>
-        <option value="OTHER" {% if type_filter == 'OTHER' %}selected{% endif %}>Other</option>
-      </select>
-    </div>
-    <button type="submit" class="btn btn-sm btn-primary">Filter</button>
-    {% if date_from or date_to or type_filter %}
-      <a href="{% url 'finance:income_list' %}" class="btn btn-sm btn-ghost">Clear</a>
-    {% endif %}
-  </form>
-  <div style="margin-left:auto;font-size:0.875rem;color:var(--oya-text-secondary);">
-    <strong style="color:var(--oya-text-primary);">{{ total_records }}</strong> records
-  </div>
-</div>
-
-<!-- DUES TABLE -->
-<div class="card" style="margin-bottom:1.5rem;">
-  <div class="card-header">
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
-      <div class="card-header-title">Yearly Dues Payments</div>
-      <div class="card-header-subtitle">All recorded member dues</div>
+      <h2 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-cash-stack me-2"></i>Income Records</h2>
+      <p class="text-muted mb-0">All dues and donation records</p>
     </div>
-    <div class="card-header-actions">
-      <span class="badge badge-success" style="font-size:0.9375rem;">&#x20A6;{{ total_dues|floatformat:0|intcomma }} total</span>
-    </div>
-  </div>
-  <div class="card-body" style="padding:0;">
-    <div class="table-container" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-      <table class="data-table" id="duesTable" style="white-space:nowrap;">
-        <thead>
-          <tr>
-            <th style="width:40px;"><input type="checkbox" class="form-check-input" id="selectAllDues"></th>
-            <th>Date</th>
-            <th>Member</th>
-            <th>Year</th>
-            <th>Amount</th>
-            <th>Recorded By</th>
-            <th>Notes</th>
-            <th style="width:80px;">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for income in dues_incomes %}
-          <tr>
-            <td style="white-space:nowrap;"><input type="checkbox" class="form-check-input row-checkbox" value="{{ income.pk }}"></td>
-            <td class="cell-muted" style="white-space:nowrap;">{{ income.created_at|date:"M d, Y" }}</td>
-            <td style="white-space:nowrap;">
-              {% if income.dues_payment %}
-                <a href="{% url 'finance:member_dues_detail' member_id=income.dues_payment.member_id %}" class="cell-name" style="color:var(--oya-primary);white-space:nowrap;">
-                  {{ income.dues_payment.member.get_full_name }}
-                </a>
-              {% else %}
-                <span class="cell-name" style="white-space:nowrap;">{{ income.paid_by|default:"N/A" }}</span>
-              {% endif %}
-            </td>
-            <td style="white-space:nowrap;"><span class="badge badge-success" style="white-space:nowrap;">{{ income.dues_payment.year|default:"N/A" }}</span></td>
-            <td style="font-weight:600;color:var(--oya-success);white-space:nowrap;">&#x20A6;{{ income.amount|floatformat:2|intcomma }}</td>
-            <td class="cell-muted" style="white-space:nowrap;">{{ income.created_by.get_full_name|default:"System" }}</td>
-            <td class="cell-muted" style="white-space:nowrap;">{{ income.dues_payment.notes|default:"—"|truncatechars:30 }}</td>
-            <td style="white-space:nowrap;">
-              <div class="table-actions" style="flex-wrap:nowrap;gap:0.25rem;">
-                <a href="{% url 'finance:member_dues_detail' member_id=income.dues_payment.member_id %}" class="table-action-btn" title="View Member Dues">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                </a>
-              </div>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="8" style="text-align:center;padding:3rem;">
-              <div class="empty-state" style="padding:0;">
-                <div class="empty-state-icon" style="width:60px;height:60px;margin-bottom:1rem;">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                </div>
-                <h3 style="font-size:1rem;">No dues payments recorded</h3>
-                <p style="font-size:0.875rem;color:var(--oya-text-muted);">Record dues payments from the Dues Tracker.</p>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-        <tfoot style="background:var(--oya-surface);border-top:2px solid var(--oya-border);">
-          <tr>
-            <td colspan="4" style="text-align:right;font-weight:600;white-space:nowrap;">Total Dues Realized:</td>
-            <td colspan="4" style="font-weight:700;color:var(--oya-success);white-space:nowrap;">&#x20A6;{{ total_dues|floatformat:2|intcomma }}</td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- DONATIONS & OTHER INCOME TABLE -->
-<div class="card" style="margin-bottom:1.5rem;">
-  <div class="card-header">
-    <div>
-      <div class="card-header-title">Donations, Events & Other Contributions</div>
-      <div class="card-header-subtitle">Non-dues income records</div>
-    </div>
-    <div class="card-header-actions">
-      <span class="badge badge-info" style="font-size:0.9375rem;">&#x20A6;{{ total_donations|floatformat:0|intcomma }} total</span>
-    </div>
-  </div>
-  <div class="card-body" style="padding:0;">
-    <div class="table-toolbar">
-      <div class="toolbar-search">
-        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <form method="get" style="width:100%;">
-          <input type="text" name="search" placeholder="Search by description, payer..." 
-                 value="{{ search_term }}" data-search-table="donationsTable"
-                 onkeydown="if(event.key==='Enter') this.form.submit()">
-          {% if date_from %}<input type="hidden" name="date_from" value="{{ date_from }}">{% endif %}
-          {% if date_to %}<input type="hidden" name="date_to" value="{{ date_to }}">{% endif %}
-          {% if type_filter %}<input type="hidden" name="type" value="{{ type_filter }}">{% endif %}
-        </form>
-      </div>
-    </div>
-
-    <div class="table-container" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-      <table class="data-table" id="donationsTable" data-sortable style="white-space:nowrap;">
-        <thead>
-          <tr>
-            <th style="width:40px;"><input type="checkbox" class="form-check-input" id="selectAllDonations"></th>
-            <th data-sort="text">Date</th>
-            <th data-sort="text">Type</th>
-            <th data-sort="text">Description</th>
-            <th data-sort="text">Paid By</th>
-            <th data-sort="text">Recorded By</th>
-            <th data-sort="number">Amount</th>
-            <th style="width:80px;">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for income in donation_incomes %}
-          <tr>
-            <td style="white-space:nowrap;"><input type="checkbox" class="form-check-input row-checkbox" value="{{ income.pk }}"></td>
-            <td class="cell-muted" style="white-space:nowrap;">{{ income.created_at|date:"M d, Y" }}</td>
-            <td style="white-space:nowrap;">
-              {% if income.income_type == "DONATION" %}
-                <span class="badge badge-info" style="white-space:nowrap;">Donation</span>
-              {% elif income.income_type == "EVENT" %}
-                <span class="badge badge-warning" style="white-space:nowrap;">Event</span>
-              {% else %}
-                <span class="badge badge-secondary" style="white-space:nowrap;">Other</span>
-              {% endif %}
-            </td>
-            <td style="white-space:nowrap;"><span class="cell-name" style="white-space:nowrap;">{{ income.reason }}</span></td>
-            <td style="white-space:nowrap;">{{ income.paid_by|default:"N/A" }}</td>
-            <td class="cell-muted" style="white-space:nowrap;">{{ income.created_by.get_full_name|default:"System" }}</td>
-            <td style="font-weight:600;color:var(--oya-success);white-space:nowrap;">&#x20A6;{{ income.amount|floatformat:2|intcomma }}</td>
-            <td style="white-space:nowrap;">
-              <div class="table-actions" style="flex-wrap:nowrap;gap:0.25rem;">
-                <a href="{% url 'finance:income_detail' pk=income.pk %}" class="table-action-btn" title="View">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                </a>
-              </div>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="8" style="text-align:center;padding:3rem;">
-              <div class="empty-state" style="padding:0;">
-                <div class="empty-state-icon" style="width:60px;height:60px;margin-bottom:1rem;">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                </div>
-                <h3 style="font-size:1rem;">No donation records found</h3>
-                <p style="font-size:0.875rem;">
-                  {% if search_term or date_from or date_to or type_filter %}
-                    No records match your search/filter criteria.
-                  {% else %}
-                    No donations or contributions recorded yet. Click "Record Income" to get started.
-                  {% endif %}
-                </p>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-        <tfoot style="background:var(--oya-surface);border-top:2px solid var(--oya-border);">
-          <tr>
-            <td colspan="6" style="text-align:right;font-weight:600;white-space:nowrap;">Total Donations Realized:</td>
-            <td colspan="2" style="font-weight:700;color:var(--oya-info);white-space:nowrap;">&#x20A6;{{ total_donations|floatformat:2|intcomma }}</td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  </div>
-
-  <!-- Pagination for donations -->
-  {% if donation_incomes.has_other_pages %}
-  <div class="card-footer">
-    <span style="font-size:0.8125rem;color:var(--oya-text-muted);">Showing {{ donation_incomes.start_index }}-{{ donation_incomes.end_index }} of {{ donation_incomes.paginator.count }} records</span>
-    <div class="pagination">
-      {% if donation_incomes.has_previous %}
-        <a href="?page={{ donation_incomes.previous_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="page-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-        </a>
-      {% else %}
-        <button class="page-btn" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
-      {% endif %}
-
-      {% for num in donation_incomes.paginator.page_range %}
-        {% if donation_incomes.number == num %}
-          <button class="page-btn active">{{ num }}</button>
-        {% elif num > donation_incomes.number|add:'-3' and num < donation_incomes.number|add:'3' %}
-          <a href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="page-btn">{{ num }}</a>
-        {% elif num == 1 or num == donation_incomes.paginator.num_pages %}
-          <a href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="page-btn">{{ num }}</a>
-        {% elif num == donation_incomes.number|add:'-3' or num == donation_incomes.number|add:'3' %}
-          <span class="page-btn" style="cursor:default;border:none;background:transparent;">...</span>
-        {% endif %}
-      {% endfor %}
-
-      {% if donation_incomes.has_next %}
-        <a href="?page={{ donation_incomes.next_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="page-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </a>
-      {% else %}
-        <button class="page-btn" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+    <div class="d-flex gap-2">
+      <a href="{% url 'finance:finance_summary' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Dashboard</a>
+      {% if user.has_executive_access %}
+      <a href="{% url 'finance:donation_create' %}" class="btn btn-success"><i class="bi bi-plus-lg me-1"></i> Record Contribution</a>
       {% endif %}
     </div>
   </div>
-  {% endif %}
-</div>
 
-<!-- Grand Total Footer -->
-<div class="card" style="margin-bottom:1.5rem;background:var(--oya-surface);border:2px solid var(--oya-border);">
-  <div class="card-body">
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
-      <div>
-        <h3 style="font-size:1.125rem;margin:0;">Grand Total Income Realized</h3>
-        <p style="margin:0;color:var(--oya-text-muted);font-size:0.875rem;">Dues + Donations + Events + Other</p>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="stat-mini bg-primary bg-opacity-10"><div class="stat-mini-value text-primary">&#8358;{{ total_income|floatformat:0|intcomma }}</div><div class="stat-mini-label">Total Income</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-mini bg-info bg-opacity-10"><div class="stat-mini-value text-info">&#8358;{{ total_dues|floatformat:0|intcomma }}</div><div class="stat-mini-label">Total Dues</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-mini bg-success bg-opacity-10"><div class="stat-mini-value text-success">&#8358;{{ total_donations|floatformat:0|intcomma }}</div><div class="stat-mini-label">Total Donations</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-mini bg-secondary bg-opacity-10"><div class="stat-mini-value text-secondary">{{ total_records|intcomma }}</div><div class="stat-mini-label">Total Records</div></div></div>
+  </div>
+
+  <div class="filter-bar mb-4">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small fw-semibold">Search</label>
+        <div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" name="search" class="form-control" placeholder="Reason, payer, or recorder..." value="{{ search_term }}"></div>
       </div>
-      <div style="font-size:clamp(1.5rem,4vw,2rem);font-weight:700;color:var(--oya-success);">
-        &#x20A6;{{ total_income|floatformat:2|intcomma }}
+      <div class="col-md-2">
+        <label class="form-label small fw-semibold">Type</label>
+        <select name="type" class="form-select">
+          <option value="">All Types</option>
+          <option value="DUES" {% if type_filter == "DUES" %}selected{% endif %}>Dues</option>
+          <option value="DONATION" {% if type_filter == "DONATION" %}selected{% endif %}>Donation</option>
+          <option value="EVENT" {% if type_filter == "EVENT" %}selected{% endif %}>Event</option>
+          <option value="OTHER" {% if type_filter == "OTHER" %}selected{% endif %}>Other</option>
+        </select>
+      </div>
+      <div class="col-md-2"><label class="form-label small fw-semibold">From</label><input type="date" name="date_from" class="form-control" value="{{ date_from }}"></div>
+      <div class="col-md-2"><label class="form-label small fw-semibold">To</label><input type="date" name="date_to" class="form-control" value="{{ date_to }}"></div>
+      <div class="col-md-2"><button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i> Filter</button></div>
+    </form>
+  </div>
+
+  <div class="income-card card mb-4">
+    <div class="card-header bg-white border-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
+      <h5 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-calendar-check me-2 text-primary"></i>Dues Income</h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light"><tr><th>Reason</th><th>Member</th><th class="text-end">Amount</th><th>Recorded By</th><th>Date</th><th class="text-end">Actions</th></tr></thead>
+          <tbody>
+            {% for income in dues_incomes %}
+            <tr>
+              <td><span class="badge badge-dues me-1">Dues</span><a href="{% url 'finance:income_detail' income.pk %}" class="text-decoration-none fw-medium">{{ income.reason }}</a></td>
+              <td>{% if income.dues_payment and income.dues_payment.member %}<a href="{% url 'finance:member_dues_detail' income.dues_payment.member.id %}" class="text-decoration-none">{{ income.dues_payment.member.get_full_name }}</a>{% else %}<span class="text-muted">{{ income.paid_by|default:"—" }}</span>{% endif %}</td>
+              <td class="text-end fw-bold text-success">&#8358;{{ income.amount|floatformat:0|intcomma }}</td>
+              <td class="small">{% if income.created_by %}{{ income.created_by.get_full_name }}{% else %}—{% endif %}</td>
+              <td class="small text-muted">{{ income.created_at|date:"M d, Y" }}</td>
+              <td class="text-end">
+                <a href="{% url 'finance:income_detail' income.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+                {% if user.has_admin_access %}<a href="{% url 'finance:income_delete' income.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>{% endif %}
+              </td>
+            </tr>
+            {% empty %}<tr><td colspan="6" class="text-center py-4 text-muted">No dues income records found.</td></tr>{% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
+
+  <div class="income-card card">
+    <div class="card-header bg-white border-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
+      <h5 class="fw-bold mb-0" style="color:#1a1a2e;"><i class="bi bi-gift me-2 text-success"></i>Donations & Contributions</h5>
+      <span class="badge bg-light text-dark">{{ donation_incomes.paginator.count|default:0 }} records</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light"><tr><th>Type</th><th>Reason</th><th>Paid By</th><th class="text-end">Amount</th><th>Recorded By</th><th>Date</th><th class="text-end">Actions</th></tr></thead>
+          <tbody>
+            {% for income in donation_incomes %}
+            <tr>
+              <td>{% if income.income_type == "DONATION" %}<span class="badge badge-donation">Donation</span>{% elif income.income_type == "EVENT" %}<span class="badge badge-event">Event</span>{% else %}<span class="badge badge-other">Other</span>{% endif %}</td>
+              <td><a href="{% url 'finance:income_detail' income.pk %}" class="text-decoration-none fw-medium">{{ income.reason|truncatechars:40 }}</a></td>
+              <td class="small">{{ income.paid_by|default:"—" }}</td>
+              <td class="text-end fw-bold text-success">&#8358;{{ income.amount|floatformat:0|intcomma }}</td>
+              <td class="small">{% if income.created_by %}{{ income.created_by.get_full_name }}{% else %}—{% endif %}</td>
+              <td class="small text-muted">{{ income.created_at|date:"M d, Y" }}</td>
+              <td class="text-end">
+                <a href="{% url 'finance:income_detail' income.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+                {% if user.has_admin_access %}<a href="{% url 'finance:income_delete' income.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>{% endif %}
+              </td>
+            </tr>
+            {% empty %}<tr><td colspan="7" class="text-center py-4 text-muted">No donation records found.</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if donation_incomes.has_other_pages %}
+      <div class="card-footer bg-white border-0">
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center mb-0">
+            {% if donation_incomes.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ donation_incomes.previous_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">Previous</a></li>{% else %}<li class="page-item disabled"><span class="page-link">Previous</span></li>{% endif %}
+            {% for num in donation_incomes.paginator.page_range %}{% if donation_incomes.number == num %}<li class="page-item active"><span class="page-link">{{ num }}</span></li>{% elif num > donation_incomes.number|add:-3 and num < donation_incomes.number|add:3 %}<li class="page-item"><a class="page-link" href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">{{ num }}</a></li>{% endif %}{% endfor %}
+            {% if donation_incomes.has_next %}<li class="page-item"><a class="page-link" href="?page={{ donation_incomes.next_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">Next</a></li>{% else %}<li class="page-item disabled"><span class="page-link">Next</span></li>{% endif %}
+          </ul>
+        </nav>
+      </div>
+      {% endif %}
+    </div>
+  </div>
 </div>
-
-<style>
-@media (max-width: 768px) {
-  .page-header-left h1 { font-size: 1.375rem !important; }
-  .page-header-left p { font-size: 0.9375rem !important; }
-  .form-control, .form-select, .form-input, .form-textarea { font-size: 0.9375rem !important; padding: 0.625rem 0.875rem !important; }
-  .form-label { font-size: 0.9375rem !important; }
-  .form-error, .form-help { font-size: 0.8125rem !important; }
-  .card-header-title { font-size: 1rem !important; }
-  .card-header-subtitle { font-size: 0.875rem !important; }
-  .card-body { padding: 1.25rem !important; }
-  .btn { font-size: 0.875rem !important; padding: 0.625rem 1rem !important; }
-  .btn-sm { font-size: 0.8125rem !important; padding: 0.5rem 0.875rem !important; }
-  .btn-lg { font-size: 0.9375rem !important; padding: 0.75rem 1.25rem !important; }
-  .badge { font-size: 0.8125rem !important; padding: 0.3rem 0.5rem !important; }
-  .data-table { font-size: 0.9375rem !important; }
-  .data-table thead th, .data-table tbody td { padding: 0.75rem 1rem !important; }
-  .cell-name { font-size: 0.9375rem !important; }
-  .cell-muted { font-size: 0.875rem !important; }
-  .table-action-btn { width: 36px !important; height: 36px !important; }
-  .kpi-value { font-size: 1.5rem !important; }
-  .kpi-label { font-size: 0.9375rem !important; }
-  .kpi-icon { width: 44px !important; height: 44px !important; }
-  .kpi-icon svg { width: 22px !important; height: 22px !important; }
-  .page-btn { min-width: 36px !important; height: 36px !important; font-size: 0.875rem !important; }
-  .filters-bar { flex-direction: column !important; align-items: stretch !important; gap: 0.75rem !important; padding: 1rem !important; }
-  .filters-bar form { flex-direction: column !important; align-items: stretch !important; }
-  .filter-group { width: 100% !important; }
-  .filter-group .form-control { width: 100% !important; }
-  .table-toolbar { flex-direction: column !important; align-items: stretch !important; }
-  .toolbar-search { max-width: 100% !important; }
-  .page-header { flex-direction: column !important; align-items: flex-start !important; }
-  .page-header-actions { width: 100% !important; flex-wrap: wrap !important; }
-  .card-header { flex-direction: column !important; align-items: flex-start !important; gap: 0.75rem !important; }
-  .card-header .btn { width: 100% !important; justify-content: center !important; }
-  .dashboard-grid-4, .dashboard-grid-3, .dashboard-grid-2 { grid-template-columns: 1fr !important; }
-  .detail-meta-grid { grid-template-columns: 1fr 1fr !important; }
-}
-@media (max-width: 480px) {
-  .page-header-left h1 { font-size: 1.25rem !important; }
-  .page-header-left p { font-size: 0.875rem !important; }
-  .form-control, .form-select, .form-input, .form-textarea { font-size: 0.875rem !important; padding: 0.5rem 0.75rem !important; }
-  .form-label { font-size: 0.875rem !important; }
-  .card-header-title { font-size: 0.9375rem !important; }
-  .card-header-subtitle { font-size: 0.8125rem !important; }
-  .card-body { padding: 1rem !important; }
-  .btn { font-size: 0.8125rem !important; padding: 0.5rem 0.875rem !important; }
-  .btn-sm { font-size: 0.75rem !important; padding: 0.375rem 0.75rem !important; }
-  .badge { font-size: 0.75rem !important; padding: 0.25rem 0.4rem !important; }
-  .data-table { font-size: 0.875rem !important; }
-  .data-table thead th, .data-table tbody td { padding: 0.625rem 0.75rem !important; }
-  .cell-name { font-size: 0.875rem !important; }
-  .cell-muted { font-size: 0.8125rem !important; }
-  .table-action-btn { width: 32px !important; height: 32px !important; }
-  .kpi-value { font-size: 1.375rem !important; }
-  .kpi-label { font-size: 0.875rem !important; }
-  .kpi-icon { width: 40px !important; height: 40px !important; }
-  .kpi-icon svg { width: 20px !important; height: 20px !important; }
-  .page-btn { min-width: 32px !important; height: 32px !important; font-size: 0.8125rem !important; }
-  .filters-bar { flex-direction: column !important; align-items: stretch !important; gap: 0.75rem !important; padding: 1rem !important; }
-  .detail-meta-grid { grid-template-columns: 1fr !important; }
-  .dashboard-grid-4 { grid-template-columns: 1fr !important; }
-}
-</style>
-
 {% endblock %}
