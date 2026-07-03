@@ -32,10 +32,24 @@ class Income(BaseModel):
         verbose_name="Amount"
     )
     reason = models.CharField(max_length=255, verbose_name="Reason")
+    
+    # NEW: Link to member for searchable contributions
+    member = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="contributions",
+        verbose_name="Member",
+        limit_choices_to={"is_active": True},
+        help_text="Select if the contributor is a registered member"
+    )
+    
     paid_by = models.CharField(
         max_length=255,
         blank=True,
-        verbose_name="Paid By"
+        verbose_name="Paid By",
+        help_text="Name of payer (used if no member is selected)"
     )
     created_by = models.ForeignKey(
         "accounts.User",
@@ -53,10 +67,18 @@ class Income(BaseModel):
         indexes = [
             models.Index(fields=["created_at"]),
             models.Index(fields=["income_type"]),
+            models.Index(fields=["member"]),  # NEW
         ]
 
     def __str__(self):
         return f"₦{self.amount:,.2f} - {self.reason}"
+
+    def get_payer_display(self):
+        """Return member name if linked, else paid_by text."""
+        if self.member:
+            return self.member.get_full_name()
+        return self.paid_by or "Anonymous"
+
 
 
 class DuesPaymentTransaction(BaseModel):
