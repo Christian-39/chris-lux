@@ -14,7 +14,7 @@
   <div class="kpi-card">
     <div class="kpi-header">
       <div class="kpi-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H55a4 a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       </div>
     </div>
     <div class="kpi-value">{{ kpis.total_active_members|default:0 }}</div>
@@ -75,6 +75,8 @@
       <canvas id="financialChart"></canvas>
     </div>
   </div>
+  <!-- Hidden JSON data for safe JavaScript consumption -->
+  {{ trend_data|json_script:"trend-data" }}
 
   <!-- Member Distribution -->
   <div class="chart-card">
@@ -273,11 +275,8 @@ const memberStats = {
 };
 
 // Financial Trend - REAL DATA from backend
-const trendData = {
-  labels: {{ trend_data.months|safe|default:"['Jan','Feb','Mar','Apr','May','Jun']" }},
-  income: {{ trend_data.income|safe|default:"[0,0,0,0,0,0]" }},
-  expenses: {{ trend_data.expenses|safe|default:"[0,0,0,0,0,0]" }}
-};
+// Properly serialize Django template data to valid JavaScript using json_script
+const trendData = JSON.parse(document.getElementById('trend-data').textContent);
 
 // Initialize charts when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
@@ -357,7 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Financial Trend Chart - REAL DATA
   const financeCtx = document.getElementById('financialChart');
-  if (financeCtx) {
+  if (financeCtx && trendData && trendData.labels && trendData.labels.length > 0) {
     window.financialChartInstance = new Chart(financeCtx, {
       type: 'line',
       data: {
@@ -426,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function() {
               },
               font: { size: 11 }
             },
-            grid: { color: 'var(--oya-border)' }
+            grid: {: 'var(--oya-border)' }
           },
           x: {
             ticks: { font: { size: 11 } },
@@ -439,14 +438,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     });
+  } else if (financeCtx) {
+    // Show a message when no data is available
+    financeCtx.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--oya-text-muted);"><p>No financial data available for this period.</p></div>';
   }
 
   // Auto-refresh financial chart every 5 minutes
   setInterval(function() {
-    fetch('{% url "dashboard:financial_trend_ajax" %}')
-      .then(response => response.json())
+    fetch('{% url "dashboard:financial_trend_ajax" %}?year=' + encodeURIComponent(trendData.year || new Date().getFullYear()))
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
       .then(data => {
-        if (window.financialChartInstance) {
+        if (window.financialChartInstance && data && data.months && data.income && data.expenses) {
           window.financialChartInstance.data.labels = data.months;
           window.financialChartInstance.data.datasets[0].data = data.income;
           window.financialChartInstance.data.datasets[1].data = data.expenses;
