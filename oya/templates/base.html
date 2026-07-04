@@ -393,15 +393,13 @@
       });
     })();
 
-        // ===== DESKTOP SIDEBAR =====
+    // ===== DESKTOP SIDEBAR =====
     (function() {
-      const sidebarToggle = document.getElementById('sidebarToggle');
+      const menuToggle = document.getElementById('sidebarToggle');
       const sidebar = document.getElementById('sidebar');
       const sidebarOverlay = document.getElementById('sidebarOverlay');
-      if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
+      if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', function() {
           sidebar.classList.toggle('collapsed');
           document.body.classList.toggle('sidebar-collapsed');
         });
@@ -413,7 +411,6 @@
         });
       }
     })();
-
 
     // ===== DROPDOWNS =====
     (function() {
@@ -483,3 +480,4 @@
   {% block extra_js %}{% endblock %}
 </body>
 </html>
+
