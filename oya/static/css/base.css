@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FILE: base.css
+   FILE 4 OF 4: base.css
    OYA - Core Design System, Reset & Form Framework
    ========================================================================== */
 
@@ -218,55 +218,6 @@ p {
 ::selection {
   background: var(--oya-primary);
   color: var(--oya-text-white);
-}
-
-/* ==========================================================================
-   OYA - Structural Core Grid & Application Layout Shell
-   ========================================================================== */
-
-/* 
-   DESKTOP LAYOUT (≥1025px):
-   - Sidebar is FIXED positioned (removed from document flow)
-   - .app-shell is BLOCK (not flex) to prevent flex allocation conflicts
-   - .main-content uses margin-left to create space for the fixed sidebar
-   - Transitions are smooth for collapse/expand
-*/
-@media (min-width: 1025px) {
-  .app-shell {
-    display: block;
-    width: 100%;
-    min-height: 100vh;
-  }
-
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: var(--sidebar-width);
-    height: 100vh;
-    z-index: 1000;
-    transition: width var(--transition-slow);
-  }
-
-  .sidebar.collapsed {
-    width: var(--sidebar-collapsed);
-  }
-
-  .main-content {
-    margin-left: var(--sidebar-width);
-    width: calc(100% - var(--sidebar-width));
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    transition: margin-left var(--transition-slow), width var(--transition-slow);
-  }
-
-  body.sidebar-collapsed .main-content {
-    margin-left: var(--sidebar-collapsed);
-    width: calc(100% - var(--sidebar-collapsed));
-  }
 }
 
 /* ==========================================================================
