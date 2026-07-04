@@ -170,6 +170,42 @@
       </tbody>
     </table>
   </div>
+
+  <!-- Dues Pagination -->
+  {% if dues_incomes.has_other_pages %}
+  <div class="card-footer">
+    <span style="font-size:clamp(0.6875rem, 1.5vw, 0.8125rem);color:var(--oya-text-muted);">Showing {{ dues_incomes.start_index }}-{{ dues_incomes.end_index }} of {{ dues_incomes.paginator.count }} records</span>
+    <div class="pagination">
+      {% if dues_incomes.has_previous %}
+        <a href="?dues_page={{ dues_incomes.previous_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="page-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </a>
+      {% else %}
+        <button class="page-btn" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      {% endif %}
+
+      {% for num in dues_incomes.paginator.page_range %}
+        {% if dues_incomes.number == num %}
+          <button class="page-btn active">{{ num }}</button>
+        {% elif num > dues_incomes.number|add:'-3' and num < dues_incomes.number|add:'3' %}
+          <a href="?dues_page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="page-btn">{{ num }}</a>
+        {% elif num == 1 or num == dues_incomes.paginator.num_pages %}
+          <a href="?dues_page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="page-btn">{{ num }}</a>
+        {% elif num == dues_incomes.number|add:'-3' or num == dues_incomes.number|add:'3' %}
+          <span class="page-btn" style="cursor:default;border:none;background:transparent;">...</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if dues_incomes.has_next %}
+        <a href="?dues_page={{ dues_incomes.next_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="page-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      {% else %}
+        <button class="page-btn" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
 </div>
 
 <!-- DONATIONS TABLE -->
