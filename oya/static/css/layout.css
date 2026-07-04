@@ -1521,6 +1521,52 @@ body.sidebar-open { overflow: hidden; }
   .show-mobile-only { display: none !important; }
 }
 
+/* ==========================================================================
+   OYA SYSTEM - DESKTOP LAYOUT ARCHITECTURE
+   ========================================================================== */
+
+@media screen and (min-width: 1025px) {
+  /* Establish the structural horizontal flex shell */
+  .app-shell {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+  }
+
+  /* Fixed sidebar tracking */
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: var(--sidebar-width, 260px) !important;
+    height: 100vh !important;
+    z-index: 1000 !important;
+    transform: translateX(0) !important; /* Prevent it from hiding on desktop */
+  }
+
+  /* Structural scaling for collapsed sidebar */
+  .sidebar.collapsed {
+    width: var(--sidebar-collapsed, 72px) !important;
+  }
+
+  /* Main content shifts precisely past the fixed sidebar */
+  .main-content {
+    margin-left: var(--sidebar-width, 260px) !important;
+    width: calc(100% - var(--sidebar-width, 260px)) !important;
+    flex-grow: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Recalculate margins smoothly when collapsed class is toggled on body */
+  body.sidebar-collapsed .main-content {
+    margin-left: var(--sidebar-collapsed, 72px) !important;
+    width: calc(100% - var(--sidebar-collapsed, 72px)) !important;
+  }
+}
+
 /* ─── Mobile: compress topbar actions to fit ─── */
 @media (max-width: 768px) {
   .topbar-actions {
