@@ -218,9 +218,8 @@ def dues_allocate(request):
                 messages.error(request, f"Allocation failed: {str(e)}")
         else:
             for field, errors in form.errors.items():
-                label = "Form" if field == "__all__" else field
                 for error in errors:
-                    messages.error(request, f"{label}: {error}")
+                    messages.error(request, f"{field}: {error}")
     else:
         form = DuesPaymentAllocationForm(recorded_by=request.user)
 
@@ -328,13 +327,20 @@ def income_list(request):
     # --- DONATIONS & OTHER (non-dues income) ---
     donation_qs = Income.objects.exclude(income_type="DUES").select_related("created_by", "member")
 
-    # Search/filter for donations
+    # Search/filter
     search_term = request.GET.get("search", "")
     if search_term:
         donation_qs = donation_qs.filter(
             Q(reason__icontains=search_term) |
             Q(paid_by__icontains=search_term) |
             Q(member__full_name__icontains=search_term) |
+            Q(created_by__full_name__icontains=search_term)
+        )
+        # Also filter dues by search term
+        dues_qs = dues_qs.filter(
+            Q(reason__icontains=search_term) |
+            Q(paid_by__icontains=search_term) |
+            Q(dues_payment__member__full_name__icontains=search_term) |
             Q(created_by__full_name__icontains=search_term)
         )
 
@@ -351,12 +357,17 @@ def income_list(request):
         dues_qs = dues_qs.filter(created_at__date__lte=date_to)
         donation_qs = donation_qs.filter(created_at__date__lte=date_to)
 
-    # Pagination for donations only
-    paginator = Paginator(donation_qs, 25)
-    page = request.GET.get("page", 1)
-    donation_incomes = paginator.get_page(page)
+    # Pagination for DUES
+    dues_paginator = Paginator(dues_qs, 25)
+    dues_page = request.GET.get("dues_page", 1)
+    dues_incomes = dues_paginator.get_page(dues_page)
 
-    # Totals
+    # Pagination for DONATIONS
+    donation_paginator = Paginator(donation_qs, 25)
+    donation_page = request.GET.get("page", 1)
+    donation_incomes = donation_paginator.get_page(donation_page)
+
+    # Totals (use full QS, not paginated)
     total_dues = Income.objects.filter(income_type="DUES").aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
     )["total"]
@@ -369,7 +380,7 @@ def income_list(request):
     total_records = Income.objects.count()
 
     context = {
-        "dues_incomes": dues_qs,
+        "dues_incomes": dues_incomes,
         "donation_incomes": donation_incomes,
         "search_term": search_term,
         "type_filter": type_filter,
@@ -408,44 +419,36 @@ def income_create(request):
     if request.method == "POST":
         form = IncomeForm(request.POST)
         if form.is_valid():
-            try:
-                with transaction.atomic():
-                    income = form.save(commit=False)
-                    income.created_by = request.user
-                    income.save()
-                    
-                log_action(
-                    user=request.user,
-                    action="CREATE",
-                    object_type="Income",
-                    object_id=income.id,
-                    ip_address=getattr(request, "client_ip", ""),
-                    description=f"Recorded {income.get_income_type_display()}: ₦{income.amount:,.2f} - {income.reason} (by {income.get_payer_display()})"
-                )
-                messages.success(request, "Income recorded successfully.")
-                return redirect("finance:donation_list")
-            except Exception as e:
-                messages.error(request, f"An error occurred while saving: {str(e)}")
+            income = form.save(commit=False)
+            income.created_by = request.user
+            income.save()
+            log_action(
+                user=request.user,
+                action="CREATE",
+                object_type="Income",
+                object_id=income.id,
+                ip_address=getattr(request, "client_ip", ""),
+                description=f"Recorded {income.get_income_type_display()}: ₦{income.amount:,.2f} - {income.reason} (by {income.get_payer_display()})"
+            )
+            messages.success(request, "Income recorded successfully.")
+            return redirect("finance:donation_list")
         else:
-            # Syncs directly with template component error blocks
             for field, errors in form.errors.items():
-                label = "Form" if field == "__all__" else field.replace('_', ' ').title()
                 for error in errors:
-                    messages.error(request, f"{label}: {error}")
+                    messages.error(request, f"{field}: {error}")
     else:
         form = IncomeForm()
 
     return render(request, "finance/income_form.html", {
         "form": form,
         "title": "Record Contribution",
-        "action": "Save Contribution",
+        "action": "Save",
         "treasury_balance": treasury_balance,
         "total_income": total_income,
         "total_expenses": total_expenses,
         "recent_incomes": recent_incomes,
         "common_reasons": list(common_reasons),
     })
-
 
 
 @login_required
@@ -748,16 +751,10 @@ def search_members(request):
     if len(q) < 2:
         return JsonResponse({"results": []})
 
-    # Also allow exact ID lookup for init/rehydration
-    id_filter = Q()
-    if q.isdigit():
-        id_filter = Q(id=int(q))
-
     users = User.objects.filter(
         Q(full_name__icontains=q) |
         Q(serial_number__icontains=q) |
-        Q(phone__icontains=q) |
-        id_filter
+        Q(phone__icontains=q)
     ).filter(is_active=True).distinct()[:10]
 
     results = []
