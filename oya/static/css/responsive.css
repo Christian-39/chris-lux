@@ -356,91 +356,31 @@ pre, code {
 }
 
 /* ==========================================================================
-   OYA SYSTEM - STRUCTURAL OVERRIDES (FIXES DESKTOP WRAPPER)
+   OYA SYSTEM - MOBILE DRAWER OVERLAY
    ========================================================================== */
 
-/* ─── 1. Strict Mobile Rules (For viewports 1024px and below) ─── */
 @media screen and (max-width: 1024px) {
-  /* Let mobile header elements flow cleanly */
-  .mobile-top-header {
-    display: flex !important;
-  }
-  
-  /* The desktop elements stay clear or behave as mobile drawers */
+  /* The layout wraps vertically on mobile screen states */
   .app-shell {
     display: block !important;
     width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
   }
 
-  .app-shell .sidebar {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    z-index: 1000;
-    transform: translateX(-100%); /* Keeps it out of sight unless active */
-  }
-
-  .main-content {
-    margin-left: 0 !important;
-    width: 100% !important;
-    display: block !important;
-  }
-}
-
-/* ─── 2. Strict Desktop Rules (For viewports 1025px and up) ─── */
-@media screen and (min-width: 1025px) {
-
-  /* Force the flexbox rows for your desktop layout wrapper */
-  div.app-shell {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: stretch !important;
-    width: 100% !important;
-    min-height: 100vh !important;
-    position: relative !important;
-  }
-
-  /* Lock the Sidebar left, out of the document flow */
-  #sidebar,
-  .app-shell #sidebar,
-  .app-shell .sidebar {
+  /* The mobile sidebar behaves as an overlapping drawer layout */
+  .sidebar {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     bottom: 0 !important;
-    width: var(--sidebar-width, 260px) !important;
+    width: 280px !important; /* Standardized drawer width */
     height: 100vh !important;
-    z-index: 100 !important;
-    flex-shrink: 0 !important;
-    display: block !important;
+    z-index: 2000 !important; /* Slides *over* topbars and cards cleanly */
   }
 
-  /* Handle Collapsed Sidebar Width */
-  .app-shell .sidebar.collapsed {
-    width: var(--sidebar-collapsed, 72px) !important;
-  }
-
-  /* Shift the main block right by exactly the sidebar's width */
-  main.main-content,
-  div.main-content,
-  .app-shell .main-content {
-    margin-left: var(--sidebar-width, 260px) !important;
-    width: calc(100% - var(--sidebar-width, 260px)) !important;
-    flex-grow: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    min-width: 0 !important;
-  }
-
-  /* Dynamically scale margins when body has the collapse toggle */
-  body.sidebar-collapsed main.main-content,
-  body.sidebar-collapsed div.main-content,
-  body.sidebar-collapsed .main-content {
-    margin-left: var(--sidebar-collapsed, 72px) !important;
-    width: calc(100% - var(--sidebar-collapsed, 72px)) !important;
+  /* Mobile content occupies full viewport width with zero offsets */
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
   }
 }
 
