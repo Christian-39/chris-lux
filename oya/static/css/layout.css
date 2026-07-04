@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FILE 3 OF 4: layouts.css
+   FILE: layouts.css
    OYA - Sidebar, Topbar, Footer, Main Content Shell, Mobile Navigation
    ========================================================================== */
 
@@ -250,7 +250,7 @@
   transition: margin-left var(--transition-slow);
 }
 
-.main-content.expanded { margin-left: var(--sidebar-collapsed); }
+/* NOTE: Collapsed state is handled via body.sidebar-collapsed in desktop media query */
 
 /* ─── Topbar ─── */
 .topbar {
@@ -910,6 +910,12 @@ body.sidebar-open { overflow: hidden; }
   transition: all var(--transition-fast);
 }
 
+.dropdown.open .dropdown-menu {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+}
+
 .dropdown-item {
   display: flex;
   align-items: center;
@@ -1522,48 +1528,60 @@ body.sidebar-open { overflow: hidden; }
 }
 
 /* ==========================================================================
-   OYA SYSTEM - DESKTOP LAYOUT ARCHITECTURE
+   OYA SYSTEM - DESKTOP LAYOUT ARCHITECTURE (≥1025px)
+   Fixed sidebar + margin-left main content. No flex allocation conflicts.
    ========================================================================== */
 
 @media screen and (min-width: 1025px) {
-  /* Establish the structural horizontal flex shell */
+  /* Block layout prevents flex item allocation issues with fixed sidebar */
   .app-shell {
-    display: flex !important;
-    flex-direction: row !important;
+    display: block !important;
     width: 100% !important;
     min-height: 100vh !important;
   }
 
-  /* Fixed sidebar tracking */
+  /* Fixed sidebar: removed from document flow */
   .sidebar {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     bottom: 0 !important;
     width: var(--sidebar-width, 260px) !important;
+    min-width: var(--sidebar-width, 260px) !important;
+    max-width: var(--sidebar-width, 260px) !important;
     height: 100vh !important;
     z-index: 1000 !important;
-    transform: translateX(0) !important; /* Prevent it from hiding on desktop */
+    transform: translateX(0) !important;
   }
 
-  /* Structural scaling for collapsed sidebar */
+  /* Collapsed sidebar width */
   .sidebar.collapsed {
     width: var(--sidebar-collapsed, 72px) !important;
+    min-width: var(--sidebar-collapsed, 72px) !important;
+    max-width: var(--sidebar-collapsed, 72px) !important;
   }
 
-  /* Main content shifts precisely past the fixed sidebar */
+  /* Main content sits beside the fixed sidebar */
   .main-content {
     margin-left: var(--sidebar-width, 260px) !important;
     width: calc(100% - var(--sidebar-width, 260px)) !important;
-    flex-grow: 1 !important;
+    min-height: 100vh !important;
     display: flex !important;
     flex-direction: column !important;
+    box-sizing: border-box !important;
+    transition: margin-left var(--transition-slow), width var(--transition-slow) !important;
   }
 
-  /* Recalculate margins smoothly when collapsed class is toggled on body */
+  /* Collapsed state: main content expands */
   body.sidebar-collapsed .main-content {
     margin-left: var(--sidebar-collapsed, 72px) !important;
     width: calc(100% - var(--sidebar-collapsed, 72px)) !important;
+  }
+
+  /* Desktop sidebar overlay: hidden (only used for mobile drawer) */
+  #sidebarOverlay,
+  .sidebar-overlay {
+    display: none !important;
   }
 }
 
