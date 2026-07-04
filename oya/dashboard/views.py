@@ -89,19 +89,17 @@ def global_search_ajax(request):
 
 @login_required
 def financial_trend_ajax(request):
-    """
-    AJAX endpoint to return income vs expenses trend data as JSON.
-    Supports ?year=YYYY parameter. Defaults to current year.
-    """
+    """AJAX endpoint to return income vs expenses trend data as JSON."""
     from datetime import datetime
     year_param = request.GET.get('year')
     try:
-        year = int(year_param) if year_param else datetime.now().year
+        year = int(year_param) if year_param else None  # None = auto-detect
     except ValueError:
-        year = datetime.now().year
-
+        year = None
+    
     trend_data = get_income_expense_trend(year=year)
     return JsonResponse(trend_data)
+
 
 
 @login_required
