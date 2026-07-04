@@ -51,7 +51,7 @@ def donation_list(request):
     if date_to:
         queryset = queryset.filter(created_at__date__lte=date_to)
 
-    paginator = Paginator(queryset, 25)
+    paginator = Paginator(queryset, 10)
     page = request.GET.get("page", 1)
     donations = paginator.get_page(page)
 
@@ -358,12 +358,12 @@ def income_list(request):
         donation_qs = donation_qs.filter(created_at__date__lte=date_to)
 
     # Pagination for DUES
-    dues_paginator = Paginator(dues_qs, 25)
+    dues_paginator = Paginator(dues_qs, 10)
     dues_page = request.GET.get("dues_page", 1)
     dues_incomes = dues_paginator.get_page(dues_page)
 
     # Pagination for DONATIONS
-    donation_paginator = Paginator(donation_qs, 25)
+    donation_paginator = Paginator(donation_qs, 10)
     donation_page = request.GET.get("page", 1)
     donation_incomes = donation_paginator.get_page(donation_page)
 
@@ -514,7 +514,7 @@ def expense_list(request):
     if date_to:
         queryset = queryset.filter(created_at__date__lte=date_to)
 
-    paginator = Paginator(queryset, 25)
+    paginator = Paginator(queryset, 10)
     page = request.GET.get("page", 1)
     expenses = paginator.get_page(page)
 
