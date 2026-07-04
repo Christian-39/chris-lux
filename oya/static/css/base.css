@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FILE 4 OF 4: base.css
+   FILE: base.css
    OYA - Core Design System, Reset & Form Framework
    ========================================================================== */
 
@@ -224,23 +224,20 @@ p {
    OYA - Structural Core Grid & Application Layout Shell
    ========================================================================== */
 
-.app-shell {
-  display: flex;
-  width: 100%;
-  min-height: 100vh;
-  box-sizing: border-box;
-}
-
-.main-content {
-  flex-grow: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-/* Responsive Desktop Structural Adjustments (Prevents Layout Underlap) */
+/* 
+   DESKTOP LAYOUT (≥1025px):
+   - Sidebar is FIXED positioned (removed from document flow)
+   - .app-shell is BLOCK (not flex) to prevent flex allocation conflicts
+   - .main-content uses margin-left to create space for the fixed sidebar
+   - Transitions are smooth for collapse/expand
+*/
 @media (min-width: 1025px) {
+  .app-shell {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+  }
+
   .sidebar {
     position: fixed;
     top: 0;
@@ -248,9 +245,8 @@ p {
     bottom: 0;
     width: var(--sidebar-width);
     height: 100vh;
-    flex-shrink: 0;
-    z-index: 100;
-    transition: width var(--transition-base);
+    z-index: 1000;
+    transition: width var(--transition-slow);
   }
 
   .sidebar.collapsed {
@@ -260,7 +256,11 @@ p {
   .main-content {
     margin-left: var(--sidebar-width);
     width: calc(100% - var(--sidebar-width));
-    transition: margin-left var(--transition-base), width var(--transition-base);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    transition: margin-left var(--transition-slow), width var(--transition-slow);
   }
 
   body.sidebar-collapsed .main-content {
