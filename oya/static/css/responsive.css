@@ -392,12 +392,6 @@ pre, code {
 
 /* ─── 2. Strict Desktop Rules (For viewports 1025px and up) ─── */
 @media screen and (min-width: 1025px) {
-  /* Turn off the mobile global elements */
-  .mobile-top-header,
-  .mobile-sidebar,
-  .mobile-sidebar-overlay {
-    display: none !important;
-  }
 
   /* Force the flexbox rows for your desktop layout wrapper */
   div.app-shell {
