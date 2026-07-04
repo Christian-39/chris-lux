@@ -14,10 +14,12 @@
     <p style="font-size:clamp(0.75rem, 2vw, 0.875rem);">Manage security and operations task force assignments</p>
   </div>
   <div class="page-header-actions" style="flex-wrap:wrap;gap:0.5rem;">
+    {% if user.is_staff or user.has_executive_access %}
     <a href="{% url 'operations:taskforce_create' %}" class="btn btn-primary">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Assign Member
     </a>
+    {% endif %}
   </div>
 </div>
 
@@ -105,6 +107,7 @@
           </td>
           <td style="white-space:nowrap;">
             <div class="table-actions" style="flex-wrap:nowrap;gap:0.25rem;">
+              {% if user.is_staff or user.has_executive_access %}
               {% if tf.is_active %}
                 <form method="post" action="{% url 'operations:taskforce_remove' pk=tf.pk %}" style="display:inline;" onsubmit="return confirm('Remove {{ tf.member.full_name }} from task force?');">
                   {% csrf_token %}
@@ -116,6 +119,7 @@
                 <button class="table-action-btn" style="opacity:0.3;cursor:default;" title="Already removed" disabled>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </button>
+              {% endif %}
               {% endif %}
             </div>
           </td>
