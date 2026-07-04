@@ -221,6 +221,55 @@ p {
 }
 
 /* ==========================================================================
+   OYA - Structural Core Grid & Application Layout Shell
+   ========================================================================== */
+
+.app-shell {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.main-content {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* Responsive Desktop Structural Adjustments (Prevents Layout Underlap) */
+@media (min-width: 1025px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    flex-shrink: 0;
+    z-index: 100;
+    transition: width var(--transition-base);
+  }
+
+  .sidebar.collapsed {
+    width: var(--sidebar-collapsed);
+  }
+
+  .main-content {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    transition: margin-left var(--transition-base), width var(--transition-base);
+  }
+
+  body.sidebar-collapsed .main-content {
+    margin-left: var(--sidebar-collapsed);
+    width: calc(100% - var(--sidebar-collapsed));
+  }
+}
+
+/* ==========================================================================
    OYA - Standard Form Architecture Framework
    ========================================================================== */
 
@@ -766,6 +815,33 @@ p {
 @keyframes skeleton-loading {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* ─── Global Footer Core Layout Alignment ─── */
+.footer, 
+.main-footer,
+footer {
+  width: 100%;
+  padding: 1.5rem;
+  margin-top: auto;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  box-sizing: border-box;
+  background: var(--oya-bg-card);
+  border-top: 1px solid var(--oya-border-light);
+}
+
+.footer-container,
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  gap: 0.5rem;
 }
 
 /* ─── Utilities ─── */
