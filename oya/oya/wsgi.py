@@ -15,15 +15,23 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "oya.settings")
 
 application = get_wsgi_application()
 
-# --- EMERGENCY MOBILE DB FORCE ---
-import sys
-from django.core.management import call_command
+# --- NATIVE MY-SQL DIRECT TABLE INJECTOR ---
+from django.db import connection
 
 try:
-    print("Forcing migration engine execution...")
-    # This instructs Django to manually run our fresh 0003 migration 
-    call_command('migrate', 'finance', '0003_create_dues_table', interactive=False)
-    print("Migration executed successfully!")
+    print("Attempting direct raw SQL table injection...")
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS finance_association_dues (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                amount DECIMAL(15, 2) NOT NULL,
+                payment_method VARCHAR(50) NOT NULL,
+                receipt_number VARCHAR(255) NULL,
+                created_at DATETIME(6) NOT NULL,
+                member_id BIGINT NOT NULL
+            );
+        """)
+    print("Raw SQL table checked/created successfully!")
 except Exception as e:
-    print(f"Migration fallback message: {e}")
-# ----------------------------------
+    print(f"Raw SQL injection message: {e}")
+# --------------------------------------------
