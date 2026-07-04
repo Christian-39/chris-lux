@@ -14,7 +14,7 @@
   <div class="kpi-card">
     <div class="kpi-header">
       <div class="kpi-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H55a4 a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       </div>
     </div>
     <div class="kpi-value">{{ kpis.total_active_members|default:0 }}</div>
@@ -64,7 +64,7 @@
       <div>
         <div class="chart-card-title">Financial Trend</div>
         <div class="chart-card-subtitle">Income vs Expenses ({{ trend_data.year }})</div>
-      </div>
+
       <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:flex-end;">
         <span class="badge" style="background:var(--oya-success-bg);color:var(--oya-success);">Income: &#x20A6;{{ trend_data.total_income_ytd|floatformat:0|intcomma }}</span>
         <span class="badge" style="background:var(--oya-danger-bg);color:var(--oya-danger);">Expenses: &#x20A6;{{ trend_data.total_expenses_ytd|floatformat:0|intcomma }}</span>
@@ -75,8 +75,6 @@
       <canvas id="financialChart"></canvas>
     </div>
   </div>
-  <!-- Hidden JSON data for safe JavaScript consumption -->
-  {{ trend_data|json_script:"trend-data" }}
 
   <!-- Member Distribution -->
   <div class="chart-card">
@@ -130,8 +128,7 @@
     </div>
   </div>
 
-  <!-- Recent Activities - ADMIN/EXECUTIVE ONLY -->
-  {% if user.is_staff or user.has_executive_access %}
+  <!-- Recent Activities - SHOW ONLY 5 -->
   <div class="card">
     <div class="card-header">
       <div>
@@ -158,6 +155,7 @@
             </svg>
           </div>
           <div class="activity-content" style="min-width:0;">
+            <!-- TRUNCATED: max 60 chars with ellipsis -->
             <div class="activity-text" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:min(220px,50vw);" title="{{ activity.description }}">
               {{ activity.description|truncatechars:60 }}
             </div>
@@ -174,20 +172,6 @@
       </div>
     </div>
   </div>
-  {% else %}
-  <!-- Floor members see Clan Distribution full-width instead -->
-  <div class="chart-card">
-    <div class="chart-card-header">
-      <div>
-        <div class="chart-card-title">Clan Distribution</div>
-        <div class="chart-card-subtitle">Members by clan/family group</div>
-      </div>
-    </div>
-    <div class="chart-container">
-      <canvas id="clanDistributionChart2"></canvas>
-    </div>
-  </div>
-  {% endif %}
 </div>
 
 <!-- Urgent Cases & Quick Actions Row -->
@@ -275,8 +259,11 @@ const memberStats = {
 };
 
 // Financial Trend - REAL DATA from backend
-// Properly serialize Django template data to valid JavaScript using json_script
-const trendData = JSON.parse(document.getElementById('trend-data').textContent);
+const trendData = {
+  labels: {{ trend_data.months|safe|default:"['Jan','Feb','Mar','Apr','May','Jun']" }},
+  income: {{ trend_data.income|safe|default:"[0,0,0,0,0,0]" }},
+  expenses: {{ trend_data.expenses|safe|default:"[0,0,0,0,0,0]" }}
+};
 
 // Initialize charts when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
@@ -284,32 +271,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const clanCtx = document.getElementById('clanDistributionChart');
   if (clanCtx && clanData.labels.length > 0) {
     new Chart(clanCtx, {
-      type: 'bar',
-      data: {
-        labels: clanData.labels,
-        datasets: [{
-          label: 'Members',
-          data: clanData.data,
-          backgroundColor: 'var(--oya-primary)',
-          borderRadius: 4,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, grid: { color: 'var(--oya-border)' } },
-          x: { grid: { display: false } }
-        }
-      }
-    });
-  }
-
-  // Second Clan Distribution Chart (for floor members when Recent Activities is hidden)
-  const clanCtx2 = document.getElementById('clanDistributionChart2');
-  if (clanCtx2 && clanData.labels.length > 0) {
-    new Chart(clanCtx2, {
       type: 'bar',
       data: {
         labels: clanData.labels,
@@ -356,7 +317,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Financial Trend Chart - REAL DATA
   const financeCtx = document.getElementById('financialChart');
-  if (financeCtx && trendData && trendData.labels && trendData.labels.length > 0) {
+  if (financeCtx) {
     window.financialChartInstance = new Chart(financeCtx, {
       type: 'line',
       data: {
@@ -425,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
               },
               font: { size: 11 }
             },
-            grid: {: 'var(--oya-border)' }
+            grid: { color: 'var(--oya-border)' }
           },
           x: {
             ticks: { font: { size: 11 } },
@@ -438,20 +399,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     });
-  } else if (financeCtx) {
-    // Show a message when no data is available
-    financeCtx.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--oya-text-muted);"><p>No financial data available for this period.</p></div>';
   }
 
   // Auto-refresh financial chart every 5 minutes
   setInterval(function() {
-    fetch('{% url "dashboard:financial_trend_ajax" %}?year=' + encodeURIComponent(trendData.year || new Date().getFullYear()))
-      .then(response => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-      })
+    fetch('{% url "dashboard:financial_trend_ajax" %}')
+      .then(response => response.json())
       .then(data => {
-        if (window.financialChartInstance && data && data.months && data.income && data.expenses) {
+        if (window.financialChartInstance) {
           window.financialChartInstance.data.labels = data.months;
           window.financialChartInstance.data.datasets[0].data = data.income;
           window.financialChartInstance.data.datasets[1].data = data.expenses;
