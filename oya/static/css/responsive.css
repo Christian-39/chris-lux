@@ -355,23 +355,35 @@ pre, code {
   }
 }
 
-/* ─── Tablet Adjustments (769px - 1024px) ─── */
-@media (max-width: 1024px) {
-  .dashboard-grid-4 { grid-template-columns: repeat(2, 1fr); }
-  .dashboard-grid-2 { grid-template-columns: 1fr; }
+/* ==========================================================================
+   OYA SYSTEM - MOBILE DRAWER OVERLAY
+   ========================================================================== */
 
-  .modal-dialog-lg { max-width: min(800px, calc(100vw - 2rem)); }
-  .modal-dialog-xl { max-width: min(1140px, calc(100vw - 2rem)); }
-
-  .sidebar {
-    width: var(--sidebar-width);
-    min-width: var(--sidebar-width);
-    max-width: var(--sidebar-width);
+@media screen and (max-width: 1024px) {
+  /* The layout wraps vertically on mobile screen states */
+  .app-shell {
+    display: block !important;
+    width: 100% !important;
   }
 
-  .main-content { margin-left: 0; }
-  .content-area { padding: 1.25rem; }
+  /* The mobile sidebar behaves as an overlapping drawer layout */
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 280px !important; /* Standardized drawer width */
+    height: 100vh !important;
+    z-index: 2000 !important; /* Slides *over* topbars and cards cleanly */
+  }
+
+  /* Mobile content occupies full viewport width with zero offsets */
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
 }
+
 
 /* ─── Print Styles ─── */
 @media print {
