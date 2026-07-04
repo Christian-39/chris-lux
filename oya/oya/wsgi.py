@@ -14,35 +14,44 @@ from django.core.wsgi import get_wsgi_application
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "oya.settings")
 
 application = get_wsgi_application()
-# --- NATIVE MY-SQL DIRECT TABLE INJECTOR ---
+
+# --- NATIVE MYSQL ALL-IN-ONE TABLE ALIGNER ---
 from django.db import connection
 
 try:
-    print("Attempting direct raw SQL table injection...")
+    print("Executing master raw SQL schema alignment for OYA finance...")
     with connection.cursor() as cursor:
-        # 1. Ensure the base table exists
+        
+        # 1. Force drop any conflicting broken structures to allow a completely clean rebuild
+        cursor.execute("DROP TABLE IF EXISTS finance_association_dues;")
+        
+        # 2. Build the main DuesPaymentTransaction table perfectly aligned with your model
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS finance_association_dues (
+            CREATE TABLE finance_association_dues (
                 id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                amount DECIMAL(15, 2) NOT NULL,
-                payment_method VARCHAR(50) NOT NULL,
-                receipt_number VARCHAR(255) NULL,
                 created_at DATETIME(6) NOT NULL,
-                member_id BIGINT NOT NULL
+                updated_at DATETIME(6) NOT NULL,
+                total_amount DECIMAL(15, 2) NOT NULL,
+                payment_method VARCHAR(20) NOT NULL,
+                receipt_reference VARCHAR(255) NOT NULL,
+                payment_date DATE NOT NULL,
+                notes LONGTEXT NOT NULL,
+                member_id BIGINT NOT NULL,
+                recorded_by_id BIGINT NULL
             );
         """)
         
-        # 2. Safely inject the missing updated_at column if it's not there
+        # 3. Create the Many-to-Many bridge table that Django needs for linking records
         cursor.execute("""
-            GLOBAL_ALTER: ALTER TABLE finance_association_dues 
-            ADD COLUMN IF NOT EXISTS updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6);
+            CREATE TABLE IF NOT EXISTS finance_dues_payment_transactions (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                duespayment_id BIGINT NOT NULL,
+                duespaymenttransaction_id BIGINT NOT NULL,
+                UNIQUE KEY finance_dues_payment_tra_duespayment_id_duespayme_7fb66e6a_uniq (duespayment_id, duespaymenttransaction_id)
+            );
         """)
-    print("Raw SQL table and columns updated successfully!")
+        
+    print("Master SQL alignment completely successful!")
 except Exception as e:
-    # If your MySQL version doesn't support 'ADD COLUMN IF NOT EXISTS', catch it cleanly
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("ALTER TABLE finance_association_dues ADD COLUMN updated_at DATETIME(6) NOT NULL;")
-    except Exception as inner_e:
-        print(f"Raw SQL injection message: {e} | Inner: {inner_e}")
+    print(f"Master SQL alignment exception caught: {e}")
 # --------------------------------------------
