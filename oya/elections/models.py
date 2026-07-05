@@ -85,6 +85,15 @@ class HandoverLedger(BaseModel):
     """Handover ledger for documenting executive transitions."""
 
     id = models.BigAutoField(primary_key=True)
+    election = models.ForeignKey(
+        Election,
+        on_delete=models.PROTECT,
+        related_name="handovers",
+        verbose_name="Related Election",
+        blank=True,
+        null=True,
+        help_text="The election that resulted in this executive transition."
+    )
     executive = models.ForeignKey(
         "executives.Executive",
         on_delete=models.PROTECT,
