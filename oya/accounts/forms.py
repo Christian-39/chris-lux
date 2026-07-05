@@ -140,6 +140,11 @@ class UserCreateForm(forms.ModelForm):
             "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Default new users to ADMIN role
+        self.fields["role"].initial = "ADMIN"
+
     def clean_serial_number(self):
         serial = self.cleaned_data.get("serial_number")
         if serial:
@@ -165,6 +170,10 @@ class UserCreateForm(forms.ModelForm):
         user = super().save(commit=False)
         # Use set_pin() which properly sets the pin field
         user.set_pin(self.cleaned_data["pin"])
+        # Ensure admin defaults are set (in case role was changed in form)
+        if user.role == "ADMIN":
+            user.is_staff = True
+            user.is_superuser = True
         if commit:
             user.save()
         return user
@@ -212,6 +221,16 @@ class UserUpdateForm(forms.ModelForm):
             # Use set_pin() which properly sets the pin field
             # and update session hash to prevent logout
             user.set_pin(new_pin)
+        # Sync permissions with role changes
+        if user.role == "ADMIN":
+            user.is_staff = True
+            user.is_superuser = True
+        elif user.role == "EXECUTIVE":
+            user.is_staff = True
+            user.is_superuser = False
+        else:  # FLOOR_MEMBER
+            user.is_staff = False
+            user.is_superuser = False
         if commit:
             user.save()
         return user
