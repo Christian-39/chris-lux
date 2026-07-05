@@ -109,16 +109,27 @@ def dues_tracker(request):
         row["total_debt"] = member_debt["debt_owed"]
         row["years_paid_count"] = len(member_debt["years_paid"])
         row["years_partial_count"] = len(member_debt.get("years_partial", []))
+        row["join_year"] = member_debt.get("join_year", PLATFORM_START_YEAR)
 
         for year in years:
             key = (member.id, year)
-            if key in dues_map:
+            # Check if year is before member's join year
+            if year < row["join_year"]:
+                row["years"][year] = {
+                    "status": DuesPayment.STATUS_NOT_APPLICABLE,
+                    "payment": None,
+                    "amount_paid": Decimal("0"),
+                    "remaining": Decimal("0"),
+                    "before_join": True,
+                }
+            elif key in dues_map:
                 dp = dues_map[key]
                 row["years"][year] = {
                     "status": dp.status,
                     "payment": dp,
                     "amount_paid": dp.amount_paid,
                     "remaining": dp.remaining_balance,
+                    "before_join": False,
                 }
                 total_dues_collected += dp.amount_paid
             else:
@@ -127,13 +138,18 @@ def dues_tracker(request):
                     "payment": None,
                     "amount_paid": Decimal("0"),
                     "remaining": Decimal(str(YEARLY_DUES)),
+                    "before_join": False,
                 }
                 total_dues_expected += YEARLY_DUES
 
         member_rows.append(row)
 
     active_members_count = members.count()
-    total_possible_dues = active_members_count * len(years) * YEARLY_DUES
+    # Adjust total possible dues to only count years from each member's join year
+    total_possible_dues = sum(
+        (current_year - max(DuesPayment.get_member_join_year(m), PLATFORM_START_YEAR) + 1) * YEARLY_DUES
+        for m in members
+    )
     collection_rate = round(
         (float(total_dues_collected) / total_possible_dues * 100), 1
     ) if total_possible_dues > 0 else 0
@@ -162,6 +178,7 @@ def dues_tracker(request):
         "active_members_count": active_members_count,
     }
     return render(request, "finance/dues_tracker.html", context)
+
 
 
 @login_required
@@ -239,7 +256,7 @@ def member_dues_detail(request, member_id):
 
     # Get join year to determine range
     join_year = DuesPayment.get_member_join_year(member)
-    start_year = max(join_year, PLATFORM_START_YEAR)
+    start_year = PLATFORM_START_YEAR  # Always show from platform start for context
 
     # Include future prepaid years in the display
     max_year = max(
@@ -258,13 +275,24 @@ def member_dues_detail(request, member_id):
 
     year_status = []
     for year in years:
-        payment = payments.filter(year=year).first()
-        year_status.append({
-            "year": year,
-            "status": payment.status if payment else DuesPayment.STATUS_OWED,
-            "payment": payment,
-            "is_future": year > current_year,
-        })
+        # Years before join year are marked as N/A
+        if year < join_year:
+            year_status.append({
+                "year": year,
+                "status": DuesPayment.STATUS_NOT_APPLICABLE,
+                "payment": None,
+                "is_future": year > current_year,
+                "before_join": True,
+            })
+        else:
+            payment = payments.filter(year=year).first()
+            year_status.append({
+                "year": year,
+                "status": payment.status if payment else DuesPayment.STATUS_OWED,
+                "payment": payment,
+                "is_future": year > current_year,
+                "before_join": False,
+            })
 
     # Get payment transactions for this member
     transactions = DuesPaymentTransaction.objects.filter(
@@ -279,8 +307,10 @@ def member_dues_detail(request, member_id):
         "transactions": transactions,
         "yearly_dues": YEARLY_DUES,
         "current_year": current_year,
+        "join_year": join_year,
     }
     return render(request, "finance/member_dues_detail.html", context)
+
 
 
 @login_required
@@ -800,3 +830,74 @@ def member_dues_preview(request):
         })
 
     return JsonResponse({"outstanding": data})
+
+# ============================================================
+# PREPAID DUES
+# ============================================================
+
+@login_required
+def prepaid_list(request):
+    """List all members with prepaid dues (future years fully paid)."""
+    current_year = timezone.now().year
+    
+    # Get all prepaid dues payments (year > current_year, fully paid)
+    prepaid_qs = DuesPayment.objects.filter(
+        year__gt=current_year,
+        amount_paid__gte=YEARLY_DUES,
+    ).select_related("member", "recorded_by").order_by("-year", "member__full_name")
+
+    # Calculate totals
+    total_prepaid_amount = prepaid_qs.aggregate(
+        total=Sum("amount_paid")
+    )["total"] or Decimal("0")
+    
+    total_prepaid_records = prepaid_qs.count()
+    
+    # Get unique members with prepaid dues
+    prepaid_members = prepaid_qs.values_list("member_id", flat=True).distinct().count()
+
+    # Group by year
+    years_with_prepaid = prepaid_qs.values_list("year", flat=True).distinct().order_by("-year")
+
+    context = {
+        "prepaid_records": prepaid_qs,
+        "total_prepaid_amount": total_prepaid_amount,
+        "total_prepaid_records": total_prepaid_records,
+        "prepaid_members_count": prepaid_members,
+        "years_with_prepaid": years_with_prepaid,
+        "current_year": current_year,
+        "yearly_dues": YEARLY_DUES,
+    }
+    return render(request, "finance/prepaid_list.html", context)
+
+
+@login_required
+def prepaid_detail(request, member_id):
+    """Show prepaid dues details for a specific member."""
+    member = get_object_or_404(User, pk=member_id, is_active=True)
+    current_year = timezone.now().year
+    
+    # Get all prepaid records for this member
+    prepaid_records = DuesPayment.objects.filter(
+        member=member,
+        year__gt=current_year,
+    ).select_related("recorded_by", "income").order_by("-year")
+    
+    # Calculate total prepaid
+    total_prepaid = prepaid_records.aggregate(
+        total=Sum("amount_paid")
+    )["total"] or Decimal("0")
+    
+    # Get member's debt info for context
+    debt_info = DuesPayment.get_member_debt(member)
+    
+    context = {
+        "member": member,
+        "prepaid_records": prepaid_records,
+        "total_prepaid": total_prepaid,
+        "debt_info": debt_info,
+        "current_year": current_year,
+        "yearly_dues": YEARLY_DUES,
+    }
+    return render(request, "finance/prepaid_detail.html", context)
+
