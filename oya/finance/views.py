@@ -92,10 +92,15 @@ def dues_tracker(request):
     years = list(range(PLATFORM_START_YEAR, current_year + 1))
 
     # Include all registered members in dues tracking.
-    # Filtering by serial_number__isnull=False ensures only real member accounts
-    # are included, regardless of is_active status (new members may be pending approval).
-    members = User.objects.filter(serial_number__isnull=False).exclude(
+    # Exclude staff and superuser accounts — only real members should appear.
+    members = User.objects.filter(
+        serial_number__isnull=False
+    ).exclude(
         serial_number=""
+    ).exclude(
+        is_staff=True
+    ).exclude(
+        is_superuser=True
     ).order_by("full_name")
 
     # Build a lookup of all dues payments
@@ -169,7 +174,8 @@ def dues_tracker(request):
             join_year = PLATFORM_START_YEAR
         total_possible_dues += (current_year - max(join_year, PLATFORM_START_YEAR) + 1) * YEARLY_DUES
     collection_rate = round(
-                (float(total_dues_collected) / float(total_possible_dues) * 100), 1) if total_possible_dues > 0 else 0
+        (float(total_dues_collected) / float(total_possible_dues) * 100), 1
+    ) if total_possible_dues > 0 else 0
 
     this_year_paid = DuesPayment.objects.filter(
         year=current_year,
@@ -648,7 +654,7 @@ def expense_create(request):
 def expense_detail(request, pk):
     """Display expense details."""
     expense = get_object_or_404(Expense.objects.select_related("created_by"), pk=pk)
-    return render(request, "financeense_detail.html", {"expense": expense})
+    return render(request, "finance/expense_detail.html", {"expense": expense})
 
 
 @login_required
@@ -798,7 +804,15 @@ def search_members(request):
         Q(full_name__icontains=q) |
         Q(serial_number__icontains=q) |
         Q(phone__icontains=q)
-    ).filter(serial_number__isnull=False).exclude(serial_number="").distinct()[:10]
+    ).filter(
+        serial_number__isnull=False
+    ).exclude(
+        serial_number=""
+    ).exclude(
+        is_staff=True
+    ).exclude(
+        is_superuser=True
+    ).distinct()[:10]
 
     results = []
     for u in users:
@@ -818,7 +832,6 @@ def search_members(request):
         })
 
     return JsonResponse({"results": results})
-
 
 @login_required
 def member_dues_preview(request):
