@@ -63,11 +63,25 @@ def executive_list(request):
 
 @login_required
 def executive_detail(request, pk):
-    """Display executive details."""
+    """Display executive details with manifesto from latest candidacy."""
     executive = get_object_or_404(
         Executive.objects.select_related("member"), pk=pk
     )
-    return render(request, "executives/executive_detail.html", {"executive": executive})
+    
+    # Get the member's latest manifesto from their candidacies
+    latest_candidacy = executive.member.candidacies.select_related("election").order_by("-created_at").first()
+    manifesto = latest_candidacy.manifesto if latest_candidacy else None
+    manifesto_election = latest_candidacy.election if latest_candidacy else None
+    
+    # Get handover records for this executive
+    handovers = executive.handovers.select_related("election").order_by("-created_at")
+    
+    return render(request, "executives/executive_detail.html", {
+        "executive": executive,
+        "manifesto": manifesto,
+        "manifesto_election": manifesto_election,
+        "handovers": handovers,
+    })
 
 
 @login_required
