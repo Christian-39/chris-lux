@@ -157,11 +157,13 @@ class DuesPayment(BaseModel):
     STATUS_PARTIAL = "PARTIAL"
     STATUS_OWED = "OWED"
     STATUS_PREPAID = "PREPAID"
+    STATUS_NOT_APPLICABLE = "N/A"  # Years before member joined
     STATUS_CHOICES = [
         (STATUS_PAID, "Paid"),
         (STATUS_PARTIAL, "Partially Paid"),
         (STATUS_OWED, "Owed"),
         (STATUS_PREPAID, "Prepaid"),
+        (STATUS_NOT_APPLICABLE, "Not Applicable"),
     ]
 
     id = models.BigAutoField(primary_key=True)
@@ -242,6 +244,10 @@ class DuesPayment(BaseModel):
     @property
     def status(self):
         current_year = timezone.now().year
+        # Check if this year is before the member's join year
+        join_year = self.get_member_join_year(self.member)
+        if self.year < join_year:
+            return self.STATUS_NOT_APPLICABLE
         if self.amount_paid >= self.YEARLY_DUES_AMOUNT:
             if self.year > current_year:
                 return self.STATUS_PREPAID
@@ -253,6 +259,10 @@ class DuesPayment(BaseModel):
     @property
     def remaining_balance(self):
         """Amount still needed to fully pay this year's dues."""
+        # If year is before join year, no balance needed
+        join_year = self.get_member_join_year(self.member)
+        if self.year < join_year:
+            return Decimal("0")
         return max(self.YEARLY_DUES_AMOUNT - self.amount_paid, Decimal("0"))
 
     @property
@@ -263,6 +273,7 @@ class DuesPayment(BaseModel):
     def get_member_join_year(cls, member):
         """Determine the first year a member should owe dues."""
         platform_start = 2020
+        # First priority: year_joined field on member/User
         join_year = getattr(member, "year_joined", None)
         if join_year and isinstance(join_year, int) and join_year >= platform_start:
             return join_year
@@ -284,6 +295,7 @@ class DuesPayment(BaseModel):
         """
         Return a list of years the member owes dues for, sorted oldest first.
         Each item is a dict with year, amount_paid, remaining_balance, status.
+        Only includes years from join_year onward.
         """
         current_year = timezone.now().year
         join_year = cls.get_member_join_year(member)
@@ -322,6 +334,7 @@ class DuesPayment(BaseModel):
         """
         Calculate total dues debt for a member.
         Debt = sum of remaining balances for all years from join_year to current_year.
+        Years before join_year are not counted.
         """
         current_year = timezone.now().year
         join_year = cls.get_member_join_year(member)
@@ -343,6 +356,7 @@ class DuesPayment(BaseModel):
 
         years_paid_qs = cls.objects.filter(
             member=member,
+            year__in=expected_years,
             amount_paid__gte=cls.YEARLY_DUES_AMOUNT,
         ).values_list("year", flat=True)
 
@@ -356,10 +370,12 @@ class DuesPayment(BaseModel):
             "years_partial": list(
                 cls.objects.filter(
                     member=member,
+                    year__in=expected_years,
                     amount_paid__gt=0,
                     amount_paid__lt=cls.YEARLY_DUES_AMOUNT,
                 ).values_list("year", flat=True)
             ),
+            "join_year": join_year,
         }
 
     @classmethod
@@ -369,6 +385,7 @@ class DuesPayment(BaseModel):
         """
         Allocate a dues payment across outstanding years (oldest first),
         then to future years if there's excess.
+        Only allocates from join_year onward.
         Returns a dict with: transaction, allocations list, messages list.
         """
         from decimal import Decimal
@@ -397,7 +414,7 @@ class DuesPayment(BaseModel):
         allocations = []
         messages_list = []
 
-        # Phase 1: Allocate to outstanding years (oldest first)
+        # Phase 1: Allocate to outstanding years (oldest first), starting from join year
         for year in range(start_year, current_year + 1):
             if remaining <= 0:
                 break
