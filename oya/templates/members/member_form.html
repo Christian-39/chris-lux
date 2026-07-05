@@ -164,6 +164,21 @@
         </div>
       </div>
 
+      <!-- Row 3.5: Year Joined -->
+      <div class="form-row" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr));gap:1rem;margin-bottom:1rem;">
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Year Joined <span style="color:var(--oya-danger);">*</span></label>
+          {{ form.year_joined }}
+          <div style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);color:var(--oya-text-muted);margin-top:0.25rem;">The year this member joined the association. Dues tracking starts from this year.</div>
+          {% if form.year_joined.errors %}
+            <div class="form-error">{{ form.year_joined.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="form-group">
+          <!-- spacer -->
+        </div>
+      </div>
+
       <!-- Row 4: Nigerian State -->
       <div class="form-row" id="nigeria_state_row" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr));gap:1rem;margin-bottom:1rem;">
         <div class="form-group">
