@@ -5,6 +5,7 @@ import random
 import string
 from django import forms
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 from .models import Member, Clan, NIGERIAN_STATES
 
 
@@ -54,6 +55,21 @@ class MemberForm(forms.ModelForm):
         })
     )
 
+    # Year joined - allow administrators to choose when member joined
+    year_joined = forms.IntegerField(
+        min_value=2020,
+        max_value=timezone.now().year,
+        required=True,
+        label="Year Joined",
+        widget=forms.NumberInput(attrs={
+            "class": "form-input",
+            "placeholder": "e.g., 2022",
+            "min": "2020",
+            "max": str(timezone.now().year),
+        }),
+        help_text="The year this member joined the association. Dues tracking starts from this year."
+    )
+
     class Meta:
         model = Member
         # NOTE: 'pin' is NOT in Meta.fields because it's not a Member model field!
@@ -61,7 +77,7 @@ class MemberForm(forms.ModelForm):
         fields = [
             "serial_number", "full_name", "phone", "age",
             "umu_nna_clan", "photo", "is_abroad", "nigerian_state",
-            "abroad_country", "status"
+            "abroad_country", "year_joined", "status"
         ]
         widgets = {
             "serial_number": forms.TextInput(attrs={
@@ -97,6 +113,10 @@ class MemberForm(forms.ModelForm):
         self.fields["umu_nna_clan"].queryset = Clan.objects.all().order_by("name")
         self.fields["umu_nna_clan"].empty_label = "-- Select Clan --"
 
+        # Set default year_joined to current year for new members
+        if not self.instance or not self.instance.pk:
+            self.fields["year_joined"].initial = timezone.now().year
+
         if self.instance and self.instance.pk:
             if self.instance.is_abroad:
                 self.fields["abroad_country"].initial = self.instance.state_or_abroad
@@ -130,6 +150,16 @@ class MemberForm(forms.ModelForm):
             if len(pin) != 6:
                 raise forms.ValidationError("PIN must be exactly 6 digits.")
         return pin
+
+    def clean_year_joined(self):
+        year_joined = self.cleaned_data.get("year_joined")
+        current_year = timezone.now().year
+        if year_joined:
+            if year_joined < 2020:
+                raise forms.ValidationError("Join year cannot be before platform creation (2020).")
+            if year_joined > current_year:
+                raise forms.ValidationError("Join year cannot be in the future.")
+        return year_joined
 
     def clean(self):
         cleaned_data = super().clean()
@@ -172,6 +202,8 @@ class MemberForm(forms.ModelForm):
                 user.phone = instance.phone
                 user.state = instance.state_or_abroad
                 user.is_active = instance.status == "ACTIVE"
+                # SYNC: year_joined from Member to User
+                user.year_joined = instance.year_joined
                 # SYNC PHOTO from Member to User
                 if instance.photo:
                     user.photo = instance.photo
@@ -185,6 +217,7 @@ class MemberForm(forms.ModelForm):
                     state=instance.state_or_abroad,
                     role="FLOOR_MEMBER",
                     is_active=instance.status == "ACTIVE",
+                    year_joined=instance.year_joined,
                 )
                 # SYNC PHOTO from Member to User
                 if instance.photo:
@@ -232,6 +265,8 @@ class MemberUpdateForm(MemberForm):
                 user.phone = instance.phone
                 user.state = instance.state_or_abroad
                 user.is_active = instance.status == "ACTIVE"
+                # SYNC: year_joined from Member to User
+                user.year_joined = instance.year_joined
                 # SYNC PHOTO from Member to User
                 if instance.photo:
                     user.photo = instance.photo
@@ -251,6 +286,7 @@ class MemberUpdateForm(MemberForm):
                     state=instance.state_or_abroad,
                     role="FLOOR_MEMBER",
                     is_active=instance.status == "ACTIVE",
+                    year_joined=instance.year_joined,
                 )
                 # SYNC PHOTO from Member to User
                 if instance.photo:
