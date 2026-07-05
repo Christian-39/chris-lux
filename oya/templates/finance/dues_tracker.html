@@ -90,7 +90,7 @@
       <table class="data-table dues-grid" id="duesGrid">
         <thead>
           <tr>
-            <th style="min-width:180px;position:sticky;left:0;background:var(--oya-surface);z-index:2;">Member</th>
+            <th style="min-width:180px;position:sticky;left:0;background:var(--oya-surface);background-color:#ffffff;z-index:10;box-shadow:2px 0 5px rgba(0,0,0,0.08);">Member</th>
             {% for year in years %}
             <th style="text-align:center;min-width:70px;">{{ year }}</th>
             {% endfor %}
@@ -100,7 +100,7 @@
         <tbody>
           {% for row in member_rows %}
           <tr>
-            <td style="position:sticky;left:0;background:var(--oya-surface);z-index:1;font-weight:500;">
+            <td style="position:sticky;left:0;background:var(--oya-surface);background-color:#ffffff;z-index:5;font-weight:500;box-shadow:2px 0 5px rgba(0,0,0,0.05);">
               <a href="{% url 'finance:member_dues_detail' row.member.id %}" style="color:var(--oya-text-primary);text-decoration:none;">
                 {{ row.member.get_full_name }}
               </a>
@@ -138,7 +138,7 @@
             <td colspan="{{ years|length|add:2 }}" style="text-align:center;padding:3rem;">
               <div class="empty-state" style="padding:0;">
                 <div class="empty-state-icon" style="width:60px;height:60px;margin-bottom:1rem;">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9"7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
                 </div>
                 <h3 style="font-size:1rem;">No active members found</h3>
                 <p style="font-size:0.875rem;">Add members to start tracking dues.</p>
@@ -157,7 +157,7 @@
 .dues-grid th { background: var(--oya-surface); font-size: 0.8125rem; font-weight: 600; color: var(--oya-text-secondary); padding: 0.75rem 0.5rem; border-bottom: 1px solid var(--oya-border); white-space: nowrap; }
 .dues-grid td { padding: 0.5rem; border-bottom: 1px solid var(--oya-border); font-size: 0.875rem; }
 .dues-grid tbody tr:hover td { background: var(--oya-surface-hover); }
-.dues-grid tbody tr:hover td:first-child { background: var(--oya-surface-hover); }
+.dues-grid tbody tr:hover td:first-child { background: var(--oya-surface-hover); background-color: #f8f9fa; }
 
 .dues-badge { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; font-size: 0.75rem; font-weight: 700; }
 .dues-badge.paid { background: var(--oya-success-bg); color: var(--oya-success); }
@@ -165,6 +165,26 @@
 .dues-badge.na { background: transparent; color: var(--oya-text-muted); font-size: 0.625rem; width: auto; height: auto; border-radius: 0; font-weight: 400; letter-spacing: 1px; }
 
 .join-year-badge { display: inline-block; background: var(--oya-info-bg); color: var(--oya-info); font-size: 0.625rem; padding: 1px 5px; border-radius: 4px; margin-left: 4px; font-weight: 600; vertical-align: middle; }
+
+/* Ensure sticky column has solid background and visual separation */
+.dues-grid th:first-child,
+.dues-grid td:first-child {
+  background: var(--oya-surface);
+  background-color: #ffffff;
+}
+.dues-grid thead th:first-child {
+  z-index: 10;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.08);
+}
+.dues-grid tbody td:first-child {
+  z-index: 5;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+}
+/* Ensure hover doesn't make background transparent */
+.dues-grid tbody tr:hover td:first-child {
+  background: var(--oya-surface-hover);
+  background-color: #f8f9fa;
+}
 
 @media (max-width: 768px) {
   .dues-grid th, .dues-grid td { padding: 0.375rem 0.25rem !important; font-size: 0.75rem !important; }
