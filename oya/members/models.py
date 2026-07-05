@@ -5,6 +5,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.utils import timezone
 from core.models import BaseModel
 
 
@@ -110,6 +111,13 @@ class Member(BaseModel):
         default=False,
         verbose_name="Living Abroad?"
     )
+    # Year the member joined the association - affects dues calculation
+    year_joined = models.PositiveIntegerField(
+        verbose_name="Year Joined",
+        help_text="The year this member joined the association. Dues will only be tracked from this year onward.",
+        default=2020,
+        validators=[MinValueValidator(2020, message="Join year cannot be before platform creation (2020).")]
+    )
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
@@ -135,16 +143,22 @@ class Member(BaseModel):
             models.Index(fields=["umu_nna_clan"]),
             models.Index(fields=["serial_number"]),
             models.Index(fields=["full_name"]),
+            models.Index(fields=["year_joined"]),
         ]
 
     def __str__(self):
         return f"{self.serial_number} - {self.full_name}"
 
     def clean(self):
-        """Model-level validation for age."""
+        """Model-level validation for age and year_joined."""
         if self.age and (self.age < 18 or self.age > 55):
             raise ValidationError({
                 "age": "Age must be between 18 and 55 years."
+            })
+        current_year = timezone.now().year
+        if self.year_joined and self.year_joined > current_year:
+            raise ValidationError({
+                "year_joined": "Join year cannot be in the future."
             })
         super().clean()
 
