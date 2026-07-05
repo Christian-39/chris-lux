@@ -7,7 +7,6 @@
 
 {% block content %}
 
-<!-- Page Header -->
 <div class="page-header">
   <div class="page-header-left">
     <h1 style="font-size:clamp(1.125rem, 3vw, 1.5rem);">Task Force Members</h1>
@@ -23,7 +22,6 @@
   </div>
 </div>
 
-<!-- Stats -->
 <div class="dashboard-grid dashboard-grid-3" style="grid-template-columns:repeat(auto-fit, minmax(min(100%, 260px), 1fr));" style="margin-bottom:clamp(0.75rem, 3vw, 1.5rem);">
   <div class="kpi-card">
     <div class="kpi-header">
@@ -48,7 +46,6 @@
   </div>
 </div>
 
-<!-- Filters -->
 <div class="filters-bar" style="flex-wrap:wrap;gap:0.5rem;">
   <form method="get" style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
     <div class="filter-group">
@@ -65,7 +62,6 @@
   </div>
 </div>
 
-<!-- Table -->
 <div class="card">
   <div class="table-container" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
     <table class="data-table" id="taskforceTable" data-sortable style="white-space:nowrap;">
@@ -108,16 +104,13 @@
           </td>
           <td style="white-space:nowrap;">
             <div class="table-actions" style="flex-wrap:nowrap;gap:0.25rem;">
-              <!-- View -->
               <a href="#" class="table-action-btn" title="View" onclick="event.preventDefault(); document.getElementById('tf-modal-{{ tf.pk }}').showModal();">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </a>
               {% if user.is_staff or user.has_executive_access %}
-                <!-- Edit -->
-                <a href="{% url 'operations:taskforce_create' %}?edit={{ tf.pk }}" class="table-action-btn" title="Edit">
+                <a href="{% url 'operations:taskforce_update' pk=tf.pk %}" class="table-action-btn" title="Edit">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 </a>
-                <!-- Delete / Remove -->
                 {% if tf.is_active %}
                   <form method="post" action="{% url 'operations:taskforce_remove' pk=tf.pk %}" style="display:inline;" onsubmit="return confirm('Remove {{ tf.member.full_name }} from task force?');">
                     {% csrf_token %}
@@ -157,7 +150,6 @@
     </table>
   </div>
 
-  <!-- Pagination -->
   {% if taskforce.has_other_pages %}
   <div class="card-footer">
     <span style="font-size:clamp(0.6875rem, 1.5vw, 0.8125rem);color:var(--oya-text-muted);">Showing {{ taskforce.start_index }}-{{ taskforce.end_index }} of {{ taskforce.paginator.count }} members</span>
@@ -194,7 +186,6 @@
   {% endif %}
 </div>
 
-<!-- View Modals for Task Force Members -->
 {% for tf in taskforce %}
 <dialog id="tf-modal-{{ tf.pk }}" style="border:none;border-radius:var(--oya-radius,8px);padding:0;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.15);">
   <div style="padding:clamp(1.25rem, 4vw, 1.75rem);">
