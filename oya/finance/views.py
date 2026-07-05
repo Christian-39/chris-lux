@@ -169,9 +169,7 @@ def dues_tracker(request):
             join_year = PLATFORM_START_YEAR
         total_possible_dues += (current_year - max(join_year, PLATFORM_START_YEAR) + 1) * YEARLY_DUES
     collection_rate = round(
-                (float(total_dues_collected) / float(total_possible_dues) * 100), 1
-
-    ) if total_possible_dues > 0 else 0
+                (float(total_dues_collected) / float(total_possible_dues) * 100), 1) if total_possible_dues > 0 else 0
 
     this_year_paid = DuesPayment.objects.filter(
         year=current_year,
