@@ -78,6 +78,7 @@
           <th data-sort="text">Serial Number</th>
           <th data-sort="text">Clan</th>
           <th data-sort="text">Status</th>
+          <th data-sort="text">Position</th>
           <th data-sort="text">Age</th>
           <th data-sort="text">State/Abroad</th>
           <th data-sort="date">Joined</th>
@@ -113,6 +114,15 @@
               <span class="badge" style="white-space:nowrap;">{{ member.status }}</span>
             {% endif %}
           </td>
+          <td style="white-space:nowrap;">
+            {% if member.position %}
+              <span class="badge badge-primary" style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);white-space:nowrap;">{{ member.position }}</span>
+            {% elif member.is_taskforce %}
+              <span class="badge badge-info" style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);white-space:nowrap;">Taskforce</span>
+            {% else %}
+              <span class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">Floor Member</span>
+            {% endif %}
+          </td>
           <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ member.age }}</td>
           <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ member.state_or_abroad|default:"—" }}</td>
           <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ member.created_at|date:"M d, Y" }}</td>
@@ -134,7 +144,7 @@
         </tr>
         {% empty %}
         <tr>
-          <td colspan="9" style="text-align:center;padding:2rem;color:var(--oya-text-muted);">
+          <td colspan="10" style="text-align:center;padding:2rem;color:var(--oya-text-muted);">
             No members found. <a href="{% url 'members:member_create' %}">Add your first member</a>.
           </td>
         </tr>
@@ -181,8 +191,6 @@
   </div>
   {% endif %}
 </div>
-
-
 
 <style>
 /* ─── Mobile Responsive Overrides ─── */
