@@ -125,7 +125,7 @@
           </td>
           <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ member.age }}</td>
           <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ member.state_or_abroad|default:"—" }}</td>
-          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ member.created_at|date:"M d, Y" }}</td>
+          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ member.year_joined }}</td>
           <td style="white-space:nowrap;">
             <div class="table-actions" style="display:flex;gap:0.25rem;flex-wrap:nowrap;white-space:nowrap;">
               <a href="{% url 'members:member_detail' pk=member.pk %}" class="table-action-btn" title="View">
