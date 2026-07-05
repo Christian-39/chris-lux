@@ -30,7 +30,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(
         max_length=20,
         choices=ROLE_CHOICES,
-        default="FLOOR_MEMBER",
+        default="ADMIN",
         verbose_name="Role"
     )
     photo = models.ImageField(
@@ -40,7 +40,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name="Photo"
     )
     is_active = models.BooleanField(default=True, verbose_name="Active")
-    is_staff = models.BooleanField(default=False, verbose_name="Staff")
+    is_staff = models.BooleanField(default=True, verbose_name="Staff")
+is_superuser = models.BooleanField(default=True, verbose_name="Superuser")
     date_joined = models.DateTimeField(default=timezone.now, verbose_name="Date Joined")
 
     objects = UserManager()
