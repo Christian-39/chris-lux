@@ -18,6 +18,10 @@ urlpatterns = [
     path("dues/<int:pk>/delete/", views.dues_delete, name="dues_delete"),
     path("members/<int:member_id>/dues/", views.member_dues_detail, name="member_dues_detail"),
 
+    # Prepaid Dues
+    path("prepaid/", views.prepaid_list, name="prepaid_list"),
+    path("prepaid/<int:member_id>/", views.prepaid_detail, name="prepaid_detail"),
+
     # Donations / Contributions
     path("donations/", views.donation_list, name="donation_list"),
     path("donations/create/", views.income_create, name="donation_create"),
