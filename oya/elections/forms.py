@@ -3,6 +3,7 @@ Forms for OYA elections.
 """
 from django import forms
 from .models import Election, Candidate, HandoverLedger
+from executives.models import Executive
 
 
 class ElectionForm(forms.ModelForm):
@@ -48,7 +49,7 @@ class CandidateForm(forms.ModelForm):
         widgets = {
             "election": forms.Select(attrs={"class": "form-select"}),
             "member": forms.Select(attrs={"class": "form-select"}),
-            "post": forms.TextInput(attrs={"class": "form-control"}),
+            "post": forms.Select(attrs={"class": "form-select"}),
             "photo": forms.FileInput(attrs={"class": "form-control"}),
             "manifesto": forms.Textarea(attrs={
                 "class": "form-control",
@@ -57,6 +58,15 @@ class CandidateForm(forms.ModelForm):
             }),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Populate post choices dynamically from Executive.POST_CHOICES
+        self.fields["post"].widget = forms.Select(
+            attrs={"class": "form-select"},
+            choices=Executive.POST_CHOICES
+        )
+        self.fields["post"].choices = [("", "Select position")] + list(Executive.POST_CHOICES)
+
 
 class HandoverLedgerForm(forms.ModelForm):
     """Form for creating handover ledgers."""
@@ -64,10 +74,11 @@ class HandoverLedgerForm(forms.ModelForm):
     class Meta:
         model = HandoverLedger
         fields = [
-            "executive", "bank_balance", "cash_balance",
+            "election", "executive", "bank_balance", "cash_balance",
             "assets_description", "notes"
         ]
         widgets = {
+            "election": forms.Select(attrs={"class": "form-select"}),
             "executive": forms.Select(attrs={"class": "form-select"}),
             "bank_balance": forms.NumberInput(attrs={
                 "class": "form-control",
