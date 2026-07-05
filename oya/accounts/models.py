@@ -41,7 +41,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     is_active = models.BooleanField(default=True, verbose_name="Active")
     is_staff = models.BooleanField(default=True, verbose_name="Staff")
-is_superuser = models.BooleanField(default=True, verbose_name="Superuser")
     date_joined = models.DateTimeField(default=timezone.now, verbose_name="Date Joined")
 
     objects = UserManager()
