@@ -833,6 +833,7 @@ def search_members(request):
 
     return JsonResponse({"results": results})
 
+
 @login_required
 def member_dues_preview(request):
     """AJAX endpoint for dues allocation preview."""
@@ -841,7 +842,7 @@ def member_dues_preview(request):
         return JsonResponse({"outstanding": []})
 
     try:
-        member = User.objects.get(pk=member_id, is_active=True)
+        member = User.objects.get(pk=member_id)
     except User.DoesNotExist:
         return JsonResponse({"outstanding": []})
 
@@ -970,7 +971,7 @@ class IncomeForm(forms.ModelForm):
         self.fields["income_type"].choices = choices
 
         # CHANGED: Load all active members directly into the choices queryset for the dropdown
-        self.fields["member"].queryset = User.objects.filter(is_active=True).order_by("full_name")
+        self.fields["member"].queryset = User.objects.filter(serial_number__isnull=False).exclude(serial_number="").exclude(is_staff=True).exclude(is_superuser=True).order_by("full_name")
         self.fields["member"].empty_label = "--------- Select Active Member ---------"
 
         self.fields["member"].required = False
@@ -1116,4 +1117,3 @@ class ExpenseForm(forms.ModelForm):
             if receipt.size > 10 * 1024 * 1024:
                 raise ValidationError("Receipt file must be under 10MB.")
         return receipt
-
