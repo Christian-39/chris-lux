@@ -23,6 +23,7 @@ class CandidateAdmin(admin.ModelAdmin):
 
 @admin.register(HandoverLedger)
 class HandoverLedgerAdmin(admin.ModelAdmin):
-    list_display = ["executive", "bank_balance", "cash_balance", "total_balance", "created_at"]
-    search_fields = ["executive__member__full_name"]
-    list_select_related = ["executive__member"]
+    list_display = ["executive", "election", "bank_balance", "cash_balance", "total_balance", "created_at"]
+    list_filter = ["election"]
+    search_fields = ["executive__member__full_name", "election__title"]
+    list_select_related = ["executive__member", "election"]
