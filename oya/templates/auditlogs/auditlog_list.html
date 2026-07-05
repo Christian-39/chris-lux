@@ -192,7 +192,12 @@
     </form>
   </div>
 
-  <div class="table-container">
+<style>
+#auditTable { white-space: nowrap; }
+#auditTable th, #auditTable td { white-space: nowrap; }
+.table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+</style>
+<div class="table-container">
     <table class="data-table" id="auditTable">
       <thead>
         <tr>
@@ -208,9 +213,8 @@
       <tbody>
         {% for log in logs %}
         <tr>
-          <td class="cell-muted">
-            {{ log.created_at|date:"M j, Y" }}<br>
-            <span style="font-size:0.75rem;">{{ log.created_at|date:"h:i:s A" }}</span>
+          <td class="cell-muted" style="white-space:nowrap;">
+            {{ log.created_at|date:"M j, Y" }} <span style="font-size:0.75rem;">{{ log.created_at|date:"h:i:s A" }}</span>
           </td>
           <td>
             {% if log.user %}
@@ -225,7 +229,7 @@
             </span>
           </td>
           <td>{{ log.object_type }}</td>
-          <td>{{ log.description|truncatechars:80 }}</td>
+          <td style="white-space:nowrap;">{{ log.description|truncatechars:80 }}</td>
           <td class="cell-muted">{{ log.ip_address|default:"—" }}</td>
           <td>
             <button class="table-action-btn" title="Details" onclick="openAuditModal({{ log.id }})">
