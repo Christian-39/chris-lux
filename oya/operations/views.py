@@ -93,6 +93,43 @@ def taskforce_create(request):
 
 
 @login_required
+def taskforce_update(request, pk):
+    """Update a task force member assignment."""
+    if not request.user.has_executive_access():
+        messages.error(request, "Executive access required.")
+        return redirect("operations:taskforce_list")
+
+    tf = get_object_or_404(TaskForceMember, pk=pk)
+
+    if request.method == "POST":
+        form = TaskForceMemberForm(request.POST, instance=tf)
+        if form.is_valid():
+            tf = form.save()
+            log_action(
+                user=request.user,
+                action="UPDATE",
+                object_type="TaskForceMember",
+                object_id=tf.id,
+                ip_address=getattr(request, "client_ip", ""),
+                description=f"Updated task force assignment for {tf.member.full_name}"
+            )
+            messages.success(request, f"Task force assignment for {tf.member.full_name} updated.")
+            return redirect("operations:taskforce_list")
+        else:
+            for error in form.errors.values():
+                messages.error(request, error)
+    else:
+        form = TaskForceMemberForm(instance=tf)
+
+    return render(request, "operations/taskforce_form.html", {
+        "form": form,
+        "taskforce": tf,
+        "title": "Update Task Force Member",
+        "action": "Update"
+    })
+
+
+@login_required
 def taskforce_remove(request, pk):
     """Remove a task force member."""
     if not request.user.has_executive_access():
@@ -230,6 +267,32 @@ def motorcycle_update(request, pk):
     })
 
 
+@login_required
+def motorcycle_delete(request, pk):
+    """Delete a motorcycle record."""
+    if not request.user.has_executive_access():
+        messages.error(request, "Executive access required.")
+        return redirect("operations:motorcycle_list")
+
+    mc = get_object_or_404(Motorcycle, pk=pk)
+
+    if request.method == "POST":
+        asset_tag = mc.asset_tag
+        mc.delete()
+        log_action(
+            user=request.user,
+            action="DELETE",
+            object_type="Motorcycle",
+            object_id=pk,
+            ip_address=getattr(request, "client_ip", ""),
+            description=f"Deleted motorcycle {asset_tag}"
+        )
+        messages.success(request, f"Motorcycle {asset_tag} deleted.")
+        return redirect("operations:motorcycle_list")
+
+    return render(request, "operations/motorcycle_delete.html", {"motorcycle": mc})
+
+
 # Case File Views
 @login_required
 def case_list(request):
@@ -295,4 +358,55 @@ def case_create(request):
                 user=request.user,
                 action="CREATE",
                 object_type="CaseFile",
-                objec<response clipped><NOTE>Result is longer than **10000 characters**, will be **truncated**.</NOTE>
+                object_id=case.id,
+                ip_address=getattr(request, "client_ip", ""),
+                description=f"Created case {case.case_number}: {case.title}"
+            )
+            messages.success(request, f"Case {case.case_number} created.")
+            return redirect("operations:case_list")
+        else:
+            for error in form.errors.values():
+                messages.error(request, error)
+    else:
+        form = CaseFileForm()
+
+    return render(request, "operations/case_form.html", {
+        "form": form,
+        "title": "Create Case File",
+        "action": "Create"
+    })
+
+
+@login_required
+def case_resolve(request, pk):
+    """Resolve a case file."""
+    if not request.user.has_executive_access():
+        messages.error(request, "Executive access required.")
+        return redirect("operations:case_list")
+
+    case = get_object_or_404(CaseFile, pk=pk)
+
+    if request.method == "POST":
+        form = CaseResolutionForm(request.POST, instance=case)
+        if form.is_valid():
+            form.save()
+            log_action(
+                user=request.user,
+                action="UPDATE",
+                object_type="CaseFile",
+                object_id=case.id,
+                ip_address=getattr(request, "client_ip", ""),
+                description=f"Resolved case {case.case_number}: {case.status}"
+            )
+            messages.success(request, f"Case {case.case_number} resolved.")
+            return redirect("operations:case_list")
+        else:
+            for error in form.errors.values():
+                messages.error(request, error)
+    else:
+        form = CaseResolutionForm(instance=case)
+
+    return render(request, "operations/case_resolve.html", {
+        "form": form,
+        "case": case
+    })
