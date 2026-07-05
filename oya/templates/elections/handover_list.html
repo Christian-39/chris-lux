@@ -31,6 +31,7 @@
         <thead>
           <tr>
             <th>Executive</th>
+            <th>Election</th>
             <th class="text-end">Bank Balance</th>
             <th class="text-end">Cash Balance</th>
             <th class="text-end">Total</th>
@@ -44,6 +45,13 @@
           <tr>
             <td>
               <span class="cell-name">{{ handover.executive }}</span>
+            </td>
+            <td>
+              {% if handover.election %}
+                <a href="{% url 'elections:election_detail' handover.election.pk %}" class="cell-name" style="font-size:0.875rem;">{{ handover.election.title }}</a>
+              {% else %}
+                <span style="color:var(--oya-text-muted);font-size:0.875rem;">—</span>
+              {% endif %}
             </td>
             <td class="text-end" style="white-space:nowrap;">&#8358;{{ handover.bank_balance|floatformat:2|intcomma }}</td>
             <td class="text-end" style="white-space:nowrap;">&#8358;{{ handover.cash_balance|floatformat:2|intcomma }}</td>
@@ -62,7 +70,7 @@
           </tr>
           {% empty %}
           <tr>
-            <td colspan="7" style="text-align:center;padding:3rem;">
+            <td colspan="8" style="text-align:center;padding:3rem;">
               <div class="empty-state" style="padding:0;">
                 <div class="empty-state-icon" style="width:clamp(48px, 15vw, 60px);height:clamp(48px, 15vw, 60px);margin-bottom:1rem;">
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
