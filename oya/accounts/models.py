@@ -5,6 +5,7 @@ Uses serial number as username and 6-digit PIN as password.
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
+from django.core.validators import MinValueValidator
 from .managers import UserManager
 
 
@@ -38,6 +39,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=True,
         null=True,
         verbose_name="Photo"
+    )
+    # Year joined — synced from Member model
+    year_joined = models.PositiveIntegerField(
+        verbose_name="Year Joined",
+        help_text="The year this member joined the association.",
+        default=2020,
+        validators=[MinValueValidator(2020, message="Join year cannot be before platform creation (2020).")]
     )
     is_active = models.BooleanField(default=True, verbose_name="Active")
     is_staff = models.BooleanField(default=True, verbose_name="Staff")
@@ -94,7 +102,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         if len(names) >= 2:
             return f"{names[0][0]}{names[1][0]}".upper()
         return self.full_name[:2].upper()
-    
+
     @property
     def member(self):
         """Get the associated Member record based on matching serial number."""
