@@ -169,9 +169,49 @@ def candidate_create(request):
 
 
 @login_required
+def candidate_update(request, pk):
+    """Update a candidate's information."""
+    if not request.user.has_executive_access():
+        messages.error(request, "Executive access required.")
+        return redirect("elections:election_list")
+
+    candidate = get_object_or_404(Candidate, pk=pk)
+
+    if request.method == "POST":
+        form = CandidateForm(request.POST, request.FILES, instance=candidate)
+        if form.is_valid():
+            candidate = form.save()
+            log_action(
+                user=request.user,
+                action="UPDATE",
+                object_type="Candidate",
+                object_id=candidate.id,
+                ip_address=getattr(request, "client_ip", ""),
+                description=f"Updated candidate {candidate.member.full_name} for {candidate.post}"
+            )
+            messages.success(
+                request,
+                f"Candidate {candidate.member.full_name} updated successfully."
+            )
+            return redirect("elections:election_detail", pk=candidate.election.id)
+        else:
+            for error in form.errors.values():
+                messages.error(request, error)
+    else:
+        form = CandidateForm(instance=candidate)
+
+    return render(request, "elections/candidate_form.html", {
+        "form": form,
+        "title": "Edit Candidate",
+        "action": "Update",
+        "candidate": candidate
+    })
+
+
+@login_required
 def handover_list(request):
     """List all handover ledgers."""
-    queryset = HandoverLedger.objects.select_related("executive__member").all()
+    queryset = HandoverLedger.objects.select_related("executive__member", "election").all()
 
     paginator = Paginator(queryset, 25)
     page = request.GET.get("page", 1)
