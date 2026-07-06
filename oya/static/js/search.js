@@ -235,6 +235,7 @@
     if (!searchInput) return;
 
     const resultsContainer = document.getElementById('searchResults');
+    let abortController = null;
 
     searchInput.addEventListener('input', debounce(() => {
       const query = searchInput.value.trim();
@@ -243,21 +244,119 @@
         return;
       }
 
-      // Simulate search results
+      // Cancel previous request
+      if (abortController) abortController.abort();
+      abortController = new AbortController();
+
+      // Show loading state
       if (resultsContainer) {
         resultsContainer.classList.remove('hidden');
         resultsContainer.innerHTML = `
-          <div class="dropdown-item">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>Search members for "${query}"</span>
-          </div>
-          <div class="dropdown-item">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            <span>Search records for "${query}"</span>
+          <div class="dropdown-item" style="justify-content:center;color:var(--oya-text-muted);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;">
+              <circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="20" stroke-linecap="round"/>
+            </svg>
+            <span>Searching...</span>
           </div>
         `;
       }
+
+      // Fetch real search results from API
+      fetch(`/search/api/?q=${encodeURIComponent(query)}`, {
+        signal: abortController.signal,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(r => {
+        if (!r.ok) throw new Error('Search failed');
+        return r.json();
+      })
+      .then(data => {
+        if (!resultsContainer) return;
+        resultsContainer.innerHTML = '';
+
+        if (!data.results || data.results.length === 0) {
+          resultsContainer.innerHTML = `
+            <div class="dropdown-item" style="color:var(--oya-text-muted);cursor:default;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+              <span>No results found for "${escapeHtml(query)}"</span>
+            </div>
+          `;
+          return;
+        }
+
+        // Group results by type
+        const groups = {};
+        data.results.forEach(item => {
+          if (!groups[item.type]) groups[item.type] = [];
+          groups[item.type].push(item);
+        });
+
+        // Render grouped results
+        Object.keys(groups).forEach(type => {
+          const header = document.createElement('div');
+          header.className = 'dropdown-header';
+          header.textContent = capitalize(type) + 's';
+          resultsContainer.appendChild(header);
+
+          groups[type].forEach(item => {
+            const el = document.createElement('a');
+            el.className = 'dropdown-item';
+            el.href = item.url || '#';
+            el.innerHTML = `
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                ${getIconForType(item.type)}
+              </svg>
+              <span>${escapeHtml(item.name || item.title || 'Untitled')}</span>
+            `;
+            el.addEventListener('click', () => {
+              resultsContainer.classList.add('hidden');
+              searchInput.value = '';
+            });
+            resultsContainer.appendChild(el);
+          });
+        });
+
+        // Add "View all results" link if provided
+        if (data.view_all_url) {
+          const divider = document.createElement('div');
+          divider.className = 'dropdown-divider';
+          resultsContainer.appendChild(divider);
+
+          const viewAll = document.createElement('a');
+          viewAll.className = 'dropdown-item';
+          viewAll.href = data.view_all_url;
+          viewAll.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14"/><path d="M12 5l7 7-7 7"/>
+            </svg>
+            <span>View all results</span>
+          `;
+          resultsContainer.appendChild(viewAll);
+        }
+      })
+      .catch(err => {
+        if (err.name === 'AbortError') return;
+        if (!resultsContainer) return;
+        resultsContainer.innerHTML = `
+          <div class="dropdown-item" style="color:var(--oya-danger);cursor:default;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+            <span>Search unavailable. Please try again.</span>
+          </div>
+        `;
+      });
     }, 300));
+
+    // Keyboard navigation
+    searchInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        if (resultsContainer) resultsContainer.classList.add('hidden');
+        searchInput.blur();
+      }
+    });
 
     // Hide results on outside click
     document.addEventListener('click', (e) => {
@@ -265,6 +364,38 @@
         resultsContainer.classList.add('hidden');
       }
     });
+
+    // Show results on focus if query exists
+    searchInput.addEventListener('focus', function() {
+      if (searchInput.value.trim().length >= 2 && resultsContainer) {
+        resultsContainer.classList.remove('hidden');
+      }
+    });
+  }
+
+  // ─── Helpers ───
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  function getIconForType(type) {
+    const icons = {
+      member: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',
+      user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+      case: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+      project: '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/>',
+      election: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+      executive: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+      motorcycle: '<circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/>',
+      default: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>'
+    };
+    return icons[type] || icons.default;
   }
 
   // ─── Initialize ───
