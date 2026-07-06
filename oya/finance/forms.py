@@ -38,11 +38,11 @@ class IncomeForm(forms.ModelForm):
         self.fields["income_type"].initial = "DONATION"
         choices = [c for c in Income.INCOME_TYPE_CHOICES if c[0] != "DUES"]
         self.fields["income_type"].choices = choices
-        
+
         # CHANGED: Load all active members directly into the choices queryset for the dropdown
-        self.fields["member"].queryset = User.objects.filter(is_active=True).order_by("full_name")
+        self.fields["member"].queryset = User.objects.filter(serial_number__isnull=False).exclude(serial_number="").exclude(is_staff=True).exclude(is_superuser=True).order_by("full_name")
         self.fields["member"].empty_label = "--------- Select Active Member ---------"
-        
+
         self.fields["member"].required = False
         self.fields["paid_by"].required = False
 
@@ -110,6 +110,17 @@ class DuesPaymentAllocationForm(forms.ModelForm):
         self.recorded_by = kwargs.pop("recorded_by", None)
         super().__init__(*args, **kwargs)
         self.fields["payment_date"].initial = timezone.now().date()
+        # FIX Issue 2: Ensure only registered members appear in dues allocation form
+        self.fields["member"].queryset = User.objects.filter(
+            serial_number__isnull=False
+        ).exclude(
+            serial_number=""
+        ).exclude(
+            is_staff=True
+        ).exclude(
+            is_superuser=True
+        ).order_by("full_name")
+        self.fields["member"].empty_label = "--------- Select Member ---------"
 
     def clean_total_amount(self):
         amount = self.cleaned_data.get("total_amount")
