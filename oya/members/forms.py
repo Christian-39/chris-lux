@@ -207,6 +207,9 @@ class MemberForm(forms.ModelForm):
                 # SYNC PHOTO from Member to User
                 if instance.photo:
                     user.photo = instance.photo
+                # FIX Issue 1 & 2: Ensure floor members are not staff/superuser
+                user.is_staff = False
+                user.is_superuser = False
                 user.set_pin(pin)  # Use custom set_pin(), not set_password()
                 user.save()
             except User.DoesNotExist:
@@ -218,6 +221,9 @@ class MemberForm(forms.ModelForm):
                     role="FLOOR_MEMBER",
                     is_active=instance.status == "ACTIVE",
                     year_joined=instance.year_joined,
+                    # FIX Issue 1 & 2: Explicitly set staff/superuser to False
+                    is_staff=False,
+                    is_superuser=False,
                 )
                 # SYNC PHOTO from Member to User
                 if instance.photo:
@@ -270,6 +276,9 @@ class MemberUpdateForm(MemberForm):
                 # SYNC PHOTO from Member to User
                 if instance.photo:
                     user.photo = instance.photo
+                # FIX Issue 1 & 2: Ensure floor members are not staff/superuser
+                user.is_staff = False
+                user.is_superuser = False
 
                 pin = self.cleaned_data.get("pin")
                 if pin:
@@ -287,6 +296,9 @@ class MemberUpdateForm(MemberForm):
                     role="FLOOR_MEMBER",
                     is_active=instance.status == "ACTIVE",
                     year_joined=instance.year_joined,
+                    # FIX Issue 1 & 2: Explicitly set staff/superuser to False
+                    is_staff=False,
+                    is_superuser=False,
                 )
                 # SYNC PHOTO from Member to User
                 if instance.photo:
