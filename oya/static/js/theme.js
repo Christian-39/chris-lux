@@ -5,7 +5,8 @@
 (function() {
   'use strict';
 
-  const STORAGE_KEY = 'oya-theme';
+  const STORAGE_KEY = 'oya_theme';
+
 
   // ─── Get Preferred Theme ───
   function getTheme() {
