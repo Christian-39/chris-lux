@@ -687,7 +687,6 @@ def expense_delete(request, pk):
 # ============================================================
 # FINANCE SUMMARY / DASHBOARD
 # ============================================================
-
 @login_required
 def finance_summary(request):
     """Display financial summary with split KPIs."""
@@ -740,21 +739,34 @@ def finance_summary(request):
             "percentage": percentage,
         })
 
-    recent_income = list(Income.objects.select_related("created_by").all()[:10])
-    recent_expenses = list(Expense.objects.select_related("created_by").all()[:10])
+    # FIX: Changed from [:10] to [:5]
+    recent_income = list(Income.objects.select_related("created_by").all()[:5])
+    recent_expenses = list(Expense.objects.select_related("created_by").all()[:5])
 
     for item in recent_income:
         item.type = "income"
     for item in recent_expenses:
         item.type = "expense"
 
+    # FIX: Changed from [:10] to [:5]
     recent_transactions = sorted(
         recent_income + recent_expenses,
         key=lambda x: x.created_at,
         reverse=True
-    )[:10]
+    )[:5]
 
-    members = User.objects.filter(is_active=True)
+    # FIX: Only include actual members (not staff/superusers) in debtor list
+    members = User.objects.filter(
+        is_active=True,
+        serial_number__isnull=False
+    ).exclude(
+        serial_number=""
+    ).exclude(
+        is_staff=True
+    ).exclude(
+        is_superuser=True
+    )
+
     debtor_list = []
     for member in members:
         debt = DuesPayment.get_member_debt(member)
@@ -798,6 +810,7 @@ def finance_summary(request):
         "prepaid_count": prepaid_count,
     }
     return render(request, "finance/finance_summary.html", context)
+
 
 
 # ============================================================
