@@ -1627,3 +1627,134 @@ body.sidebar-open { overflow: hidden; }
 [data-theme="system"] .theme-icon-current { display: block; }
 [data-theme="system"] .theme-icon-moon { display: none; }
 [data-theme="system"] .theme-icon-sun { display: none; }
+
+/* ==========================================================================
+   THEME ICON VISIBILITY RULES
+   ========================================================================== */
+
+/* Desktop topbar toggle button icons */
+#themeMenuToggle .theme-icon-light,
+#themeMenuToggle .theme-icon-dark,
+#themeMenuToggle .theme-icon-system {
+  display: none;
+}
+
+#themeMenuToggle[data-active-theme="light"] .theme-icon-light,
+#themeMenuToggle[data-active-theme="dark"] .theme-icon-dark,
+#themeMenuToggle[data-active-theme="system"] .theme-icon-system {
+  display: inline-block;
+}
+
+/* Mobile theme button icons */
+#mobileThemeBtn .theme-icon-light,
+#mobileThemeBtn .theme-icon-dark,
+#mobileThemeBtn .theme-icon-system {
+  display: none;
+}
+
+#mobileThemeBtn[data-active-theme="light"] .theme-icon-light,
+#mobileThemeBtn[data-active-theme="dark"] .theme-icon-dark,
+#mobileThemeBtn[data-active-theme="system"] .theme-icon-system {
+  display: inline-block;
+}
+
+/* Legacy support for old icon class names */
+[data-theme="light"] .theme-icon-sun,
+[data-theme="light"] .theme-icon-current { display: none; }
+[data-theme="light"] .theme-icon-moon { display: block; }
+[data-theme="dark"] .theme-icon-sun,
+[data-theme="dark"] .theme-icon-current { display: block; }
+[data-theme="dark"] .theme-icon-moon { display: none; }
+[data-theme="system"] .theme-icon-current { display: block; }
+[data-theme="system"] .theme-icon-moon { display: none; }
+[data-theme="system"] .theme-icon-sun { display: none; }
+
+/* ==========================================================================
+   DESKTOP FIXED SIDEBAR + SCROLLABLE MAIN CONTENT
+   Sidebar stays fixed while only main-content scrolls.
+   Mobile behavior is preserved via media queries.
+   ========================================================================== */
+
+@media screen and (min-width: 1025px) {
+  /* Prevent body from scrolling — only main-content should scroll */
+  body {
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  /* App shell fills viewport and uses flex */
+  .app-shell {
+    height: 100vh;
+    min-height: 100vh;
+    max-height: 100vh;
+  }
+
+  /* Sidebar stays fixed in place */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh;
+    max-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* Main content area scrolls independently */
+  .main-content {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    height: 100vh;
+    max-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+  }
+
+  /* When sidebar is collapsed, adjust main-content */
+  body.sidebar-collapsed .main-content {
+    margin-left: var(--sidebar-collapsed);
+    width: calc(100% - var(--sidebar-collapsed));
+  }
+
+  /* Content area should not add extra scroll since main-content handles it */
+  .content-area {
+    overflow-y: visible;
+    overflow-x: hidden;
+  }
+
+  /* Topbar stays sticky within the scrolling main-content */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+}
+
+/* Mobile: restore default body scrolling, remove fixed constraints */
+@media screen and (max-width: 1024px) {
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: auto;
+  }
+
+  .app-shell {
+    height: auto;
+    min-height: 100vh;
+    max-height: none;
+  }
+
+  .main-content {
+    height: auto;
+    max-height: none;
+    overflow-y: visible;
+    overflow-x: hidden;
+  }
+
+  .content-area {
+    overflow-y: visible;
+    overflow-x: hidden;
+  }
+}
