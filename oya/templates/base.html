@@ -22,9 +22,10 @@
 
   <script>
     (function() {
-      const saved = localStorage.getItem('oya_theme');
+      const STORAGE_KEY = 'oya_theme';
+      const saved = localStorage.getItem(STORAGE_KEY);
       let theme;
-      if (saved === 'AUTO' || saved === 'auto') {
+      if (saved === 'system' || saved === 'auto') {
         theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       } else {
         theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -252,7 +253,7 @@
   <script src="{% static 'js/main.js' %}"></script>
 
   <script>
-    // ===== THEME SYSTEM (FIXED) =====
+    // ===== THEME SYSTEM (UNIFIED) =====
     (function() {
       const STORAGE_KEY = 'oya_theme';
 
@@ -279,24 +280,27 @@
           detail: {
             theme: theme,
             applied: applied,
-            source: source || 'topbar'
+            source: source || 'base'
           }
         }));
       }
 
+      // Initialize theme on page load
       (function initTheme() {
         const saved = getCurrentTheme();
         const applied = resolveTheme(saved);
         document.documentElement.setAttribute('data-theme', applied);
       })();
 
+      // Theme option buttons (from settings page, etc.)
       const themeOptions = document.querySelectorAll('[data-theme-option]');
       themeOptions.forEach(btn => {
         btn.addEventListener('click', function() {
-          setTheme(this.dataset.themeOption, 'topbar');
+          setTheme(this.dataset.themeOption, 'settings');
         });
       });
 
+      // Mobile theme button (cycles through themes)
       const mobileThemeBtn = document.getElementById('mobileThemeBtn');
       if (mobileThemeBtn) {
         mobileThemeBtn.addEventListener('click', function(e) {
@@ -311,6 +315,7 @@
         });
       }
 
+      // Settings page theme buttons
       const settingsThemeBtns = document.querySelectorAll('[data-settings-theme]');
       settingsThemeBtns.forEach(btn => {
         btn.addEventListener('click', function() {
@@ -318,15 +323,14 @@
         });
       });
 
+      // Listen for theme changes from other sources (topbar, mobile, etc.)
       window.addEventListener('oyathemechange', function(e) {
-        if (e.detail && e.detail.source !== 'topbar' && e.detail.source !== 'mobile-header') {
-          const currentApplied = document.documentElement.getAttribute('data-theme');
-          if (e.detail.applied && e.detail.applied !== currentApplied) {
-            document.documentElement.setAttribute('data-theme', e.detail.applied);
-          }
+        if (e.detail && e.detail.applied) {
+          document.documentElement.setAttribute('data-theme', e.detail.applied);
         }
       });
 
+      // Listen for system preference changes
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
         const currentPref = getCurrentTheme();
         if (currentPref === 'system' || currentPref === 'auto') {
