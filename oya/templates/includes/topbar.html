@@ -25,13 +25,13 @@
     <!-- Theme Dropdown (Desktop only) -->
     <div class="dropdown hide-mobile">
       <button class="topbar-btn dropdown-toggle" id="themeMenuToggle" aria-label="Theme Menu" title="Change Theme" data-active-theme="light">
-        <svg class="theme-icon-current" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="theme-icon-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
         </svg>
-        <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="theme-icon-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
         </svg>
-        <svg class="theme-icon-desktop" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="theme-icon-system" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
         </svg>
       </button>
@@ -117,6 +117,7 @@
 <script>
 // Theme Dropdown Logic
 (function() {
+  const STORAGE_KEY = 'oya_theme';
   var themeToggle = document.getElementById('themeMenuToggle');
   var themeMenu = document.getElementById('themeDropdownMenu');
   if (!themeToggle || !themeMenu) return;
@@ -139,14 +140,29 @@
   themeMenu.querySelectorAll('[data-theme-option]').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var theme = this.dataset.themeOption;
-      if (typeof setThemeAll === 'function') setThemeAll(theme);
+      setThemeAll(theme);
       themeToggle.closest('.dropdown').classList.remove('open');
     });
+  });
+
+  // Initialize theme UI on load
+  function initThemeUI() {
+    var stored = localStorage.getItem(STORAGE_KEY);
+    var theme = (stored === 'dark' || stored === 'light' || stored === 'system') ? stored : 'system';
+    updateAllThemeUI(theme);
+  }
+  initThemeUI();
+
+  // Listen for theme changes from other sources (mobile btn, settings page, etc.)
+  window.addEventListener('oyathemechange', function(e) {
+    if (e.detail && e.detail.theme) {
+      updateAllThemeUI(e.detail.theme);
+    }
   });
 })();
 
 function setThemeAll(theme) {
-  localStorage.setItem('oya-theme', theme);
+  localStorage.setItem('oya_theme', theme);
   var root = document.documentElement;
   if (theme === 'system') {
     var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -159,6 +175,7 @@ function setThemeAll(theme) {
 }
 
 function updateAllThemeUI(theme) {
+  // Update dropdown checkmarks
   var themeMenu = document.getElementById('themeDropdownMenu');
   if (themeMenu) {
     themeMenu.querySelectorAll('[data-theme-option]').forEach(function(btn) {
@@ -168,16 +185,18 @@ function updateAllThemeUI(theme) {
       btn.classList.toggle('active', isActive);
     });
   }
+  // Update desktop toggle button icon
   var desktopBtn = document.getElementById('themeMenuToggle');
   if (desktopBtn) {
     desktopBtn.setAttribute('data-active-theme', theme);
-    desktopBtn.querySelectorAll('.theme-icon-current, .theme-icon-moon, .theme-icon-desktop').forEach(function(icon) {
+    desktopBtn.querySelectorAll('.theme-icon-light, .theme-icon-dark, .theme-icon-system').forEach(function(icon) {
       icon.style.display = 'none';
     });
-    var activeClass = theme === 'system' ? 'theme-icon-desktop' : (theme === 'dark' ? 'theme-icon-moon' : 'theme-icon-current');
+    var activeClass = theme === 'system' ? 'theme-icon-system' : (theme === 'dark' ? 'theme-icon-dark' : 'theme-icon-light');
     var activeIcon = desktopBtn.querySelector('.' + activeClass);
     if (activeIcon) activeIcon.style.display = 'inline-block';
   }
+  // Update mobile toggle button icon
   var mobileBtn = document.getElementById('mobileThemeBtn');
   if (mobileBtn) {
     mobileBtn.setAttribute('data-active-theme', theme);
@@ -189,20 +208,6 @@ function updateAllThemeUI(theme) {
     if (mai) mai.style.display = 'inline-block';
   }
 }
-
-function initThemeUI() {
-  var stored = localStorage.getItem('oya-theme');
-  var theme = (stored === 'dark' || stored === 'light') ? stored : 'system';
-  updateAllThemeUI(theme);
-}
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initThemeUI);
-} else {
-  initThemeUI();
-}
-window.addEventListener('storage', function(e) {
-  if (e.key === 'oya-theme') updateAllThemeUI(e.newValue || 'system');
-});
 
 // User Dropdown
 (function() {
