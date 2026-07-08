@@ -412,7 +412,7 @@ def income_list(request):
     dues_grouped = []
     for txn in dues_txns_qs:
         dues_records = DuesPayment.objects.filter(
-            transaction=txn
+            transactions=txn
         ).values_list("year", flat=True).order_by("year")
         
         years_list = list(dues_records)
@@ -789,7 +789,7 @@ def finance_summary(request):
     
     for txn in recent_dues_txns:
         dues_records = DuesPayment.objects.filter(
-            transaction=txn
+            transactions=txn
         ).values_list("year", flat=True).order_by("year")
         
         years_list = list(dues_records)
