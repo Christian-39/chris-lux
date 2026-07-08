@@ -1,6 +1,6 @@
 """Updated views for OYA finance with smart dues allocation."""
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -370,12 +370,12 @@ def dues_delete(request, pk):
 @login_required
 def income_list(request):
     """List all income records split by Dues (grouped by transaction) and Donations with totals."""
-    
+
     # --- DUES (grouped by DuesPaymentTransaction) ---
     dues_txns_qs = DuesPaymentTransaction.objects.select_related(
         "member", "recorded_by"
     ).order_by("-payment_date")
-    
+
     # --- DONATIONS & OTHER (non-dues income) ---
     donation_qs = Income.objects.exclude(income_type="DUES").select_related("created_by", "member")
 
@@ -414,7 +414,7 @@ def income_list(request):
         dues_records = DuesPayment.objects.filter(
             transactions=txn
         ).values_list("year", flat=True).order_by("year")
-        
+
         years_list = list(dues_records)
         if years_list:
             if len(years_list) == 1:
@@ -427,7 +427,7 @@ def income_list(request):
                 reason = f"Yearly Dues — {year_display}{prepaid_label}"
         else:
             reason = "Yearly Dues"
-        
+
         dues_grouped.append({
             "transaction": txn,
             "reason": reason,
@@ -774,24 +774,24 @@ def finance_summary(request):
         # ===================================================================
     # FIX: Group dues payments by transaction instead of showing each year
     # ===================================================================
-    
+
     recent_dues_txns = DuesPaymentTransaction.objects.select_related(
         "member", "recorded_by"
     ).order_by("-payment_date")[:5]
-    
+
     recent_donations = Income.objects.exclude(
         income_type="DUES"
     ).select_related("created_by", "member").order_by("-created_at")[:5]
-    
+
     recent_expenses = Expense.objects.select_related("created_by").order_by("-created_at")[:5]
-    
+
     recent_transactions = []
-    
+
     for txn in recent_dues_txns:
         dues_records = DuesPayment.objects.filter(
             transactions=txn
         ).values_list("year", flat=True).order_by("year")
-        
+
         years_list = list(dues_records)
         if years_list:
             if len(years_list) == 1:
@@ -804,13 +804,18 @@ def finance_summary(request):
                 description = f"Yearly Dues ({year_display}){prepaid_label}"
         else:
             description = "Yearly Dues"
-        
+
+        # Normalize payment_date to datetime for consistent sorting
+        payment_dt = txn.payment_date
+        if isinstance(payment_dt, date) and not isinstance(payment_dt, datetime):
+            payment_dt = datetime.combine(payment_dt, datetime.min.time())
+
         recent_transactions.append({
             "type": "dues_transaction",
             "amount": txn.total_amount,
             "description": description,
             "reason": description,
-            "created_at": txn.payment_date,
+            "created_at": payment_dt,
             "payment_date": txn.payment_date,
             "member": txn.member,
             "recorded_by": txn.recorded_by,
@@ -819,7 +824,7 @@ def finance_summary(request):
             "years": years_list,
             "is_prepaid": any(y > current_year for y in years_list) if years_list else False,
         })
-    
+
     for income in recent_donations:
         recent_transactions.append({
             "type": "income",
@@ -833,7 +838,7 @@ def finance_summary(request):
             "created_by": income.created_by,
             "paid_by": income.paid_by,
         })
-    
+
     for expense in recent_expenses:
         recent_transactions.append({
             "type": "expense",
@@ -845,7 +850,7 @@ def finance_summary(request):
             "expense_object": expense,
             "created_by": expense.created_by,
         })
-    
+
     recent_transactions.sort(key=lambda x: x["created_at"], reverse=True)
     recent_transactions = recent_transactions[:5]
 
@@ -1018,7 +1023,7 @@ def prepaid_list(request):
             year_display = str(years_sorted[0])
         else:
             year_display = f"{years_sorted[0]}–{years_sorted[-1]}"
-        
+
         prepaid_grouped.append({
             "member": data["member"],
             "years": years_sorted,
@@ -1085,4 +1090,3 @@ def prepaid_detail(request, member_id):
         "yearly_dues": YEARLY_DUES,
     }
     return render(request, "finance/prepaid_detail.html", context)
-
