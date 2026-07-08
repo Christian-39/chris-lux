@@ -805,10 +805,13 @@ def finance_summary(request):
         else:
             description = "Yearly Dues"
 
-        # Normalize payment_date to datetime for consistent sorting
+        # Normalize payment_date to aware datetime for consistent sorting
         payment_dt = txn.payment_date
         if isinstance(payment_dt, date) and not isinstance(payment_dt, datetime):
             payment_dt = datetime.combine(payment_dt, datetime.min.time())
+        # Make naive datetime aware (match Django's timezone-aware datetimes)
+        if payment_dt.tzinfo is None:
+            payment_dt = timezone.make_aware(payment_dt)
 
         recent_transactions.append({
             "type": "dues_transaction",
