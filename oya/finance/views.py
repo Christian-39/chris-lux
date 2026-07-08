@@ -369,12 +369,13 @@ def dues_delete(request, pk):
 
 @login_required
 def income_list(request):
-    """List all income records split by Dues and Donations with totals."""
-    # --- DUES (from Income records with income_type="DUES") ---
-    dues_qs = Income.objects.filter(income_type="DUES").select_related(
-        "created_by", "dues_payment", "dues_payment__member"
-    ).order_by("-created_at")
-
+    """List all income records split by Dues (grouped by transaction) and Donations with totals."""
+    
+    # --- DUES (grouped by DuesPaymentTransaction) ---
+    dues_txns_qs = DuesPaymentTransaction.objects.select_related(
+        "member", "recorded_by"
+    ).order_by("-payment_date")
+    
     # --- DONATIONS & OTHER (non-dues income) ---
     donation_qs = Income.objects.exclude(income_type="DUES").select_related("created_by", "member")
 
@@ -387,12 +388,10 @@ def income_list(request):
             Q(member__full_name__icontains=search_term) |
             Q(created_by__full_name__icontains=search_term)
         )
-        # Also filter dues by search term
-        dues_qs = dues_qs.filter(
-            Q(reason__icontains=search_term) |
-            Q(paid_by__icontains=search_term) |
-            Q(dues_payment__member__full_name__icontains=search_term) |
-            Q(created_by__full_name__icontains=search_term)
+        dues_txns_qs = dues_txns_qs.filter(
+            Q(member__full_name__icontains=search_term) |
+            Q(receipt_reference__icontains=search_term) |
+            Q(recorded_by__full_name__icontains=search_term)
         )
 
     type_filter = request.GET.get("type", "")
@@ -402,14 +401,46 @@ def income_list(request):
     date_from = request.GET.get("date_from", "")
     date_to = request.GET.get("date_to", "")
     if date_from:
-        dues_qs = dues_qs.filter(created_at__date__gte=date_from)
         donation_qs = donation_qs.filter(created_at__date__gte=date_from)
+        dues_txns_qs = dues_txns_qs.filter(payment_date__gte=date_from)
     if date_to:
-        dues_qs = dues_qs.filter(created_at__date__lte=date_to)
         donation_qs = donation_qs.filter(created_at__date__lte=date_to)
+        dues_txns_qs = dues_txns_qs.filter(payment_date__lte=date_to)
 
-    # Pagination for DUES
-    dues_paginator = Paginator(dues_qs, 10)
+    # Build grouped dues data for display
+    current_year = timezone.now().year
+    dues_grouped = []
+    for txn in dues_txns_qs:
+        dues_records = DuesPayment.objects.filter(
+            transaction=txn
+        ).values_list("year", flat=True).order_by("year")
+        
+        years_list = list(dues_records)
+        if years_list:
+            if len(years_list) == 1:
+                year_display = str(years_list[0])
+                reason = f"Yearly Dues — {year_display}"
+            else:
+                year_display = f"{years_list[0]}–{years_list[-1]}"
+                has_prepaid = any(y > current_year for y in years_list)
+                prepaid_label = " (Prepaid)" if has_prepaid else ""
+                reason = f"Yearly Dues — {year_display}{prepaid_label}"
+        else:
+            reason = "Yearly Dues"
+        
+        dues_grouped.append({
+            "transaction": txn,
+            "reason": reason,
+            "amount": txn.total_amount,
+            "member": txn.member,
+            "recorded_by": txn.recorded_by,
+            "payment_date": txn.payment_date,
+            "years": years_list,
+            "is_prepaid": any(y > current_year for y in years_list) if years_list else False,
+        })
+
+    # Pagination for DUES (grouped transactions)
+    dues_paginator = Paginator(dues_grouped, 10)
     dues_page = request.GET.get("dues_page", 1)
     dues_incomes = dues_paginator.get_page(dues_page)
 
@@ -443,6 +474,7 @@ def income_list(request):
         "total_records": total_records,
     }
     return render(request, "finance/income_list.html", context)
+
 
 @login_required
 def income_create(request):
@@ -739,21 +771,84 @@ def finance_summary(request):
             "percentage": percentage,
         })
 
-    # FIX: Changed from [:10] to [:5]
-    recent_income = list(Income.objects.select_related("created_by").all()[:5])
-    recent_expenses = list(Expense.objects.select_related("created_by").all()[:5])
+        # ===================================================================
+    # FIX: Group dues payments by transaction instead of showing each year
+    # ===================================================================
+    
+    recent_dues_txns = DuesPaymentTransaction.objects.select_related(
+        "member", "recorded_by"
+    ).order_by("-payment_date")[:5]
+    
+    recent_donations = Income.objects.exclude(
+        income_type="DUES"
+    ).select_related("created_by", "member").order_by("-created_at")[:5]
+    
+    recent_expenses = Expense.objects.select_related("created_by").order_by("-created_at")[:5]
+    
+    recent_transactions = []
+    
+    for txn in recent_dues_txns:
+        dues_records = DuesPayment.objects.filter(
+            transaction=txn
+        ).values_list("year", flat=True).order_by("year")
+        
+        years_list = list(dues_records)
+        if years_list:
+            if len(years_list) == 1:
+                year_display = str(years_list[0])
+                description = f"Yearly Dues {year_display}"
+            else:
+                year_display = f"{years_list[0]}–{years_list[-1]}"
+                has_prepaid = any(y > current_year for y in years_list)
+                prepaid_label = " (Prepaid)" if has_prepaid else ""
+                description = f"Yearly Dues ({year_display}){prepaid_label}"
+        else:
+            description = "Yearly Dues"
+        
+        recent_transactions.append({
+            "type": "dues_transaction",
+            "amount": txn.total_amount,
+            "description": description,
+            "reason": description,
+            "created_at": txn.payment_date,
+            "payment_date": txn.payment_date,
+            "member": txn.member,
+            "recorded_by": txn.recorded_by,
+            "transaction_id": txn.id,
+            "income_type": "DUES",
+            "years": years_list,
+            "is_prepaid": any(y > current_year for y in years_list) if years_list else False,
+        })
+    
+    for income in recent_donations:
+        recent_transactions.append({
+            "type": "income",
+            "amount": income.amount,
+            "description": income.reason,
+            "reason": income.reason,
+            "created_at": income.created_at,
+            "income_type": income.income_type,
+            "income_object": income,
+            "member": income.member,
+            "created_by": income.created_by,
+            "paid_by": income.paid_by,
+        })
+    
+    for expense in recent_expenses:
+        recent_transactions.append({
+            "type": "expense",
+            "amount": expense.amount,
+            "description": expense.description,
+            "reason": expense.description,
+            "created_at": expense.created_at,
+            "category": expense.category,
+            "expense_object": expense,
+            "created_by": expense.created_by,
+        })
+    
+    recent_transactions.sort(key=lambda x: x["created_at"], reverse=True)
+    recent_transactions = recent_transactions[:5]
 
-    for item in recent_income:
-        item.type = "income"
-    for item in recent_expenses:
-        item.type = "expense"
-
-    # FIX: Changed from [:10] to [:5]
-    recent_transactions = sorted(
-        recent_income + recent_expenses,
-        key=lambda x: x.created_at,
-        reverse=True
-    )[:5]
 
     # FIX: Only include actual members (not staff/superusers) in debtor list
     members = User.objects.filter(
@@ -888,38 +983,77 @@ def member_dues_preview(request):
 
 @login_required
 def prepaid_list(request):
-    """List all members with prepaid dues (future years fully paid)."""
+    """List all members with prepaid dues (future years fully paid) — grouped by member."""
     current_year = timezone.now().year
 
     # Get all prepaid dues payments (year > current_year, fully paid)
-    prepaid_qs = DuesPayment.objects.filter(
+    prepaid_members_qs = DuesPayment.objects.filter(
         year__gt=current_year,
         amount_paid__gte=YEARLY_DUES,
-    ).select_related("member", "recorded_by").order_by("-year", "member__full_name")
+    ).select_related("member", "recorded_by").order_by("member__full_name", "-year")
+
+    # Group by member: collect years and total amounts
+    member_prepaid_map = {}
+    for dp in prepaid_members_qs:
+        member_id = dp.member_id
+        if member_id not in member_prepaid_map:
+            member_prepaid_map[member_id] = {
+                "member": dp.member,
+                "years": [],
+                "total_amount": Decimal("0"),
+                "latest_recorded_by": dp.recorded_by,
+                "latest_date": dp.created_at,
+            }
+        member_prepaid_map[member_id]["years"].append(dp.year)
+        member_prepaid_map[member_id]["total_amount"] += dp.amount_paid
+        if dp.created_at > member_prepaid_map[member_id]["latest_date"]:
+            member_prepaid_map[member_id]["latest_date"] = dp.created_at
+            member_prepaid_map[member_id]["latest_recorded_by"] = dp.recorded_by
+
+    # Build grouped records list
+    prepaid_grouped = []
+    for member_id, data in member_prepaid_map.items():
+        years_sorted = sorted(data["years"])
+        if len(years_sorted) == 1:
+            year_display = str(years_sorted[0])
+        else:
+            year_display = f"{years_sorted[0]}–{years_sorted[-1]}"
+        
+        prepaid_grouped.append({
+            "member": data["member"],
+            "years": years_sorted,
+            "year_display": year_display,
+            "total_amount": data["total_amount"],
+            "recorded_by": data["latest_recorded_by"],
+            "created_at": data["latest_date"],
+            "year_count": len(years_sorted),
+        })
+
+    # Sort by total amount (highest first)
+    prepaid_grouped.sort(key=lambda x: x["total_amount"], reverse=True)
 
     # Calculate totals
-    total_prepaid_amount = prepaid_qs.aggregate(
-        total=Sum("amount_paid")
-    )["total"] or Decimal("0")
+    total_prepaid_amount = sum(item["total_amount"] for item in prepaid_grouped)
+    total_prepaid_records = len(prepaid_grouped)
+    prepaid_members_count = len(prepaid_grouped)
 
-    total_prepaid_records = prepaid_qs.count()
-
-    # Get unique members with prepaid dues
-    prepaid_members = prepaid_qs.values_list("member_id", flat=True).distinct().count()
-
-    # Group by year
-    years_with_prepaid = prepaid_qs.values_list("year", flat=True).distinct().order_by("-year")
+    # Get unique future years covered
+    all_years = set()
+    for item in prepaid_grouped:
+        all_years.update(item["years"])
+    years_with_prepaid = sorted(all_years, reverse=True)
 
     context = {
-        "prepaid_records": prepaid_qs,
+        "prepaid_records": prepaid_grouped,
         "total_prepaid_amount": total_prepaid_amount,
         "total_prepaid_records": total_prepaid_records,
-        "prepaid_members_count": prepaid_members,
+        "prepaid_members_count": prepaid_members_count,
         "years_with_prepaid": years_with_prepaid,
         "current_year": current_year,
         "yearly_dues": YEARLY_DUES,
     }
     return render(request, "finance/prepaid_list.html", context)
+
 
 
 @login_required
