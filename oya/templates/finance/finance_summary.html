@@ -118,51 +118,87 @@
 <div class="dashboard-grid dashboard-grid-2">
 
   <!-- Recent Transactions -->
-  <div class="card">
-    <div class="card-header">
-      <div>
-        <div class="card-header-title">Recent Transactions</div>
-        <div class="card-header-subtitle">Latest financial activities</div>
-      </div>
-      <a href="{% url 'finance:donation_list' %}" class="btn btn-sm btn-ghost">View All</a>
+<div class="card">
+  <div class="card-header">
+    <div>
+      <div class="card-header-title">Recent Transactions</div>
+      <div class="card-header-subtitle">Latest financial activities</div>
     </div>
-    <div class="card-body" style="padding:0;">
-      <div class="activity-feed" style="padding:0 1.25rem;">
-        {% for transaction in recent_transactions %}
-        <div class="activity-item">
-          {% if transaction.type == "income" %}
-          <div class="activity-icon {% if transaction.income_type == 'DUES' %}warning{% else %}success{% endif %}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
-          </div>
-          <div class="activity-content">
-            <div class="activity-text">
-              <strong>&#x20A6;{{ transaction.amount|floatformat:2|intcomma }}</strong> - {{ transaction.reason }}
-              <span class="badge {% if transaction.income_type == 'DUES' %}badge-warning{% else %}badge-success{% endif %}" style="margin-left:0.5rem;">
-                {{ transaction.get_income_type_display }}
-              </span>
-            </div>
-            <div class="activity-time">{{ transaction.created_at|date:"M d, Y \a\t h:i A" }}</div>
-          </div>
-          {% else %}
-          <div class="activity-icon danger">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg>
-          </div>
-          <div class="activity-content">
-            <div class="activity-text"><strong>&#x20A6;{{ transaction.amount|floatformat:2|intcomma }}</strong> - {{ transaction.description }} <strong>{% if transaction.category %}({{ transaction.get_category_display }}){% endif %}</strong></div>
-            <div class="activity-time">{{ transaction.created_at|date:"M d, Y \a\t h:i A" }}</div>
-          </div>
-          {% endif %}
+    <a href="{% url 'finance:donation_list' %}" class="btn btn-sm btn-ghost">View All</a>
+  </div>
+  <div class="card-body" style="padding:0;">
+    <div class="activity-feed" style="padding:0 1.25rem;">
+      {% for transaction in recent_transactions %}
+      <div class="activity-item transaction-row" style="cursor: pointer;" 
+           {% if transaction.type == "dues_transaction" %}
+           onclick="window.location.href='{% url 'finance:member_dues_detail' transaction.member.id %}'"
+           {% elif transaction.type == "income" and transaction.income_object %}
+           onclick="window.location.href='{% url 'finance:income_detail' transaction.income_object.id %}'"
+           {% elif transaction.type == "expense" and transaction.expense_object %}
+           onclick="window.location.href='{% url 'finance:expense_detail' transaction.expense_object.id %}'"
+           {% endif %}>
+        
+        {% if transaction.type == "dues_transaction" %}
+        <div class="activity-icon warning">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
         </div>
-        {% empty %}
-        <div class="activity-item" style="justify-content:center;padding:2rem 0;">
-          <div class="empty-state" style="padding:0;text-align:center;">
-            <p style="color:var(--oya-text-muted);">No transactions recorded yet.</p>
+        <div class="activity-content">
+          <div class="activity-text">
+            <strong>{{ transaction.member.get_full_name }}</strong> — 
+            <strong>&#x20A6;{{ transaction.amount|floatformat:2|intcomma }}</strong> 
+            — {{ transaction.description }}
+            <span class="badge badge-warning" style="margin-left:0.5rem;">Yearly Dues</span>
+            {% if transaction.is_prepaid %}
+            <span class="badge badge-info" style="margin-left:0.25rem;">Prepaid</span>
+            {% endif %}
           </div>
+          <div class="activity-time">{{ transaction.payment_date|date:"M d, Y \a\t h:i A" }}</div>
         </div>
-        {% endfor %}
+        
+        {% elif transaction.type == "income" %}
+        <div class="activity-icon success">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+        </div>
+        <div class="activity-content">
+          <div class="activity-text">
+            {% if transaction.member %}
+            <strong>{{ transaction.member.get_full_name }}</strong> — 
+            {% elif transaction.paid_by %}
+            <strong>{{ transaction.paid_by }}</strong> — 
+            {% endif %}
+            <strong>&#x20A6;{{ transaction.amount|floatformat:2|intcomma }}</strong> 
+            — {{ transaction.reason }}
+            <span class="badge badge-success" style="margin-left:0.5rem;">
+              {{ transaction.get_income_type_display }}
+            </span>
+          </div>
+          <div class="activity-time">{{ transaction.created_at|date:"M d, Y \a\t h:i A" }}</div>
+        </div>
+        
+        {% elif transaction.type == "expense" %}
+        <div class="activity-icon danger">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg>
+        </div>
+        <div class="activity-content">
+          <div class="activity-text">
+            <strong>&#x20A6;{{ transaction.amount|floatformat:2|intcomma }}</strong> 
+            — {{ transaction.description }} 
+            <strong>{% if transaction.category %}({{ transaction.get_category_display }}){% endif %}</strong>
+          </div>
+          <div class="activity-time">{{ transaction.created_at|date:"M d, Y \a\t h:i A" }}</div>
+        </div>
+        {% endif %}
       </div>
+      {% empty %}
+      <div class="activity-item" style="justify-content:center;padding:2rem 0;">
+        <div class="empty-state" style="padding:0;text-align:center;">
+          <p style="color:var(--oya-text-muted);">No transactions recorded yet.</p>
+        </div>
+      </div>
+      {% endfor %}
     </div>
   </div>
+</div>
 
   <!-- Top Debtors -->
   <div class="card">
@@ -232,6 +268,8 @@
 </div>
 
 <style>
+.transaction-row { transition: background-color 0.15s ease; }
+.transaction-row:hover { background-color: var(--oya-surface-hover); }
 /* Paste your existing responsive CSS here, or keep the full block from your original file */
 @media (max-width: 768px) {
   .page-header-left h1 { font-size: 1.375rem !important; }
