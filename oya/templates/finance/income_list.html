@@ -126,29 +126,32 @@
         </tr>
       </thead>
       <tbody>
-        {% for income in dues_incomes %}
+                {% for item in dues_incomes %}
         <tr>
           <td style="white-space:nowrap;">
             <span class="badge badge-dues">Dues</span>
-            <a href="{% url 'finance:income_detail' income.pk %}" class="cell-name" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">{{ income.reason|truncatechars:30 }}</a>
-          </td>
-          <td style="white-space:nowrap;">
-            {% if income.dues_payment and income.dues_payment.member %}
-            <a href="{% url 'finance:member_dues_detail' income.dues_payment.member.id %}" class="text-decoration-none">{{ income.dues_payment.member.get_full_name }}</a>
-            {% else %}
-            <span class="cell-muted">{{ income.paid_by|default:"—" }}</span>
+            <a href="{% url 'finance:member_dues_detail' item.member.id %}" class="cell-name" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">{{ item.reason|truncatechars:30 }}</a>
+            {% if item.is_prepaid %}
+            <span class="badge badge-prepaid-mini">Prepaid</span>
             {% endif %}
           </td>
-          <td class="text-end fw-bold" style="color:var(--oya-success);font-size:clamp(0.8125rem, 2vw, 0.875rem);white-space:nowrap;">&#8358;{{ income.amount|floatformat:0|intcomma }}</td>
-          <td style="white-space:nowrap;">{% if income.created_by %}{{ income.created_by.get_full_name }}{% else %}—{% endif %}</td>
-          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ income.created_at|date:"M d, Y" }}</td>
+          <td style="white-space:nowrap;">
+            {% if item.member %}
+            <a href="{% url 'finance:member_dues_detail' item.member.id %}" class="text-decoration-none">{{ item.member.get_full_name }}</a>
+            {% else %}
+            <span class="cell-muted">—</span>
+            {% endif %}
+          </td>
+          <td class="text-end fw-bold" style="color:var(--oya-success);font-size:clamp(0.8125rem, 2vw, 0.875rem);white-space:nowrap;">&#8358;{{ item.amount|floatformat:0|intcomma }}</td>
+          <td style="white-space:nowrap;">{% if item.recorded_by %}{{ item.recorded_by.get_full_name }}{% else %}—{% endif %}</td>
+          <td class="cell-muted" style="font-size:clamp(0.75rem, 1.5vw, 0.8125rem);white-space:nowrap;">{{ item.payment_date|date:"M d, Y" }}</td>
           <td style="white-space:nowrap;">
             <div class="table-actions" style="flex-wrap:nowrap;gap:0.25rem;">
-              <a href="{% url 'finance:income_detail' income.pk %}" class="table-action-btn" title="View">
+              <a href="{% url 'finance:member_dues_detail' item.member.id %}" class="table-action-btn" title="View Member Dues">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </a>
               {% if user.has_admin_access %}
-              <a href="{% url 'finance:income_delete' income.pk %}" class="table-action-btn" title="Delete" style="color:var(--oya-danger);">
+              <a href="{% url 'finance:dues_delete' item.transaction.id %}" class="table-action-btn" title="Delete" style="color:var(--oya-danger);">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
               </a>
               {% endif %}
