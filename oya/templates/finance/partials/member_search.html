@@ -1,0 +1,93 @@
+<div class="position-relative" id="memberSearchWidget">
+  <label class="form-label fw-semibold">{{ label|default:'Member' }} {% if required %}<span class="text-danger">*</span>{% endif %}</label>
+  <div id="memberSearchContainer">
+    <div class="input-group">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="text" class="form-control" id="memberSearchInput" placeholder="{{ placeholder|default:'Type member name or serial...' }}" autocomplete="off">
+    </div>
+    <div class="search-results d-none" id="searchResults" style="position:absolute;top:100%;left:0;right:0;z-index:1000;background:#fff;border:1px solid #dee2e6;border-radius:0 0 8px 8px;max-height:300px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    </div>
+  </div>
+  <div class="member-selected mt-2 d-none align-items-center gap-2 p-2 rounded bg-light" id="memberSelected">
+    <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center fw-bold" style="width:32px;height:32px;font-size:.8rem;" id="selectedAvatar">AB</div>
+    <div class="flex-grow-1">
+      <div class="fw-semibold small" id="selectedName"></div>
+      <div class="text-muted" style="font-size:.7rem;" id="selectedMeta"></div>
+    </div>
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="changeMember">Change</button>
+  </div>
+  <input type="hidden" name="{{ field_name|default:'member' }}" id="{{ field_id|default:'id_member' }}">
+</div>
+
+<script>
+(function() {
+  const searchInput = document.getElementById('memberSearchInput');
+  const searchResults = document.getElementById('searchResults');
+  const memberSelected = document.getElementById('memberSelected');
+  const memberSearchContainer = document.getElementById('memberSearchContainer');
+  const changeMemberBtn = document.getElementById('changeMember');
+  const hiddenInput = document.getElementById('{{ field_id|default:"id_member" }}');
+  let searchTimeout;
+
+  searchInput.addEventListener('input', function() {
+    const q = this.value.trim();
+    clearTimeout(searchTimeout);
+    if (q.length < 2) { searchResults.classList.add('d-none'); return; }
+    searchTimeout = setTimeout(function() {
+      fetch('{% url "finance:search_members" %}?q=' + encodeURIComponent(q), {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(r => r.json())
+      .then(data => {
+        searchResults.innerHTML = '';
+        if (data.results && data.results.length) {
+          data.results.forEach(function(item) {
+            const div = document.createElement('div');
+            div.className = 'search-result-item';
+            div.style.cssText = 'padding:.75rem 1rem;cursor:pointer;border-bottom:1px solid #f0f0f0;transition:background .15s;';
+            div.innerHTML = item.html;
+            div.addEventListener('click', function() { selectMember(item); });
+            div.addEventListener('mouseenter', function() { this.style.background = '#f8f9fa'; });
+            div.addEventListener('mouseleave', function() { this.style.background = ''; });
+            searchResults.appendChild(div);
+          });
+          searchResults.classList.remove('d-none');
+        } else {
+          searchResults.innerHTML = '<div class="p-3 text-muted">No members found.</div>';
+          searchResults.classList.remove('d-none');
+        }
+      })
+      .catch(function() {
+        searchResults.innerHTML = '<div class="p-3 text-danger">Search failed.</div>';
+        searchResults.classList.remove('d-none');
+      });
+    }, 300);
+  });
+
+  function selectMember(item) {
+    hiddenInput.value = item.id;
+    searchInput.value = item.text;
+    searchResults.classList.add('d-none');
+    memberSearchContainer.classList.add('d-none');
+    memberSelected.classList.remove('d-none');
+    memberSelected.classList.add('d-flex');
+    document.getElementById('selectedName').textContent = item.name;
+    document.getElementById('selectedMeta').textContent = item.serial + ' \u00b7 ' + item.role;
+    document.getElementById('selectedAvatar').textContent = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  }
+
+  changeMemberBtn.addEventListener('click', function() {
+    hiddenInput.value = '';
+    searchInput.value = '';
+    memberSearchContainer.classList.remove('d-none');
+    memberSelected.classList.add('d-none');
+    memberSelected.classList.remove('d-flex');
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+      searchResults.classList.add('d-none');
+    }
+  });
+})();
+</script>
