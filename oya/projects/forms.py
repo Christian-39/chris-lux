@@ -3,6 +3,7 @@ Forms for OYA projects — EXTENDED with fundraising fields.
 Replace your existing projects/forms.py with this file.
 """
 from django import forms
+from decimal import Decimal
 from .models import Project
 
 

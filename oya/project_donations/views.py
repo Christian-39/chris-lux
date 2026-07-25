@@ -17,7 +17,6 @@ from .models import OutsideDonor, Donation
 from .forms import OutsideDonorForm, DonationForm
 from .reports import (
     generate_project_fundraising_report,
-    generate_donor_statement,
     generate_donation_history_report,
     generate_member_donation_history_report,
     generate_outside_donor_statement,

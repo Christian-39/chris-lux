@@ -24,6 +24,7 @@ urlpatterns = [
     path("auditlogs/", include("auditlogs.urls")),
     path("dashboard/", include("dashboard.urls")),
     path("settings/", include("settingsapp.urls")),
+    path("project-donations/", include("project_donations.urls")),
     
     path('search/ajax/', global_search_ajax, name='global_search_ajax'),
 ]

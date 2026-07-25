@@ -41,6 +41,7 @@ LOCAL_APPS = [
     "elections",
     "finance",
     "projects",
+    "project_donations",
     "operations",
     "notifications",
     "auditlogs",
