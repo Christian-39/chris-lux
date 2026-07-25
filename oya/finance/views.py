@@ -14,6 +14,7 @@ from django.db import transaction
 from auditlogs.services import log_action
 from accounts.models import User
 from .models import Income, Expense, DuesPayment, DuesPaymentTransaction
+from project_donations.models import Donation as ProjectDonation, OutsideDonor
 from .forms import IncomeForm, ExpenseForm, DuesPaymentAllocationForm
 
 logger = logging.getLogger("oya")
@@ -894,12 +895,54 @@ def finance_summary(request):
         amount_paid__gte=YEARLY_DUES,
     ).count()
 
+    # ─── PROJECT DONATIONS ───
+    total_project_donations = ProjectDonation.objects.filter(
+        status="CONFIRMED"
+    ).aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+
+    total_member_project_donations = ProjectDonation.objects.filter(
+        status="CONFIRMED", donor_type="MEMBER"
+    ).aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+
+    total_outside_project_donations = ProjectDonation.objects.filter(
+        status="CONFIRMED", donor_type="OUTSIDE"
+    ).aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+
+    donations_by_project = ProjectDonation.objects.filter(
+        status="CONFIRMED"
+    ).values("project__title").annotate(
+        total=Sum("amount"), count=Count("id")
+    ).order_by("-total")
+
+    highest_fundraising_project = donations_by_project.first()
+
+    total_outside_donors_count = OutsideDonor.objects.count()
+
+    total_raised_through_invitees = ProjectDonation.objects.filter(
+        status="CONFIRMED", invited_by__isnull=False
+    ).aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+
     context = {
         "treasury_balance": treasury_balance,
         "total_income": total_income,
         "total_dues": total_dues,
         "total_donations": total_donations,
         "total_expenses": total_expenses,
+        "total_project_donations": total_project_donations,
+        "total_member_project_donations": total_member_project_donations,
+        "total_outside_project_donations": total_outside_project_donations,
+        "donations_by_project": list(donations_by_project),
+        "highest_fundraising_project": highest_fundraising_project,
+        "total_outside_donors_count": total_outside_donors_count,
+        "total_raised_through_invitees": total_raised_through_invitees,
         "total_transactions": Income.objects.count() + Expense.objects.count(),
         "expenses_by_category": expenses_by_category,
         "recent_transactions": recent_transactions,
