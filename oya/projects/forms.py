@@ -1,5 +1,6 @@
 """
-Forms for OYA projects.
+Forms for OYA projects — EXTENDED with fundraising fields.
+Replace your existing projects/forms.py with this file.
 """
 from django import forms
 from .models import Project
@@ -10,7 +11,11 @@ class ProjectForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        fields = ["title", "budget", "description", "status", "progress_percentage"]
+        fields = [
+            "title", "budget", "description", "status", "progress_percentage",
+            "enable_fundraising", "target_amount", "fundraising_start_date",
+            "fundraising_end_date", "fundraising_status"
+        ]
         widgets = {
             "title": forms.TextInput(attrs={
                 "class": "form-control",
@@ -34,6 +39,25 @@ class ProjectForm(forms.ModelForm):
                 "max": "100",
                 "placeholder": "0-100"
             }),
+            "enable_fundraising": forms.CheckboxInput(attrs={
+                "class": "form-check-input",
+                "id": "id_enable_fundraising"
+            }),
+            "target_amount": forms.NumberInput(attrs={
+                "class": "form-control",
+                "step": "0.01",
+                "min": "0",
+                "placeholder": "0.00"
+            }),
+            "fundraising_start_date": forms.DateInput(attrs={
+                "class": "form-control",
+                "type": "date"
+            }),
+            "fundraising_end_date": forms.DateInput(attrs={
+                "class": "form-control",
+                "type": "date"
+            }),
+            "fundraising_status": forms.Select(attrs={"class": "form-select"}),
         }
 
     def clean_progress_percentage(self):
@@ -47,3 +71,28 @@ class ProjectForm(forms.ModelForm):
         if budget and budget < 0:
             raise forms.ValidationError("Budget cannot be negative.")
         return budget
+
+    def clean_target_amount(self):
+        target = self.cleaned_data.get("target_amount")
+        if target and target < 0:
+            raise forms.ValidationError("Target amount cannot be negative.")
+        return target
+
+    def clean(self):
+        cleaned = super().clean()
+        enable = cleaned.get("enable_fundraising")
+        start = cleaned.get("fundraising_start_date")
+        end = cleaned.get("fundraising_end_date")
+
+        if enable:
+            if not cleaned.get("target_amount"):
+                self.add_error("target_amount", "Target amount is required when fundraising is enabled.")
+            if start and end and start > end:
+                self.add_error("fundraising_end_date", "End date cannot be before start date.")
+        else:
+            cleaned["target_amount"] = Decimal("0")
+            cleaned["fundraising_start_date"] = None
+            cleaned["fundraising_end_date"] = None
+            cleaned["fundraising_status"] = "UPCOMING"
+
+        return cleaned
