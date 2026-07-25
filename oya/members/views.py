@@ -66,9 +66,39 @@ def member_list(request):
 
 @login_required
 def member_detail(request, pk):
-    """Display member details."""
+    """Display member details with outside donors and donation data."""
     member = get_object_or_404(Member.objects.select_related("umu_nna_clan"), pk=pk)
-    return render(request, "members/member_detail.html", {"member": member})
+    
+    from project_donations.models import Donation, OutsideDonor
+    from django.db.models import Sum, Value, DecimalField
+    from django.db.models.functions import Coalesce
+    
+    # Outside donors invited by this member
+    outside_donors_invited = member.invited_outside_donors.select_related().all()
+    total_invited_donors = outside_donors_invited.count()
+    total_raised_through_invitees = outside_donors_invited.aggregate(
+        total=Coalesce(Sum("donations__amount", filter=Q(donations__status="CONFIRMED")), Value(0, output_field=DecimalField()))
+    )["total"] or 0
+    
+    # Personal project donations
+    personal_donations = Donation.objects.filter(
+        member=member, status="CONFIRMED"
+    ).select_related("project").order_by("-donation_date")
+    total_personal_donations = personal_donations.aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"] or 0
+    projects_supported = personal_donations.values("project").distinct().count()
+    
+    return render(request, "members/member_detail.html", {
+        "member": member,
+        "outside_donors_invited": outside_donors_invited,
+        "total_invited_donors": total_invited_donors,
+        "total_raised_through_invitees": total_raised_through_invitees,
+        "personal_donations": personal_donations,
+        "total_personal_donations": total_personal_donations,
+        "projects_supported": projects_supported,
+    })
+
 
 
 @login_required
