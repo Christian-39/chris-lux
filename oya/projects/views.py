@@ -54,9 +54,53 @@ def project_list(request):
 
 @login_required
 def project_detail(request, pk):
-    """Display project details."""
+    """Display project details with fundraising data."""
     project = get_object_or_404(Project, pk=pk)
-    return render(request, "projects/project_detail.html", {"project": project})
+    
+    fundraising_data = None
+    if project.enable_fundraising:
+        from project_donations.models import Donation
+        from django.db.models import Sum
+        
+        confirmed = Donation.objects.filter(
+            project=project, status="CONFIRMED"
+        ).select_related("member", "outside_donor", "recorded_by").order_by("-donation_date")
+        
+        member_donations = confirmed.filter(donor_type="MEMBER")
+        outside_donations = confirmed.filter(donor_type="OUTSIDE")
+        
+        total_donors = confirmed.values("member", "outside_donor").distinct().count()
+        
+        top_member_donors = member_donations.values(
+            "member__id", "member__full_name", "member__photo"
+        ).annotate(total=Sum("amount")).order_by("-total")[:5]
+        
+        top_outside_donors = outside_donations.values(
+            "outside_donor__id", "outside_donor__full_name", "outside_donor__profile_picture"
+        ).annotate(total=Sum("amount")).order_by("-total")[:5]
+        
+        top_inviters = confirmed.filter(
+            invited_by__isnull=False
+        ).values(
+            "invited_by__id", "invited_by__full_name", "invited_by__photo"
+        ).annotate(total=Sum("amount")).order_by("-total")[:5]
+        
+        fundraising_data = {
+            "total_donors": total_donors,
+            "member_donations_total": project.total_member_donations,
+            "outside_donations_total": project.total_outside_donations,
+            "total_donations_recorded": confirmed.count(),
+            "top_member_donors": list(top_member_donors),
+            "top_outside_donors": list(top_outside_donors),
+            "top_inviters": list(top_inviters),
+            "recent_donations": confirmed[:10],
+        }
+    
+    return render(request, "projects/project_detail.html", {
+        "project": project,
+        "fundraising_data": fundraising_data,
+    })
+
 
 
 @login_required
