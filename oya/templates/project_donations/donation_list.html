@@ -61,6 +61,17 @@
 <div class="filters-bar">
   <form method="get" style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
     <div class="filter-group">
+      <span class="filter-label">Project:</span>
+      <select name="project" class="form-control" style="width:180px;" onchange="this.form.submit()">
+        <option value="">All Projects</option>
+        {% for proj in fundraising_projects %}
+          <option value="{{ proj.id }}" {% if project_filter == proj.id|stringformat:"s" %}selected{% endif %}>
+            {{ proj.title|truncatechars:25 }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
       <span class="filter-label">Type:</span>
       <select name="donor_type" class="form-control" style="width:140px;" onchange="this.form.submit()">
         <option value="" {% if not donor_type_filter %}selected{% endif %}>All</option>
@@ -95,6 +106,7 @@
                onkeydown="if(event.key==='Enter') this.form.submit()">
         {% if donor_type_filter %}<input type="hidden" name="donor_type" value="{{ donor_type_filter }}">{% endif %}
         {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+        {% if project_filter %}<input type="hidden" name="project" value="{{ project_filter }}">{% endif %}
       </form>
     </div>
   </div>
@@ -169,7 +181,7 @@
               </div>
               <h3 style="font-size:1rem;">No donations found</h3>
               <p style="font-size:0.875rem;">
-                {% if search_term or donor_type_filter or status_filter %}
+                {% if search_term or donor_type_filter or status_filter or project_filter %}
                   No donations match your search/filter criteria.
                 {% else %}
                   No donations have been recorded yet. Click "Record Donation" to get started.
@@ -188,7 +200,7 @@
     <span style="font-size:0.8125rem;color:var(--oya-text-muted);">Showing {{ donations.start_index }}-{{ donations.end_index }} of {{ donations.paginator.count }} records</span>
     <div class="pagination">
       {% if donations.has_previous %}
-        <a href="?page={{ donations.previous_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if donor_type_filter %}&donor_type={{ donor_type_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="page-btn">
+        <a href="?page={{ donations.previous_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if donor_type_filter %}&donor_type={{ donor_type_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if project_filter %}&project={{ project_filter }}{% endif %}" class="page-btn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
         </a>
       {% else %}
@@ -198,15 +210,15 @@
         {% if donations.number == num %}
           <button class="page-btn active">{{ num }}</button>
         {% elif num > donations.number|add:'-3' and num < donations.number|add:'3' %}
-          <a href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if donor_type_filter %}&donor_type={{ donor_type_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="page-btn">{{ num }}</a>
+          <a href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if donor_type_filter %}&donor_type={{ donor_type_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if project_filter %}&project={{ project_filter }}{% endif %}" class="page-btn">{{ num }}</a>
         {% elif num == 1 or num == donations.paginator.num_pages %}
-          <a href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if donor_type_filter %}&donor_type={{ donor_type_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="page-btn">{{ num }}</a>
+          <a href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if donor_type_filter %}&donor_type={{ donor_type_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if project_filter %}&project={{ project_filter }}{% endif %}" class="page-btn">{{ num }}</a>
         {% elif num == donations.number|add:'-3' or num == donations.number|add:'3' %}
           <span class="page-btn" style="cursor:default;border:none;background:transparent;">...</span>
         {% endif %}
       {% endfor %}
       {% if donations.has_next %}
-        <a href="?page={{ donations.next_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if donor_type_filter %}&donor_type={{ donor_type_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="page-btn">
+        <a href="?page={{ donations.next_page_number }}{% if search_term %}&search={{ search_term }}{% endif %}{% if donor_type_filter %}&donor_type={{ donor_type_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if project_filter %}&project={{ project_filter }}{% endif %}" class="page-btn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
       {% else %}
