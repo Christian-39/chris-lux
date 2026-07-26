@@ -42,7 +42,6 @@ class OutsideDonor(BaseModel):
         verbose_name="Invited By",
         help_text="The OYA member who introduced this donor."
     )
-    date_added = models.DateTimeField(default=timezone.now, verbose_name="Date Added")
 
     class Meta:
         db_table = "project_donations_outside_donor"
@@ -52,7 +51,7 @@ class OutsideDonor(BaseModel):
         indexes = [
             models.Index(fields=["full_name"]),
             models.Index(fields=["invited_by"]),
-            models.Index(fields=["date_added"]),
+            models.Index(fields=["created_at"]),
         ]
 
     def __str__(self):
