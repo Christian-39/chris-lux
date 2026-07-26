@@ -136,6 +136,14 @@ class Donation(BaseModel):
         related_name="facilitated_donations",
         verbose_name="Invited By"
     )
+    income = models.OneToOneField(
+        "finance.Income",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="project_donation",
+        verbose_name="Linked Income Record"
+    )
     amount = models.DecimalField(
         max_digits=15,
         decimal_places=2,
@@ -209,14 +217,4 @@ class Donation(BaseModel):
         # Auto-set invited_by for outside donors from their profile
         if self.donor_type == "OUTSIDE" and self.outside_donor and not self.invited_by:
             self.invited_by = self.outside_donor.invited_by
-        with transaction.atomic():
-            super().save(*args, **kwargs)
-            if self.project:
-                self.project.update_fundraising_stats()
-
-    def delete(self, *args, **kwargs):
-        project = self.project
-        with transaction.atomic():
-            super().delete(*args, **kwargs)
-            if project:
-                project.update_fundraising_stats()
+        super().save(*args, **kwargs)

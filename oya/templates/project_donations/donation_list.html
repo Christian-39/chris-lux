@@ -60,6 +60,7 @@
 
 <div class="filters-bar">
   <form method="get" style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+    {% if fundraising_projects %}
     <div class="filter-group">
       <span class="filter-label">Project:</span>
       <select name="project" class="form-control" style="width:180px;" onchange="this.form.submit()">
@@ -71,6 +72,7 @@
         {% endfor %}
       </select>
     </div>
+    {% endif %}
     <div class="filter-group">
       <span class="filter-label">Type:</span>
       <select name="donor_type" class="form-control" style="width:140px;" onchange="this.form.submit()">
@@ -91,7 +93,8 @@
     </div>
     {% if search_term %}<input type="hidden" name="search" value="{{ search_term }}">{% endif %}
   </form>
-  <div style="margin-left:auto;font-size:0.875rem;color:var(--oya-text-secondary);">
+  <div style="margin-left:auto;font-size:0.875rem;color:var(--oya-text-secondary);display:flex;align-items:center;gap:0.75rem;">
+    <a href="{% url 'project_donations:outside_donor_list' %}" class="btn btn-sm btn-ghost">Outside Donors</a>
     <strong style="color:var(--oya-text-primary);">{{ donations.paginator.count }}</strong> records
   </div>
 </div>
@@ -129,14 +132,14 @@
         {% for donation in donations %}
         <tr>
           <td style="white-space:nowrap;">{{ donation.donation_date|date:"M d, Y" }}</td>
-          <td style="white-space:nowrap;">
-            <span class="cell-name">{{ donation.project.title|truncatechars:25 }}</span>
+                    <td style="white-space:nowrap;">
+            <a href="{% url 'projects:project_detail' pk=donation.project.pk %}" class="cell-name">{{ donation.project.title|truncatechars:25 }}</a>
           </td>
           <td style="white-space:nowrap;">
             {% if donation.member %}
-              <span class="cell-name">{{ donation.member.full_name }}</span>
+              <a href="{% url 'members:member_detail' pk=donation.member.pk %}" class="cell-name">{{ donation.member.full_name }}</a>
             {% elif donation.outside_donor %}
-              <span class="cell-name">{{ donation.outside_donor.full_name }}</span>
+              <a href="{% url 'project_donations:outside_donor_detail' pk=donation.outside_donor.pk %}" class="cell-name">{{ donation.outside_donor.full_name }}</a>
             {% else %}
               <span class="cell-muted">Anonymous</span>
             {% endif %}

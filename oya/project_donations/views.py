@@ -13,6 +13,7 @@ from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 from django.utils import timezone
 from auditlogs.services import log_action
+from projects.models import Project
 from .models import OutsideDonor, Donation
 from .forms import OutsideDonorForm, DonationForm
 from .reports import (
@@ -257,6 +258,7 @@ def donation_list(request):
         "total_donations": total_donations,
         "member_total": member_total,
         "outside_total": outside_total,
+        "fundraising_projects": Project.objects.filter(enable_fundraising=True).order_by("-created_at"),
     }
     return render(request, "project_donations/donation_list.html", context)
 

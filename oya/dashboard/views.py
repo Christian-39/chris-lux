@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.db.models import Q
 from members.models import Member
 from accounts.models import User
+from projects.models import Project
 from operations.models import CaseFile, TaskForceMember, Motorcycle
 from project_donations.models import Donation as ProjectDonation, OutsideDonor
 from django.db.models import Sum, Value, DecimalField
@@ -175,6 +176,11 @@ def index(request):
     is_admin = request.user.has_admin_access()
     is_executive = request.user.has_executive_access()
 
+    # ─── FIX: Project donation KPIs for admin dashboard ───
+    total_project_donations = ProjectDonation.objects.filter(status="CONFIRMED").aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+
     context = {
         "kpis": kpis,
         "member_stats": member_stats,
@@ -188,6 +194,15 @@ def index(request):
         "trend_data": trend_data,
         "is_admin": is_admin,
         "is_executive": is_executive,
+        # Project donations
+        "total_project_donations": total_project_donations,
+        "active_fundraising_projects": Project.objects.filter(
+            enable_fundraising=True, fundraising_status="ACTIVE"
+        ).count(),
+        "total_outside_donors": OutsideDonor.objects.count(),
+        "total_raised_through_invitees": ProjectDonation.objects.filter(
+            status="CONFIRMED", invited_by__isnull=False
+        ).aggregate(total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField())))["total"],
     }
     return render(request, "dashboard/admin_dashboard.html", context)
 
