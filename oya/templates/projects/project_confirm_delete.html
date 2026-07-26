@@ -1,104 +1,40 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Delete Project
-
-<style>
-/* ─── Responsive Confirm Delete ─── */
-@media (max-width: 768px) {
-  .page-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-  .page-header-left h1 { font-size: 1.25rem !important; }
-  .page-header-left p { font-size: 0.8125rem !important; }
-  .page-header-actions { width: 100%; }
-  .page-header-actions .btn { width: 100%; justify-content: center; }
-  .dashboard-grid-1 { max-width: 100% !important; padding: 0 0.5rem; }
-  .card-body { padding: 1.5rem 1rem !important; }
-  .card-body h2 { font-size: 1.125rem !important; }
-  .card-body p { font-size: 0.8125rem !important; }
-  .card-body > div[style*="grid-template-columns"] { grid-template-columns: 1fr 1fr !important; }
-  form[style*="display:flex"] { flex-direction: column; }
-  form .btn { width: 100%; justify-content: center; }
-}
-
-@media (max-width: 480px) {
-  .page-header-left h1 { font-size: 1.125rem !important; }
-  .card-body { padding: 1rem !important; }
-  .card-body h2 { font-size: 1rem !important; }
-  .card-body p { font-size: 0.75rem !important; }
-  .card-body > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
-  .card-body > div > div { font-size: 0.8125rem !important; }
-  .card-body > div > div span:first-child { font-size: 0.6875rem !important; }
-  .btn { padding: 0.5rem 1rem; font-size: 0.8125rem; }
-}
-</style>
-
-{% endblock %}
-{% block page_title %}Delete Project
-
-<style>
-/* ─── Responsive Confirm Delete ─── */
-@media (max-width: 768px) {
-  .page-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-  .page-header-left h1 { font-size: 1.25rem !important; }
-  .page-header-left p { font-size: 0.8125rem !important; }
-  .page-header-actions { width: 100%; }
-  .page-header-actions .btn { width: 100%; justify-content: center; }
-  .dashboard-grid-1 { max-width: 100% !important; padding: 0 0.5rem; }
-  .card-body { padding: 1.5rem 1rem !important; }
-  .card-body h2 { font-size: 1.125rem !important; }
-  .card-body p { font-size: 0.8125rem !important; }
-  .card-body > div[style*="grid-template-columns"] { grid-template-columns: 1fr 1fr !important; }
-  form[style*="display:flex"] { flex-direction: column; }
-  form .btn { width: 100%; justify-content: center; }
-}
-
-@media (max-width: 480px) {
-  .page-header-left h1 { font-size: 1.125rem !important; }
-  .card-body { padding: 1rem !important; }
-  .card-body h2 { font-size: 1rem !important; }
-  .card-body p { font-size: 0.75rem !important; }
-  .card-body > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
-  .card-body > div > div { font-size: 0.8125rem !important; }
-  .card-body > div > div span:first-child { font-size: 0.6875rem !important; }
-  .btn { padding: 0.5rem 1rem; font-size: 0.8125rem; }
-}
-</style>
-
-{% endblock %}
-{% block breadcrumb %}Projects
-
-<style>
-/* ─── Responsive Confirm Delete ─── */
-@media (max-width: 768px) {
-  .page-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-  .page-header-left h1 { font-size: 1.25rem !important; }
-  .page-header-left p { font-size: 0.8125rem !important; }
-  .page-header-actions { width: 100%; }
-  .page-header-actions .btn { width: 100%; justify-content: center; }
-  .dashboard-grid-1 { max-width: 100% !important; padding: 0 0.5rem; }
-  .card-body { padding: 1.5rem 1rem !important; }
-  .card-body h2 { font-size: 1.125rem !important; }
-  .card-body p { font-size: 0.8125rem !important; }
-  .card-body > div[style*="grid-template-columns"] { grid-template-columns: 1fr 1fr !important; }
-  form[style*="display:flex"] { flex-direction: column; }
-  form .btn { width: 100%; justify-content: center; }
-}
-
-@media (max-width: 480px) {
-  .page-header-left h1 { font-size: 1.125rem !important; }
-  .card-body { padding: 1rem !important; }
-  .card-body h2 { font-size: 1rem !important; }
-  .card-body p { font-size: 0.75rem !important; }
-  .card-body > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
-  .card-body > div > div { font-size: 0.8125rem !important; }
-  .card-body > div > div span:first-child { font-size: 0.6875rem !important; }
-  .btn { padding: 0.5rem 1rem; font-size: 0.8125rem; }
-}
-</style>
-
-{% endblock %}
+{% block title %}Delete Project{% endblock %}
+{% block page_title %}Delete Project{% endblock %}
+{% block breadcrumb %}Projects{% endblock %}
 
 {% block content %}
+
+<style>
+/* ─── Responsive Confirm Delete ─── */
+@media (max-width: 768px) {
+  .page-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+  .page-header-left h1 { font-size: 1.25rem !important; }
+  .page-header-left p { font-size: 0.8125rem !important; }
+  .page-header-actions { width: 100%; }
+  .page-header-actions .btn { width: 100%; justify-content: center; }
+  .dashboard-grid-1 { max-width: 100% !important; padding: 0 0.5rem; }
+  .card-body { padding: 1.5rem 1rem !important; }
+  .card-body h2 { font-size: 1.125rem !important; }
+  .card-body p { font-size: 0.8125rem !important; }
+  .card-body > div[style*="grid-template-columns"] { grid-template-columns: 1fr 1fr !important; }
+  form[style*="display:flex"] { flex-direction: column; }
+  form .btn { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 480px) {
+  .page-header-left h1 { font-size: 1.125rem !important; }
+  .card-body { padding: 1rem !important; }
+  .card-body h2 { font-size: 1rem !important; }
+  .card-body p { font-size: 0.75rem !important; }
+  .card-body > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+  .card-body > div > div { font-size: 0.8125rem !important; }
+  .card-body > div > div span:first-child { font-size: 0.6875rem !important; }
+  .btn { padding: 0.5rem 1rem; font-size: 0.8125rem; }
+}
+</style>
 
 <!-- Page Header -->
 <div class="page-header">
@@ -174,36 +110,5 @@
     </div>
   </div>
 </div>
-
-
-
-<style>
-/* ─── Responsive Confirm Delete ─── */
-@media (max-width: 768px) {
-  .page-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-  .page-header-left h1 { font-size: 1.25rem !important; }
-  .page-header-left p { font-size: 0.8125rem !important; }
-  .page-header-actions { width: 100%; }
-  .page-header-actions .btn { width: 100%; justify-content: center; }
-  .dashboard-grid-1 { max-width: 100% !important; padding: 0 0.5rem; }
-  .card-body { padding: 1.5rem 1rem !important; }
-  .card-body h2 { font-size: 1.125rem !important; }
-  .card-body p { font-size: 0.8125rem !important; }
-  .card-body > div[style*="grid-template-columns"] { grid-template-columns: 1fr 1fr !important; }
-  form[style*="display:flex"] { flex-direction: column; }
-  form .btn { width: 100%; justify-content: center; }
-}
-
-@media (max-width: 480px) {
-  .page-header-left h1 { font-size: 1.125rem !important; }
-  .card-body { padding: 1rem !important; }
-  .card-body h2 { font-size: 1rem !important; }
-  .card-body p { font-size: 0.75rem !important; }
-  .card-body > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
-  .card-body > div > div { font-size: 0.8125rem !important; }
-  .card-body > div > div span:first-child { font-size: 0.6875rem !important; }
-  .btn { padding: 0.5rem 1rem; font-size: 0.8125rem; }
-}
-</style>
 
 {% endblock %}
