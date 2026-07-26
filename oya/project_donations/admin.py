@@ -9,15 +9,15 @@ from .models import OutsideDonor, Donation
 class OutsideDonorAdmin(admin.ModelAdmin):
     list_display = [
         "full_name", "phone_number", "occupation",
-        "invited_by", "date_added", "total_donations"
+        "invited_by", "created_at", "total_donations"
     ]
-    list_filter = ["gender", "date_added"]
+    list_filter = ["gender", "created_at"]
     search_fields = [
         "full_name", "phone_number", "occupation",
         "invited_by__full_name"
     ]
     raw_id_fields = ["invited_by"]
-    date_hierarchy = "date_added"
+    date_hierarchy = "created_at"
     readonly_fields = ["total_donations", "donation_count", "projects_supported"]
 
 
