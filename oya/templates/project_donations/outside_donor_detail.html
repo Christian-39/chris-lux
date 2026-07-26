@@ -20,7 +20,7 @@
     <div>
       <h1 style="font-size:1.5rem;">{{ donor.full_name }}</h1>
       <p style="color:var(--oya-text-secondary);font-size:0.9375rem;">
-        Outside Donor &middot; Added {{ donor.date_added|date:"M d, Y" }}
+        Outside Donor &middot; Added {{ donor.created_at|date:"M d, Y" }}
       </p>
     </div>
   </div>
@@ -119,7 +119,7 @@
         </div>
         <div class="meta-item">
           <span class="meta-label">Date Added</span>
-          <span class="meta-value">{{ donor.date_added|date:"F d, Y" }}</span>
+          <span class="meta-value">{{ donor.created_at|date:"F d, Y" }}</span>
         </div>
         <div class="meta-item">
           <span class="meta-label">Member Serial</span>
