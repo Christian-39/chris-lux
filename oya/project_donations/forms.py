@@ -128,11 +128,15 @@ class DonationForm(forms.ModelForm):
         self.fields["invited_by"].empty_label = "-- Select Inviting Member --"
         self.fields["invited_by"].required = False
 
-        # Only show projects with fundraising enabled
+        # Only show projects with fundraising enabled, but keep current project on edit
+        from django.db.models import Q
         from projects.models import Project
-        self.fields["project"].queryset = Project.objects.filter(
-            enable_fundraising=True
-        ).order_by("-created_at")
+        qs = Project.objects.filter(enable_fundraising=True)
+        if self.instance and self.instance.pk and self.instance.project_id:
+            qs = Project.objects.filter(
+                Q(enable_fundraising=True) | Q(pk=self.instance.project_id)
+            )
+        self.fields["project"].queryset = qs.order_by("-created_at")
         self.fields["project"].empty_label = "-- Select Fundraising Project --"
 
     def clean(self):
