@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db import transaction
+from django.db.utils import OperationalError
 from auditlogs.services import log_action
 from .models import Election, Candidate, HandoverLedger, Vote
 from .forms import ElectionForm, CandidateForm, HandoverLedgerForm
@@ -53,11 +54,15 @@ def election_detail(request, pk):
     # Determine which posts the current user has already voted for in this election
     voted_posts = set()
     if request.user.is_authenticated:
-        voted_posts = set(
-            Vote.objects.filter(
-                voter=request.user, election=election
-            ).values_list("post", flat=True)
-        )
+        try:
+            voted_posts = set(
+                Vote.objects.filter(
+                    voter=request.user, election=election
+                ).values_list("post", flat=True)
+            )
+        except OperationalError:
+            # Vote table may not exist yet (migration pending)
+            pass
 
     context = {
         "election": election,
@@ -236,9 +241,15 @@ def cast_vote(request, pk):
         return redirect("elections:election_detail", pk=election.id)
 
     # Prevent voting for the same post twice in the same election
-    if Vote.objects.filter(
-        voter=request.user, election=election, post=candidate.post
-    ).exists():
+    try:
+        already_voted = Vote.objects.filter(
+            voter=request.user, election=election, post=candidate.post
+        ).exists()
+    except OperationalError:
+        messages.error(request, "Voting system is temporarily unavailable. Please try again later.")
+        return redirect("elections:election_detail", pk=election.id)
+
+    if already_voted:
         messages.warning(
             request,
             f"You have already voted for {candidate.post} in this election."
