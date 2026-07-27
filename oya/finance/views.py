@@ -84,8 +84,32 @@ def donation_list(request):
 
     total_records = Income.objects.exclude(income_type="DUES").count()
 
+    # ─── PROJECT DONATIONS LIST (includes outside donors) ───
+    project_donation_qs = ProjectDonation.objects.filter(
+        status="CONFIRMED"
+    ).select_related("project", "member", "outside_donor", "invited_by")
+
+    if search_term:
+        project_donation_qs = project_donation_qs.filter(
+            Q(narration__icontains=search_term) |
+            Q(reference_number__icontains=search_term) |
+            Q(project__title__icontains=search_term) |
+            Q(member__full_name__icontains=search_term) |
+            Q(outside_donor__full_name__icontains=search_term) |
+            Q(invited_by__full_name__icontains=search_term)
+        )
+    if date_from:
+        project_donation_qs = project_donation_qs.filter(donation_date__gte=date_from)
+    if date_to:
+        project_donation_qs = project_donation_qs.filter(donation_date__lte=date_to)
+
+    project_donation_paginator = Paginator(project_donation_qs, 10)
+    project_donation_page = request.GET.get("project_page", 1)
+    project_donation_incomes = project_donation_paginator.get_page(project_donation_page)
+
     context = {
         "donations": donations,
+        "project_donation_incomes": project_donation_incomes,
         "search_term": search_term,
         "type_filter": type_filter,
         "income_types": [c for c in Income.INCOME_TYPE_CHOICES if c[0] != "DUES"],
@@ -466,12 +490,35 @@ def income_list(request):
     donation_page = request.GET.get("page", 1)
     donation_incomes = donation_paginator.get_page(donation_page)
 
+    # ─── PROJECT DONATIONS (outside donors + members) ───
+    project_donation_qs = ProjectDonation.objects.filter(
+        status="CONFIRMED"
+    ).select_related("project", "member", "outside_donor", "invited_by")
+
+    if search_term:
+        project_donation_qs = project_donation_qs.filter(
+            Q(narration__icontains=search_term) |
+            Q(reference_number__icontains=search_term) |
+            Q(project__title__icontains=search_term) |
+            Q(member__full_name__icontains=search_term) |
+            Q(outside_donor__full_name__icontains=search_term) |
+            Q(invited_by__full_name__icontains=search_term)
+        )
+    if date_from:
+        project_donation_qs = project_donation_qs.filter(donation_date__gte=date_from)
+    if date_to:
+        project_donation_qs = project_donation_qs.filter(donation_date__lte=date_to)
+
+    project_donation_paginator = Paginator(project_donation_qs, 10)
+    project_donation_page = request.GET.get("project_page", 1)
+    project_donation_incomes = project_donation_paginator.get_page(project_donation_page)
+
     # Totals (use full QS, not paginated)
     total_dues = Income.objects.filter(income_type="DUES").aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
     )["total"]
 
-    total_donations = Income.objects.exclude(income_type="DUES").aggregate(
+    total_donations_income = Income.objects.exclude(income_type="DUES").aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
     )["total"]
 
@@ -481,18 +528,22 @@ def income_list(request):
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
     )["total"]
 
-    total_income = total_dues + total_donations + total_project_donations
+    # Include outside donor project donations in donation totals
+    total_donations = total_donations_income + total_project_donations
+    total_income = total_dues + total_donations
     total_records = Income.objects.count()
 
     context = {
         "dues_incomes": dues_incomes,
         "donation_incomes": donation_incomes,
+        "project_donation_incomes": project_donation_incomes,
         "search_term": search_term,
         "type_filter": type_filter,
         "date_from": date_from,
         "date_to": date_to,
         "total_dues": total_dues,
         "total_donations": total_donations,
+        "total_project_donations": total_project_donations,
         "total_income": total_income,
         "total_records": total_records,
     }
@@ -769,18 +820,19 @@ def finance_summary(request):
         total=Sum("amount")
     )["total"] or 0
 
-    total_donations = Income.objects.exclude(income_type="DUES").aggregate(
+    total_donations_income = Income.objects.exclude(income_type="DUES").aggregate(
         total=Sum("amount")
     )["total"] or 0
 
-    # Combine confirmed project donations into overall income / treasury
+    # Include confirmed project donations (from outside donors & members) in totals
     total_project_donations = ProjectDonation.objects.filter(
         status="CONFIRMED"
     ).aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
     )["total"]
 
-    total_income = total_dues + total_donations + total_project_donations
+    total_donations = total_donations_income + total_project_donations
+    total_income = total_dues + total_donations
     total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or 0
     treasury_balance = total_income - total_expenses
 
@@ -900,6 +952,40 @@ def finance_summary(request):
             "category": expense.category,
             "expense_object": expense,
             "created_by": expense.created_by,
+        })
+
+    # ─── RECENT PROJECT DONATIONS (includes outside donors) ───
+    recent_project_donations = ProjectDonation.objects.filter(
+        status="CONFIRMED"
+    ).select_related("project", "member", "outside_donor", "invited_by").order_by("-donation_date")[:5]
+
+    for pd in recent_project_donations:
+        donation_dt = pd.donation_date
+        if isinstance(donation_dt, date) and not isinstance(donation_dt, datetime):
+            donation_dt = datetime.combine(donation_dt, datetime.min.time())
+        if donation_dt.tzinfo is None:
+            donation_dt = timezone.make_aware(donation_dt)
+
+        donor_name = (
+            pd.member.full_name if pd.member
+            else pd.outside_donor.full_name if pd.outside_donor
+            else "Anonymous"
+        )
+
+        recent_transactions.append({
+            "type": "project_donation",
+            "amount": pd.amount,
+            "description": f"Project Donation — {pd.project.title if pd.project else 'General'}",
+            "reason": pd.narration or "Project Donation",
+            "created_at": donation_dt,
+            "donation_date": pd.donation_date,
+            "project": pd.project,
+            "donor_name": donor_name,
+            "donor_type": pd.get_donor_type_display(),
+            "outside_donor": pd.outside_donor,
+            "member": pd.member,
+            "invited_by": pd.invited_by,
+            "reference_number": pd.reference_number,
         })
 
     recent_transactions.sort(key=lambda x: x["created_at"], reverse=True)
