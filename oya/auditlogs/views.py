@@ -2,13 +2,12 @@
 Views for OYA audit logs.
 """
 import logging
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from django.contrib import messages
 import csv
 from .models import AuditLog
 
@@ -16,7 +15,7 @@ logger = logging.getLogger("oya")
 
 
 ENTITY_CHOICES = [
-    "Member", "Executive", "Finance", "Project", "Donation",
+    "Member", "Executive", "Finance", "Project","Donation",
     "Case", "Setting", "System", "Election", "Notification"
 ]
 
@@ -25,6 +24,8 @@ ENTITY_CHOICES = [
 def auditlog_list(request):
     """List all audit logs with search and filter."""
     if not request.user.has_admin_access():
+        from django.shortcuts import redirect
+        from django.contrib import messages
         messages.error(request, "Admin access required.")
         return redirect("dashboard:index")
 
@@ -105,6 +106,8 @@ def auditlog_detail(request, pk):
 def auditlog_export(request):
     """Export audit logs to CSV."""
     if not request.user.has_admin_access():
+        from django.contrib import messages
+        from django.shortcuts import redirect
         messages.error(request, "Admin access required.")
         return redirect("auditlogs:auditlog_list")
 
@@ -135,107 +138,6 @@ def auditlog_export(request):
 
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = 'attachment; filename="audit_logs.csv"'
-
-    writer = csv.writer(response)
-    writer.writerow(["ID", "Timestamp", "User", "Action", "Entity", "Object ID", "Description", "IP Address"])
-
-    for log in queryset:
-        writer.writerow([
-            log.id,
-            log.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            log.user.full_name if log.user else "System",
-            log.action,
-            log.object_type,
-            log.object_id or "",
-            log.description,
-            log.ip_address or "",
-        ])
-
-    return response
-
-
-# ============================================================
-# PROJECT DONATION AUDIT LOGS
-# ============================================================
-
-@login_required
-def auditlog_donation_list(request):
-    """List audit logs for project donations only."""
-    if not request.user.has_admin_access():
-        messages.error(request, "Admin access required.")
-        return redirect("dashboard:index")
-
-    queryset = AuditLog.objects.select_related("user").filter(
-        Q(object_type__iexact="Donation") |
-        Q(object_type__iexact="OutsideDonor") |
-        Q(description__icontains="donation")
-    )
-
-    # Action filter
-    action_filter = request.GET.get("action", "").strip()
-    if action_filter:
-        queryset = queryset.filter(action=action_filter)
-
-    # User search filter
-    user_search = request.GET.get("user_search", "").strip()
-    if user_search:
-        queryset = queryset.filter(
-            Q(user__full_name__icontains=user_search) |
-            Q(user__serial_number__icontains=user_search)
-        )
-
-    # Date range
-    date_from = request.GET.get("date_from", "").strip()
-    date_to = request.GET.get("date_to", "").strip()
-    if date_from:
-        queryset = queryset.filter(created_at__date__gte=date_from)
-    if date_to:
-        queryset = queryset.filter(created_at__date__lte=date_to)
-
-    queryset = queryset.order_by("-created_at")
-
-    paginator = Paginator(queryset, 25)
-    page = request.GET.get("page", 1)
-    logs = paginator.get_page(page)
-
-    context = {
-        "logs": logs,
-        "paginator": paginator,
-        "action_filter": action_filter,
-        "user_search": user_search,
-        "date_from": date_from,
-        "date_to": date_to,
-        "action_choices": AuditLog.ACTION_CHOICES,
-        "is_donation_view": True,
-    }
-    return render(request, "auditlogs/auditlog_list.html", context)
-
-
-@login_required
-def auditlog_donation_export(request):
-    """Export project-donation audit logs to CSV."""
-    if not request.user.has_admin_access():
-        messages.error(request, "Admin access required.")
-        return redirect("auditlogs:auditlog_donation_list")
-
-    queryset = AuditLog.objects.select_related("user").filter(
-        Q(object_type__iexact="Donation") |
-        Q(object_type__iexact="OutsideDonor") |
-        Q(description__icontains="donation")
-    ).order_by("-created_at")
-
-    action_filter = request.GET.get("action", "").strip()
-    if action_filter:
-        queryset = queryset.filter(action=action_filter)
-    date_from = request.GET.get("date_from", "").strip()
-    date_to = request.GET.get("date_to", "").strip()
-    if date_from:
-        queryset = queryset.filter(created_at__date__gte=date_from)
-    if date_to:
-        queryset = queryset.filter(created_at__date__lte=date_to)
-
-    response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = 'attachment; filename="donation_audit_logs.csv"'
 
     writer = csv.writer(response)
     writer.writerow(["ID", "Timestamp", "User", "Action", "Entity", "Object ID", "Description", "IP Address"])
