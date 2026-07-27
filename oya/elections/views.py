@@ -7,8 +7,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.db import transaction
 from auditlogs.services import log_action
-from .models import Election, Candidate, HandoverLedger
+from .models import Election, Candidate, HandoverLedger, Vote
 from .forms import ElectionForm, CandidateForm, HandoverLedgerForm
 
 logger = logging.getLogger("oya")
@@ -49,9 +50,19 @@ def election_detail(request, pk):
     election = get_object_or_404(Election.objects.prefetch_related("candidates"), pk=pk)
     candidates = election.candidates.select_related("member").all()
 
+    # Determine which posts the current user has already voted for in this election
+    voted_posts = set()
+    if request.user.is_authenticated:
+        voted_posts = set(
+            Vote.objects.filter(
+                voter=request.user, election=election
+            ).values_list("post", flat=True)
+        )
+
     context = {
         "election": election,
         "candidates": candidates,
+        "voted_posts": voted_posts,
     }
     return render(request, "elections/election_detail.html", context)
 
@@ -207,6 +218,7 @@ def candidate_update(request, pk):
         "candidate": candidate
     })
 
+
 @login_required
 def cast_vote(request, pk):
     """Cast a vote for a candidate."""
@@ -223,15 +235,25 @@ def cast_vote(request, pk):
         messages.error(request, "Voting is only allowed for ongoing elections.")
         return redirect("elections:election_detail", pk=election.id)
 
-    # Basic duplicate-vote guard via session (use a Vote model for production)
-    vote_key = f"voted_election_{election.id}"
-    if request.session.get(vote_key):
-        messages.warning(request, "You have already voted in this election.")
+    # Prevent voting for the same post twice in the same election
+    if Vote.objects.filter(
+        voter=request.user, election=election, post=candidate.post
+    ).exists():
+        messages.warning(
+            request,
+            f"You have already voted for {candidate.post} in this election."
+        )
         return redirect("elections:election_detail", pk=election.id)
 
-    candidate.votes += 1
-    candidate.save(update_fields=["votes"])
-    request.session[vote_key] = True
+    with transaction.atomic():
+        Vote.objects.create(
+            voter=request.user,
+            election=election,
+            candidate=candidate,
+            post=candidate.post,
+        )
+        candidate.votes += 1
+        candidate.save(update_fields=["votes"])
 
     log_action(
         user=request.user,
@@ -239,9 +261,12 @@ def cast_vote(request, pk):
         object_type="Candidate",
         object_id=candidate.id,
         ip_address=getattr(request, "client_ip", ""),
-        description=f"Voted for {candidate.member.full_name} in {election.title}"
+        description=f"Voted for {candidate.member.full_name} ({candidate.post}) in {election.title}"
     )
-    messages.success(request, f"Vote cast for {candidate.member.full_name}.")
+    messages.success(
+        request,
+        f"Vote cast for {candidate.member.full_name} for {candidate.post}."
+    )
     return redirect("elections:election_detail", pk=election.id)
 
 
