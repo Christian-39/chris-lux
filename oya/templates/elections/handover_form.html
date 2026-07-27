@@ -3,7 +3,7 @@
 
 {% block title %}{{ title }}{% endblock %}
 {% block page_title %}{{ title }}{% endblock %}
-{% block breadcrumb %}<a href="{% url 'elections:handover_list' %}">Handovers</a> &rsaquo; {{ action }}{% endblock %}
+{% block breadcrumb %}<a href="{% url 'elections:election_list' %}">Elections</a> &rsaquo; <a href="{% url 'elections:handover_list' %}">Handovers</a> &rsaquo; {{ action }}{% endblock %}
 
 {% block content %}
 
