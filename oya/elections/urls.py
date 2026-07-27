@@ -13,7 +13,7 @@ urlpatterns = [
     path("<int:pk>/update/", views.election_update, name="election_update"),
     path("candidates/create/", views.candidate_create, name="candidate_create"),
     path("candidates/<int:pk>/update/", views.candidate_update, name="candidate_update"),
-path("candidate/<int:pk>/vote/", views.cast_vote, name="cast_vote"),
+    path("candidate/<int:pk>/vote/", views.cast_vote, name="cast_vote"),
     path("handovers/", views.handover_list, name="handover_list"),
     path("handovers/create/", views.handover_create, name="handover_create"),
 ]
