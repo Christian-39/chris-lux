@@ -567,11 +567,11 @@ def income_create(request):
     total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or 0
     treasury_balance = total_income - total_expenses
 
-    recent_incomes = Income.objects.exclude(income_type="DUES").select_related("created_by", "member").order_by("-created_at")[:5]
+    recent_incomes = Income.objects.exclude(income_type__in=["DUES", "PROJECT_DONATION"]).select_related("created_by", "member").order_by("-created_at")[:5]
 
     thirty_days_ago = timezone.now() - timedelta(days=30)
     common_reasons = (
-        Income.objects.exclude(income_type="DUES").filter(created_at__gte=thirty_days_ago)
+        Income.objects.exclude(income_type__in=["DUES", "PROJECT_DONATION"]).filter(created_at__gte=thirty_days_ago)
         .values("reason")
         .annotate(count=Count("id"))
         .order_by("-count")
@@ -698,7 +698,7 @@ def expense_list(request):
     ).aggregate(total=Sum("amount"))["total"] or 0
 
     total_records = Expense.objects.count()
-    total_income = Income.objects.aggregate(total=Sum("amount"))["total"] or 0
+    total_income = Income.objects.exclude(income_type="PROJECT_DONATION").aggregate(total=Sum("amount"))["total"] or 0
     total_project_donations = ProjectDonation.objects.filter(
         status="CONFIRMED"
     ).aggregate(

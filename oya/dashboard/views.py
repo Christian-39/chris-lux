@@ -12,6 +12,7 @@ from accounts.models import User
 from projects.models import Project
 from operations.models import CaseFile, TaskForceMember, Motorcycle
 from project_donations.models import Donation as ProjectDonation, OutsideDonor
+from finance.models import Income
 from django.db.models import Sum, Value, DecimalField
 from django.db.models.functions import Coalesce
 
@@ -154,9 +155,23 @@ def financial_trend_ajax(request):
 
 
 def _patch_finance_stats_with_project_donations(finance_stats):
-    """Helper: merge confirmed project donations into finance stats dict."""
+    """Helper: merge confirmed project donations into finance stats dict.
+
+    get_finance_statistics() may already include auto-created PROJECT_DONATION
+    Income records (from signals). We subtract those first, then add the
+    authoritative ProjectDonation total so project donations are counted
+    exactly once — never doubled.
+    """
     total_project_donations = ProjectDonation.objects.filter(
         status="CONFIRMED"
+    ).aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+
+    # Auto-created Income records for project donations (managed by signals).
+    # These may already be included in get_finance_statistics() totals.
+    project_donation_income = Income.objects.filter(
+        income_type="PROJECT_DONATION"
     ).aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
     )["total"]
@@ -164,9 +179,13 @@ def _patch_finance_stats_with_project_donations(finance_stats):
     if isinstance(finance_stats, dict):
         finance_stats["total_project_donations"] = total_project_donations
         if "total_income" in finance_stats:
-            finance_stats["total_income"] = finance_stats["total_income"] + total_project_donations
+            finance_stats["total_income"] = (
+                finance_stats["total_income"] - project_donation_income + total_project_donations
+            )
         if "treasury_balance" in finance_stats:
-            finance_stats["treasury_balance"] = finance_stats["treasury_balance"] + total_project_donations
+            finance_stats["treasury_balance"] = (
+                finance_stats["treasury_balance"] - project_donation_income + total_project_donations
+            )
 
     return finance_stats, total_project_donations
 
