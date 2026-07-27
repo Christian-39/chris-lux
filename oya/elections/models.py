@@ -2,6 +2,7 @@
 Models for OYA elections.
 """
 from django.db import models
+from django.conf import settings
 from core.models import BaseModel
 
 
@@ -79,6 +80,44 @@ class Candidate(BaseModel):
 
     def __str__(self):
         return f"{self.member.full_name} for {self.post}"
+
+
+class Vote(BaseModel):
+    """Vote model to track individual votes per post."""
+
+    id = models.BigAutoField(primary_key=True)
+    election = models.ForeignKey(
+        Election,
+        on_delete=models.CASCADE,
+        related_name="vote_records",
+        verbose_name="Election"
+    )
+    candidate = models.ForeignKey(
+        Candidate,
+        on_delete=models.CASCADE,
+        related_name="vote_records",
+        verbose_name="Candidate"
+    )
+    voter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="election_votes",
+        verbose_name="Voter"
+    )
+    post = models.CharField(
+        max_length=50,
+        verbose_name="Post"
+    )
+
+    class Meta:
+        db_table = "elections_vote"
+        verbose_name = "Vote"
+        verbose_name_plural = "Votes"
+        ordering = ["-created_at"]
+        unique_together = [["voter", "election", "post"]]
+
+    def __str__(self):
+        return f"{self.voter} voted {self.candidate.member.full_name} for {self.post}"
 
 
 class HandoverLedger(BaseModel):
