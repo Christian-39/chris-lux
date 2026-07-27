@@ -30,7 +30,7 @@ YEARLY_DUES = 5000
 @login_required
 def donation_list(request):
     """List all non-dues income (donations, events, other)."""
-    queryset = Income.objects.exclude(income_type__in=["DUES", "PROJECT_DONATION"]).select_related("created_by", "member")
+    queryset = Income.objects.exclude(income_type="DUES").select_related("created_by", "member")
 
     search_term = request.GET.get("search", "")
     if search_term:
@@ -56,9 +56,10 @@ def donation_list(request):
     page = request.GET.get("page", 1)
     donations = paginator.get_page(page)
 
-    total_donations_income = Income.objects.exclude(
-        income_type__in=["DUES", "PROJECT_DONATION"]
-    ).aggregate(total=Sum("amount"))["total"] or 0
+    # In donation_list, income_list, finance_summary, expense_list, etc.
+total_donations = Income.objects.exclude(
+    income_type__in=["DUES", "PROJECT_DONATION"]
+).aggregate(total=Sum("amount"))["total"] or 0
 
 
     # Add confirmed project donations to donation totals
@@ -71,7 +72,7 @@ def donation_list(request):
 
     now = timezone.now()
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    this_month_donations = Income.objects.exclude(income_type__in=["DUES", "PROJECT_DONATION"]).filter(
+    this_month_donations = Income.objects.exclude(income_type="DUES").filter(
         created_at__gte=month_start
     ).aggregate(total=Sum("amount"))["total"] or 0
 
@@ -83,7 +84,7 @@ def donation_list(request):
     )["total"]
     this_month_donations = this_month_donations + this_month_project_donations
 
-    total_records = Income.objects.exclude(income_type__in=["DUES", "PROJECT_DONATION"]).count()
+    total_records = Income.objects.exclude(income_type="DUES").count()
 
     # ─── PROJECT DONATIONS LIST (includes outside donors) ───
     project_donation_qs = ProjectDonation.objects.filter(
@@ -419,7 +420,7 @@ def income_list(request):
     ).order_by("-payment_date")
 
     # --- DONATIONS & OTHER (non-dues income) ---
-    donation_qs = Income.objects.exclude(income_type__in=["DUES", "PROJECT_DONATION"]).select_related("created_by", "member")
+    donation_qs = Income.objects.exclude(income_type="DUES").select_related("created_by", "member")
 
     # Search/filter
     search_term = request.GET.get("search", "")
@@ -519,9 +520,10 @@ def income_list(request):
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
     )["total"]
 
-    total_donations_income = Income.objects.exclude(
-        income_type__in=["DUES", "PROJECT_DONATION"]
-    ).aggregate(total=Sum("amount"))["total"] or 0
+    # In donation_list, income_list, finance_summary, expense_list, etc.
+total_donations = Income.objects.exclude(
+    income_type__in=["DUES", "PROJECT_DONATION"]
+).aggregate(total=Sum("amount"))["total"] or 0
 
 
     total_project_donations = ProjectDonation.objects.filter(
@@ -559,7 +561,7 @@ def income_create(request):
         messages.error(request, "Executive access required.")
         return redirect("finance:donation_list")
 
-    total_income = Income.objects.exclude(income_type="PROJECT_DONATION").aggregate(total=Sum("amount"))["total"] or 0
+    total_income = Income.objects.aggregate(total=Sum("amount"))["total"] or 0
     total_project_donations = ProjectDonation.objects.filter(
         status="CONFIRMED"
     ).aggregate(
@@ -569,11 +571,11 @@ def income_create(request):
     total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or 0
     treasury_balance = total_income - total_expenses
 
-    recent_incomes = Income.objects.exclude(income_type__in=["DUES", "PROJECT_DONATION"]).select_related("created_by", "member").order_by("-created_at")[:5]
+    recent_incomes = Income.objects.exclude(income_type="DUES").select_related("created_by", "member").order_by("-created_at")[:5]
 
     thirty_days_ago = timezone.now() - timedelta(days=30)
     common_reasons = (
-        Income.objects.exclude(income_type__in=["DUES", "PROJECT_DONATION"]).filter(created_at__gte=thirty_days_ago)
+        Income.objects.exclude(income_type="DUES").filter(created_at__gte=thirty_days_ago)
         .values("reason")
         .annotate(count=Count("id"))
         .order_by("-count")
@@ -691,7 +693,7 @@ def expense_list(request):
     ).aggregate(total=Sum("amount"))["total"] or 0
 
     total_records = Expense.objects.count()
-    total_income = Income.objects.exclude(income_type="PROJECT_DONATION").aggregate(total=Sum("amount"))["total"] or 0
+    total_income = Income.objects.aggregate(total=Sum("amount"))["total"] or 0
     total_project_donations = ProjectDonation.objects.filter(
         status="CONFIRMED"
     ).aggregate(
@@ -721,7 +723,7 @@ def expense_create(request):
         messages.error(request, "Executive access required.")
         return redirect("finance:expense_list")
 
-    total_income = Income.objects.exclude(income_type="PROJECT_DONATION").aggregate(total=Sum("amount"))["total"] or 0
+    total_income = Income.objects.aggregate(total=Sum("amount"))["total"] or 0
     total_project_donations = ProjectDonation.objects.filter(
         status="CONFIRMED"
     ).aggregate(
@@ -822,9 +824,10 @@ def finance_summary(request):
         total=Sum("amount")
     )["total"] or 0
 
-    total_donations_income = Income.objects.exclude(
-        income_type__in=["DUES", "PROJECT_DONATION"]
-    ).aggregate(total=Sum("amount"))["total"] or 0
+    # In donation_list, income_list, finance_summary, expense_list, etc.
+total_donations_income = Income.objects.exclude(
+    income_type__in=["DUES", "PROJECT_DONATION"]
+).aggregate(total=Sum("amount"))["total"] or 0
 
 
     # Include confirmed project donations (from outside donors & members) in totals
@@ -883,7 +886,7 @@ def finance_summary(request):
     ).order_by("-payment_date")[:5]
 
     recent_donations = Income.objects.exclude(
-        income_type__in=["DUES", "PROJECT_DONATION"]
+        income_type="DUES"
     ).select_related("created_by", "member").order_by("-created_at")[:5]
 
     recent_expenses = Expense.objects.select_related("created_by").order_by("-created_at")[:5]
