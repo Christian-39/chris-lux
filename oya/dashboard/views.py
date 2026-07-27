@@ -160,6 +160,21 @@ def index(request):
     kpis = get_dashboard_kpis()
     member_stats = get_member_statistics()
     finance_stats = get_finance_statistics()
+
+    # Merge confirmed project donations into dashboard finance stats
+    total_project_donations = ProjectDonation.objects.filter(
+        status="CONFIRMED"
+    ).aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+
+    if isinstance(finance_stats, dict):
+        finance_stats["total_project_donations"] = total_project_donations
+        if "total_income" in finance_stats:
+            finance_stats["total_income"] = finance_stats["total_income"] + total_project_donations
+        if "treasury_balance" in finance_stats:
+            finance_stats["treasury_balance"] = finance_stats["treasury_balance"] + total_project_donations
+
     recent_activities = get_recent_activities()
 
     # Real data for dashboard components
@@ -212,6 +227,20 @@ def member_dashboard(request):
     """Member-only dashboard view."""
     kpis = get_dashboard_kpis()
     member_stats = get_member_statistics()
+
+    # Merge confirmed project donations into dashboard finance stats
+    total_project_donations = ProjectDonation.objects.filter(
+        status="CONFIRMED"
+    ).aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+
+    if isinstance(finance_stats, dict):
+        finance_stats["total_project_donations"] = total_project_donations
+        if "total_income" in finance_stats:
+            finance_stats["total_income"] = finance_stats["total_income"] + total_project_donations
+        if "treasury_balance" in finance_stats:
+            finance_stats["treasury_balance"] = finance_stats["treasury_balance"] + total_project_donations
 
     # Floor members get restricted activities (money + member add/remove only)
     member_activities = get_member_recent_activities(limit=5)
