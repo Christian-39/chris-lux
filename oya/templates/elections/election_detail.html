@@ -80,13 +80,20 @@
     </div>
     <div class="card-footer" style="display:flex;gap:0.5rem;flex-wrap:wrap;">
       {% if election.status == "ONGOING" %}
-      <form method="post" action="{% url 'elections:cast_vote' candidate.pk %}" style="flex:1;min-width:100px;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary" style="width:100%;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          Vote
-        </button>
-      </form>
+        {% if candidate.post in voted_posts %}
+          <button type="button" class="btn btn-secondary" disabled style="flex:1;min-width:100px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Voted
+          </button>
+        {% else %}
+          <form method="post" action="{% url 'elections:cast_vote' candidate.pk %}" style="flex:1;min-width:100px;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary" style="width:100%;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Vote
+            </button>
+          </form>
+        {% endif %}
       {% endif %}
       {% if user.has_executive_access %}
       <a href="{% url 'elections:candidate_update' candidate.pk %}" class="btn btn-secondary" style="flex:1;min-width:100px;">
