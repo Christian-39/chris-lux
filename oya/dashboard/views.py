@@ -181,6 +181,17 @@ def index(request):
     # Merge confirmed project donations into dashboard finance stats
     finance_stats, total_project_donations = _patch_finance_stats_with_project_donations(finance_stats)
 
+    # Sync patched finance stats back into kpis so templates using kpis.treasury_balance are correct
+    if isinstance(finance_stats, dict):
+        tb = finance_stats.get("treasury_balance", 0)
+        ti = finance_stats.get("total_income", 0)
+        if isinstance(kpis, dict):
+            kpis["treasury_balance"] = tb
+            kpis["total_income"] = ti
+        else:
+            setattr(kpis, "treasury_balance", tb)
+            setattr(kpis, "total_income", ti)
+
     # Expose as top-level context variables (for templates that use them directly)
     total_income = finance_stats.get("total_income", 0) if isinstance(finance_stats, dict) else 0
     treasury_balance = finance_stats.get("treasury_balance", 0) if isinstance(finance_stats, dict) else 0
@@ -241,6 +252,17 @@ def member_dashboard(request):
 
     # Merge confirmed project donations into dashboard finance stats
     finance_stats, total_project_donations = _patch_finance_stats_with_project_donations(finance_stats)
+
+    # Sync patched finance stats back into kpis so templates using kpis.treasury_balance are correct
+    if isinstance(finance_stats, dict):
+        tb = finance_stats.get("treasury_balance", 0)
+        ti = finance_stats.get("total_income", 0)
+        if isinstance(kpis, dict):
+            kpis["treasury_balance"] = tb
+            kpis["total_income"] = ti
+        else:
+            setattr(kpis, "treasury_balance", tb)
+            setattr(kpis, "total_income", ti)
 
     # Top-level finance variables for templates
     total_income = finance_stats.get("total_income", 0) if isinstance(finance_stats, dict) else 0
