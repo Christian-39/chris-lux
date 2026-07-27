@@ -207,6 +207,43 @@ def candidate_update(request, pk):
         "candidate": candidate
     })
 
+@login_required
+def cast_vote(request, pk):
+    """Cast a vote for a candidate."""
+    if request.method != "POST":
+        messages.error(request, "Invalid request method.")
+        return redirect("elections:election_list")
+
+    candidate = get_object_or_404(
+        Candidate.objects.select_related("election", "member"), pk=pk
+    )
+    election = candidate.election
+
+    if election.status != "ONGOING":
+        messages.error(request, "Voting is only allowed for ongoing elections.")
+        return redirect("elections:election_detail", pk=election.id)
+
+    # Basic duplicate-vote guard via session (use a Vote model for production)
+    vote_key = f"voted_election_{election.id}"
+    if request.session.get(vote_key):
+        messages.warning(request, "You have already voted in this election.")
+        return redirect("elections:election_detail", pk=election.id)
+
+    candidate.votes += 1
+    candidate.save(update_fields=["votes"])
+    request.session[vote_key] = True
+
+    log_action(
+        user=request.user,
+        action="VOTE",
+        object_type="Candidate",
+        object_id=candidate.id,
+        ip_address=getattr(request, "client_ip", ""),
+        description=f"Voted for {candidate.member.full_name} in {election.title}"
+    )
+    messages.success(request, f"Vote cast for {candidate.member.full_name}.")
+    return redirect("elections:election_detail", pk=election.id)
+
 
 @login_required
 def handover_list(request):
