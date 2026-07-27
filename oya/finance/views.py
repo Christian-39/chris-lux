@@ -56,9 +56,11 @@ def donation_list(request):
     page = request.GET.get("page", 1)
     donations = paginator.get_page(page)
 
-    total_donations = Income.objects.exclude(income_type="DUES").aggregate(
-        total=Sum("amount")
-    )["total"] or 0
+    # In donation_list, income_list, finance_summary, expense_list, etc.
+total_donations = Income.objects.exclude(
+    income_type__in=["DUES", "PROJECT_DONATION"]
+).aggregate(total=Sum("amount"))["total"] or 0
+
 
     # Add confirmed project donations to donation totals
     total_project_donations = ProjectDonation.objects.filter(
@@ -518,9 +520,11 @@ def income_list(request):
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
     )["total"]
 
-    total_donations_income = Income.objects.exclude(income_type="DUES").aggregate(
-        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
+    # In donation_list, income_list, finance_summary, expense_list, etc.
+total_donations = Income.objects.exclude(
+    income_type__in=["DUES", "PROJECT_DONATION"]
+).aggregate(total=Sum("amount"))["total"] or 0
+
 
     total_project_donations = ProjectDonation.objects.filter(
         status="CONFIRMED"
@@ -820,9 +824,11 @@ def finance_summary(request):
         total=Sum("amount")
     )["total"] or 0
 
-    total_donations_income = Income.objects.exclude(income_type="DUES").aggregate(
-        total=Sum("amount")
-    )["total"] or 0
+    # In donation_list, income_list, finance_summary, expense_list, etc.
+total_donations_income = Income.objects.exclude(
+    income_type__in=["DUES", "PROJECT_DONATION"]
+).aggregate(total=Sum("amount"))["total"] or 0
+
 
     # Include confirmed project donations (from outside donors & members) in totals
     total_project_donations = ProjectDonation.objects.filter(
