@@ -153,15 +153,8 @@ def financial_trend_ajax(request):
     return JsonResponse(trend_data)
 
 
-
-@login_required
-def index(request):
-    """Main admin/executive dashboard view with all KPIs."""
-    kpis = get_dashboard_kpis()
-    member_stats = get_member_statistics()
-    finance_stats = get_finance_statistics()
-
-    # Merge confirmed project donations into dashboard finance stats
+def _patch_finance_stats_with_project_donations(finance_stats):
+    """Helper: merge confirmed project donations into finance stats dict."""
     total_project_donations = ProjectDonation.objects.filter(
         status="CONFIRMED"
     ).aggregate(
@@ -174,6 +167,24 @@ def index(request):
             finance_stats["total_income"] = finance_stats["total_income"] + total_project_donations
         if "treasury_balance" in finance_stats:
             finance_stats["treasury_balance"] = finance_stats["treasury_balance"] + total_project_donations
+
+    return finance_stats, total_project_donations
+
+
+@login_required
+def index(request):
+    """Main admin/executive dashboard view with all KPIs."""
+    kpis = get_dashboard_kpis()
+    member_stats = get_member_statistics()
+    finance_stats = get_finance_statistics()
+
+    # Merge confirmed project donations into dashboard finance stats
+    finance_stats, total_project_donations = _patch_finance_stats_with_project_donations(finance_stats)
+
+    # Expose as top-level context variables (for templates that use them directly)
+    total_income = finance_stats.get("total_income", 0) if isinstance(finance_stats, dict) else 0
+    treasury_balance = finance_stats.get("treasury_balance", 0) if isinstance(finance_stats, dict) else 0
+    total_expenses = finance_stats.get("total_expenses", 0) if isinstance(finance_stats, dict) else 0
 
     recent_activities = get_recent_activities()
 
@@ -191,11 +202,6 @@ def index(request):
     is_admin = request.user.has_admin_access()
     is_executive = request.user.has_executive_access()
 
-    # ─── FIX: Project donation KPIs for admin dashboard ───
-    total_project_donations = ProjectDonation.objects.filter(status="CONFIRMED").aggregate(
-        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
-
     context = {
         "kpis": kpis,
         "member_stats": member_stats,
@@ -209,6 +215,10 @@ def index(request):
         "trend_data": trend_data,
         "is_admin": is_admin,
         "is_executive": is_executive,
+        # Top-level finance variables for templates
+        "total_income": total_income,
+        "treasury_balance": treasury_balance,
+        "total_expenses": total_expenses,
         # Project donations
         "total_project_donations": total_project_donations,
         "active_fundraising_projects": Project.objects.filter(
@@ -227,20 +237,14 @@ def member_dashboard(request):
     """Member-only dashboard view."""
     kpis = get_dashboard_kpis()
     member_stats = get_member_statistics()
+    finance_stats = get_finance_statistics()
 
     # Merge confirmed project donations into dashboard finance stats
-    total_project_donations = ProjectDonation.objects.filter(
-        status="CONFIRMED"
-    ).aggregate(
-        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
+    finance_stats, total_project_donations = _patch_finance_stats_with_project_donations(finance_stats)
 
-    if isinstance(finance_stats, dict):
-        finance_stats["total_project_donations"] = total_project_donations
-        if "total_income" in finance_stats:
-            finance_stats["total_income"] = finance_stats["total_income"] + total_project_donations
-        if "treasury_balance" in finance_stats:
-            finance_stats["treasury_balance"] = finance_stats["treasury_balance"] + total_project_donations
+    # Top-level finance variables for templates
+    total_income = finance_stats.get("total_income", 0) if isinstance(finance_stats, dict) else 0
+    treasury_balance = finance_stats.get("treasury_balance", 0) if isinstance(finance_stats, dict) else 0
 
     # Floor members get restricted activities (money + member add/remove only)
     member_activities = get_member_recent_activities(limit=5)
@@ -269,9 +273,10 @@ def member_dashboard(request):
     context = {
         "kpis": kpis,
         "member_stats": member_stats,
-        "total_project_donations": ProjectDonation.objects.filter(status="CONFIRMED").aggregate(
-            total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-        )["total"],
+        "finance_stats": finance_stats,
+        "total_income": total_income,
+        "treasury_balance": treasury_balance,
+        "total_project_donations": total_project_donations,
         "active_fundraising_projects": Project.objects.filter(
             enable_fundraising=True, fundraising_status="ACTIVE"
         ).count(),
@@ -291,7 +296,6 @@ def member_dashboard(request):
         "is_member": True,
     }
     return render(request, "dashboard/member_dashboard.html", context)
-
 
 
 @login_required
