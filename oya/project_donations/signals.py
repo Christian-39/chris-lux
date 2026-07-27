@@ -52,14 +52,14 @@ def _ensure_donation_income(donation):
         donation.income.amount = donation.amount
         donation.income.reason = f"Project Donation — {donation.project.title}"
         donation.income.paid_by = payer_name
-        donation.income.income_type = "DONATION"
+        donation.income.income_type = "PROJECT_DONATION"
         if member_user:
             donation.income.member = member_user
         donation.income.save()
     else:
         # Create new income and link back without re-firing signals
         income = Income.objects.create(
-            income_type="DONATION",
+            income_type="PROJECT_DONATION",
             amount=donation.amount,
             reason=f"Project Donation — {donation.project.title}",
             paid_by=payer_name,
