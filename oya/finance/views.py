@@ -60,11 +60,27 @@ def donation_list(request):
         total=Sum("amount")
     )["total"] or 0
 
+    # Add confirmed project donations to donation totals
+    total_project_donations = ProjectDonation.objects.filter(
+        status="CONFIRMED"
+    ).aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+    total_donations = total_donations + total_project_donations
+
     now = timezone.now()
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     this_month_donations = Income.objects.exclude(income_type="DUES").filter(
         created_at__gte=month_start
     ).aggregate(total=Sum("amount"))["total"] or 0
+
+    this_month_project_donations = ProjectDonation.objects.filter(
+        status="CONFIRMED",
+        donation_date__gte=month_start,
+    ).aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+    this_month_donations = this_month_donations + this_month_project_donations
 
     total_records = Income.objects.exclude(income_type="DUES").count()
 
@@ -459,7 +475,13 @@ def income_list(request):
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
     )["total"]
 
-    total_income = total_dues + total_donations
+    total_project_donations = ProjectDonation.objects.filter(
+        status="CONFIRMED"
+    ).aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+
+    total_income = total_dues + total_donations + total_project_donations
     total_records = Income.objects.count()
 
     context = {
@@ -485,6 +507,12 @@ def income_create(request):
         return redirect("finance:donation_list")
 
     total_income = Income.objects.aggregate(total=Sum("amount"))["total"] or 0
+    total_project_donations = ProjectDonation.objects.filter(
+        status="CONFIRMED"
+    ).aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+    total_income = total_income + total_project_donations
     total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or 0
     treasury_balance = total_income - total_expenses
 
@@ -611,6 +639,12 @@ def expense_list(request):
 
     total_records = Expense.objects.count()
     total_income = Income.objects.aggregate(total=Sum("amount"))["total"] or 0
+    total_project_donations = ProjectDonation.objects.filter(
+        status="CONFIRMED"
+    ).aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+    total_income = total_income + total_project_donations
     treasury_balance = total_income - total_expenses
 
     context = {
@@ -635,6 +669,12 @@ def expense_create(request):
         return redirect("finance:expense_list")
 
     total_income = Income.objects.aggregate(total=Sum("amount"))["total"] or 0
+    total_project_donations = ProjectDonation.objects.filter(
+        status="CONFIRMED"
+    ).aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+    total_income = total_income + total_project_donations
     total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or 0
     treasury_balance = total_income - total_expenses
 
@@ -733,7 +773,14 @@ def finance_summary(request):
         total=Sum("amount")
     )["total"] or 0
 
-    total_income = total_dues + total_donations
+    # Combine confirmed project donations into overall income / treasury
+    total_project_donations = ProjectDonation.objects.filter(
+        status="CONFIRMED"
+    ).aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+
+    total_income = total_dues + total_donations + total_project_donations
     total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or 0
     treasury_balance = total_income - total_expenses
 
@@ -896,11 +943,7 @@ def finance_summary(request):
     ).count()
 
     # ─── PROJECT DONATIONS ───
-    total_project_donations = ProjectDonation.objects.filter(
-        status="CONFIRMED"
-    ).aggregate(
-        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
+    # total_project_donations already calculated above
 
     total_member_project_donations = ProjectDonation.objects.filter(
         status="CONFIRMED", donor_type="MEMBER"
