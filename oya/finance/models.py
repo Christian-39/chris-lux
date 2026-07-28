@@ -84,7 +84,7 @@ class Income(BaseModel):
         ]
 
     def __str__(self):
-        return f"₦{self.amount:,.2f} - {self.reason}"
+        return f"NGN {self.amount:,.2f} - {self.reason}"
 
     def get_payer_display(self):
         """Return member name if linked, else paid_by text."""
