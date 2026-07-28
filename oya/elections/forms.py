@@ -123,7 +123,6 @@ class HandoverLedgerForm(forms.ModelForm):
             raise ValidationError("Tenure end date cannot be before start date.")
         
         return cleaned_data
-
     
     def save(self, commit=True):
         instance = super().save(commit=False)
