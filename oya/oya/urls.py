@@ -13,6 +13,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", lambda request: redirect("accounts:login"), name="home"),
     path("", include("accounts.urls")),
+    path("accounts/", include("accounts.urls")),
     path("members/", include("members.urls")),
     path("executives/", include("executives.urls")),
     path("elections/", include("elections.urls")),

@@ -1,6 +1,8 @@
-{% extends "base.html" %} {% load static %} {% block title %}Cases{% endblock %}
-{% block page_title %}Operations Cases{% endblock %} {% block breadcrumb
-%}Cases{% endblock %} {% block content %}
+{% extends "base.html" %} {% load static %} {% block title %}Cases{% endblock %}<!-- prettier-ignore -->
+{% block page_title %}Operations Cases{% endblock %}<!-- prettier-ignore -->
+{% block breadcrumb %}Cases{% endblock %}
+
+{% block content %}
 
 <!-- Page Header -->
 <div class="page-header">
@@ -290,8 +292,8 @@
           </td>
           <td style="white-space: nowrap">{{ case.respondent.full_name }}</td>
           <td style="white-space: nowrap">
-            {% if case.reported_to %} {{ case.reported_to.member.full_name }} {%
-            else %}
+            <!-- prettier-ignore -->
+            {% if case.reported_to %} {{ case.reported_to.member.full_name }} {% else %}
             <span class="cell-muted">—</span>
             {% endif %}
           </td>
@@ -413,8 +415,8 @@
         font-size: clamp(0.6875rem, 1.5vw, 0.8125rem);
         color: var(--oya-text-muted);
       "
-      >Showing {{ cases.start_index }}-{{ cases.end_index }} of {{
-      cases.paginator.count }} cases</span
+      ><!-- prettier-ignore -->
+      Showing {{ cases.start_index }}-{{ cases.end_index }} of {{ cases.paginator.count }} cases</span
     >
     <div class="pagination">
       {% if cases.has_previous %}
@@ -444,10 +446,9 @@
           stroke-width="2"
         >
           <polyline points="15 18 9 12 15 6" />
-        </svg>
-      </button>
-      {% endif %} {% for num in cases.paginator.page_range %} {% if cases.number
-      == num %}
+        </svg></button
+      ><!-- prettier-ignore -->
+      {% endif %} {% for num in cases.paginator.page_range %} {% if cases.number == num %}
       <button class="page-btn active">{{ num }}</button>
       {% elif num > cases.number|add:'-3' and num < cases.number|add:'3' %}
       <a
