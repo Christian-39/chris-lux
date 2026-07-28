@@ -142,14 +142,18 @@ class HandoverLedger(BaseModel):
         verbose_name="Outgoing Executive"
     )
     
-    # Tenure period for auto-calculation
+    # Tenure period for auto-calculation — nullable for backward-compatible migration
     tenure_start = models.DateField(
         verbose_name="Tenure Start Date",
-        help_text="Start date of this executive's tenure (for auto-calculating aggregates)."
+        help_text="Start date of this executive's tenure (for auto-calculating aggregates).",
+        null=True,
+        blank=True,
     )
     tenure_end = models.DateField(
         verbose_name="Tenure End Date",
-        help_text="End/handover date for this executive's tenure."
+        help_text="End/handover date for this executive's tenure.",
+        null=True,
+        blank=True,
     )
 
     # Physical balances being handed over
@@ -256,13 +260,17 @@ class HandoverLedger(BaseModel):
     def recalculate_aggregates(self):
         """
         Recalculate all auto-aggregated fields based on tenure dates.
-        Call this before saving.
+        Call this before saving. Skips if tenure dates are not set.
         """
         from finance.models import Income, Expense, DuesPayment
         from project_donations.models import Donation as ProjectDonation
         from operations.models import TaskForceMember, Motorcycle, CaseFile
         from projects.models import Project
         from django.db.models import Q
+        
+        # Guard: skip auto-calculation if tenure dates aren't set yet
+        if not self.tenure_start or not self.tenure_end:
+            return
         
         start = self.tenure_start
         end = self.tenure_end
