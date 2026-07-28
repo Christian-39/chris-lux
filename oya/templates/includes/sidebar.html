@@ -115,10 +115,12 @@
 
       <a
         href="{% url 'operations:case_list' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'case_list' or request.resolver_match.url_name == 'case_detail' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.url_name == 'case_list' or request.resolver_match.url_name == 'case_detail' or request.resolver_match.url_name == 'case_create' or request.resolver_match.url_name == 'case_resolve' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
+          width="18"
+          height="18"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -130,15 +132,36 @@
             d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
           />
           <polyline points="14 2 14 8 20 8" />
-          <line x1="16" y1="13" x2="8" y2="13" />
-          <line x1="16" y1="17" x2="8" y2="17" />
         </svg>
         <span class="nav-label">Cases</span>
       </a>
 
       <a
+        href="{% url 'operations:taskforce_list' %}"
+        class="nav-item {% if request.resolver_match.url_name == 'taskforce_list' or request.resolver_match.url_name == 'taskforce_create' or request.resolver_match.url_name == 'taskforce_update' or request.resolver_match.url_name == 'taskforce_remove' %}active{% endif %}"
+      >
+        <svg
+          class="nav-icon"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        <span class="nav-label">Task Force</span>
+      </a>
+
+      <a
         href="{% url 'operations:motorcycle_list' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'motorcycle_list' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.url_name == 'motorcycle_list' or request.resolver_match.url_name == 'motorcycle_create' or request.resolver_match.url_name == 'motorcycle_update' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
@@ -260,7 +283,7 @@
           <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
           <polyline points="17 6 23 6 23 12" />
         </svg>
-        <span class="nav-label">Income</span>
+        <span class="nav-label">Contributions & Reg.</span>
       </a>
 
       <a
@@ -282,7 +305,7 @@
         <span class="nav-label">Expenses</span>
       </a>
 
-            <!-- Outside Donors -->
+      <!-- Outside Donors -->
       <a
         href="{% url 'project_donations:outside_donor_list' %}"
         class="nav-item {% if request.resolver_match.url_name == 'outside_donor_list' or request.resolver_match.url_name == 'outside_donor_detail' or request.resolver_match.url_name == 'outside_donor_create' or request.resolver_match.url_name == 'outside_donor_update' or request.resolver_match.url_name == 'outside_donor_delete' %}active{% endif %}"
@@ -320,32 +343,8 @@
             d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
           />
         </svg>
-        <span class="nav-label">Donations</span>
+        <span class="nav-label">Project Donations</span>
       </a>
-
-      <!-- Donation Reports -->
-      <a
-        href="{% url 'project_donations:donation_history_report' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'donation_history_report' %}active{% endif %}"
-      >
-        <svg
-          class="nav-icon"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <polyline points="14 2 14 8 20 8" />
-          <line x1="16" y1="13" x2="8" y2="13" />
-          <line x1="16" y1="17" x2="8" y2="17" />
-          <polyline points="10 9 9 9 8 9" />
-        </svg>
-        <span class="nav-label">Donation Reports</span>
-      </a>
-
     </div>
 
     <!-- Administration -->
@@ -369,7 +368,7 @@
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
           <circle cx="12" cy="7" r="4" />
         </svg>
-        <span class="nav-label">Users</span>
+        <span class="nav-label">Admins</span>
       </a>
 
       <a
