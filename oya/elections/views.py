@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.db import transaction
 from django.db.utils import OperationalError
 from auditlogs.services import log_action
@@ -281,21 +281,116 @@ def cast_vote(request, pk):
     return redirect("elections:election_detail", pk=election.id)
 
 
+# ============================================================
+# HANDOVER LEDGER VIEWS
+# ============================================================
+
 @login_required
 def handover_list(request):
-    """List all handover ledgers."""
+    """List all handover ledgers with search and pagination."""
     queryset = HandoverLedger.objects.select_related("executive__member", "election").all()
 
-    paginator = Paginator(queryset, 25)
+    search_term = request.GET.get("search", "")
+    if search_term:
+        queryset = queryset.filter(
+            Q(executive__member__full_name__icontains=search_term) |
+            Q(executive__post__icontains=search_term) |
+            Q(election__title__icontains=search_term)
+        )
+
+    paginator = Paginator(queryset, 12)
     page = request.GET.get("page", 1)
     handovers = paginator.get_page(page)
 
-    return render(request, "elections/handover_list.html", {"handovers": handovers})
+    # Summary stats
+    stats = {
+        "total": HandoverLedger.objects.count(),
+        "total_bank": HandoverLedger.objects.aggregate(total=Sum("bank_balance"))["total"] or 0,
+        "total_cash": HandoverLedger.objects.aggregate(total=Sum("cash_balance"))["total"] or 0,
+        "total_revenue": HandoverLedger.objects.aggregate(total=Sum("total_revenue"))["total"] or 0,
+    }
+
+    return render(request, "elections/handover_list.html", {
+        "handovers": handovers,
+        "search_term": search_term,
+        "stats": stats,
+    })
+
+
+@login_required
+def handover_detail(request, pk):
+    """Display comprehensive handover details."""
+    handover = get_object_or_404(
+        HandoverLedger.objects.select_related("executive__member", "election"),
+        pk=pk
+    )
+    
+    # Fetch detailed records for the tenure period
+    from operations.models import TaskForceMember, Motorcycle, CaseFile
+    from projects.models import Project
+    from project_donations.models import Donation as ProjectDonation
+    from finance.models import Income, Expense, DuesPayment
+    
+    start = handover.tenure_start
+    end = handover.tenure_end
+    
+    # Operations details
+    taskforce_members = TaskForceMember.objects.select_related("member").all()
+    motorcycles = Motorcycle.objects.select_related("assigned_to").all()
+    cases = CaseFile.objects.select_related("respondent", "created_by").all()
+    
+    # Finance details
+    recent_income = Income.objects.filter(
+        created_at__date__gte=start,
+        created_at__date__lte=end
+    ).exclude(income_type__in=["DUES", "PROJECT_DONATION"]).select_related("created_by", "member").order_by("-created_at")[:10]
+    
+    recent_expenses = Expense.objects.filter(
+        created_at__date__gte=start,
+        created_at__date__lte=end
+    ).select_related("created_by").order_by("-created_at")[:10]
+    
+    recent_dues = DuesPayment.objects.filter(
+        created_at__date__gte=start,
+        created_at__date__lte=end
+    ).select_related("member", "recorded_by").order_by("-created_at")[:10]
+    
+    # Project details with donations during tenure
+    projects = Project.objects.all().order_by("-created_at")
+    projects_with_donations = []
+    for project in projects:
+        donations = ProjectDonation.objects.filter(
+            project=project,
+            status="CONFIRMED",
+            donation_date__gte=start,
+            donation_date__lte=end
+        ).select_related("member", "outside_donor").order_by("-donation_date")
+        
+        donation_total = donations.aggregate(total=Sum("amount"))["total"] or 0
+        
+        projects_with_donations.append({
+            "project": project,
+            "donations": donations[:5],
+            "donation_total": donation_total,
+            "donation_count": donations.count(),
+        })
+    
+    context = {
+        "handover": handover,
+        "taskforce_members": taskforce_members,
+        "motorcycles": motorcycles,
+        "cases": cases,
+        "recent_income": recent_income,
+        "recent_expenses": recent_expenses,
+        "recent_dues": recent_dues,
+        "projects_with_donations": projects_with_donations,
+    }
+    return render(request, "elections/handover_detail.html", context)
 
 
 @login_required
 def handover_create(request):
-    """Create a handover ledger entry."""
+    """Create a comprehensive handover ledger entry."""
     if not request.user.has_executive_access():
         messages.error(request, "Executive access required.")
         return redirect("elections:handover_list")
@@ -310,10 +405,10 @@ def handover_create(request):
                 object_type="HandoverLedger",
                 object_id=handover.id,
                 ip_address=getattr(request, "client_ip", ""),
-                description=f"Created handover ledger for {handover.executive}"
+                description=f"Created handover ledger for {handover.executive} (₦{handover.net_financial_position:,.2f})"
             )
-            messages.success(request, "Handover ledger created successfully.")
-            return redirect("elections:handover_list")
+            messages.success(request, "Handover ledger created successfully with auto-calculated aggregates.")
+            return redirect("elections:handover_detail", pk=handover.id)
         else:
             for error in form.errors.values():
                 messages.error(request, error)
@@ -325,3 +420,66 @@ def handover_create(request):
         "title": "Create Handover Ledger",
         "action": "Create"
     })
+
+
+@login_required
+def handover_update(request, pk):
+    """Update a handover ledger and recalculate aggregates."""
+    if not request.user.has_executive_access():
+        messages.error(request, "Executive access required.")
+        return redirect("elections:handover_list")
+
+    handover = get_object_or_404(HandoverLedger, pk=pk)
+
+    if request.method == "POST":
+        form = HandoverLedgerForm(request.POST, instance=handover)
+        if form.is_valid():
+            handover = form.save()
+            log_action(
+                user=request.user,
+                action="UPDATE",
+                object_type="HandoverLedger",
+                object_id=handover.id,
+                ip_address=getattr(request, "client_ip", ""),
+                description=f"Updated handover ledger for {handover.executive}"
+            )
+            messages.success(request, "Handover ledger updated and aggregates recalculated.")
+            return redirect("elections:handover_detail", pk=handover.id)
+        else:
+            for error in form.errors.values():
+                messages.error(request, error)
+    else:
+        form = HandoverLedgerForm(instance=handover)
+
+    return render(request, "elections/handover_form.html", {
+        "form": form,
+        "title": "Update Handover Ledger",
+        "action": "Update",
+        "handover": handover
+    })
+
+
+@login_required
+def handover_delete(request, pk):
+    """Delete a handover ledger."""
+    if not request.user.has_admin_access():
+        messages.error(request, "Admin access required.")
+        return redirect("elections:handover_list")
+
+    handover = get_object_or_404(HandoverLedger, pk=pk)
+
+    if request.method == "POST":
+        executive_name = str(handover.executive)
+        handover.delete()
+        log_action(
+            user=request.user,
+            action="DELETE",
+            object_type="HandoverLedger",
+            object_id=pk,
+            ip_address=getattr(request, "client_ip", ""),
+            description=f"Deleted handover ledger for {executive_name}"
+        )
+        messages.success(request, f"Handover ledger for {executive_name} deleted.")
+        return redirect("elections:handover_list")
+
+    return render(request, "elections/handover_confirm_delete.html", {"handover": handover})
