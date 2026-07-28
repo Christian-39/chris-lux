@@ -126,12 +126,35 @@
   height: 16px;
 }
 
-.activity-icon.success { background: var(--oya-success-bg); color: var(--oya-success); }
-.activity-icon.warning { background: var(--oya-warning-bg); color: var(--oya-warning); }
-.activity-icon.danger { background: var(--oya-danger-bg); color: var(--oya-danger); }
-.activity-icon.info { background: var(--oya-info-bg); color: var(--oya-info); }
-.activity-icon.primary { background: var(--oya-primary-50); color: var(--oya-primary); }
-.activity-icon.accent { background: var(--oya-accent-50); color: var(--oya-accent); }
+.activity-icon.success {
+  background: var(--oya-success-bg);
+  color: var(--oya-success);
+}
+
+.activity-icon.warning {
+  background: var(--oya-warning-bg);
+  color: var(--oya-warning);
+}
+
+.activity-icon.danger {
+  background: var(--oya-danger-bg);
+  color: var(--oya-danger);
+}
+
+.activity-icon.info {
+  background: var(--oya-info-bg);
+  color: var(--oya-info);
+}
+
+.activity-icon.primary {
+  background: var(--oya-primary-50);
+  color: var(--oya-primary);
+}
+
+.activity-icon.accent {
+  background: var(--oya-accent-50);
+  color: var(--oya-accent);
+}
 
 .activity-content {
   flex: 1;
@@ -170,9 +193,17 @@
   margin-bottom: 0;
 }
 
-.urgent-case.high { border-left-color: var(--oya-danger); }
-.urgent-case.medium { border-left-color: var(--oya-warning); }
-.urgent-case.low { border-left-color: var(--oya-info); }
+.urgent-case.high {
+  border-left-color: var(--oya-danger);
+}
+
+.urgent-case.medium {
+  border-left-color: var(--oya-warning);
+}
+
+.urgent-case.low {
+  border-left-color: var(--oya-info);
+}
 
 .urgent-case-title {
   font-weight: 600;
@@ -323,14 +354,14 @@
   background: #FFF;
   border-radius: 50%;
   transition: transform var(--transition-fast);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.toggle input:checked + .toggle-slider {
+.toggle input:checked+.toggle-slider {
   background: var(--oya-primary);
 }
 
-.toggle input:checked + .toggle-slider::before {
+.toggle input:checked+.toggle-slider::before {
   transform: translateX(22px);
 }
 
