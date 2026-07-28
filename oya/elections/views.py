@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum, Value, DecimalField
+from decimal import Decimal
 from django.db.models.functions import Coalesce
 from django.db import transaction
 from django.db.utils import OperationalError
@@ -303,24 +304,25 @@ def handover_list(request):
     page = request.GET.get("page", 1)
     handovers = paginator.get_page(page)
 
-    # Summary stats — all DecimalFields, so Value must declare output_field
-    dec = DecimalField()
+    # Summary stats — plain Sum, then fall back to Decimal("0") in Python
     agg = HandoverLedger.objects.aggregate(
-        total_bank=Coalesce(Sum("bank_balance"), Value(0, output_field=dec)),
-        total_cash=Coalesce(Sum("cash_balance"), Value(0, output_field=dec)),
-        sum_income=Coalesce(Sum("total_income"), Value(0, output_field=dec)),
-        sum_dues=Coalesce(Sum("total_dues"), Value(0, output_field=dec)),
-        sum_donations=Coalesce(Sum("total_donations"), Value(0, output_field=dec)),
-        sum_taskforce=Coalesce(Sum("taskforce_revenue"), Value(0, output_field=dec)),
+        total_bank=Sum("bank_balance"),
+        total_cash=Sum("cash_balance"),
+        sum_income=Sum("total_income"),
+        sum_dues=Sum("total_dues"),
+        sum_donations=Sum("total_donations"),
+        sum_taskforce=Sum("taskforce_revenue"),
     )
 
     stats = {
         "total": HandoverLedger.objects.count(),
-        "total_bank": agg["total_bank"],
-        "total_cash": agg["total_cash"],
+        "total_bank": agg["total_bank"] or Decimal("0"),
+        "total_cash": agg["total_cash"] or Decimal("0"),
         "total_revenue": (
-            agg["sum_income"] + agg["sum_dues"] +
-            agg["sum_donations"] + agg["sum_taskforce"]
+            (agg["sum_income"] or Decimal("0")) +
+            (agg["sum_dues"] or Decimal("0")) +
+            (agg["sum_donations"] or Decimal("0")) +
+            (agg["sum_taskforce"] or Decimal("0"))
         ),
     }
 
