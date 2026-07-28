@@ -245,8 +245,8 @@ class DuesPayment(BaseModel):
         ]
 
     def __str__(self):
-        status = self.get_status_display()
-        return f"{self.member.get_full_name()} — {self.year} Dues ({status})"
+        status_label = dict(self.STATUS_CHOICES).get(self.status, self.status)
+        return f"{self.member.get_full_name()} — {self.year} Dues ({status_label})"
 
     def clean(self):
         if self.year < 2020:
@@ -268,6 +268,10 @@ class DuesPayment(BaseModel):
         elif self.amount_paid > 0:
             return self.STATUS_PARTIAL
         return self.STATUS_OWED
+
+    def get_status_display(self):
+        return dict(self.STATUS_CHOICES).get(self.status, self.status)
+
 
     @property
     def remaining_balance(self):

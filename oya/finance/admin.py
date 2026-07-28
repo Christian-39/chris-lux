@@ -9,7 +9,6 @@ class IncomeAdmin(admin.ModelAdmin):
     list_filter = ["created_at", "income_type"]
     search_fields = ["reason", "paid_by", "member__full_name", "member__serial_number", "case__case_number", "case__title"]
     ordering = ["-created_at"]
-    date_hierarchy = "created_at"
     autocomplete_fields = ["member", "created_by", "case"]
     
     def get_payer(self, obj):
@@ -26,7 +25,6 @@ class DuesPaymentTransactionAdmin(admin.ModelAdmin):
     list_filter = ["payment_method", "payment_date", "created_at"]
     search_fields = ["member__full_name", "receipt_reference", "notes"]
     ordering = ["-payment_date"]
-    date_hierarchy = "payment_date"
     autocomplete_fields = ["member", "recorded_by"]
 
 
@@ -38,7 +36,6 @@ class DuesPaymentAdmin(admin.ModelAdmin):
     list_filter = ["year", "created_at"]
     search_fields = ["member__full_name", "notes"]
     ordering = ["-year", "member__full_name"]
-    date_hierarchy = "created_at"
     autocomplete_fields = ["member", "recorded_by"]
 
 
@@ -48,4 +45,3 @@ class ExpenseAdmin(admin.ModelAdmin):
     list_filter = ["category", "created_at"]
     search_fields = ["description", "category"]
     ordering = ["-created_at"]
-    date_hierarchy = "created_at"
