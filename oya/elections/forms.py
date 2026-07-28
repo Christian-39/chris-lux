@@ -114,7 +114,7 @@ class HandoverLedgerForm(forms.ModelForm):
             }),
         }
 
-        def clean(self):
+    def clean(self):
         cleaned_data = super().clean()
         tenure_start = cleaned_data.get("tenure_start")
         tenure_end = cleaned_data.get("tenure_end")
