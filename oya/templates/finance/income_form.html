@@ -94,6 +94,29 @@
               </div>
             </div>
 
+            <!-- NEW: Case selector (only visible for Case Fine) -->
+            <div class="form-group-wrapper mb-4" id="caseFieldGroup" style="display:none;">
+              <label class="form-label custom-label">Related Case <span class="text-danger">*</span></label>
+              <div class="custom-input-container">
+                <select name="case" class="form-select" id="id_case">
+                  <option value="">--------- Select Resolved Case ---------</option>
+                  {% for case in form.case.field.queryset %}
+                  <option value="{{ case.pk }}"
+                          data-amount="{{ case.fine_amount }}"
+                          data-reason="Case Fine — {{ case.case_number }}: {{ case.title }}"
+                          data-payer="{{ case.respondent.full_name }}"
+                          {% if form.case.value|stringformat:"s" == case.pk|stringformat:"s" %}selected{% endif %}>
+                    {{ case.case_number }} — {{ case.title }} (&#8358;{{ case.fine_amount|floatformat:2 }})
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="custom-form-text">Select the resolved case this fine was collected from.</div>
+              {% if form.case.errors %}
+              <div class="invalid-feedback d-block">{{ form.case.errors.0 }}</div>
+              {% endif %}
+            </div>
+
             <div class="form-group-wrapper mb-4">
               <label class="form-label custom-label">Payment Reason / Description <span class="text-danger">*</span></label>
               <div class="custom-input-container">
@@ -192,10 +215,10 @@
 
   /* Input and Selection Form Elements Modernization */
   .form-control, .form-select {
-    -webkit-appearance: none; /* Strip out aggressive iOS layout overrides */
+    -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    font-size: 1rem !important; /* Forces mobile safari to stay at base zoom without snapping page scale */
+    font-size: 1rem !important;
     padding: 0.65rem 0.9rem;
     border-radius: 10px;
     border: 1px solid var(--border-color);
@@ -327,7 +350,7 @@
   .btn-primary-custom {
     background: var(--primary-brand);
     color: #ffffff;
-    flex: 2; /* Desktop prioritized spacing proportions */
+    flex: 2;
   }
   .btn-primary-custom:hover {
     opacity: 0.92;
@@ -343,34 +366,25 @@
     background: #edf2f7;
   }
 
-  /* ==========================================================================
-     MOBILE-FIRST OVERRIDES (@media Screen Breakpoint Optimization Layer)
-     ========================================================================== */
   @media (max-width: 575.98px) {
-    /* Compress root space padding slightly so the viewport maximizes code display visibility */
     .container {
       padding-left: 12px;
       padding-right: 12px;
     }
-    
     .card-body {
       padding: 1.15rem 0.95rem !important;
     }
-
-    /* Stack buttons full-width vertically on smaller devices */
     .action-buttons-layout-container {
       flex-direction: column;
       gap: 8px;
     }
-
     .btn-primary-custom, .btn-light-custom {
       width: 100%;
       flex: none;
-      padding: 0.8rem 1.2rem; /* Thicker touch targets on mobile viewports */
+      padding: 0.8rem 1.2rem;
     }
-
     .btn-light-custom {
-      order: 2; /* Moves Cancel under Save when stacked layout is drawn */
+      order: 2;
     }
     .btn-primary-custom {
       order: 1;
@@ -388,8 +402,11 @@
   const reasonInput = document.getElementById('id_reason');
   const submitBtn = document.getElementById('submitBtn');
   const incomeForm = document.getElementById('incomeForm');
+  const incomeTypeSelect = document.getElementById('id_income_type');
+  const caseFieldGroup = document.getElementById('caseFieldGroup');
+  const caseSelect = document.getElementById('id_case');
 
-  // Parse out display text name parameters gracefully upon change index updates
+  // Member dropdown -> auto-fill paid_by
   if (memberSelect) {
     memberSelect.addEventListener('change', function() {
       if (this.selectedIndex > 0) {
@@ -402,7 +419,7 @@
     });
   }
 
-  // Handle Quick Badge Suggestion items
+  // Quick Badge Suggestion items
   document.querySelectorAll('.quick-reason-badge').forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
@@ -412,16 +429,58 @@
     });
   });
 
-  // Native interception handling for smooth processing
+  // NEW: Toggle case field based on income type
+  function toggleCaseField() {
+    if (incomeTypeSelect && incomeTypeSelect.value === 'CASE_FINE') {
+      if (caseFieldGroup) caseFieldGroup.style.display = 'block';
+      if (caseSelect) caseSelect.setAttribute('required', 'required');
+      if (memberSelect) {
+        memberSelect.value = '';
+        memberSelect.disabled = true;
+      }
+    } else {
+      if (caseFieldGroup) caseFieldGroup.style.display = 'none';
+      if (caseSelect) {
+        caseSelect.removeAttribute('required');
+        caseSelect.value = '';
+      }
+      if (memberSelect) memberSelect.disabled = false;
+    }
+  }
+
+  if (incomeTypeSelect) {
+    incomeTypeSelect.addEventListener('change', toggleCaseField);
+    toggleCaseField();
+  }
+
+  // NEW: Auto-fill amount, reason, paid_by from selected case
+  function fillFromCase() {
+    if (!caseSelect || caseSelect.selectedIndex <= 0) return;
+    const option = caseSelect.options[caseSelect.selectedIndex];
+    const amt = option.getAttribute('data-amount');
+    const rsn = option.getAttribute('data-reason');
+    const pyr = option.getAttribute('data-payer');
+    if (amt && amountInput) amountInput.value = amt;
+    if (rsn && reasonInput) reasonInput.value = rsn;
+    if (pyr && paidByInput) paidByInput.value = pyr;
+  }
+
+  if (caseSelect) {
+    caseSelect.addEventListener('change', fillFromCase);
+  }
+
+  // Form validation
   incomeForm.addEventListener('submit', function(e) {
     let isFormValid = true;
     const amount = parseFloat(amountInput.value);
 
-    if (paidByInput && !paidByInput.value.trim()) {
-      paidByInput.classList.add('is-invalid');
-      isFormValid = false;
-    } else if (paidByInput) {
-      paidByInput.classList.remove('is-invalid');
+    if (incomeTypeSelect && incomeTypeSelect.value !== 'CASE_FINE') {
+      if (paidByInput && !paidByInput.value.trim()) {
+        paidByInput.classList.add('is-invalid');
+        isFormValid = false;
+      } else if (paidByInput) {
+        paidByInput.classList.remove('is-invalid');
+      }
     }
 
     if (amountInput && (isNaN(amount) || amount <= 0)) {

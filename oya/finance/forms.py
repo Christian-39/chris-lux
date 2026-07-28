@@ -8,13 +8,14 @@ from accounts.models import User  # Ensure this import matches your user model p
 
 
 class IncomeForm(forms.ModelForm):
-    """Form for creating and updating income records (Donations, Events, Other)."""
+    """Form for creating and updating income records (Donations, Events, Other, Case Fines)."""
 
     class Meta:
         model = Income
-        fields = ["income_type", "amount", "reason", "member", "paid_by"]
+        fields = ["income_type", "case", "amount", "reason", "member", "paid_by"]
         widgets = {
             "income_type": forms.Select(attrs={"class": "form-select"}),
+            "case": forms.Select(attrs={"class": "form-select", "id": "id_case"}),
             "amount": forms.NumberInput(attrs={
                 "class": "form-control",
                 "step": "0.01",
@@ -25,8 +26,7 @@ class IncomeForm(forms.ModelForm):
                 "class": "form-control",
                 "placeholder": "e.g., Donation for project, Event ticket sales"
             }),
-            # CHANGED: Swapped from HiddenInput to a structural Form Select widget
-            "member": forms.Select(attrs={"class": "form-select", "id": "id_member"}),  
+            "member": forms.Select(attrs={"class": "form-select", "id": "id_member"}),
             "paid_by": forms.TextInput(attrs={
                 "class": "form-control",
                 "placeholder": "Name of payer / contributor (if not a member)"
@@ -39,36 +39,71 @@ class IncomeForm(forms.ModelForm):
         choices = [c for c in Income.INCOME_TYPE_CHOICES if c[0] != "DUES"]
         self.fields["income_type"].choices = choices
 
-        # CHANGED: Load all active members directly into the choices queryset for the dropdown
+        # Member dropdown
         self.fields["member"].queryset = User.objects.filter(serial_number__isnull=False).exclude(serial_number="").exclude(is_staff=True).exclude(is_superuser=True).order_by("full_name")
         self.fields["member"].empty_label = "--------- Select Active Member ---------"
-
         self.fields["member"].required = False
         self.fields["paid_by"].required = False
 
+        # NEW: Case dropdown — only resolved cases that carry a fine
+        from operations.models import CaseFile
+        self.fields["case"].queryset = CaseFile.objects.filter(
+            status="RESOLVED",
+            fine_amount__gt=0
+        ).order_by("-created_at")
+        self.fields["case"].empty_label = "--------- Select Resolved Case ---------"
+        self.fields["case"].required = False
+
     def clean_amount(self):
         amount = self.cleaned_data.get("amount")
+        income_type = self.cleaned_data.get("income_type")
+        case = self.cleaned_data.get("case")
+        # Auto-fill amount from case fine when case type is selected
+        if income_type == "CASE_FINE" and case and not amount:
+            return case.fine_amount
         if amount and amount <= 0:
             raise ValidationError("Amount must be greater than zero.")
         return amount
 
+    def clean_reason(self):
+        reason = self.cleaned_data.get("reason")
+        income_type = self.cleaned_data.get("income_type")
+        case = self.cleaned_data.get("case")
+        if income_type == "CASE_FINE" and case and not reason:
+            return f"Case Fine — {case.case_number}: {case.title}"
+        return reason
+
+    def clean_paid_by(self):
+        paid_by = self.cleaned_data.get("paid_by")
+        income_type = self.cleaned_data.get("income_type")
+        case = self.cleaned_data.get("case")
+        if income_type == "CASE_FINE" and case and not paid_by:
+            return case.respondent.full_name
+        return paid_by
+
     def clean(self):
         cleaned = super().clean()
+        income_type = cleaned.get("income_type")
+        case = cleaned.get("case")
         member = cleaned.get("member")
         paid_by = cleaned.get("paid_by")
 
-        # Auto-fill paid_by text representation from member object attributes if dropped down
-        if member and not paid_by:
-            cleaned["paid_by"] = member.get_full_name()
-
-        if not member and not paid_by:
-            raise ValidationError(
-                "Please either select a member from the dropdown or enter a payer name."
-            )
+        if income_type == "CASE_FINE":
+            if not case:
+                raise ValidationError(
+                    {"case": "Please select the case this fine was collected from."}
+                )
+            # Case fines auto-fill payer from respondent; member link is optional
+        else:
+            # Original validation for non-case income
+            if member and not paid_by:
+                cleaned["paid_by"] = member.get_full_name()
+            if not member and not paid_by:
+                raise ValidationError(
+                    "Please either select a member from the dropdown or enter a payer name."
+                )
 
         return cleaned
-
-
 
 
 class DuesPaymentAllocationForm(forms.ModelForm):

@@ -115,6 +115,26 @@ class CaseFile(BaseModel):
         related_name="cases",
         verbose_name="Respondent"
     )
+    # NEW: Task-force member who received the report
+    reported_to = models.ForeignKey(
+        "operations.TaskForceMember",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reported_cases",
+        verbose_name="Reported To",
+        limit_choices_to={"is_active": True},
+    )
+    # NEW: Task-force member who resolved the case
+    resolved_by = models.ForeignKey(
+        "operations.TaskForceMember",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="resolved_cases",
+        verbose_name="Resolved By",
+        limit_choices_to={"is_active": True},
+    )
     created_by = models.ForeignKey(
         "accounts.User",
         on_delete=models.SET_NULL,

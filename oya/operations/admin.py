@@ -23,8 +23,8 @@ class MotorcycleAdmin(admin.ModelAdmin):
 
 @admin.register(CaseFile)
 class CaseFileAdmin(admin.ModelAdmin):
-    list_display = ["case_number", "title", "respondent", "status", "fine_amount", "created_at"]
+    list_display = ["case_number", "title", "respondent", "status", "fine_amount", "reported_to", "resolved_by", "created_at"]
     list_filter = ["status", "created_at"]
-    search_fields = ["case_number", "title", "respondent__full_name"]
-    list_select_related = ["respondent"]
+    search_fields = ["case_number", "title", "respondent__full_name", "reported_to__member__full_name", "resolved_by__member__full_name"]
+    list_select_related = ["respondent", "reported_to", "reported_to__member", "resolved_by", "resolved_by__member"]
     date_hierarchy = "created_at"

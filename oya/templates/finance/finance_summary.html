@@ -1,11 +1,6 @@
-{% extends "base.html" %}
-{% load static %}
-{% load humanize %}
-
-{% block title %}Finance Dashboard{% endblock %}
-{% block page_title %}Finance Overview{% endblock %}
-{% block breadcrumb %}Finance{% endblock %}
-{% block content %}
+{% extends "base.html" %} {% load static %} {% load humanize %} {% block title
+%}Finance Dashboard{% endblock %} {% block page_title %}Finance Overview{%
+endblock %} {% block breadcrumb %}Finance{% endblock %} {% block content %}
 
 <!-- Page Header -->
 <div class="page-header">
@@ -16,21 +11,42 @@
   <div class="page-header-actions">
     {% if user.is_staff %}
     <a href="{% url 'finance:dues_create' %}" class="btn btn-primary">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <line x1="12" y1="5" x2="12" y2="19" />
         <line x1="5" y1="12" x2="19" y2="12" />
       </svg>
       Record Dues
     </a>
     <a href="{% url 'finance:donation_create' %}" class="btn btn-success">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <line x1="12" y1="5" x2="12" y2="19" />
         <line x1="5" y1="12" x2="19" y2="12" />
       </svg>
       Record Contribution
     </a>
     <a href="{% url 'finance:expense_create' %}" class="btn btn-danger">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <line x1="5" y1="12" x2="19" y2="12" />
       </svg>
       Record Expense
@@ -44,7 +60,12 @@
   <div class="kpi-card">
     <div class="kpi-header">
       <div class="kpi-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <line x1="12" y1="1" x2="12" y2="23" />
           <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
         </svg>
@@ -58,32 +79,60 @@
 
   <div class="kpi-card accent-success">
     <div class="kpi-header">
-      <div class="kpi-icon" style="background: var(--oya-success-bg); color: var(--oya-success)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div
+        class="kpi-icon"
+        style="background: var(--oya-success-bg); color: var(--oya-success)"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
         </svg>
       </div>
     </div>
-    <div class="kpi-value" style="color: var(--oya-success); font-size: clamp(1.25rem, 4vw, 1.75rem)">
+    <div
+      class="kpi-value"
+      style="color: var(--oya-success); font-size: clamp(1.25rem, 4vw, 1.75rem)"
+    >
       &#x20A6;{{ total_dues|floatformat:0|intcomma }}
     </div>
     <div class="kpi-label">Total Dues Collected (&#x20A6;)</div>
-    <div style="font-size: 0.75rem; color: var(--oya-text-muted); margin-top: 0.25rem;">
+    <div
+      style="
+        font-size: 0.75rem;
+        color: var(--oya-text-muted);
+        margin-top: 0.25rem;
+      "
+    >
       {{ dues_collection_rate }}% collection rate
     </div>
   </div>
 
   <div class="kpi-card accent-info">
     <div class="kpi-header">
-      <div class="kpi-icon" style="background: var(--oya-info-bg); color: var(--oya-info)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div
+        class="kpi-icon"
+        style="background: var(--oya-info-bg); color: var(--oya-info)"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
           <circle cx="9" cy="7" r="4" />
           <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
         </svg>
       </div>
     </div>
-    <div class="kpi-value" style="color: var(--oya-info); font-size: clamp(1.25rem, 4vw, 1.75rem)">
+    <div
+      class="kpi-value"
+      style="color: var(--oya-info); font-size: clamp(1.25rem, 4vw, 1.75rem)"
+    >
       &#x20A6;{{ total_donations|floatformat:0|intcomma }}
     </div>
     <div class="kpi-label">Donations &amp; Contributions (&#x20A6;)</div>
@@ -91,13 +140,24 @@
 
   <div class="kpi-card accent-danger">
     <div class="kpi-header">
-      <div class="kpi-icon" style="background: var(--oya-danger-bg); color: var(--oya-danger)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div
+        class="kpi-icon"
+        style="background: var(--oya-danger-bg); color: var(--oya-danger)"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
         </svg>
       </div>
     </div>
-    <div class="kpi-value" style="color: var(--oya-danger); font-size: clamp(1.25rem, 4vw, 1.75rem)">
+    <div
+      class="kpi-value"
+      style="color: var(--oya-danger); font-size: clamp(1.25rem, 4vw, 1.75rem)"
+    >
       &#x20A6;{{ total_expenses|floatformat:0|intcomma }}
     </div>
     <div class="kpi-label">Total Expenses YTD (&#x20A6;)</div>
@@ -108,19 +168,36 @@
 <div class="dashboard-grid dashboard-grid-3" style="margin-bottom: 1.5rem">
   <div class="kpi-card accent-warning">
     <div class="kpi-header">
-      <div class="kpi-icon" style="background: var(--oya-warning-bg); color: var(--oya-warning)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div
+        class="kpi-icon"
+        style="background: var(--oya-warning-bg); color: var(--oya-warning)"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
           <line x1="8" y1="21" x2="16" y2="21" />
           <line x1="12" y1="17" x2="12" y2="21" />
         </svg>
       </div>
     </div>
-    <div class="kpi-value" style="color: var(--oya-warning); font-size: clamp(1.25rem, 4vw, 1.75rem)">
+    <div
+      class="kpi-value"
+      style="color: var(--oya-warning); font-size: clamp(1.25rem, 4vw, 1.75rem)"
+    >
       {{ this_year_dues_paid }} / {{ active_members }}
     </div>
     <div class="kpi-label">{{ current_year }} Dues Paid</div>
-    <div style="font-size: 0.75rem; color: var(--oya-text-muted); margin-top: 0.25rem;">
+    <div
+      style="
+        font-size: 0.75rem;
+        color: var(--oya-text-muted);
+        margin-top: 0.25rem;
+      "
+    >
       {{ this_year_dues_rate }}% of active members
     </div>
   </div>
@@ -128,7 +205,12 @@
   <div class="kpi-card">
     <div class="kpi-header">
       <div class="kpi-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <circle cx="12" cy="12" r="10" />
           <polyline points="12 6 12 12 16 14" />
         </svg>
@@ -142,13 +224,24 @@
 
   <div class="kpi-card accent-success">
     <div class="kpi-header">
-      <div class="kpi-icon" style="background: var(--oya-success-bg); color: var(--oya-success)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div
+        class="kpi-icon"
+        style="background: var(--oya-success-bg); color: var(--oya-success)"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
         </svg>
       </div>
     </div>
-    <div class="kpi-value" style="color: var(--oya-success); font-size: clamp(1.25rem, 4vw, 1.75rem)">
+    <div
+      class="kpi-value"
+      style="color: var(--oya-success); font-size: clamp(1.25rem, 4vw, 1.75rem)"
+    >
       &#x20A6;{{ total_income|floatformat:0|intcomma }}
     </div>
     <div class="kpi-label">Total Income (&#x20A6;)</div>
@@ -164,7 +257,9 @@
         <div class="card-header-title">Recent Transactions</div>
         <div class="card-header-subtitle">Latest financial activities</div>
       </div>
-      <a href="{% url 'finance:donation_list' %}" class="btn btn-sm btn-ghost">View All</a>
+      <a href="{% url 'finance:donation_list' %}" class="btn btn-sm btn-ghost"
+        >View All</a
+      >
     </div>
     <div class="card-body" style="padding: 0">
       <div class="activity-feed" style="padding: 0 1.25rem">
@@ -202,15 +297,35 @@
             </div>
           </div>
 
-          {% elif transaction.type == "income" %}
+                    {% elif transaction.type == "income" %}
           <div class="activity-icon success">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
             </svg>
           </div>
           <div class="activity-content">
-            <!-- prettier-ignore -->
             <div class="activity-text">
+              {% if transaction.income_type == "CASE_FINE" and transaction.income_object.case %}
+                <strong>{{ transaction.income_object.case.case_number }}</strong> —
+              {% elif transaction.member %}
+                <strong>{{ transaction.member.get_full_name }}</strong> —
+              {% elif transaction.paid_by %}
+                <strong>{{ transaction.paid_by }}</strong> —
+              {% endif %}
+              <strong>&#x20A6;{{ transaction.amount|floatformat:2|intcomma }}</strong>
+              — {{ transaction.reason }}
+              {% if transaction.income_type == "CASE_FINE" %}
+              <span class="badge badge-case" style="margin-left: 0.5rem">Case Fine</span>
+              {% else %}
+              <span class="badge badge-success" style="margin-left: 0.5rem">
+                {{ transaction.get_income_type_display }}
+              </span>
+              {% endif %}
+            </div>
+            <div class="activity-time">
+              {{ transaction.created_at|date:"M d, Y \a\t h:i A" }}
+            </div>
+          </div>
               {% if transaction.member %}
                 <strong>{{ transaction.member.get_full_name }}</strong> —
               {% elif transaction.paid_by %}
@@ -247,9 +362,14 @@
           {% endif %}
         </div>
         {% empty %}
-        <div class="activity-item" style="justify-content: center; padding: 2rem 0">
+        <div
+          class="activity-item"
+          style="justify-content: center; padding: 2rem 0"
+        >
           <div class="empty-state" style="padding: 0; text-align: center">
-            <p style="color: var(--oya-text-muted)">No transactions recorded yet.</p>
+            <p style="color: var(--oya-text-muted)">
+              No transactions recorded yet.
+            </p>
           </div>
         </div>
         {% endfor %}
@@ -291,8 +411,13 @@
       </div>
 
       {% if donations_by_project %}
-      <h4 style="font-size: 0.9375rem; margin-bottom: 0.75rem">Donations by Project</h4>
-      <div class="table-container" style="overflow-x: auto; margin-bottom: 1rem">
+      <h4 style="font-size: 0.9375rem; margin-bottom: 0.75rem">
+        Donations by Project
+      </h4>
+      <div
+        class="table-container"
+        style="overflow-x: auto; margin-bottom: 1rem"
+      >
         <table class="data-table" style="white-space: nowrap">
           <thead>
             <tr>
@@ -314,17 +439,34 @@
           </tbody>
         </table>
       </div>
-      {% endif %}
-
-      {% if highest_fundraising_project %}
-      <div style="background: var(--oya-bg); padding: 1rem; border-radius: var(--oya-radius)">
-        <div style="font-size: 0.75rem; color: var(--oya-text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+      {% endif %} {% if highest_fundraising_project %}
+      <div
+        style="
+          background: var(--oya-bg);
+          padding: 1rem;
+          border-radius: var(--oya-radius);
+        "
+      >
+        <div
+          style="
+            font-size: 0.75rem;
+            color: var(--oya-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+          "
+        >
           Highest Fundraising Project
         </div>
         <div style="font-size: 1.125rem; font-weight: 700; margin-top: 0.25rem">
           {{ highest_fundraising_project.project__title }}
         </div>
-        <div style="font-size: 0.875rem; color: var(--oya-success); font-weight: 600;">
+        <div
+          style="
+            font-size: 0.875rem;
+            color: var(--oya-success);
+            font-weight: 600;
+          "
+        >
           &#x20A6;{{ highest_fundraising_project.total|floatformat:2|intcomma }}
         </div>
       </div>
@@ -339,14 +481,21 @@
         <div class="card-header-title">Top Debtors</div>
         <div class="card-header-subtitle">Members with highest unpaid dues</div>
       </div>
-      <a href="{% url 'finance:dues_tracker' %}" class="btn btn-sm btn-ghost">View All</a>
+      <a href="{% url 'finance:dues_tracker' %}" class="btn btn-sm btn-ghost"
+        >View All</a
+      >
     </div>
     <div class="card-body" style="padding: 0">
       <div class="activity-feed" style="padding: 0 1.25rem">
         {% for debtor in top_debtors %}
         <div class="activity-item">
           <div class="activity-icon danger">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
               <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -360,15 +509,25 @@
               </span>
             </div>
             <div class="activity-time">
-              {{ debtor.years_missed }} year{{ debtor.years_missed|pluralize }} missed
+              {{ debtor.years_missed }} year{{ debtor.years_missed|pluralize }}
+              missed
             </div>
           </div>
-          <a href="{% url 'finance:member_dues_detail' debtor.member.id %}" class="btn btn-sm btn-ghost">View</a>
+          <a
+            href="{% url 'finance:member_dues_detail' debtor.member.id %}"
+            class="btn btn-sm btn-ghost"
+            >View</a
+          >
         </div>
         {% empty %}
-        <div class="activity-item" style="justify-content: center; padding: 2rem 0">
+        <div
+          class="activity-item"
+          style="justify-content: center; padding: 2rem 0"
+        >
           <div class="empty-state" style="padding: 0; text-align: center">
-            <p style="color: var(--oya-text-muted)">All members are up to date on dues!</p>
+            <p style="color: var(--oya-text-muted)">
+              All members are up to date on dues!
+            </p>
           </div>
         </div>
         {% endfor %}
@@ -390,17 +549,33 @@
     <div style="display: flex; flex-direction: column; gap: 0.625rem">
       {% for category in expenses_by_category %}
       <div>
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem;">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+          "
+        >
           <span>{{ category.category }}</span>
           <span style="font-weight: 600">
             &#x20A6;{{ category.total|floatformat:0|intcomma }}
-            <span style="font-weight: 400; color: var(--oya-text-muted); font-size: 0.75rem;">
+            <span
+              style="
+                font-weight: 400;
+                color: var(--oya-text-muted);
+                font-size: 0.75rem;
+              "
+            >
               ({{ category.percentage }}%)
             </span>
           </span>
         </div>
         <div class="progress-bar">
-          <div class="progress-fill danger" style="width: {{ category.percentage }}%"></div>
+          <div
+            class="progress-fill danger"
+            style="width: {{ category.percentage }}%"
+          ></div>
         </div>
       </div>
       {% endfor %}
@@ -414,6 +589,15 @@
 </div>
 
 <style>
+    .badge-case {
+    background: var(--oya-danger-bg);
+    color: var(--oya-danger);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
   .transaction-row {
     transition: background-color 0.15s ease;
   }

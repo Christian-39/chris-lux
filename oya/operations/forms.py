@@ -62,7 +62,7 @@ class CaseFileForm(forms.ModelForm):
         model = CaseFile
         fields = [
             "case_number", "title", "description",
-            "fine_amount", "status", "respondent"
+            "fine_amount", "status", "respondent", "reported_to"
         ]
         widgets = {
             "case_number": forms.TextInput(attrs={
@@ -86,7 +86,17 @@ class CaseFileForm(forms.ModelForm):
             }),
             "status": forms.Select(attrs={"class": "form-select"}),
             "respondent": forms.Select(attrs={"class": "form-select"}),
+            "reported_to": forms.Select(attrs={"class": "form-select"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Only active task-force members can receive a report
+        self.fields["reported_to"].queryset = TaskForceMember.objects.filter(
+            is_active=True
+        ).select_related("member").order_by("member__full_name")
+        self.fields["reported_to"].empty_label = "--------- Select Task Force Member ---------"
+        self.fields["reported_to"].label = "Reported To (Task Force)"
 
 
 class CaseResolutionForm(forms.ModelForm):
@@ -94,7 +104,7 @@ class CaseResolutionForm(forms.ModelForm):
 
     class Meta:
         model = CaseFile
-        fields = ["status", "resolution_notes", "resolved_date"]
+        fields = ["status", "resolution_notes", "resolved_date", "resolved_by"]
         widgets = {
             "status": forms.Select(attrs={"class": "form-select"}),
             "resolution_notes": forms.Textarea(attrs={
@@ -106,4 +116,14 @@ class CaseResolutionForm(forms.ModelForm):
                 "class": "form-control",
                 "type": "date"
             }),
+            "resolved_by": forms.Select(attrs={"class": "form-select"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Only active task-force members can resolve
+        self.fields["resolved_by"].queryset = TaskForceMember.objects.filter(
+            is_active=True
+        ).select_related("member").order_by("member__full_name")
+        self.fields["resolved_by"].empty_label = "--------- Select Task Force Member ---------"
+        self.fields["resolved_by"].label = "Resolved By (Task Force)"

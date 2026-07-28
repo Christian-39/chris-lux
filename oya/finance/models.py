@@ -14,6 +14,7 @@ class Income(BaseModel):
         ("DUES", "Yearly Dues"),
         ("DONATION", "Donation / Contribution"),
         ("EVENT", "Event Fee"),
+        ("CASE_FINE", "Case Fine / Resolution"),
         ("OTHER", "Other"),
     ]
 
@@ -45,6 +46,17 @@ class Income(BaseModel):
         help_text="Select if the contributor is a registered member"
     )
 
+    # NEW: Link to the case file that generated this fine
+    case = models.ForeignKey(
+        "operations.CaseFile",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="income_records",
+        verbose_name="Related Case",
+        help_text="Select the resolved case this fine was collected from"
+    )
+
     paid_by = models.CharField(
         max_length=255,
         blank=True,
@@ -68,6 +80,7 @@ class Income(BaseModel):
             models.Index(fields=["created_at"]),
             models.Index(fields=["income_type"]),
             models.Index(fields=["member"]),
+            models.Index(fields=["case"]),
         ]
 
     def __str__(self):
