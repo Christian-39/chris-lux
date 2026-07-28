@@ -1,6 +1,11 @@
-{% extends "base.html" %} {% load humanize %} {% load static %} {% block title
-%}Income Records{% endblock %} {% block page_title %}Income Records{% endblock
-%} {% block breadcrumb %}Income{% endblock %} {% block content %}
+{% extends "base.html" %} {% load humanize %} {% load static %}
+<!-- prettier-ignore -->
+
+{% block title %}Income Records{% endblock %} 
+{% block page_title %}Income Records{% endblock%}
+<!-- prettier-ignore -->
+{% block breadcrumb %}Income{% endblock %} 
+{% block content %}
 
 <!-- Page Header -->
 <div class="page-header">
@@ -349,8 +354,8 @@
             &#8358;{{ item.amount|floatformat:0|intcomma }}
           </td>
           <td style="white-space: nowrap">
-            {% if item.recorded_by %}{{ item.recorded_by.get_full_name }}{% else
-            %}—{% endif %}
+            <!-- prettier-ignore -->
+            {% if item.recorded_by %}{{ item.recorded_by.get_full_name }}{% else  %}—{% endif %}
           </td>
           <td
             class="cell-muted"
@@ -450,8 +455,8 @@
         font-size: clamp(0.6875rem, 1.5vw, 0.8125rem);
         color: var(--oya-text-muted);
       "
-      >Showing {{ dues_incomes.start_index }}-{{ dues_incomes.end_index }} of {{
-      dues_incomes.paginator.count }} records</span
+      ><!-- prettier-ignore -->
+      Showing {{ dues_incomes.start_index }}-{{ dues_incomes.end_index }} of {{ dues_incomes.paginator.count }} records</span
     >
     <div class="pagination">
       <!-- prettier-ignore -->
@@ -484,8 +489,8 @@
         class="page-btn active"
       >
         {{ num }}</button
-      >{% elif num > dues_incomes.number|add:'-3' and num <
-      dues_incomes.number|add:'3' %}<a
+      ><!-- prettier-ignore -->
+      {% elif num > dues_incomes.number|add:'-3' and num < dues_incomes.number|add:'3' %}<a
         href="?dues_page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}"
         class="page-btn"
         >{{ num }}</a
@@ -493,8 +498,8 @@
         href="?dues_page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}"
         class="page-btn"
         >{{ num }}</a
-      >{% elif num == dues_incomes.number|add:'-3' or num ==
-      dues_incomes.number|add:'3' %}<span
+      ><!-- prettier-ignore -->
+      {% elif num == dues_incomes.number|add:'-3' or num == dues_incomes.number|add:'3' %}<span
         class="page-btn"
         style="cursor: default; border: none; background: transparent"
         >...</span
@@ -609,8 +614,8 @@
             &#8358;{{ income.amount|floatformat:0|intcomma }}
           </td>
           <td style="white-space: nowrap">
-            {% if income.created_by %}{{ income.created_by.get_full_name }}{%
-            else %}—{% endif %}
+            <!-- prettier-ignore -->
+            {% if income.created_by %}{{ income.created_by.get_full_name }}{% else %}—{% endif %}
           </td>
           <td
             class="cell-muted"
@@ -709,8 +714,8 @@
         font-size: clamp(0.6875rem, 1.5vw, 0.8125rem);
         color: var(--oya-text-muted);
       "
-      >Showing {{ donation_incomes.start_index }}-{{ donation_incomes.end_index
-      }} of {{ donation_incomes.paginator.count }} records</span
+      ><!-- prettier-ignore -->
+      Showing {{ donation_incomes.start_index }}-{{ donation_incomes.end_index }} of {{ donation_incomes.paginator.count }} records</span
     >
     <div class="pagination">
       <!-- prettier-ignore -->
@@ -743,8 +748,8 @@
         class="page-btn active"
       >
         {{ num }}</button
-      >{% elif num > donation_incomes.number|add:'-3' and num <
-      donation_incomes.number|add:'3' %}<a
+      ><!-- prettier-ignore -->
+      {% elif num > donation_incomes.number|add:'-3' and num < donation_incomes.number|add:'3' %}<a
         href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}"
         class="page-btn"
         >{{ num }}</a
@@ -752,8 +757,8 @@
         href="?page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}"
         class="page-btn"
         >{{ num }}</a
-      >{% elif num == donation_incomes.number|add:'-3' or num ==
-      donation_incomes.number|add:'3' %}<span
+      ><!-- prettier-ignore -->
+      {% elif num == donation_incomes.number|add:'-3' or num == donation_incomes.number|add:'3' %}<span
         class="page-btn"
         style="cursor: default; border: none; background: transparent"
         >...</span
@@ -979,9 +984,8 @@
         font-size: clamp(0.6875rem, 1.5vw, 0.8125rem);
         color: var(--oya-text-muted);
       "
-      >Showing {{ project_donation_incomes.start_index }}-{{
-      project_donation_incomes.end_index }} of {{
-      project_donation_incomes.paginator.count }} records</span
+      ><!-- prettier-ignore -->
+      Showing {{ project_donation_incomes.start_index }}-{{ project_donation_incomes.end_index }} of {{ project_donation_incomes.paginator.count }} records</span
     >
     <div class="pagination">
       <!-- prettier-ignore -->
@@ -1014,18 +1018,18 @@
         class="page-btn active"
       >
         {{ num }}</button
-      >{% elif num > project_donation_incomes.number|add:'-3' and num <
-      project_donation_incomes.number|add:'3' %}<a
+      ><!-- prettier-ignore -->
+      {% elif num > project_donation_incomes.number|add:'-3' and num < project_donation_incomes.number|add:'3' %}<a
         href="?project_page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}"
         class="page-btn"
         >{{ num }}</a
-      >{% elif num == 1 or num == project_donation_incomes.paginator.num_pages
-      %}<a
+      ><!-- prettier-ignore -->
+      {% elif num == 1 or num == project_donation_incomes.paginator.num_pages %}<a
         href="?project_page={{ num }}{% if search_term %}&search={{ search_term }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}"
         class="page-btn"
-        >{{ num }}</a
-      >{% elif num == project_donation_incomes.number|add:'-3' or num ==
-      project_donation_incomes.number|add:'3' %}<span
+        >{{ num }} </a
+      ><!-- prettier-ignore -->
+      {% elif num == project_donation_incomes.number|add:'-3' or num == project_donation_incomes.number|add:'3' %}<span
         class="page-btn"
         style="cursor: default; border: none; background: transparent"
         >...</span

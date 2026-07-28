@@ -1,6 +1,10 @@
-{% extends "base.html" %} {% load static %} {% load humanize %} {% block title
-%}Finance Dashboard{% endblock %} {% block page_title %}Finance Overview{%
-endblock %} {% block breadcrumb %}Finance{% endblock %} {% block content %}
+{% extends "base.html" %} 
+{% load static %} {% load humanize %}<!-- prettier-ignore -->
+
+{% block title %}Finance Dashboard{% endblock %} 
+{% block page_title %}Finance Overview{% endblock %}<!-- prettier-ignore -->
+{% block breadcrumb %}Finance{% endblock %}<!-- prettier-ignore -->
+{% block content %}
 
 <!-- Page Header -->
 <div class="page-header">
@@ -297,7 +301,7 @@ endblock %} {% block breadcrumb %}Finance{% endblock %} {% block content %}
             </div>
           </div>
 
-                    {% elif transaction.type == "income" %}
+          {% elif transaction.type == "income" %}
           <div class="activity-icon success">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
@@ -597,7 +601,7 @@ endblock %} {% block breadcrumb %}Finance{% endblock %} {% block content %}
     font-size: 0.75rem;
     font-weight: 600;
   }
-  
+
   .transaction-row {
     transition: background-color 0.15s ease;
   }

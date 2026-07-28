@@ -1,7 +1,13 @@
-{% extends "base.html" %} {% load humanize %} {% load static %} {% block title
-%}{{ income.reason }} — Income Detail{% endblock %} {% block page_title %}Income
-Detail{% endblock %} {% block breadcrumb %}Income / Detail{% endblock %} {%
-block content %}
+{% extends "base.html" %}<!-- prettier-ignore -->
+{% load humanize %} 
+{% load static %}
+
+<!-- prettier-ignore -->
+{% block title %}{{ income.reason }} — Income Detail{% endblock %} 
+{% block page_title %}Income Detail{% endblock %}
+<!-- prettier-ignore -->
+{% block breadcrumb %}Income / Detail{% endblock %} 
+{% block content %}
 
 <!-- Page Header -->
 <div class="page-header">
@@ -66,9 +72,8 @@ block content %}
     <a
       href="{% url 'project_donations:donation_detail' income.project_donation.id %}"
       class="cell-name"
-    >
-      {{ income.project_donation.project.title }} — &#x20A6;{{
-      income.project_donation.amount|floatformat:2 }}
+      ><!-- prettier-ignore -->
+      {{ income.project_donation.project.title }} — &#x20A6;{{ income.project_donation.amount|floatformat:2 }}
     </a>
   </div>
 </div>

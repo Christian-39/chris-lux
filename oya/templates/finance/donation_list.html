@@ -1,7 +1,9 @@
-{% extends "base.html" %} {% load humanize %} {% load static %} {% block title
-%}Donations & Contributions{% endblock %} {% block page_title %}Donations &
-Contributions{% endblock %} {% block breadcrumb %}Donations{% endblock %} {%
-block content %}
+{% extends "base.html" %} {% load humanize %} {% load static %}<!-- prettier-ignore -->
+
+{% block title %}Donations & Contributions{% endblock %} 
+{% block page_title %}Donations & Contributions{% endblock %}<!-- prettier-ignore -->
+{% block breadcrumb %}Donations{% endblock %}<!-- prettier-ignore -->
+{% block content %}
 
 <!-- Page Header -->
 <div class="page-header">
@@ -302,8 +304,8 @@ block content %}
             {% endif %}
           </td>
           <td style="white-space: nowrap">
-            {% if donation.case %} {{ donation.case.respondent.full_name }} {%
-            elif donation.member %}
+            <!-- prettier-ignore -->
+            {% if donation.case %} {{ donation.case.respondent.full_name }} {% elif donation.member %}
             <a
               href="{% url 'finance:member_dues_detail' donation.member.id %}"
               class="text-decoration-none fw-medium"
@@ -322,8 +324,8 @@ block content %}
             &#8358;{{ donation.amount|floatformat:0|intcomma }}
           </td>
           <td style="white-space: nowrap">
-            {% if donation.created_by %}{{ donation.created_by.get_full_name
-            }}{% else %}—{% endif %}
+            <!-- prettier-ignore -->
+            {% if donation.created_by %}{{ donation.created_by.get_full_name }}{% else %}—{% endif %}
           </td>
           <td
             class="cell-muted"
@@ -407,10 +409,8 @@ block content %}
                 No donation records found
               </h3>
               <p style="font-size: clamp(0.75rem, 2vw, 0.875rem)">
-                {% if search_term or type_filter %} No donations match your
-                search/filter criteria. {% else %} No donations have been
-                recorded yet. Click "Record Contribution" to get started. {%
-                endif %}
+                <!-- prettier-ignore -->
+                {% if search_term or type_filter %} No donations match your search/filter criteria. {% else %} No donations have been recorded yet. Click "Record Contribution" to get started. {% endif %}
               </p>
             </div>
           </td>
