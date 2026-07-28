@@ -14,6 +14,11 @@ urlpatterns = [
     path("candidates/create/", views.candidate_create, name="candidate_create"),
     path("candidates/<int:pk>/update/", views.candidate_update, name="candidate_update"),
     path("candidate/<int:pk>/vote/", views.cast_vote, name="cast_vote"),
+    
+    # Handover Ledger URLs
     path("handovers/", views.handover_list, name="handover_list"),
     path("handovers/create/", views.handover_create, name="handover_create"),
+    path("handovers/<int:pk>/", views.handover_detail, name="handover_detail"),
+    path("handovers/<int:pk>/update/", views.handover_update, name="handover_update"),
+    path("handovers/<int:pk>/delete/", views.handover_delete, name="handover_delete"),
 ]
