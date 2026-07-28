@@ -6,7 +6,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Value, DecimalField
+from django.db.models.functions import Coalesce
 from django.db import transaction
 from django.db.utils import OperationalError
 from auditlogs.services import log_action
@@ -302,17 +303,15 @@ def handover_list(request):
     page = request.GET.get("page", 1)
     handovers = paginator.get_page(page)
 
-    # Summary stats — aggregate DB fields only, compute total_revenue in Python
-    from django.db.models import Sum, Value
-    from django.db.models.functions import Coalesce
-
+    # Summary stats — all DecimalFields, so Value must declare output_field
+    dec = DecimalField()
     agg = HandoverLedger.objects.aggregate(
-        total_bank=Coalesce(Sum("bank_balance"), Value(0)),
-        total_cash=Coalesce(Sum("cash_balance"), Value(0)),
-        sum_income=Coalesce(Sum("total_income"), Value(0)),
-        sum_dues=Coalesce(Sum("total_dues"), Value(0)),
-        sum_donations=Coalesce(Sum("total_donations"), Value(0)),
-        sum_taskforce=Coalesce(Sum("taskforce_revenue"), Value(0)),
+        total_bank=Coalesce(Sum("bank_balance"), Value(0, output_field=dec)),
+        total_cash=Coalesce(Sum("cash_balance"), Value(0, output_field=dec)),
+        sum_income=Coalesce(Sum("total_income"), Value(0, output_field=dec)),
+        sum_dues=Coalesce(Sum("total_dues"), Value(0, output_field=dec)),
+        sum_donations=Coalesce(Sum("total_donations"), Value(0, output_field=dec)),
+        sum_taskforce=Coalesce(Sum("taskforce_revenue"), Value(0, output_field=dec)),
     )
 
     stats = {
