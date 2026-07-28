@@ -302,12 +302,27 @@ def handover_list(request):
     page = request.GET.get("page", 1)
     handovers = paginator.get_page(page)
 
-    # Summary stats
+    # Summary stats — aggregate DB fields only, compute total_revenue in Python
+    from django.db.models import Sum, Value
+    from django.db.models.functions import Coalesce
+
+    agg = HandoverLedger.objects.aggregate(
+        total_bank=Coalesce(Sum("bank_balance"), Value(0)),
+        total_cash=Coalesce(Sum("cash_balance"), Value(0)),
+        sum_income=Coalesce(Sum("total_income"), Value(0)),
+        sum_dues=Coalesce(Sum("total_dues"), Value(0)),
+        sum_donations=Coalesce(Sum("total_donations"), Value(0)),
+        sum_taskforce=Coalesce(Sum("taskforce_revenue"), Value(0)),
+    )
+
     stats = {
         "total": HandoverLedger.objects.count(),
-        "total_bank": HandoverLedger.objects.aggregate(total=Sum("bank_balance"))["total"] or 0,
-        "total_cash": HandoverLedger.objects.aggregate(total=Sum("cash_balance"))["total"] or 0,
-        "total_revenue": HandoverLedger.objects.aggregate(total=Sum("total_revenue"))["total"] or 0,
+        "total_bank": agg["total_bank"],
+        "total_cash": agg["total_cash"],
+        "total_revenue": (
+            agg["sum_income"] + agg["sum_dues"] +
+            agg["sum_donations"] + agg["sum_taskforce"]
+        ),
     }
 
     return render(request, "elections/handover_list.html", {
@@ -315,6 +330,7 @@ def handover_list(request):
         "search_term": search_term,
         "stats": stats,
     })
+
 
 
 @login_required
