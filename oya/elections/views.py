@@ -6,9 +6,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum, Value, DecimalField
+from django.db.models import Q, Sum
 from decimal import Decimal
-from django.db.models.functions import Coalesce
 from django.db import transaction
 from django.db.utils import OperationalError
 from auditlogs.services import log_action
@@ -305,34 +304,32 @@ def handover_list(request):
     handovers = paginator.get_page(page)
 
     # Summary stats — plain Sum, then fall back to Decimal("0") in Python
- agg = HandoverLedger.objects.aggregate(
-    total_bank=Sum("bank_balance"),
-    total_cash=Sum("cash_balance"),
-    sum_income=Sum("total_income"),
-    sum_dues=Sum("total_dues"),
-    sum_donations=Sum("total_donations"),
-    sum_taskforce=Sum("taskforce_revenue"),
-)
+    agg = HandoverLedger.objects.aggregate(
+        total_bank=Sum("bank_balance"),
+        total_cash=Sum("cash_balance"),
+        sum_income=Sum("total_income"),
+        sum_dues=Sum("total_dues"),
+        sum_donations=Sum("total_donations"),
+        sum_taskforce=Sum("taskforce_revenue"),
+    )
 
-stats = {
-    "total": HandoverLedger.objects.count(),
-    "total_bank": agg["total_bank"] or Decimal("0"),
-    "total_cash": agg["total_cash"] or Decimal("0"),
-    "total_revenue": (
-        (agg["sum_income"] or Decimal("0")) +
-        (agg["sum_dues"] or Decimal("0")) +
-        (agg["sum_donations"] or Decimal("0")) +
-        (agg["sum_taskforce"] or Decimal("0"))
-    ),
-}
-
+    stats = {
+        "total": HandoverLedger.objects.count(),
+        "total_bank": agg["total_bank"] or Decimal("0"),
+        "total_cash": agg["total_cash"] or Decimal("0"),
+        "total_revenue": (
+            (agg["sum_income"] or Decimal("0")) +
+            (agg["sum_dues"] or Decimal("0")) +
+            (agg["sum_donations"] or Decimal("0")) +
+            (agg["sum_taskforce"] or Decimal("0"))
+        ),
+    }
 
     return render(request, "elections/handover_list.html", {
         "handovers": handovers,
         "search_term": search_term,
         "stats": stats,
     })
-
 
 
 @login_required
@@ -342,37 +339,37 @@ def handover_detail(request, pk):
         HandoverLedger.objects.select_related("executive__member", "election"),
         pk=pk
     )
-    
+
     # Fetch detailed records for the tenure period
     from operations.models import TaskForceMember, Motorcycle, CaseFile
     from projects.models import Project
     from project_donations.models import Donation as ProjectDonation
     from finance.models import Income, Expense, DuesPayment
-    
+
     start = handover.tenure_start
     end = handover.tenure_end
-    
+
     # Operations details
     taskforce_members = TaskForceMember.objects.select_related("member").all()
     motorcycles = Motorcycle.objects.select_related("assigned_to").all()
     cases = CaseFile.objects.select_related("respondent", "created_by").all()
-    
+
     # Finance details
     recent_income = Income.objects.filter(
         created_at__date__gte=start,
         created_at__date__lte=end
     ).exclude(income_type__in=["DUES", "PROJECT_DONATION"]).select_related("created_by", "member").order_by("-created_at")[:10]
-    
+
     recent_expenses = Expense.objects.filter(
         created_at__date__gte=start,
         created_at__date__lte=end
     ).select_related("created_by").order_by("-created_at")[:10]
-    
+
     recent_dues = DuesPayment.objects.filter(
         created_at__date__gte=start,
         created_at__date__lte=end
     ).select_related("member", "recorded_by").order_by("-created_at")[:10]
-    
+
     # Project details with donations during tenure
     projects = Project.objects.all().order_by("-created_at")
     projects_with_donations = []
@@ -383,16 +380,16 @@ def handover_detail(request, pk):
             donation_date__gte=start,
             donation_date__lte=end
         ).select_related("member", "outside_donor").order_by("-donation_date")
-        
+
         donation_total = donations.aggregate(total=Sum("amount"))["total"] or 0
-        
+
         projects_with_donations.append({
             "project": project,
             "donations": donations[:5],
             "donation_total": donation_total,
             "donation_count": donations.count(),
         })
-    
+
     context = {
         "handover": handover,
         "taskforce_members": taskforce_members,
