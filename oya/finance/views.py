@@ -580,15 +580,34 @@ def income_create(request):
         messages.error(request, "Executive access required.")
         return redirect("finance:donation_list")
 
-    total_income = Income.objects.exclude(income_type="PROJECT_DONATION").aggregate(total=Sum("amount"))["total"] or 0
+     # ─── TREASURY BALANCE (all money collected minus expenses) ───
+    total_income = Income.objects.exclude(income_type="PROJECT_DONATION").aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
+
     total_project_donations = ProjectDonation.objects.filter(
         status="CONFIRMED"
     ).aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
-    total_income = total_income + total_project_donations
-    total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or 0
+    )["total"] or Decimal("0")
+    total_income += total_project_donations
+
+    # Add prepaid dues (future years fully paid) — cash already received
+    current_year = timezone.now().year
+    total_prepaid = DuesPayment.objects.filter(
+        year__gt=current_year,
+        amount_paid__gte=YEARLY_DUES,
+    ).aggregate(
+        total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
+    total_income += total_prepaid
+
+    total_expenses = Expense.objects.aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
     treasury_balance = total_income - total_expenses
+    # ─────────────────────────────────────────────────────────────
+
 
     recent_incomes = Income.objects.exclude(income_type__in=["DUES", "PROJECT_DONATION"]).select_related("created_by", "member").order_by("-created_at")[:5]
 
@@ -633,7 +652,9 @@ def income_create(request):
         "total_expenses": total_expenses,
         "recent_incomes": recent_incomes,
         "common_reasons": list(common_reasons),
+        "total_prepaid": total_prepaid,   # ← add this
     })
+
 
 
 @login_required
@@ -721,15 +742,33 @@ def expense_list(request):
     ).aggregate(total=Sum("amount"))["total"] or 0
 
     total_records = Expense.objects.count()
-    total_income = Income.objects.exclude(income_type="PROJECT_DONATION").aggregate(total=Sum("amount"))["total"] or 0
+    # ─── TREASURY BALANCE (all money collected minus expenses) ───
+    total_income = Income.objects.exclude(income_type="PROJECT_DONATION").aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
+
     total_project_donations = ProjectDonation.objects.filter(
         status="CONFIRMED"
     ).aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
-    total_income = total_income + total_project_donations
-    treasury_balance = total_income - total_expenses
+    )["total"] or Decimal("0")
+    total_income += total_project_donations
 
+    # Add prepaid dues (future years fully paid) — cash already received
+    current_year = timezone.now().year
+    total_prepaid = DuesPayment.objects.filter(
+        year__gt=current_year,
+        amount_paid__gte=YEARLY_DUES,
+    ).aggregate(
+        total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
+    total_income += total_prepaid
+
+    total_expenses = Expense.objects.aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
+    treasury_balance = total_income - total_expenses
+    # ─────────────────────────────────────────────────────────────
     context = {
         "expenses": expenses,
         "search_term": search_term,
@@ -741,7 +780,9 @@ def expense_list(request):
         "this_month_expenses": this_month_expenses,
         "total_records": total_records,
         "treasury_balance": treasury_balance,
+        "total_prepaid": total_prepaid,   # ← add this
     }
+
     return render(request, "finance/expense_list.html", context)
 
 @login_required
@@ -751,15 +792,34 @@ def expense_create(request):
         messages.error(request, "Executive access required.")
         return redirect("finance:expense_list")
 
-    total_income = Income.objects.exclude(income_type="PROJECT_DONATION").aggregate(total=Sum("amount"))["total"] or 0
+    # ─── TREASURY BALANCE (all money collected minus expenses) ───
+    total_income = Income.objects.exclude(income_type="PROJECT_DONATION").aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
+
     total_project_donations = ProjectDonation.objects.filter(
         status="CONFIRMED"
     ).aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
-    total_income = total_income + total_project_donations
-    total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or 0
+    )["total"] or Decimal("0")
+    total_income += total_project_donations
+
+    # Add prepaid dues (future years fully paid) — cash already received
+    current_year = timezone.now().year
+    total_prepaid = DuesPayment.objects.filter(
+        year__gt=current_year,
+        amount_paid__gte=YEARLY_DUES,
+    ).aggregate(
+        total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
+    total_income += total_prepaid
+
+    total_expenses = Expense.objects.aggregate(
+        total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
     treasury_balance = total_income - total_expenses
+    # ─────────────────────────────────────────────────────────────
+
 
     recent_expenses = Expense.objects.select_related("created_by").order_by("-created_at")[:5]
 
@@ -803,7 +863,9 @@ def expense_create(request):
         "total_expenses": total_expenses,
         "recent_expenses": recent_expenses,
         "common_categories": list(common_categories),
+        "total_prepaid": total_prepaid,   # ← add this
     })
+
 
 
 @login_required
