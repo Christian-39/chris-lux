@@ -214,6 +214,17 @@ def dues_tracker(request):
         except Exception:
             join_year = PLATFORM_START_YEAR
         total_possible_dues += (current_year - max(join_year, PLATFORM_START_YEAR) + 1) * YEARLY_DUES
+
+    # ─── ADD PREPAID DUES TO TOTAL COLLECTED (money already received) ───
+    total_prepaid = DuesPayment.objects.filter(
+        year__gt=current_year,
+        amount_paid__gte=YEARLY_DUES,
+    ).aggregate(
+        total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
+    total_dues_collected += total_prepaid
+    # ─────────────────────────────────────────────────────────────────────
+
     collection_rate = round(
         (float(total_dues_collected) / float(total_possible_dues) * 100), 1
     ) if total_possible_dues > 0 else 0
@@ -240,6 +251,7 @@ def dues_tracker(request):
         "this_year_expected": this_year_expected,
         "this_year_rate": this_year_rate,
         "active_members_count": active_members_count,
+        "total_prepaid": total_prepaid,
     }
     return render(request, "finance/dues_tracker.html", context)
 
@@ -516,17 +528,27 @@ def income_list(request):
     # Totals (use full QS, not paginated)
     total_dues = Income.objects.filter(income_type="DUES").aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
+    )["total"] or Decimal("0")
+
+    # ─── ADD PREPAID DUES TO TOTAL DUES COLLECTED ───
+    total_prepaid = DuesPayment.objects.filter(
+        year__gt=current_year,
+        amount_paid__gte=YEARLY_DUES,
+    ).aggregate(
+        total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
+    total_dues = total_dues + total_prepaid
+    # ─────────────────────────────────────────────────
 
     total_donations_income = Income.objects.exclude(income_type__in=["DUES", "PROJECT_DONATION"]).aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
+    )["total"] or Decimal("0")
 
     total_project_donations = ProjectDonation.objects.filter(
         status="CONFIRMED"
     ).aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
+    )["total"] or Decimal("0")
 
     # Include outside donor project donations in donation totals
     total_donations = total_donations_income + total_project_donations
@@ -546,6 +568,7 @@ def income_list(request):
         "total_project_donations": total_project_donations,
         "total_income": total_income,
         "total_records": total_records,
+        "total_prepaid": total_prepaid,
     }
     return render(request, "finance/income_list.html", context)
 
@@ -829,6 +852,16 @@ def finance_summary(request):
         total=Sum("amount")
     )["total"] or 0
 
+    # ─── ADD PREPAID DUES TO TOTAL DUES COLLECTED ───
+    total_prepaid = DuesPayment.objects.filter(
+        year__gt=current_year,
+        amount_paid__gte=YEARLY_DUES,
+    ).aggregate(
+        total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
+    total_dues = total_dues + total_prepaid
+    # ─────────────────────────────────────────────────
+
     total_donations_income = Income.objects.exclude(income_type__in=["DUES", "PROJECT_DONATION"]).aggregate(
         total=Sum("amount")
     )["total"] or 0
@@ -838,7 +871,7 @@ def finance_summary(request):
         status="CONFIRMED"
     ).aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
+    )["total"] or Decimal("0")
 
     total_donations = total_donations_income + total_project_donations
     total_income = total_dues + total_donations
@@ -1044,13 +1077,13 @@ def finance_summary(request):
         status="CONFIRMED", donor_type="MEMBER"
     ).aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
+    )["total"] or Decimal("0")
 
     total_outside_project_donations = ProjectDonation.objects.filter(
         status="CONFIRMED", donor_type="OUTSIDE"
     ).aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
+    )["total"] or Decimal("0")
 
     donations_by_project = ProjectDonation.objects.filter(
         status="CONFIRMED"
@@ -1066,7 +1099,7 @@ def finance_summary(request):
         status="CONFIRMED", invited_by__isnull=False
     ).aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
+    )["total"] or Decimal("0")
 
     context = {
         "treasury_balance": treasury_balance,
@@ -1092,6 +1125,7 @@ def finance_summary(request):
         "current_year": current_year,
         "partial_payments": partial_payments,
         "prepaid_count": prepaid_count,
+        "total_prepaid": total_prepaid,
     }
     return render(request, "finance/finance_summary.html", context)
 
