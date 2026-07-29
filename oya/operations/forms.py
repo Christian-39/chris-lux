@@ -61,14 +61,10 @@ class CaseFileForm(forms.ModelForm):
     class Meta:
         model = CaseFile
         fields = [
-            "case_number", "title", "description",
+            "title", "description",
             "fine_amount", "status", "respondent", "reported_to"
         ]
         widgets = {
-            "case_number": forms.TextInput(attrs={
-                "class": "form-control",
-                "placeholder": "e.g., CASE-2026-001"
-            }),
             "title": forms.TextInput(attrs={
                 "class": "form-control",
                 "placeholder": "Case title"
@@ -91,7 +87,6 @@ class CaseFileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Only active task-force members can receive a report
         self.fields["reported_to"].queryset = TaskForceMember.objects.filter(
             is_active=True
         ).select_related("member").order_by("member__full_name")

@@ -69,17 +69,6 @@
             <label
               class="form-label"
               style="font-size: clamp(0.8125rem, 2vw, 0.875rem)"
-              >Case Number
-              <span style="color: var(--oya-danger)">*</span></label
-            >
-            {{ form.case_number }} {% if form.case_number.errors %}
-            <div class="form-error">{{ form.case_number.errors.0 }}</div>
-            {% endif %}
-          </div>
-          <div class="form-group">
-            <label
-              class="form-label"
-              style="font-size: clamp(0.8125rem, 2vw, 0.875rem)"
               >Status</label
             >
             {{ form.status }} {% if form.status.errors %}

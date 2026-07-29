@@ -93,6 +93,8 @@ class CaseFile(BaseModel):
     case_number = models.CharField(
         max_length=50,
         unique=True,
+        blank=True,
+        null=True,
         verbose_name="Case Number"
     )
     title = models.CharField(max_length=255, verbose_name="Title")
@@ -157,3 +159,14 @@ class CaseFile(BaseModel):
 
     def __str__(self):
         return f"{self.case_number} - {self.title}"
+
+    def save(self, *args, **kwargs):
+        # Generate case number on first save only
+        if not self.case_number:
+            # First commit to obtain a primary key
+            super().save(*args, **kwargs)
+            self.case_number = f"OYA-CASE-{self.pk:04d}"
+            # Update only the case_number to avoid side-effects
+            super().save(update_fields=["case_number"])
+        else:
+            super().save(*args, **kwargs)
