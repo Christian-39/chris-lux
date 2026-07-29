@@ -149,6 +149,17 @@ class Member(BaseModel):
     def __str__(self):
         return f"{self.serial_number} - {self.full_name}"
 
+    @property
+    def position(self):
+        """Return the current executive post if the member is an executive."""
+        current_role = self.executive_roles.filter(is_current=True).first()
+        return current_role.post if current_role else None
+
+    @property
+    def is_taskforce(self):
+        """Check if the member is currently assigned to the task force."""
+        return self.task_force_assignments.filter(is_active=True).exists()
+
     def clean(self):
         """Model-level validation for age and year_joined."""
         if self.age and (self.age < 18 or self.age > 55):

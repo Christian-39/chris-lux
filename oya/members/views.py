@@ -21,7 +21,10 @@ logger = logging.getLogger("oya")
 @login_required
 def member_list(request):
     """List all members with search, filter, and pagination."""
-    queryset = Member.objects.select_related("umu_nna_clan").all()
+    queryset = Member.objects.select_related("umu_nna_clan").prefetch_related(
+        "executive_roles",
+        "task_force_assignments",
+    ).all()
 
     search_term = request.GET.get("search", "")
     if search_term:
