@@ -464,3 +464,88 @@ def case_resolve(request, pk):
         "case": case
     })
 
+
+@login_required
+def case_update(request, pk):
+    """Edit an existing case file."""
+    if not request.user.has_executive_access():
+        messages.error(request, "Executive access required.")
+        return redirect("operations:case_list")
+
+    case = get_object_or_404(CaseFile, pk=pk)
+
+    if request.method == "POST":
+        form = CaseFileForm(request.POST, instance=case)
+        if form.is_valid():
+            case = form.save()
+
+            # Ensure fine is recorded if case is resolved
+            if case.status == "RESOLVED" and case.fine_amount and case.fine_amount > 0:
+                income, created = Income.objects.get_or_create(
+                    case=case,
+                    income_type="CASE_FINE",
+                    defaults={
+                        "amount": case.fine_amount,
+                        "reason": f"Fine for case {case.case_number}: {case.title}",
+                        "paid_by": case.respondent.full_name if case.respondent else "Unknown",
+                        "created_by": request.user,
+                    }
+                )
+                if created:
+                    log_action(
+                        user=request.user,
+                        action="CREATE",
+                        object_type="Income",
+                        object_id=income.id,
+                        ip_address=getattr(request, "client_ip", ""),
+                        description=f"Recorded case fine: ₦{case.fine_amount:,.2f} for {case.case_number}"
+                    )
+
+            log_action(
+                user=request.user,
+                action="UPDATE",
+                object_type="CaseFile",
+                object_id=case.id,
+                ip_address=getattr(request, "client_ip", ""),
+                description=f"Updated case {case.case_number}: {case.title}"
+            )
+            messages.success(request, f"Case {case.case_number} updated.")
+            return redirect("operations:case_list")
+        else:
+            for error in form.errors.values():
+                messages.error(request, error)
+    else:
+        form = CaseFileForm(instance=case)
+
+    return render(request, "operations/case_form.html", {
+        "form": form,
+        "case": case,
+        "title": "Edit Case File",
+        "action": "Update"
+    })
+
+
+@login_required
+def case_delete(request, pk):
+    """Delete a case file."""
+    if not request.user.has_executive_access():
+        messages.error(request, "Executive access required.")
+        return redirect("operations:case_list")
+
+    case = get_object_or_404(CaseFile, pk=pk)
+
+    if request.method == "POST":
+        case_number = case.case_number
+        case.delete()
+        log_action(
+            user=request.user,
+            action="DELETE",
+            object_type="CaseFile",
+            object_id=pk,
+            ip_address=getattr(request, "client_ip", ""),
+            description=f"Deleted case {case_number}"
+        )
+        messages.success(request, f"Case {case_number} deleted.")
+        return redirect("operations:case_list")
+
+    return render(request, "operations/case_delete.html", {"case": case})
