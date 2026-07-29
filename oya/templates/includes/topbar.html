@@ -295,109 +295,69 @@
 </header>
 
 <script>
-  // Theme setting & icon updates only.
-  // Dropdown open/close is handled globally in base.html.
   (function () {
-    const STORAGE_KEY = "oya_theme";
+    var themeAPI = window.OYA && window.OYA.theme;
+    if (!themeAPI) return;
+
     var themeMenu = document.getElementById("themeDropdownMenu");
-    if (!themeMenu) return;
 
     // When a theme option is chosen, apply it and close the menu
-    themeMenu.querySelectorAll("[data-theme-option]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var theme = this.dataset.themeOption;
-        setThemeAll(theme);
-        var parent = themeMenu.closest(".dropdown");
-        if (parent) parent.classList.remove("open");
-      });
-    });
-
-    // Initialize checkmarks + icons on load
-    function initThemeUI() {
-      var stored = localStorage.getItem(STORAGE_KEY);
-      var theme =
-        stored === "dark" || stored === "light" || stored === "system"
-          ? stored
-          : "system";
-      updateAllThemeUI(theme);
-    }
-    initThemeUI();
-
-    // Keep icons in sync when mobile or settings page changes theme
-    window.addEventListener("oyathemechange", function (e) {
-      if (e.detail && e.detail.theme) {
-        updateAllThemeUI(e.detail.theme);
-      }
-    });
-  })();
-
-  function setThemeAll(theme) {
-    localStorage.setItem("oya_theme", theme);
-    var root = document.documentElement;
-    if (theme === "system") {
-      var prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
-      root.setAttribute("data-theme", prefersDark ? "dark" : "light");
-    } else {
-      root.setAttribute("data-theme", theme);
-    }
-    updateAllThemeUI(theme);
-    window.dispatchEvent(
-      new CustomEvent("oyathemechange", { detail: { theme: theme } }),
-    );
-  }
-
-  function updateAllThemeUI(theme) {
-    // Dropdown checkmarks
-    var themeMenu = document.getElementById("themeDropdownMenu");
     if (themeMenu) {
       themeMenu.querySelectorAll("[data-theme-option]").forEach(function (btn) {
-        var check = btn.querySelector(".dropdown-check");
-        var isActive = btn.dataset.themeOption === theme;
-        if (check) check.style.opacity = isActive ? "1" : "0";
-        btn.classList.toggle("active", isActive);
+        btn.addEventListener("click", function () {
+          themeAPI.set(this.dataset.themeOption);
+          var parent = themeMenu.closest(".dropdown");
+          if (parent) parent.classList.remove("open");
+        });
       });
     }
-    // Desktop topbar icon
-    var desktopBtn = document.getElementById("themeMenuToggle");
-    if (desktopBtn) {
-      desktopBtn.setAttribute("data-active-theme", theme);
-      desktopBtn
-        .querySelectorAll(
-          ".theme-icon-light, .theme-icon-dark, .theme-icon-system",
-        )
-        .forEach(function (icon) {
+
+    // Initialize checkmarks + icons on load
+    function updateThemeUI() {
+      var stored = themeAPI.getStored() || 'system';
+      var applied = themeAPI.resolve(stored);
+
+      // Dropdown checkmarks
+      if (themeMenu) {
+        themeMenu.querySelectorAll("[data-theme-option]").forEach(function (btn) {
+          var check = btn.querySelector(".dropdown-check");
+          var isActive = btn.dataset.themeOption === stored;
+          if (check) check.style.opacity = isActive ? "1" : "0";
+          btn.classList.toggle("active", isActive);
+        });
+      }
+
+      // Desktop topbar icon
+      var desktopBtn = document.getElementById("themeMenuToggle");
+      if (desktopBtn) {
+        desktopBtn.setAttribute("data-active-theme", stored);
+        desktopBtn.querySelectorAll(".theme-icon-light, .theme-icon-dark, .theme-icon-system").forEach(function (icon) {
           icon.style.display = "none";
         });
-      var activeClass =
-        theme === "system"
-          ? "theme-icon-system"
-          : theme === "dark"
-            ? "theme-icon-dark"
-            : "theme-icon-light";
-      var activeIcon = desktopBtn.querySelector("." + activeClass);
-      if (activeIcon) activeIcon.style.display = "inline-block";
-    }
-    // Mobile header icon
-    var mobileBtn = document.getElementById("mobileThemeBtn");
-    if (mobileBtn) {
-      mobileBtn.setAttribute("data-active-theme", theme);
-      mobileBtn
-        .querySelectorAll(
-          ".theme-icon-light, .theme-icon-dark, .theme-icon-system",
-        )
-        .forEach(function (icon) {
+        var activeClass = stored === "system" ? "theme-icon-system" : (stored === "dark" ? "theme-icon-dark" : "theme-icon-light");
+        var activeIcon = desktopBtn.querySelector("." + activeClass);
+        if (activeIcon) activeIcon.style.display = "inline-block";
+      }
+
+      // Mobile header icon
+      var mobileBtn = document.getElementById("mobileThemeBtn");
+      if (mobileBtn) {
+        mobileBtn.setAttribute("data-active-theme", stored);
+        mobileBtn.querySelectorAll(".theme-icon-light, .theme-icon-dark, .theme-icon-system").forEach(function (icon) {
           icon.style.display = "none";
         });
-      var mac =
-        theme === "system"
-          ? "theme-icon-system"
-          : theme === "dark"
-            ? "theme-icon-dark"
-            : "theme-icon-light";
-      var mai = mobileBtn.querySelector("." + mac);
-      if (mai) mai.style.display = "inline-block";
+        var mac = stored === "system" ? "theme-icon-system" : (stored === "dark" ? "theme-icon-dark" : "theme-icon-light");
+        var mai = mobileBtn.querySelector("." + mac);
+        if (mai) mai.style.display = "inline-block";
+      }
     }
-  }
+
+    // Run immediately
+    updateThemeUI();
+
+    // Keep icons in sync when mobile or settings page changes theme
+    window.addEventListener("oyathemechange", function () {
+      updateThemeUI();
+    });
+  })();
 </script>
