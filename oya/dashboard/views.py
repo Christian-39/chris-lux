@@ -48,71 +48,86 @@ def global_search_ajax(request):
     q = query
 
     # ─── Members ───
-    members = Member.objects.filter(
+    for m in Member.objects.filter(
         Q(full_name__icontains=q)
         | Q(serial_number__icontains=q)
         | Q(phone__icontains=q)
         | Q(state_or_abroad__icontains=q)
-    )[:5]
-    for m in members:
+    )[:5]:
+        try:
+            url = reverse("members:member_detail", kwargs={"pk": m.pk})
+        except NoReverseMatch:
+            url = "#"
         results.append({
             "type": "member",
             "name": f"{m.full_name} ({m.serial_number})",
-            "url": reverse("members:member_detail", kwargs={"pk": m.pk}),
+            "url": url,
         })
 
-    # ─── Users (accounts) ───
-    users = User.objects.filter(
+    # ─── Users ───
+    for u in User.objects.filter(
         Q(full_name__icontains=q)
         | Q(serial_number__icontains=q)
         | Q(phone__icontains=q)
-    )[:5]
-    for u in users:
+    )[:5]:
+        try:
+            url = reverse("accounts:profile")
+        except NoReverseMatch:
+            url = "#"
         results.append({
             "type": "user",
             "name": u.full_name or u.serial_number,
-            "url": reverse("accounts:profile"),
+            "url": url,
         })
 
     # ─── Case Files ───
-    cases = CaseFile.objects.filter(
+    for c in CaseFile.objects.filter(
         Q(title__icontains=q)
         | Q(case_number__icontains=q)
         | Q(respondent__full_name__icontains=q)
-    )[:5]
-    for c in cases:
+    )[:5]:
+        try:
+            url = reverse("operations:case_detail", kwargs={"pk": c.pk})
+        except NoReverseMatch:
+            url = "#"
         results.append({
             "type": "case",
             "name": f"{c.case_number or 'Case'}: {c.title}",
-            "url": reverse("operations:case_detail", kwargs={"pk": c.pk}),
+            "url": url,
         })
-
-    # ─── Outside Donors ───
-    try:
-        from project_donations.models import OutsideDonor
-        donors = OutsideDonor.objects.filter(
-            Q(full_name__icontains=q) | Q(phone_number__icontains=q)
-        )[:5]
-        for d in donors:
-            results.append({
-                "type": "member",
-                "name": f"{d.full_name} (Outside Donor)",
-                "url": reverse("project_donations:outside_donor_detail", kwargs={"pk": d.pk}),
-            })
-    except Exception:
-        pass
 
     # ─── Projects ───
     try:
         from projects.models import Project
-        projects = Project.objects.filter(
+        for p in Project.objects.filter(
             Q(title__icontains=q) | Q(description__icontains=q)
-        )[:5]
-        for p in projects:
+        )[:5]:
+            try:
+                url = reverse("projects:project_detail", kwargs={"pk": p.pk})
+            except NoReverseMatch:
+                url = "#"
             results.append({
                 "type": "project",
                 "name": p.title,
-                "url": reverse("projects:project_detail", kwargs={"pk": p.pk}),
+                "url": url,
+            })
+    except Exception:
+        pass
+
+    # ─── Outside Donors ───
+    try:
+        from project_donations.models import OutsideDonor
+        for d in OutsideDonor.objects.filter(
+            Q(full_name__icontains=q) | Q(phone_number__icontains=q)
+        )[:5]:
+            try:
+                url = reverse("project_donations:outside_donor_detail", kwargs={"pk": d.pk})
+            except NoReverseMatch:
+                url = "#"
+            results.append({
+                "type": "member",
+                "name": f"{d.full_name} (Outside Donor)",
+                "url": url,
             })
     except Exception:
         pass

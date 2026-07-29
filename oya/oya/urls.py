@@ -26,7 +26,7 @@ urlpatterns = [
     path("settings/", include("settingsapp.urls")),
     path("project-donations/", include("project_donations.urls")),
     
-    path('search/ajax/', global_search_ajax, name='global_search_ajax'),
+    path('search/api/', global_search_ajax, name='global_search_ajax'),
 ]
 
 if settings.DEBUG:
