@@ -261,17 +261,12 @@
       {% endif %}
 
       <nav class="mobile-sidebar-nav">
+        <!-- Main -->
         <div class="mobile-nav-section">
           <div class="mobile-nav-section-title">Main</div>
-          <a href="{% url 'dashboard:index' %}" class="mobile-nav-link">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+
+          <a href="{% url 'dashboard:index' %}" class="mobile-nav-link {% if request.resolver_match.namespace == 'dashboard' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="7" height="7" />
               <rect x="14" y="3" width="7" height="7" />
               <rect x="14" y="14" width="7" height="7" />
@@ -279,15 +274,9 @@
             </svg>
             Dashboard
           </a>
-          <a href="{% url 'members:member_list' %}" class="mobile-nav-link">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+
+          <a href="{% url 'members:member_list' %}" class="mobile-nav-link {% if request.resolver_match.namespace == 'members' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
               <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -295,18 +284,9 @@
             </svg>
             Members
           </a>
-          <a
-            href="{% url 'executives:executive_list' %}"
-            class="mobile-nav-link"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+
+          <a href="{% url 'executives:executive_list' %}" class="mobile-nav-link {% if request.resolver_match.namespace == 'executives' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
@@ -314,53 +294,28 @@
           </a>
         </div>
 
+        <!-- Operations -->
         <div class="mobile-nav-section">
           <div class="mobile-nav-section-title">Operations</div>
-          <a href="{% url 'operations:case_list' %}" class="mobile-nav-link">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-              />
+
+          <a href="{% url 'operations:case_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'case_list' or request.resolver_match.url_name == 'case_detail' or request.resolver_match.url_name == 'case_create' or request.resolver_match.url_name == 'case_resolve' or request.resolver_match.url_name == 'case_update' or request.resolver_match.url_name == 'case_delete' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <polyline points="14 2 14 8 20 8" />
             </svg>
             Cases
           </a>
-          <a
-            href="{% url 'operations:motorcycle_list' %}"
-            class="mobile-nav-link"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+
+          <a href="{% url 'operations:motorcycle_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'motorcycle_list' or request.resolver_match.url_name == 'motorcycle_create' or request.resolver_match.url_name == 'motorcycle_update' or request.resolver_match.url_name == 'motorcycle_delete' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="5.5" cy="17.5" r="3.5" />
               <circle cx="18.5" cy="17.5" r="3.5" />
             </svg>
             Motorcycles
           </a>
-          <a
-            href="{% url 'operations:taskforce_list' %}"
-            class="mobile-nav-link"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+
+          <a href="{% url 'operations:taskforce_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'taskforce_list' or request.resolver_match.url_name == 'taskforce_create' or request.resolver_match.url_name == 'taskforce_update' or request.resolver_match.url_name == 'taskforce_remove' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
               <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -368,28 +323,16 @@
             </svg>
             Task Force
           </a>
-          <a href="{% url 'projects:project_list' %}" class="mobile-nav-link">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+
+          <a href="{% url 'projects:project_list' %}" class="mobile-nav-link {% if request.resolver_match.namespace == 'projects' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="12 2 2 7 12 12 22 7 12 2" />
             </svg>
             Projects
           </a>
-          <a href="{% url 'elections:election_list' %}" class="mobile-nav-link">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+
+          <a href="{% url 'elections:election_list' %}" class="mobile-nav-link {% if request.resolver_match.namespace == 'elections' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
               <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
@@ -397,115 +340,89 @@
           </a>
         </div>
 
+        <!-- Finance -->
         <div class="mobile-nav-section">
-          <div class="mobile-nav-section">
-  <div class="mobile-nav-section-title">Finance</div>
-  <a href="{% url 'finance:finance_summary' %}" class="mobile-nav-link">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <line x1="12" y1="1" x2="12" y2="23" />
-      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-    </svg>
-    Finance Overview
-  </a>
-  <a href="{% url 'finance:dues_tracker' %}" class="mobile-nav-link">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-      <polyline points="14 2 14 8 20 8" />
-    </svg>
-    Dues
-  </a>
-  <a href="{% url 'finance:income_list' %}" class="mobile-nav-link">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-    </svg>
-    Contributions
-  </a>
-  <a href="{% url 'finance:expense_list' %}" class="mobile-nav-link">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
-    </svg>
-    Expenses
-  </a>
+          <div class="mobile-nav-section-title">Finance</div>
 
-  <!-- NEW: Outside Donors -->
-  <a href="{% url 'project_donations:outside_donor_list' %}" class="mobile-nav-link">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-    Outside Donors
-  </a>
+          <a href="{% url 'finance:finance_summary' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'finance_summary' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+            Finance Overview
+          </a>
 
-  <!-- EXISTING: Donations -->
-  <a href="{% url 'project_donations:donation_list' %}" class="mobile-nav-link">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-    </svg>
-    Project Donations
-  </a>
-</div>
+          <a href="{% url 'finance:dues_tracker' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'dues_tracker' or request.resolver_match.url_name == 'dues_allocate' or request.resolver_match.url_name == 'dues_create' or request.resolver_match.url_name == 'dues_delete' or request.resolver_match.url_name == 'member_dues_detail' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            Dues
+          </a>
 
+          <a href="{% url 'finance:income_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'income_list' or request.resolver_match.url_name == 'income_create' or request.resolver_match.url_name == 'income_detail' or request.resolver_match.url_name == 'income_delete' or request.resolver_match.url_name == 'donation_list' or request.resolver_match.url_name == 'donation_create' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+            </svg>
+            Contributions
+          </a>
 
+          <a href="{% url 'finance:expense_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'expense_list' or request.resolver_match.url_name == 'expense_create' or request.resolver_match.url_name == 'expense_detail' or request.resolver_match.url_name == 'expense_delete' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
+            </svg>
+            Expenses
+          </a>
+
+          <a href="{% url 'project_donations:outside_donor_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'outside_donor_list' or request.resolver_match.url_name == 'outside_donor_detail' or request.resolver_match.url_name == 'outside_donor_create' or request.resolver_match.url_name == 'outside_donor_update' or request.resolver_match.url_name == 'outside_donor_delete' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            Outside Donors
+          </a>
+
+          <a href="{% url 'project_donations:donation_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'donation_list' or request.resolver_match.url_name == 'donation_detail' or request.resolver_match.url_name == 'donation_create' or request.resolver_match.url_name == 'donation_update' or request.resolver_match.url_name == 'donation_delete' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+            Project Donations
+          </a>
+        </div>
+
+        <!-- Administration -->
         <div class="mobile-nav-section">
           <div class="mobile-nav-section-title">Administration</div>
-          <a href="{% url 'accounts:user_list' %}" class="mobile-nav-link">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+
+          <a href="{% url 'accounts:user_list' %}" class="mobile-nav-link {% if request.resolver_match.url_name == 'user_list' or request.resolver_match.url_name == 'user_create' or request.resolver_match.url_name == 'user_detail' or request.resolver_match.url_name == 'user_update' or request.resolver_match.url_name == 'user_delete' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
             Admins
           </a>
-          <a
-            href="{% url 'notifications:notification_list' %}"
-            class="mobile-nav-link"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+
+          <a href="{% url 'notifications:notification_list' %}" class="mobile-nav-link {% if request.resolver_match.namespace == 'notifications' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
               <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
-            Notifications {% if unread_notification_count > 0 %}
-            <span class="mobile-nav-badge"
-              >{{ unread_notification_count }}</span
-            >
+            Notifications
+            {% if unread_notification_count > 0 %}
+            <span class="mobile-nav-badge">{{ unread_notification_count }}</span>
             {% endif %}
           </a>
+
           {% if user.is_staff %}
-          <a href="{% url 'auditlogs:auditlog_list' %}" class="mobile-nav-link">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+          <a href="{% url 'auditlogs:auditlog_list' %}" class="mobile-nav-link {% if request.resolver_match.namespace == 'auditlogs' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
             </svg>
             Audit Logs
           </a>
-          <a href="{% url 'settingsapp:settings' %}" class="mobile-nav-link">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+
+          <a href="{% url 'settingsapp:settings' %}" class="mobile-nav-link {% if request.resolver_match.namespace == 'settingsapp' %}active{% endif %}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="3" />
             </svg>
             Settings

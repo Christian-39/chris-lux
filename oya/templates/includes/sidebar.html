@@ -48,7 +48,7 @@
 
       <a
         href="{% url 'dashboard:index' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'index' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.namespace == 'dashboard' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
@@ -69,7 +69,7 @@
 
       <a
         href="{% url 'members:member_list' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'member_list' or request.resolver_match.url_name == 'member_detail' or request.resolver_match.url_name == 'member_create' or request.resolver_match.url_name == 'member_update' or request.resolver_match.url_name == 'member_remove' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.namespace == 'members' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
@@ -90,7 +90,7 @@
 
       <a
         href="{% url 'executives:executive_list' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'executive_list' or request.resolver_match.url_name == 'executive_form' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.namespace == 'executives' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
@@ -115,7 +115,7 @@
 
       <a
         href="{% url 'operations:case_list' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'case_list' or request.resolver_match.url_name == 'case_detail' or request.resolver_match.url_name == 'case_create' or request.resolver_match.url_name == 'case_resolve' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.url_name == 'case_list' or request.resolver_match.url_name == 'case_detail' or request.resolver_match.url_name == 'case_create' or request.resolver_match.url_name == 'case_resolve' or request.resolver_match.url_name == 'case_update' or request.resolver_match.url_name == 'case_delete' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
@@ -161,7 +161,7 @@
 
       <a
         href="{% url 'operations:motorcycle_list' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'motorcycle_list' or request.resolver_match.url_name == 'motorcycle_create' or request.resolver_match.url_name == 'motorcycle_update' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.url_name == 'motorcycle_list' or request.resolver_match.url_name == 'motorcycle_create' or request.resolver_match.url_name == 'motorcycle_update' or request.resolver_match.url_name == 'motorcycle_delete' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
@@ -183,7 +183,7 @@
 
       <a
         href="{% url 'projects:project_list' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'project_list' or request.resolver_match.url_name == 'project_detail' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.namespace == 'projects' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
@@ -203,7 +203,7 @@
 
       <a
         href="{% url 'elections:election_list' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'election_list' or request.resolver_match.url_name == 'election_detail' or request.resolver_match.url_name == 'election_create' or request.resolver_match.url_name == 'election_update' or request.resolver_match.url_name == 'candidate_create' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.namespace == 'elections' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
@@ -246,7 +246,7 @@
 
       <a
         href="{% url 'finance:dues_tracker' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'dues_tracker' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.url_name == 'dues_tracker' or request.resolver_match.url_name == 'dues_allocate' or request.resolver_match.url_name == 'dues_create' or request.resolver_match.url_name == 'dues_delete' or request.resolver_match.url_name == 'member_dues_detail' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
@@ -269,7 +269,7 @@
 
       <a
         href="{% url 'finance:income_list' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'income_list' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.url_name == 'income_list' or request.resolver_match.url_name == 'income_create' or request.resolver_match.url_name == 'income_detail' or request.resolver_match.url_name == 'income_delete' or request.resolver_match.url_name == 'donation_list' or request.resolver_match.url_name == 'donation_create' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
@@ -288,7 +288,7 @@
 
       <a
         href="{% url 'finance:expense_list' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'expense_list' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.url_name == 'expense_list' or request.resolver_match.url_name == 'expense_create' or request.resolver_match.url_name == 'expense_detail' or request.resolver_match.url_name == 'expense_delete' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
@@ -354,7 +354,7 @@
       <!-- User List -->
       <a
         href="{% url 'accounts:user_list' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'user_list' or request.resolver_match.url_name == 'user_create' or request.resolver_match.url_name == 'user_update' or request.resolver_match.url_name == 'user_detail' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.url_name == 'user_list' or request.resolver_match.url_name == 'user_create' or request.resolver_match.url_name == 'user_detail' or request.resolver_match.url_name == 'user_update' or request.resolver_match.url_name == 'user_delete' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
@@ -373,7 +373,7 @@
 
       <a
         href="{% url 'notifications:notification_list' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'notification_list' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.namespace == 'notifications' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
@@ -405,7 +405,7 @@
 
       <a
         href="{% url 'auditlogs:auditlog_list' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'auditlog_list' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.namespace == 'auditlogs' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
@@ -423,7 +423,7 @@
 
       <a
         href="{% url 'settingsapp:settings' %}"
-        class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.namespace == 'settingsapp' %}active{% endif %}"
       >
         <svg
           class="nav-icon"
