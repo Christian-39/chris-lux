@@ -7,12 +7,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Q
+from django.utils import timezone
 from members.models import Member
 from accounts.models import User
 from projects.models import Project
 from operations.models import CaseFile, TaskForceMember, Motorcycle
 from project_donations.models import Donation as ProjectDonation, OutsideDonor
-from finance.models import Income
+from finance.models import Income, DuesPayment
 from django.db.models import Sum, Value, DecimalField
 from django.db.models.functions import Coalesce
 
@@ -31,6 +32,8 @@ from .services import (
 )
 
 logger = logging.getLogger("oya")
+
+YEARLY_DUES = 5000
 
 
 @login_required
@@ -166,7 +169,7 @@ def _patch_finance_stats_with_project_donations(finance_stats):
         status="CONFIRMED"
     ).aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
+    )["total"] or Decimal("0")
 
     # Auto-created Income records for project donations (managed by signals).
     # These may already be included in get_finance_statistics() totals.
@@ -174,7 +177,7 @@ def _patch_finance_stats_with_project_donations(finance_stats):
         income_type="PROJECT_DONATION"
     ).aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
-    )["total"]
+    )["total"] or Decimal("0")
 
     if isinstance(finance_stats, dict):
         finance_stats["total_project_donations"] = total_project_donations
@@ -190,6 +193,32 @@ def _patch_finance_stats_with_project_donations(finance_stats):
     return finance_stats, total_project_donations
 
 
+def _patch_finance_stats_with_prepaid_dues(finance_stats):
+    """Helper: add prepaid dues (future years fully paid) to finance stats.
+
+    Prepaid dues represent cash already received, so they must be included
+    in total dues collected, total income, and treasury balance.
+    """
+    current_year = timezone.now().year
+    total_prepaid = DuesPayment.objects.filter(
+        year__gt=current_year,
+        amount_paid__gte=YEARLY_DUES,
+    ).aggregate(
+        total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
+
+    if isinstance(finance_stats, dict):
+        finance_stats["total_prepaid"] = total_prepaid
+        if "total_dues" in finance_stats:
+            finance_stats["total_dues"] = finance_stats["total_dues"] + total_prepaid
+        if "total_income" in finance_stats:
+            finance_stats["total_income"] = finance_stats["total_income"] + total_prepaid
+        if "treasury_balance" in finance_stats:
+            finance_stats["treasury_balance"] = finance_stats["treasury_balance"] + total_prepaid
+
+    return finance_stats, total_prepaid
+
+
 @login_required
 def index(request):
     """Main admin/executive dashboard view with all KPIs."""
@@ -199,6 +228,9 @@ def index(request):
 
     # Merge confirmed project donations into dashboard finance stats
     finance_stats, total_project_donations = _patch_finance_stats_with_project_donations(finance_stats)
+
+    # Merge prepaid dues into dashboard finance stats (cash already received)
+    finance_stats, total_prepaid = _patch_finance_stats_with_prepaid_dues(finance_stats)
 
     # Sync patched finance stats back into kpis so templates using kpis.treasury_balance are correct
     if isinstance(finance_stats, dict):
@@ -258,6 +290,8 @@ def index(request):
         "total_raised_through_invitees": ProjectDonation.objects.filter(
             status="CONFIRMED", invited_by__isnull=False
         ).aggregate(total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField())))["total"],
+        # Prepaid dues
+        "total_prepaid": total_prepaid,
     }
     return render(request, "dashboard/admin_dashboard.html", context)
 
@@ -271,6 +305,9 @@ def member_dashboard(request):
 
     # Merge confirmed project donations into dashboard finance stats
     finance_stats, total_project_donations = _patch_finance_stats_with_project_donations(finance_stats)
+
+    # Merge prepaid dues into dashboard finance stats (cash already received)
+    finance_stats, total_prepaid = _patch_finance_stats_with_prepaid_dues(finance_stats)
 
     # Sync patched finance stats back into kpis so templates using kpis.treasury_balance are correct
     if isinstance(finance_stats, dict):
@@ -335,6 +372,7 @@ def member_dashboard(request):
         "total_contributed": total_contributed,
         "trend_data": trend_data,
         "is_member": True,
+        "total_prepaid": total_prepaid,
     }
     return render(request, "dashboard/member_dashboard.html", context)
 
