@@ -324,25 +324,42 @@
           >
             {{ case.created_at|date:"M d, Y" }}
           </td>
-          <td style="white-space: nowrap">
+           <td style="white-space: nowrap">
             <div class="table-actions" style="flex-wrap: nowrap; gap: 0.25rem">
               <a
                 href="{% url 'operations:case_detail' pk=case.pk %}"
                 class="table-action-btn"
                 title="View"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                   <circle cx="12" cy="12" r="3" />
                 </svg>
               </a>
+              {% if user.is_staff %}
+              <a
+                href="{% url 'operations:case_update' pk=case.pk %}"
+                class="table-action-btn"
+                title="Edit"
+                style="color: var(--oya-primary)"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </a>
+              <a
+                href="{% url 'operations:case_delete' pk=case.pk %}"
+                class="table-action-btn"
+                title="Delete"
+                style="color: var(--oya-danger)"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+              </a>
+              {% endif %}
               {% if user.is_staff and case.status != "RESOLVED" %}
               <a
                 href="{% url 'operations:case_resolve' pk=case.pk %}"
@@ -350,14 +367,7 @@
                 title="Resolve"
                 style="color: var(--oya-success)"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </a>
