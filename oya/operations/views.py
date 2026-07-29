@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
 from auditlogs.services import log_action
+from finance.models import Income
 from .models import TaskForceMember, Motorcycle, CaseFile
 from .forms import (
     TaskForceMemberForm, MotorcycleForm,
@@ -354,6 +355,30 @@ def case_create(request):
             case = form.save(commit=False)
             case.created_by = request.user
             case.save()
+
+            # ─── RECORD FINE AS INCOME IF RESOLVED ON CREATION ───
+            if case.status == "RESOLVED" and case.fine_amount and case.fine_amount > 0:
+                income, created = Income.objects.get_or_create(
+                    case=case,
+                    income_type="CASE_FINE",
+                    defaults={
+                        "amount": case.fine_amount,
+                        "reason": f"Fine for case {case.case_number}: {case.title}",
+                        "paid_by": case.respondent.full_name if case.respondent else "Unknown",
+                        "created_by": request.user,
+                    }
+                )
+                if created:
+                    log_action(
+                        user=request.user,
+                        action="CREATE",
+                        object_type="Income",
+                        object_id=income.id,
+                        ip_address=getattr(request, "client_ip", ""),
+                        description=f"Recorded case fine: ₦{case.fine_amount:,.2f} for {case.case_number}"
+                    )
+            # ───────────────────────────────────────────────────────
+
             log_action(
                 user=request.user,
                 action="CREATE",
@@ -379,7 +404,7 @@ def case_create(request):
 
 @login_required
 def case_resolve(request, pk):
-    """Resolve a case file."""
+    """Resolve a case file and record any fine as income."""
     if not request.user.has_executive_access():
         messages.error(request, "Executive access required.")
         return redirect("operations:case_list")
@@ -389,7 +414,35 @@ def case_resolve(request, pk):
     if request.method == "POST":
         form = CaseResolutionForm(request.POST, instance=case)
         if form.is_valid():
-            form.save()
+            case = form.save()
+
+            # ─── RECORD FINE AS INCOME ON RESOLUTION ───
+            if case.fine_amount and case.fine_amount > 0:
+                income, created = Income.objects.get_or_create(
+                    case=case,
+                    income_type="CASE_FINE",
+                    defaults={
+                        "amount": case.fine_amount,
+                        "reason": f"Fine for case {case.case_number}: {case.title}",
+                        "paid_by": case.respondent.full_name if case.respondent else "Unknown",
+                        "created_by": request.user,
+                    }
+                )
+                if created:
+                    log_action(
+                        user=request.user,
+                        action="CREATE",
+                        object_type="Income",
+                        object_id=income.id,
+                        ip_address=getattr(request, "client_ip", ""),
+                        description=f"Recorded case fine: ₦{case.fine_amount:,.2f} for {case.case_number}"
+                    )
+                    messages.info(
+                        request,
+                        f"₦{case.fine_amount:,.2f} fine automatically recorded in finances."
+                    )
+            # ────────────────────────────────────────────
+
             log_action(
                 user=request.user,
                 action="UPDATE",
@@ -410,3 +463,4 @@ def case_resolve(request, pk):
         "form": form,
         "case": case
     })
+
