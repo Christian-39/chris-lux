@@ -41,7 +41,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       </div>
     </div>
-    <div class="kpi-value" style="font-size:clamp(1.25rem,4vw,1.75rem);">&#x20A6;{{ total_dues_collected|floatformat:0|intcomma }}</div>
+    <div class="kpi-value">&#x20A6;{{ total_dues_collected|floatformat:0|intcomma }}</div>
     <div class="kpi-label">Total Dues Collected</div>
   </div>
 
@@ -51,7 +51,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
       </div>
     </div>
-    <div class="kpi-value" style="color:var(--oya-success);font-size:clamp(1.25rem,4vw,1.75rem);">{{ this_year_paid }} / {{ this_year_expected }}</div>
+    <div class="kpi-value" style="color:var(--oya-success);">{{ this_year_paid }} / {{ this_year_expected }}</div>
     <div class="kpi-label">{{ current_year }} Dues Paid</div>
     <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-top:0.25rem;">{{ this_year_rate }}% collection rate</div>
   </div>
@@ -62,7 +62,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       </div>
     </div>
-    <div class="kpi-value" style="color:var(--oya-warning);font-size:clamp(1.25rem,4vw,1.75rem);">{{ collection_rate }}%</div>
+    <div class="kpi-value" style="color:var(--oya-warning);">{{ collection_rate }}%</div>
     <div class="kpi-label">Overall Collection</div>
   </div>
 
@@ -72,7 +72,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
       </div>
     </div>
-    <div class="kpi-value" style="color:var(--oya-info);font-size:clamp(1.25rem,4vw,1.75rem);">{{ active_members_count }}</div>
+    <div class="kpi-value" style="color:var(--oya-info);">{{ active_members_count }}</div>
     <div class="kpi-label">Active Members</div>
   </div>
 </div>

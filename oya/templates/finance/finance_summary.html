@@ -75,7 +75,7 @@
         </svg>
       </div>
     </div>
-    <div class="kpi-value" style="font-size: clamp(1.25rem, 4vw, 1.75rem)">
+    <div class="kpi-value" style="">
       &#x20A6;{{ treasury_balance|floatformat:0|intcomma }}
     </div>
     <div class="kpi-label">Treasury Balance (&#x20A6;)</div>
@@ -99,7 +99,7 @@
     </div>
     <div
       class="kpi-value"
-      style="color: var(--oya-success); font-size: clamp(1.25rem, 4vw, 1.75rem)"
+      style="color: var(--oya-success); "
     >
       &#x20A6;{{ total_dues|floatformat:0|intcomma }}
     </div>
@@ -135,7 +135,7 @@
     </div>
     <div
       class="kpi-value"
-      style="color: var(--oya-info); font-size: clamp(1.25rem, 4vw, 1.75rem)"
+      style="color: var(--oya-info); "
     >
       &#x20A6;{{ total_donations|floatformat:0|intcomma }}
     </div>
@@ -160,7 +160,7 @@
     </div>
     <div
       class="kpi-value"
-      style="color: var(--oya-danger); font-size: clamp(1.25rem, 4vw, 1.75rem)"
+      style="color: var(--oya-danger); "
     >
       &#x20A6;{{ total_expenses|floatformat:0|intcomma }}
     </div>
@@ -190,7 +190,7 @@
     </div>
     <div
       class="kpi-value"
-      style="color: var(--oya-warning); font-size: clamp(1.25rem, 4vw, 1.75rem)"
+      style="color: var(--oya-warning); "
     >
       {{ this_year_dues_paid }} / {{ active_members }}
     </div>
@@ -220,7 +220,7 @@
         </svg>
       </div>
     </div>
-    <div class="kpi-value" style="font-size: clamp(1.25rem, 4vw, 1.75rem)">
+    <div class="kpi-value" style="">
       {{ total_transactions }}
     </div>
     <div class="kpi-label">Total Transactions</div>
@@ -244,7 +244,7 @@
     </div>
     <div
       class="kpi-value"
-      style="color: var(--oya-success); font-size: clamp(1.25rem, 4vw, 1.75rem)"
+      style="color: var(--oya-success); "
     >
       &#x20A6;{{ total_income|floatformat:0|intcomma }}
     </div>

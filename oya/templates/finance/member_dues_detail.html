@@ -41,7 +41,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       </div>
     </div>
-    <div class="kpi-value" style="color:var(--oya-primary);font-size:clamp(1.25rem, 4vw, 1.75rem);">&#8358;{{ debt_info.total_expected|floatformat:0|intcomma }}</div>
+    <div class="kpi-value" style="color:var(--oya-primary);">&#8358;{{ debt_info.total_expected|floatformat:0|intcomma }}</div>
     <div class="kpi-label">Total Expected</div>
   </div>
   <div class="kpi-card accent-success">
@@ -50,7 +50,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
       </div>
     </div>
-    <div class="kpi-value" style="color:var(--oya-success);font-size:clamp(1.25rem, 4vw, 1.75rem);">&#8358;{{ debt_info.total_paid|floatformat:0|intcomma }}</div>
+    <div class="kpi-value" style="color:var(--oya-success);">&#8358;{{ debt_info.total_paid|floatformat:0|intcomma }}</div>
     <div class="kpi-label">Total Paid</div>
   </div>
   <div class="kpi-card accent-danger">
@@ -59,7 +59,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
       </div>
     </div>
-    <div class="kpi-value" style="color:var(--oya-danger);font-size:clamp(1.25rem, 4vw, 1.75rem);">&#8358;{{ debt_info.debt_owed|floatformat:0|intcomma }}</div>
+    <div class="kpi-value" style="color:var(--oya-danger);">&#8358;{{ debt_info.debt_owed|floatformat:0|intcomma }}</div>
     <div class="kpi-label">Debt Owed</div>
   </div>
   <div class="kpi-card accent-info">
@@ -68,7 +68,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       </div>
     </div>
-    <div class="kpi-value" style="color:var(--oya-info);font-size:clamp(1.25rem, 4vw, 1.75rem);">&#8358;{{ debt_info.prepaid_amount|default:0|floatformat:0|intcomma }}</div>
+    <div class="kpi-value" style="color:var(--oya-info);">&#8358;{{ debt_info.prepaid_amount|default:0|floatformat:0|intcomma }}</div>
     <div class="kpi-label">Prepaid</div>
   </div>
 </div>
