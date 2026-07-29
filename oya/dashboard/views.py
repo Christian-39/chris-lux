@@ -5,6 +5,7 @@ import logging
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.urls import reverse
 from django.http import JsonResponse
 from django.db.models import Q
 from django.utils import timezone
@@ -38,108 +39,87 @@ YEARLY_DUES = 5000
 
 @login_required
 def global_search_ajax(request):
-    """AJAX endpoint for global search across all OYA modules including project donations."""
+    """AJAX endpoint for topbar global search."""
     query = request.GET.get("q", "").strip()
     if len(query) < 2:
-        return JsonResponse({
-            "members": [],
-            "users": [],
-            "cases": [],
-            "outside_donors": [],
-            "donations": [],
+        return JsonResponse({"results": [], "view_all_url": None})
+
+    results = []
+    q = query
+
+    # ─── Members ───
+    members = Member.objects.filter(
+        Q(full_name__icontains=q)
+        | Q(serial_number__icontains=q)
+        | Q(phone__icontains=q)
+        | Q(state_or_abroad__icontains=q)
+    )[:5]
+    for m in members:
+        results.append({
+            "type": "member",
+            "name": f"{m.full_name} ({m.serial_number})",
+            "url": reverse("members:member_detail", kwargs={"pk": m.pk}),
         })
 
-    # ─── MEMBERS ───
-    members = Member.objects.filter(
-        Q(full_name__icontains=query) |
-        Q(serial_number__icontains=query) |
-        Q(phone__icontains=query) |
-        Q(state_or_abroad__icontains=query)
-    )[:5]
-
-    # ─── USERS ───
+    # ─── Users (accounts) ───
     users = User.objects.filter(
-        Q(full_name__icontains=query) |
-        Q(serial_number__icontains=query) |
-        Q(phone__icontains=query)
+        Q(full_name__icontains=q)
+        | Q(serial_number__icontains=q)
+        | Q(phone__icontains=q)
     )[:5]
+    for u in users:
+        results.append({
+            "type": "user",
+            "name": u.full_name or u.serial_number,
+            "url": reverse("accounts:profile"),
+        })
 
-    # ─── CASES ───
+    # ─── Case Files ───
     cases = CaseFile.objects.filter(
-        Q(title__icontains=query) |
-        Q(description__icontains=query) |
-        Q(status__icontains=query)
+        Q(title__icontains=q)
+        | Q(case_number__icontains=q)
+        | Q(respondent__full_name__icontains=q)
     )[:5]
+    for c in cases:
+        results.append({
+            "type": "case",
+            "name": f"{c.case_number or 'Case'}: {c.title}",
+            "url": reverse("operations:case_detail", kwargs={"pk": c.pk}),
+        })
 
-    # ─── OUTSIDE DONORS ───
-    from project_donations.models import OutsideDonor
-    outside_donors = OutsideDonor.objects.filter(
-        Q(full_name__icontains=query) | Q(phone_number__icontains=query)
-    ).select_related("invited_by")[:5]
+    # ─── Outside Donors ───
+    try:
+        from project_donations.models import OutsideDonor
+        donors = OutsideDonor.objects.filter(
+            Q(full_name__icontains=q) | Q(phone_number__icontains=q)
+        )[:5]
+        for d in donors:
+            results.append({
+                "type": "member",
+                "name": f"{d.full_name} (Outside Donor)",
+                "url": reverse("project_donations:outside_donor_detail", kwargs={"pk": d.pk}),
+            })
+    except Exception:
+        pass
 
-    # ─── DONATIONS ───
-    from project_donations.models import Donation
-    donations = Donation.objects.filter(
-        Q(reference_number__icontains=query) |
-        Q(narration__icontains=query) |
-        Q(project__title__icontains=query) |
-        Q(member__full_name__icontains=query) |
-        Q(outside_donor__full_name__icontains=query) |
-        Q(invited_by__full_name__icontains=query)
-    ).select_related("project", "member", "outside_donor", "invited_by")[:5]
+    # ─── Projects ───
+    try:
+        from projects.models import Project
+        projects = Project.objects.filter(
+            Q(title__icontains=q) | Q(description__icontains=q)
+        )[:5]
+        for p in projects:
+            results.append({
+                "type": "project",
+                "name": p.title,
+                "url": reverse("projects:project_detail", kwargs={"pk": p.pk}),
+            })
+    except Exception:
+        pass
 
     return JsonResponse({
-        "members": [
-            {
-                "id": m.id,
-                "full_name": m.full_name,
-                "serial_number": m.serial_number,
-                "status": m.status,
-            }
-            for m in members
-        ],
-        "users": [
-            {
-                "id": u.id,
-                "full_name": u.full_name,
-                "serial_number": u.serial_number,
-                "role": u.get_role_display() if hasattr(u, "get_role_display") else u.role,
-            }
-            for u in users
-        ],
-        "cases": [
-            {
-                "id": c.id,
-                "title": c.title,
-                "status": c.status,
-            }
-            for c in cases
-        ],
-        "outside_donors": [
-            {
-                "id": d.id,
-                "full_name": d.full_name,
-                "phone_number": d.phone_number,
-                "invited_by": d.invited_by.full_name if d.invited_by else None,
-            }
-            for d in outside_donors
-        ],
-        "donations": [
-            {
-                "id": d.id,
-                "amount": float(d.amount),
-                "project": d.project.title if d.project else None,
-                "donor_type": d.get_donor_type_display(),
-                "donor_name": (
-                    d.member.full_name if d.member
-                    else d.outside_donor.full_name if d.outside_donor
-                    else "Anonymous"
-                ),
-                "donation_date": d.donation_date.strftime("%Y-%m-%d"),
-                "status": d.get_status_display(),
-            }
-            for d in donations
-        ],
+        "results": results,
+        "view_all_url": None,
     })
 
 

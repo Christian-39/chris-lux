@@ -231,9 +231,11 @@
 
   // ─── Global Search (Topbar) ───
   function initGlobalSearch() {
+    // Inside initGlobalSearch() in search.js
     const searchInput = document.getElementById('globalSearch');
     if (!searchInput) return;
 
+    const API_URL = searchInput.dataset.searchUrl || '/search/api/';
     const resultsContainer = document.getElementById('searchResults');
     let abortController = null;
 
@@ -244,106 +246,71 @@
         return;
       }
 
-      // Cancel previous request
       if (abortController) abortController.abort();
       abortController = new AbortController();
 
-      // Show loading state
       if (resultsContainer) {
         resultsContainer.classList.remove('hidden');
         resultsContainer.innerHTML = `
           <div class="dropdown-item" style="justify-content:center;color:var(--oya-text-muted);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;">
-              <circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="20" stroke-linecap="round"/>
-            </svg>
             <span>Searching...</span>
           </div>
         `;
       }
 
-      // Fetch real search results from API
-      fetch(`/search/api/?q=${encodeURIComponent(query)}`, {
+      fetch(`${API_URL}?q=${encodeURIComponent(query)}`, {
         signal: abortController.signal,
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
       })
-      .then(r => {
-        if (!r.ok) throw new Error('Search failed');
+      .then(async r => {
+        if (!r.ok) {
+          const text = await r.text();
+          throw new Error(`HTTP ${r.status}: ${text.slice(0, 100)}`);
+        }
         return r.json();
       })
       .then(data => {
         if (!resultsContainer) return;
         resultsContainer.innerHTML = '';
 
-        if (!data.results || data.results.length === 0) {
+        // Guard: ensure data.results exists
+        const items = Array.isArray(data.results) ? data.results : [];
+        
+        if (items.length === 0) {
           resultsContainer.innerHTML = `
             <div class="dropdown-item" style="color:var(--oya-text-muted);cursor:default;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-              </svg>
               <span>No results found for "${escapeHtml(query)}"</span>
             </div>
           `;
           return;
         }
 
-        // Group results by type
-        const groups = {};
-        data.results.forEach(item => {
-          if (!groups[item.type]) groups[item.type] = [];
-          groups[item.type].push(item);
-        });
-
-        // Render grouped results
-        Object.keys(groups).forEach(type => {
-          const header = document.createElement('div');
-          header.className = 'dropdown-header';
-          header.textContent = capitalize(type) + 's';
-          resultsContainer.appendChild(header);
-
-          groups[type].forEach(item => {
-            const el = document.createElement('a');
-            el.className = 'dropdown-item';
-            el.href = item.url || '#';
-            el.innerHTML = `
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                ${getIconForType(item.type)}
-              </svg>
-              <span>${escapeHtml(item.name || item.title || 'Untitled')}</span>
-            `;
-            el.addEventListener('click', () => {
-              resultsContainer.classList.add('hidden');
-              searchInput.value = '';
-            });
-            resultsContainer.appendChild(el);
-          });
-        });
-
-        // Add "View all results" link if provided
-        if (data.view_all_url) {
-          const divider = document.createElement('div');
-          divider.className = 'dropdown-divider';
-          resultsContainer.appendChild(divider);
-
-          const viewAll = document.createElement('a');
-          viewAll.className = 'dropdown-item';
-          viewAll.href = data.view_all_url;
-          viewAll.innerHTML = `
+        items.forEach(item => {
+          const el = document.createElement('a');
+          el.className = 'dropdown-item';
+          el.href = item.url || '#';
+          el.style.display = 'flex';
+          el.style.alignItems = 'center';
+          el.style.gap = '0.5rem';
+          el.innerHTML = `
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14"/><path d="M12 5l7 7-7 7"/>
+              ${getIconForType(item.type)}
             </svg>
-            <span>View all results</span>
+            <span>${escapeHtml(item.name || 'Untitled')}</span>
           `;
-          resultsContainer.appendChild(viewAll);
-        }
+          el.addEventListener('click', () => {
+            resultsContainer.classList.add('hidden');
+            searchInput.value = '';
+          });
+          resultsContainer.appendChild(el);
+        });
       })
       .catch(err => {
         if (err.name === 'AbortError') return;
+        console.error('Search error:', err);
         if (!resultsContainer) return;
         resultsContainer.innerHTML = `
           <div class="dropdown-item" style="color:var(--oya-danger);cursor:default;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
-            </svg>
             <span>Search unavailable. Please try again.</span>
           </div>
         `;

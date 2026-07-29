@@ -1,22 +1,8 @@
 {% load static %}
 <header class="topbar">
   <div class="topbar-left">
-    <h2 class="page-title">{% block page_title %}Dashboard{% endblock %}</h2>
-    <nav class="breadcrumb hide-mobile">
-      <a href="{% url 'dashboard:index' %}">Home</a>
-      <svg
-        class="breadcrumb-separator"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <polyline points="9 18 15 12 9 6" />
-      </svg>
-      <span>{% block breadcrumb %}Dashboard{% endblock %}</span>
-    </nav>
+    <h2 class="page-title">{% block page_title %}OYA | Peace & Progress{% endblock %}</h2>
+    
   </div>
 
   <div class="topbar-search hide-mobile">
@@ -37,6 +23,7 @@
       id="globalSearch"
       placeholder="Search members, records, cases..."
       autocomplete="off"
+      data-search-url="{% url 'dashboard:global_search_ajax' %}"
     />
     <div id="searchResults" class="search-dropdown hidden"></div>
   </div>
