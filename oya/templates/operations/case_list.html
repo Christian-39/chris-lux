@@ -1,5 +1,9 @@
-{% extends "base.html" %} {% load static %} {% block title %}Cases{% endblock %}<!-- prettier-ignore -->
-{% block page_title %}Operations Cases{% endblock %}<!-- prettier-ignore -->
+{% extends "base.html" %} 
+{% load static %}
+{% load humanize %}
+
+{% block title %}Cases{% endblock %}
+{% block page_title %}Operations Cases{% endblock %}
 {% block breadcrumb %}Cases{% endblock %}
 
 {% block content %}
@@ -313,7 +317,7 @@
               white-space: nowrap;
             "
           >
-            &#x20A6;{{ case.fine_amount|floatformat:2 }}
+            &#x20A6;{{ case.fine_amount|floatformat:2 | intcomma }}
           </td>
           <td
             class="cell-muted"
