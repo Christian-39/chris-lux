@@ -7,26 +7,23 @@
 
   const STORAGE_KEY = 'oya_theme';
 
-
   // ─── Get Preferred Theme ───
   function getTheme() {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'dark' || stored === 'light') {
       return stored;
     }
+    // Treat null, undefined, 'auto', or 'system' as system
     return 'system';
   }
 
   // ─── Apply Theme ───
   function applyTheme(theme) {
     const root = document.documentElement;
-
-    if (theme === 'system') {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-    } else {
-      root.setAttribute('data-theme', theme);
-    }
+    const effectiveTheme = (theme === 'system' || theme === 'auto')
+      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : theme;
+    root.setAttribute('data-theme', effectiveTheme);
   }
 
   // ─── Save Theme ───
@@ -39,13 +36,31 @@
     saveTheme(theme);
     applyTheme(theme);
     updateThemeUI(theme);
+    // Notify all components (topbar, mobile header, settings, etc.)
+    window.dispatchEvent(new CustomEvent('oyathemechange', { detail: { theme } }));
   }
 
   // ─── Update UI ───
   function updateThemeUI(theme) {
+    const stored = theme || getTheme();
     document.querySelectorAll('[data-theme-option]').forEach(el => {
-      el.classList.toggle('active', el.dataset.themeOption === theme);
+      const isActive = el.dataset.themeOption === stored;
+      el.classList.toggle('active', isActive);
+      // Sync checkmarks inside dropdown items
+      const check = el.querySelector('.dropdown-check');
+      if (check) {
+        check.style.opacity = isActive ? '1' : '0';
+      }
     });
+  }
+
+  // ─── Resolve Theme to concrete light/dark ───
+  function resolveTheme(theme) {
+    const t = theme || getTheme();
+    if (t === 'system' || t === 'auto') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return (t === 'dark' || t === 'light') ? t : 'light';
   }
 
   // ─── Toggle Sidebar ───
@@ -57,7 +72,7 @@
 
     if (!sidebar || !toggleBtn) return;
 
-    // Desktop collapse
+    // Desktop collapse / Mobile show
     toggleBtn.addEventListener('click', () => {
       if (window.innerWidth > 1024) {
         sidebar.classList.toggle('collapsed');
@@ -164,9 +179,15 @@
 
     container.appendChild(toast);
 
+    // Trigger reflow
+    void toast.offsetWidth;
+    toast.classList.add('show');
+
     setTimeout(() => {
-      toast.classList.add('hide');
-      toast.addEventListener('animationend', () => toast.remove());
+      toast.classList.remove('show');
+      toast.addEventListener('transitionend', () => {
+        if (toast.parentNode) toast.remove();
+      }, { once: true });
     }, duration);
   }
 
@@ -211,7 +232,7 @@
     initMobileNav();
     initTabs();
 
-    // Theme switcher buttons
+    // Theme switcher buttons (desktop dropdown, settings cards, mobile, etc.)
     document.querySelectorAll('[data-theme-option]').forEach(btn => {
       btn.addEventListener('click', () => setTheme(btn.dataset.themeOption));
     });
@@ -227,7 +248,8 @@
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
       overlay.addEventListener('click', (e) => {
         if (e.target === overlay) {
-          overlay.classList.remove('show');
+          const modal = overlay.closest('.modal');
+          if (modal) modal.classList.remove('show');
           document.body.style.overflow = '';
         }
       });
@@ -236,7 +258,7 @@
     // Close modal on ESC
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        document.querySelectorAll('.modal-overlay.show').forEach(m => {
+        document.querySelectorAll('.modal.show').forEach(m => {
           m.classList.remove('show');
         });
         document.body.style.overflow = '';
@@ -249,8 +271,19 @@
       getTheme,
       showToast,
       openModal,
-      closeModal
+      closeModal,
+      // Backward-compatible namespace for topbar.html and legacy code
+      theme: {
+        set: setTheme,
+        getStored: getTheme,
+        resolve: resolveTheme
+      }
     };
+
+    // Also expose showToast globally for inline templates that expect it
+    if (typeof window.showToast !== 'function') {
+      window.showToast = showToast;
+    }
   }
 
   if (document.readyState === 'loading') {
