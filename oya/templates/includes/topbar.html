@@ -361,3 +361,13 @@
     });
   })();
 </script>
+<script>
+  (function () {
+    // Sync topbar menu UI when initialized or changed
+    window.addEventListener("oyathemechange", function (e) {
+      if (window.OYA && window.OYA.getTheme) {
+        // theme.js automatically syncs UI components via event listeners
+      }
+    });
+  })();
+</script>
