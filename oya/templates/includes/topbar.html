@@ -2,7 +2,7 @@
 <header class="topbar">
   <div class="topbar-left">
     <h2 class="page-title">{% block page_title %}OYA | Peace & Progress{% endblock %}</h2>
-    
+
   </div>
 
   <div class="topbar-search hide-mobile">
@@ -358,16 +358,6 @@
     // Keep icons in sync when mobile or settings page changes theme
     window.addEventListener("oyathemechange", function () {
       updateThemeUI();
-    });
-  })();
-</script>
-<script>
-  (function () {
-    // Sync topbar menu UI when initialized or changed
-    window.addEventListener("oyathemechange", function (e) {
-      if (window.OYA && window.OYA.getTheme) {
-        // theme.js automatically syncs UI components via event listeners
-      }
     });
   })();
 </script>
