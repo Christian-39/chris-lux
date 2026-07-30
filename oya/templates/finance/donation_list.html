@@ -184,16 +184,8 @@
           All
         </option>
         {% for code, label in income_types %}
-        <option
-          value="{{ code }}"
-          {%
-          if
-          type_filter=""
-          ="code"
-          %}selected{%
-          endif
-          %}
-        >
+        <option value="{{ code }}" {% if type_filter == code %}selected{% endif %}>
+
           {{ label }}
         </option>
         {% endfor %}
@@ -420,6 +412,7 @@
     </table>
   </div>
 </div>
+{% endblock %}
 {% block extra_css %}
 <style>
   .badge-case {
