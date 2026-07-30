@@ -485,7 +485,7 @@
           {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user }}{% endif %}
         </div>
         <div class="user-role">
-          {% if user.is_staff %}Administrator{% else %}Member{% endif %}
+          {% if user.has_executive_access %}Administrator{% else %}Member{% endif %}
         </div>
         {% else %}
         <div class="user-name">Guest</div>

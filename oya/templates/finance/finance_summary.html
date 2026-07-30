@@ -13,7 +13,7 @@
     <p>Comprehensive overview of OYA's financial health and transactions</p>
   </div>
   <div class="page-header-actions">
-    {% if user.is_staff %}
+    {% if user.has_executive_access %}
     <a href="{% url 'finance:dues_create' %}" class="btn btn-primary">
       <svg
         width="18"

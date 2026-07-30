@@ -103,6 +103,16 @@ class User(AbstractBaseUser, PermissionsMixin):
             return f"{names[0][0]}{names[1][0]}".upper()
         return self.full_name[:2].upper()
 
+    def has_executive_access(self):
+        """Check if user has executive access."""
+        if self.role in ["ADMIN", "EXECUTIVE"] or self.is_superuser:
+            return True
+        # Also grant access if this user is a current executive
+        member = self.member
+        if member and member.position:
+            return True
+        return False
+
     @property
     def member(self):
         """Get the associated Member record based on matching serial number."""

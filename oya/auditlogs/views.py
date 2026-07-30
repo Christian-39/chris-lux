@@ -23,7 +23,7 @@ ENTITY_CHOICES = [
 @login_required
 def auditlog_list(request):
     """List all audit logs with search and filter."""
-    if not request.user.has_admin_access():
+    if not request.user.has_executive_access():
         from django.shortcuts import redirect
         from django.contrib import messages
         messages.error(request, "Admin access required.")
@@ -94,7 +94,7 @@ def auditlog_list(request):
 @login_required
 def auditlog_detail(request, pk):
     """Return audit log detail HTML for modal (AJAX)."""
-    if not request.user.has_admin_access():
+    if not request.user.has_executive_access():
         return HttpResponse("<p class='text-danger'>Access denied.</p>", status=403)
 
     log = get_object_or_404(AuditLog.objects.select_related("user"), pk=pk)
@@ -105,7 +105,7 @@ def auditlog_detail(request, pk):
 @login_required
 def auditlog_export(request):
     """Export audit logs to CSV."""
-    if not request.user.has_admin_access():
+    if not request.user.has_executive_access():
         from django.contrib import messages
         from django.shortcuts import redirect
         messages.error(request, "Admin access required.")

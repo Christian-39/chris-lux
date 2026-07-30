@@ -19,7 +19,7 @@ logger = logging.getLogger("oya")
 @login_required
 def settings_view(request):
     """View and update system settings."""
-    if not request.user.has_admin_access():
+    if not request.user.has_executive_access():
         messages.error(request, "Admin access required.")
         return redirect("dashboard:index")
 

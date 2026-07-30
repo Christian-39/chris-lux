@@ -28,7 +28,7 @@
       </svg>
       Export
     </button>
-    {% if user.is_staff %}
+    {% if user.has_executive_access %}
     <a href="{% url 'operations:case_create' %}" class="btn btn-primary">
       <svg
         width="18"
@@ -343,7 +343,7 @@
                   <circle cx="12" cy="12" r="3" />
                 </svg>
               </a>
-              {% if user.is_staff %}
+              {% if user.has_executive_access %}
               <a
                 href="{% url 'operations:case_update' pk=case.pk %}"
                 class="table-action-btn"
@@ -386,7 +386,7 @@
                   />
                 </svg>
               </a>
-              {% endif %} {% if user.is_staff and case.status != "RESOLVED" %}
+              {% endif %} {% if user.has_executive_access and case.status != "RESOLVED" %}
               <a
                 href="{% url 'operations:case_resolve' pk=case.pk %}"
                 class="table-action-btn"
