@@ -645,12 +645,18 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-// Theme card selection
+// Theme card selection — now applies theme live
 document.querySelectorAll('.theme-card').forEach(card => {
   card.addEventListener('click', () => {
     document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
     card.classList.add('active');
     card.querySelector('input[type="radio"]').checked = true;
+
+    // Live preview: apply theme immediately without waiting for form save
+    const theme = card.dataset.themeOption; // "light", "dark", or "system"
+    if (window.OYA && window.OYA.setTheme) {
+      window.OYA.setTheme(theme);
+    }
   });
 });
 
