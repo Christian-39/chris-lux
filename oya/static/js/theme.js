@@ -216,8 +216,8 @@
     }
   }
 
-  // ─── Initialize ───
-  function init() {
+  // ─── DOM-Dependent Initialization ───
+  function initDOM() {
     // Apply theme without transition on initial load
     document.documentElement.classList.add('no-transition');
     applyTheme(getTheme());
@@ -264,31 +264,32 @@
         document.body.style.overflow = '';
       }
     });
-
-    // Expose globals
-    window.OYA = {
-      setTheme,
-      getTheme,
-      showToast,
-      openModal,
-      closeModal,
-      // Backward-compatible namespace for topbar.html and legacy code
-      theme: {
-        set: setTheme,
-        getStored: getTheme,
-        resolve: resolveTheme
-      }
-    };
-
-    // Also expose showToast globally for inline templates that expect it
-    if (typeof window.showToast !== 'function') {
-      window.showToast = showToast;
-    }
   }
 
+  // ─── Expose API immediately so inline template scripts can use it ───
+  window.OYA = {
+    setTheme,
+    getTheme,
+    showToast,
+    openModal,
+    closeModal,
+    // Backward-compatible namespace for topbar.html and legacy code
+    theme: {
+      set: setTheme,
+      getStored: getTheme,
+      resolve: resolveTheme
+    }
+  };
+
+  // Also expose showToast globally for inline templates that expect it
+  if (typeof window.showToast !== 'function') {
+    window.showToast = showToast;
+  }
+
+  // Run DOM init when ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', initDOM);
   } else {
-    init();
+    initDOM();
   }
 })();
