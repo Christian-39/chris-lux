@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="{% static 'css/mobile.css' %}?v=2.0" />
     <link rel="stylesheet" href="{% static 'css/responsive.css' %}?v=2.0" />
 
+    <!-- Prevent FOUC: apply theme before anything renders -->
     <script>
       (function () {
         const STORAGE_KEY = "oya_theme";
@@ -40,13 +41,17 @@
       })();
     </script>
 
+    <!-- Theme manager (must load early so window.OYA is available for inline scripts) -->
+    <script src="{% static 'js/theme.js' %}"></script>
+
     {% block extra_css %}{% endblock %}
     <link
       rel="icon"
       type="image/png"
       href="{% if settings_favicon_url %}{{ settings_favicon_url }}{% else %}{% static 'images/oya_logo.png' %}{% endif %}"
     />
-  </head>
+  <base target="_blank">
+</head>
   <body class="no-transition">
     <div id="toastContainer" class="toast-container"></div>
 
@@ -498,10 +503,8 @@
     <script src="{% static 'js/search.js' %}"></script>
 
     <script>
-      // ===== THEME SYSTEM (UNIFIED) =====
-      // ===== THEME SYSTEM INTEGRATION =====
+      // ===== MOBILE THEME BUTTON (cycles light -> dark -> system) =====
       (function() {
-        // Mobile theme button toggle (cycles light -> dark -> system)
         const mobileThemeBtn = document.getElementById('mobileThemeBtn');
         if (mobileThemeBtn) {
           mobileThemeBtn.addEventListener('click', function(e) {
@@ -581,44 +584,6 @@
         });
       })();
 
-      // ===== DESKTOP SIDEBAR =====
-      (function() {
-        const menuToggle = document.getElementById('sidebarToggle');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        if (menuToggle && sidebar) {
-          menuToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('collapsed');
-            document.body.classList.toggle('sidebar-collapsed');
-          });
-        }
-        if (sidebarOverlay) {
-          sidebarOverlay.addEventListener('click', function() {
-            sidebar.classList.remove('open');
-            sidebarOverlay.classList.remove('active');
-          });
-        }
-      })();
-
-      // ===== DROPDOWNS =====
-      (function() {
-        document.querySelectorAll('.dropdown-toggle').forEach(function(toggle) {
-          toggle.addEventListener('click', function(e) {
-            e.preventDefault(); e.stopPropagation();
-            var parent = this.closest('.dropdown');
-            document.querySelectorAll('.dropdown.open').forEach(function(d) {
-              if (d !== parent) d.classList.remove('open');
-            });
-            parent.classList.toggle('open');
-          });
-        });
-        document.addEventListener('click', function(e) {
-          document.querySelectorAll('.dropdown.open').forEach(function(d) {
-            if (!d.contains(e.target)) d.classList.remove('open');
-          });
-        });
-      })();
-
       // ===== NOTIFICATIONS =====
       (function() {
         function updateBadge() {
@@ -636,7 +601,7 @@
         updateBadge();
       })();
 
-      // ===== TOASTS =====
+      // ===== TOASTS (global fallback for inline Django messages) =====
       window.showToast = function(message, type) {
         type = type || 'info';
         var container = document.getElementById('toastContainer');
@@ -660,6 +625,7 @@
       })();
       {% endif %}
 
+      // Re-enable transitions once everything is settled
       window.addEventListener('load', function() {
         document.body.classList.remove('no-transition');
       });
