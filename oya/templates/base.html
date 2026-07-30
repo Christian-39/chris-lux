@@ -1,6 +1,6 @@
 {% load static %}
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -31,47 +31,20 @@
     <script>
       (function () {
         const STORAGE_KEY = "oya_theme";
-
-        function getSystemTheme() {
-          return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        const saved = localStorage.getItem(STORAGE_KEY);
+        let theme;
+        if (saved === "system" || saved === "auto") {
+          theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        } else {
+          theme =
+            saved ||
+            (window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light");
         }
-
-        function resolveTheme(theme) {
-          if (theme === "system" || theme === "auto") return getSystemTheme();
-          if (theme === "dark" || theme === "light") return theme;
-          return getSystemTheme();
-        }
-
-        function getStoredTheme() {
-          return localStorage.getItem(STORAGE_KEY);
-        }
-
-        // Apply theme immediately before anything renders
-        const saved = getStoredTheme();
-        const applied = resolveTheme(saved);
-        document.documentElement.setAttribute("data-theme", applied);
-        document.documentElement.classList.add("no-transition");
-
-        // Expose global API so topbar & mobile can use the same functions
-        window.OYA = window.OYA || {};
-        window.OYA.theme = {
-          STORAGE_KEY: STORAGE_KEY,
-          getSystem: getSystemTheme,
-          resolve: resolveTheme,
-          getStored: getStoredTheme,
-          getApplied: function () {
-            return resolveTheme(getStoredTheme());
-          },
-          set: function (theme) {
-            const t = theme === "system" || theme === "auto" ? "system" : (theme === "dark" ? "dark" : "light");
-            localStorage.setItem(STORAGE_KEY, t);
-            const applied = resolveTheme(t);
-            document.documentElement.setAttribute("data-theme", applied);
-            window.dispatchEvent(new CustomEvent("oyathemechange", {
-              detail: { theme: t, applied: applied }
-            }));
-          }
-        };
+        document.documentElement.setAttribute("data-theme", theme);
       })();
     </script>
 
@@ -535,40 +508,88 @@
     <script>
       // ===== THEME SYSTEM (UNIFIED) =====
       (function() {
-        var themeAPI = window.OYA && window.OYA.theme;
-        if (!themeAPI) return;
+        const STORAGE_KEY = 'oya_theme';
 
-        // Mobile header theme button (cycles light → dark → system)
-        var mobileThemeBtn = document.getElementById('mobileThemeBtn');
+        function getSystemTheme() {
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        function resolveTheme(theme) {
+          if (theme === 'system' || theme === 'auto') {
+            return getSystemTheme();
+          }
+          return theme || getSystemTheme();
+        }
+
+        function getCurrentTheme() {
+          return localStorage.getItem(STORAGE_KEY) || 'system';
+        }
+
+        function setTheme(theme, source) {
+          const applied = resolveTheme(theme);
+          document.documentElement.setAttribute('data-theme', applied);
+          localStorage.setItem(STORAGE_KEY, theme);
+          window.dispatchEvent(new CustomEvent('oyathemechange', {
+            detail: {
+              theme: theme,
+              applied: applied,
+              source: source || 'base'
+            }
+          }));
+        }
+
+        // Initialize theme on page load
+        (function initTheme() {
+          const saved = getCurrentTheme();
+          const applied = resolveTheme(saved);
+          document.documentElement.setAttribute('data-theme', applied);
+        })();
+
+        // Theme option buttons (from settings page, etc.)
+        const themeOptions = document.querySelectorAll('[data-theme-option]');
+        themeOptions.forEach(btn => {
+          btn.addEventListener('click', function() {
+            setTheme(this.dataset.themeOption, 'settings');
+          });
+        });
+
+        // Mobile theme button (cycles through themes)
+        const mobileThemeBtn = document.getElementById('mobileThemeBtn');
         if (mobileThemeBtn) {
           mobileThemeBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            var current = themeAPI.getStored() || 'system';
-            var next = current === 'light' ? 'dark' : (current === 'dark' ? 'system' : 'light');
-            themeAPI.set(next);
+            const current = getCurrentTheme();
+            let next;
+            if (current === 'light') next = 'dark';
+            else if (current === 'dark') next = 'system';
+            else next = 'light';
+            setTheme(next, 'mobile-header');
           });
         }
 
-        // Settings page theme cards
-        document.querySelectorAll('[data-settings-theme]').forEach(function(btn) {
+        // Settings page theme buttons
+        const settingsThemeBtns = document.querySelectorAll('[data-settings-theme]');
+        settingsThemeBtns.forEach(btn => {
           btn.addEventListener('click', function() {
-            themeAPI.set(this.dataset.settingsTheme);
+            setTheme(this.dataset.settingsTheme, 'settings');
           });
         });
 
-        // Listen for system preference changes when in system mode
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
-          var stored = themeAPI.getStored();
-          if (stored === 'system' || stored === 'auto') {
-            themeAPI.set('system');
+        // Listen for theme changes from other sources (topbar, mobile, etc.)
+        window.addEventListener('oyathemechange', function(e) {
+          if (e.detail && e.detail.applied) {
+            document.documentElement.setAttribute('data-theme', e.detail.applied);
           }
         });
 
-        // Remove no-transition after paint to enable CSS transitions
-        window.addEventListener('load', function() {
-          document.body.classList.remove('no-transition');
-          document.documentElement.classList.remove('no-transition');
+        // Listen for system preference changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+          const currentPref = getCurrentTheme();
+          if (currentPref === 'system' || currentPref === 'auto') {
+            const newApplied = e.matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newApplied);
+          }
         });
       })();
 
