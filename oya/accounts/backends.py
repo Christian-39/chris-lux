@@ -20,6 +20,10 @@ class SerialNumberAuthBackend(BaseBackend):
         except User.DoesNotExist:
             return None
         
+        # Block inactive/removed members from logging in
+        if not user.is_active:
+            return None
+        
         # Check custom pin field first
         if user.pin and check_password(pin, user.pin):
             return user
@@ -31,7 +35,18 @@ class SerialNumberAuthBackend(BaseBackend):
         return None
 
     def get_user(self, user_id):
+        """
+        Load user from session. Return None if inactive so Django
+        treats them as logged-out on subsequent requests.
+        """
         try:
-            return User.objects.get(pk=user_id)
+            user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return None
+        
+        # CRITICAL: Return None for inactive users so they are logged out
+        # immediately and cannot browse protected pages.
+        if not user.is_active:
+            return None
+        
+        return user

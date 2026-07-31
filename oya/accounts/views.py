@@ -52,10 +52,18 @@ def login_view(request):
                 messages.success(request, f"Welcome, {user.full_name}!")
                 return redirect("dashboard:index")
             else:
-                form.add_error(None, "Invalid serial number or PIN. Please check your credentials and try again.")
+                # Distinguish between bad credentials vs inactive account
+                # We do a second lookup to check if the account exists but is inactive
+                try:
+                    inactive_user = User.objects.get(serial_number=serial_number.upper().strip())
+                    if not inactive_user.is_active:
+                        form.add_error(None, "This account has been deactivated. Contact an administrator.")
+                    else:
+                        form.add_error(None, "Invalid serial number or PIN. Please check your credentials and try again.")
+                except User.DoesNotExist:
+                    form.add_error(None, "Invalid serial number or PIN. Please check your credentials and try again.")
 
     return render(request, "accounts/login.html", {"form": form})
-
 
 def logout_view(request):
     """Handle user logout."""

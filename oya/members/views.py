@@ -226,13 +226,19 @@ def member_remove(request, pk):
     if request.method == "POST":
         form = MemberRemoveForm(request.POST, instance=member)
         if form.is_valid():
-            form.save()
+            # Save reason/offense from form
+            member = form.save(commit=False)
 
+            # FORCE the status update directly in the DB
+            member.status = "REMOVED"
+            member.save(update_fields=["status", "removal_reason", "offense_committed", "updated_at"])
+
+            # Deactivate linked User account
             try:
                 from accounts.models import User
                 user = User.objects.get(serial_number=member.serial_number)
                 user.is_active = False
-                user.save()
+                user.save(update_fields=["is_active"])
             except User.DoesNotExist:
                 pass
 
@@ -253,8 +259,7 @@ def member_remove(request, pk):
     return render(request, "members/member_remove.html", {
         "form": form,
         "member": member
-    })
-
+    })  
 
 @login_required
 def member_delete(request, pk):
