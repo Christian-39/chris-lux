@@ -10,7 +10,7 @@ class Executive(BaseModel):
 
     POST_CHOICES = [
         ("President", "President"),
-        ("Deputy President", "Deputy President"),
+        ("Vice President", "Vice President"),
         ("Secretary", "Secretary"),
         ("Assistant Secretary", "Assistant Secretary"),
         ("Treasurer", "Treasurer"),
