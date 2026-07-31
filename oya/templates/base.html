@@ -28,6 +28,16 @@
     <link rel="stylesheet" href="{% static 'css/mobile.css' %}?v=2.0" />
     <link rel="stylesheet" href="{% static 'css/responsive.css' %}?v=2.0" />
 
+    <!-- Fix: active mobile nav link text visibility -->
+    <style>
+      .mobile-nav-link.active {
+        color: #ffffff !important;
+      }
+      .mobile-nav-link.active svg {
+        stroke: #ffffff;
+      }
+    </style>
+
     <!-- Prevent FOUC: apply theme before anything renders -->
     <script>
       (function () {
