@@ -3,7 +3,8 @@ Dashboard services for OYA KPIs and aggregations.
 """
 import logging
 from datetime import datetime
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Count, Q, Value, DecimalField
+from django.db.models.functions import Coalesce
 from django.core.cache import cache
 from members.models import Member, Clan
 from executives.models import Executive
@@ -12,6 +13,7 @@ from projects.models import Project
 from operations.models import TaskForceMember, Motorcycle, CaseFile
 from elections.models import Election
 from notifications.models import Notification
+from project_donations.models import Donation as ProjectDonation, OutsideDonor
 
 logger = logging.getLogger("oya")
 
@@ -195,7 +197,7 @@ def get_member_recent_activities(limit=10):
     
     # Money-related keywords (case-insensitive search on action/description)
     money_keywords = [
-        'income', 'expense', 'dues', 'payment', '₦', 'naira', 'recorded income',
+        'income', 'expense', 'dues', 'payment', 'naira', 'recorded income',
         'recorded expense', 'finance', 'treasury', 'contribution', 'donation'
     ]
     
@@ -230,9 +232,9 @@ def get_member_recent_activities(limit=10):
     # Combine: money OR add OR remove
     combined_q = money_q | add_q | remove_q
     
-    # Also filter by model name for finance/members operations
+    # Also filter by object_type for finance/members operations
     model_q = Q(
-        model_name__in=['income', 'expense', 'duespayment', 'member', 'members']
+        object_type__in=['income', 'expense', 'duespayment', 'member', 'members']
     )
     
     final_q = combined_q | model_q
@@ -240,7 +242,6 @@ def get_member_recent_activities(limit=10):
     return AuditLog.objects.select_related("user").filter(
         final_q
     ).order_by("-created_at")[:limit]
-
 
 
 def get_clan_distribution():
@@ -328,10 +329,39 @@ def invalidate_dashboard_cache():
     cache.delete("oya_member_statistics")
     cache.delete("oya_finance_statistics")
     cache.delete("oya_clan_distribution")
+    cache.delete("oya_dashboard_extras")
     # Also invalidate trend cache for current and nearby years
     current_year = datetime.now().year
     for y in range(current_year - 2, current_year + 2):
         cache.delete(f"oya_income_expense_trend_{y}")
+
+
+def get_dashboard_extras():
+    """Cache the remaining per-request dashboard queries (recent activity, notices, etc.)."""
+    cache_key = "oya_dashboard_extras"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+
+    extras = {
+        "recent_activities": list(get_recent_activities()),
+        "member_recent_activities": list(get_member_recent_activities()),
+        "urgent_cases": list(get_urgent_cases()),
+        "executives": list(get_current_executives()),
+        "task_force": list(get_active_task_force()),
+        "notices": list(get_recent_notices()),
+        "active_fundraising_projects": Project.objects.filter(
+            enable_fundraising=True, fundraising_status="ACTIVE"
+        ).count(),
+        "total_outside_donors": OutsideDonor.objects.count(),
+        "total_raised_through_invitees": ProjectDonation.objects.filter(
+            status="CONFIRMED", invited_by__isnull=False
+        ).aggregate(
+            total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+        )["total"],
+    }
+    cache.set(cache_key, extras, CACHE_TIMEOUT)
+    return extras
 
 
 # --- Private helper functions ---

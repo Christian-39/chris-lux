@@ -6,6 +6,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.utils import timezone
+from django.utils.functional import cached_property
 from core.models import BaseModel
 
 
@@ -149,11 +150,15 @@ class Member(BaseModel):
     def __str__(self):
         return f"{self.serial_number} - {self.full_name}"
 
-    @property
+    @cached_property
     def position(self):
-        """Return the current executive post if the member is an executive."""
-        current_role = self.executive_roles.filter(is_current=True).first()
-        return current_role.post if current_role else None
+        """Return the current executive post if the member is an executive.
+        Uses the prefetched cache when available (zero extra queries),
+        otherwise one query cached for the life of the instance."""
+        for role in self.executive_roles.all():
+            if role.is_current:
+                return role.post
+        return None
 
     @property
     def is_taskforce(self):

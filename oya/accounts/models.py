@@ -6,6 +6,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
 from django.core.validators import MinValueValidator
+from django.utils.functional import cached_property
 from .managers import UserManager
 
 
@@ -90,7 +91,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def has_executive_access(self):
         """Check if user has executive access."""
-        return self.role in ["ADMIN", "EXECUTIVE"] or self.is_superuser
+        if self.role in ["ADMIN", "EXECUTIVE"] or self.is_superuser:
+            return True
+        # Also grant access if this user is a current executive
+        member = self.member  # cached_property — one query per request
+        return bool(member and member.position)
 
     def is_floor_member(self):
         """Check if user is a floor member."""
@@ -103,21 +108,15 @@ class User(AbstractBaseUser, PermissionsMixin):
             return f"{names[0][0]}{names[1][0]}".upper()
         return self.full_name[:2].upper()
 
-    def has_executive_access(self):
-        """Check if user has executive access."""
-        if self.role in ["ADMIN", "EXECUTIVE"] or self.is_superuser:
-            return True
-        # Also grant access if this user is a current executive
-        member = self.member
-        if member and member.position:
-            return True
-        return False
-
-    @property
+    @cached_property
     def member(self):
-        """Get the associated Member record based on matching serial number."""
+        """Get the associated Member record based on matching serial number.
+        Cached per-instance so repeated access within one request reuses
+        the same object — no extra queries after the first hit."""
         from members.models import Member
         try:
-            return Member.objects.get(serial_number=self.serial_number)
+            return Member.objects.select_related("umu_nna_clan").get(
+                serial_number=self.serial_number
+            )
         except Member.DoesNotExist:
             return None

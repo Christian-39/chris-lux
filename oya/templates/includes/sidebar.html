@@ -403,6 +403,8 @@
         {% endif %}
       </a>
 
+      {% if user.has_executive_access %}
+
       <a
         href="{% url 'auditlogs:auditlog_list' %}"
         class="nav-item {% if request.resolver_match.namespace == 'auditlogs' %}active{% endif %}"
@@ -441,6 +443,7 @@
         </svg>
         <span class="nav-label">Settings</span>
       </a>
+      {% endif %}
     </div>
   </nav>
 
@@ -448,7 +451,7 @@
   <div class="sidebar-footer">
     <div class="user-info">
       <!-- prettier-ignore -->
-      {% if user.is_authenticated %} {% with member_photo=user.member.photo|default:None %}
+      {% if user.is_authenticated %}{% with member=user.member %}{% with member_photo=member.photo|default:None %}
       <div
         class="user-avatar"
         style="overflow: hidden; cursor: pointer"
@@ -469,7 +472,7 @@
         {% else %} {{ user.get_full_name|first|upper|default:user.serial_number|first|upper }}
         {% endif %}
       </div>
-      {% endwith %} {% else %}
+      {% endwith %}{% endwith %} {% else %}
       <div
         class="user-avatar"
         style="overflow: hidden; cursor: pointer"
@@ -485,7 +488,7 @@
           {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user }}{% endif %}
         </div>
         <div class="user-role">
-          {% if user.member.position %}{{ user.member.position }}{% else %}{{ user.get_role_display|default:"Member" }}{% endif %} 
+          {% if member.position %}{{ member.position }}{% else %}{{ user.get_role_display|default:"Member" }}{% endif %}
         </div>
         {% else %}
         <div class="user-name">Guest</div>

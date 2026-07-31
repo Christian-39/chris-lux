@@ -2,11 +2,12 @@
 Views for OYA operations.
 """
 import logging
+from dashboard.services import invalidate_dashboard_cache
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Count
 from auditlogs.services import log_action
 from finance.models import Income
 from .models import TaskForceMember, Motorcycle, CaseFile
@@ -34,10 +35,15 @@ def taskforce_list(request):
     page = request.GET.get("page", 1)
     taskforce = paginator.get_page(page)
 
-    # Stats
-    total_taskforce = TaskForceMember.objects.count()
-    active_count = TaskForceMember.objects.filter(is_active=True).count()
-    inactive_count = TaskForceMember.objects.filter(is_active=False).count()
+    # Stats — single query
+    tf_stats = TaskForceMember.objects.aggregate(
+        total=Count("id"),
+        active=Count("id", filter=Q(is_active=True)),
+        inactive=Count("id", filter=Q(is_active=False)),
+    )
+    total_taskforce = tf_stats["total"]
+    active_count = tf_stats["active"]
+    inactive_count = tf_stats["inactive"]
 
     context = {
         "taskforce": taskforce,
@@ -78,6 +84,7 @@ def taskforce_create(request):
                 description=f"Assigned {tf.member.full_name} to task force"
             )
             messages.success(request, f"{tf.member.full_name} assigned to task force.")
+            invalidate_dashboard_cache()
             return redirect("operations:taskforce_list")
         else:
             for error in form.errors.values():
@@ -115,6 +122,7 @@ def taskforce_update(request, pk):
                 description=f"Updated task force assignment for {tf.member.full_name}"
             )
             messages.success(request, f"Task force assignment for {tf.member.full_name} updated.")
+            invalidate_dashboard_cache()
             return redirect("operations:taskforce_list")
         else:
             for error in form.errors.values():
@@ -151,6 +159,7 @@ def taskforce_remove(request, pk):
             description=f"Removed {tf.member.full_name} from task force"
         )
         messages.success(request, f"{tf.member.full_name} removed from task force.")
+        invalidate_dashboard_cache()
         return redirect("operations:taskforce_list")
 
     return render(request, "operations/taskforce_remove.html", {"taskforce": tf})
@@ -178,11 +187,17 @@ def motorcycle_list(request):
     page = request.GET.get("page", 1)
     motorcycles = paginator.get_page(page)
 
-    # Stats
-    total_motorcycles = Motorcycle.objects.count()
-    excellent_count = Motorcycle.objects.filter(condition="EXCELLENT").count()
-    needs_service_count = Motorcycle.objects.filter(condition="NEEDS_SERVICE").count()
-    grounded_count = Motorcycle.objects.filter(condition="GROUNDED").count()
+    # Stats — single query
+    mc_stats = Motorcycle.objects.aggregate(
+        total=Count("id"),
+        excellent=Count("id", filter=Q(condition="EXCELLENT")),
+        needs_service=Count("id", filter=Q(condition="NEEDS_SERVICE")),
+        grounded=Count("id", filter=Q(condition="GROUNDED")),
+    )
+    total_motorcycles = mc_stats["total"]
+    excellent_count = mc_stats["excellent"]
+    needs_service_count = mc_stats["needs_service"]
+    grounded_count = mc_stats["grounded"]
 
     context = {
         "motorcycles": motorcycles,
@@ -217,6 +232,7 @@ def motorcycle_create(request):
                 description=f"Registered motorcycle {mc.asset_tag}"
             )
             messages.success(request, f"Motorcycle {mc.asset_tag} registered.")
+            invalidate_dashboard_cache()
             return redirect("operations:motorcycle_list")
         else:
             for error in form.errors.values():
@@ -253,6 +269,7 @@ def motorcycle_update(request, pk):
                 description=f"Updated motorcycle {mc.asset_tag}"
             )
             messages.success(request, "Motorcycle updated.")
+            invalidate_dashboard_cache()
             return redirect("operations:motorcycle_list")
         else:
             for error in form.errors.values():
@@ -289,6 +306,7 @@ def motorcycle_delete(request, pk):
             description=f"Deleted motorcycle {asset_tag}"
         )
         messages.success(request, f"Motorcycle {asset_tag} deleted.")
+        invalidate_dashboard_cache()
         return redirect("operations:motorcycle_list")
 
     return render(request, "operations/motorcycle_delete.html", {"motorcycle": mc})
@@ -316,12 +334,13 @@ def case_list(request):
     page = request.GET.get("page", 1)
     cases = paginator.get_page(page)
 
-    stats = {
-        "open": CaseFile.objects.filter(status="OPEN").count(),
-        "in_progress": CaseFile.objects.filter(status="IN_PROGRESS").count(),
-        "resolved": CaseFile.objects.filter(status="RESOLVED").count(),
-        "total": CaseFile.objects.count(),
-    }
+    # Stats — single query
+    stats = CaseFile.objects.aggregate(
+        open=Count("id", filter=Q(status="OPEN")),
+        in_progress=Count("id", filter=Q(status="IN_PROGRESS")),
+        resolved=Count("id", filter=Q(status="RESOLVED")),
+        total=Count("id"),
+    )
 
     context = {
         "cases": cases,
@@ -388,6 +407,7 @@ def case_create(request):
                 description=f"Created case {case.case_number}: {case.title}"
             )
             messages.success(request, f"Case {case.case_number} created.")
+            invalidate_dashboard_cache()
             return redirect("operations:case_list")
         else:
             for error in form.errors.values():
@@ -452,6 +472,7 @@ def case_resolve(request, pk):
                 description=f"Resolved case {case.case_number}: {case.status}"
             )
             messages.success(request, f"Case {case.case_number} resolved.")
+            invalidate_dashboard_cache()
             return redirect("operations:case_list")
         else:
             for error in form.errors.values():
@@ -510,6 +531,7 @@ def case_update(request, pk):
                 description=f"Updated case {case.case_number}: {case.title}"
             )
             messages.success(request, f"Case {case.case_number} updated.")
+            invalidate_dashboard_cache()
             return redirect("operations:case_list")
         else:
             for error in form.errors.values():
@@ -546,6 +568,7 @@ def case_delete(request, pk):
             description=f"Deleted case {case_number}"
         )
         messages.success(request, f"Case {case_number} deleted.")
+        invalidate_dashboard_cache()
         return redirect("operations:case_list")
 
     return render(request, "operations/case_delete.html", {"case": case})

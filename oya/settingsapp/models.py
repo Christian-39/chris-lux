@@ -2,6 +2,7 @@
 Models for OYA system settings.
 """
 from django.db import models
+from django.core.cache import cache
 
 
 def logo_upload_path(instance, filename):
@@ -102,9 +103,10 @@ class SystemSettings(models.Model):
         verbose_name_plural = "System Settings"
 
     def save(self, *args, **kwargs):
-        """Ensure only one instance exists."""
+        """Ensure only one instance exists and invalidate cache on change."""
         self.pk = 1
         super().save(*args, **kwargs)
+        cache.delete(self.CACHE_KEY)
 
     def delete(self, *args, **kwargs):
         """Prevent deletion of the singleton instance."""
@@ -112,8 +114,11 @@ class SystemSettings(models.Model):
 
     @classmethod
     def load(cls):
-        """Load the singleton instance."""
-        obj, created = cls.objects.get_or_create(pk=1)
+        """Load the singleton instance from cache or DB."""
+        obj = cache.get(cls.CACHE_KEY)
+        if obj is None:
+            obj, _ = cls.objects.get_or_create(pk=1)
+            cache.set(cls.CACHE_KEY, obj, 3600)  # 1 hour — settings rarely change
         return obj
 
     def __str__(self):
@@ -132,3 +137,5 @@ class SystemSettings(models.Model):
         if self.favicon and self.favicon.name:
             return self.favicon.url
         return ""
+
+    CACHE_KEY = "oya_system_settings_singleton"

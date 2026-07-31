@@ -93,6 +93,7 @@ def election_create(request):
                 description=f"Created election: {election.title}"
             )
             messages.success(request, f"Election '{election.title}' created successfully.")
+            invalidate_dashboard_cache()
             return redirect("elections:election_list")
         else:
             for error in form.errors.values():
@@ -129,6 +130,7 @@ def election_update(request, pk):
                 description=f"Updated election: {election.title}"
             )
             messages.success(request, "Election updated successfully.")
+            invalidate_dashboard_cache()
             return redirect("elections:election_list")
         else:
             for error in form.errors.values():
@@ -168,6 +170,7 @@ def candidate_create(request):
                 request,
                 f"{candidate.member.full_name} added as candidate for {candidate.post}."
             )
+            invalidate_dashboard_cache()
             return redirect("elections:election_detail", pk=candidate.election.id)
         else:
             for error in form.errors.values():
@@ -210,6 +213,7 @@ def candidate_update(request, pk):
                 request,
                 f"Candidate {candidate.member.full_name} updated successfully."
             )
+            invalidate_dashboard_cache()
             return redirect("elections:election_detail", pk=candidate.election.id)
         else:
             for error in form.errors.values():
@@ -279,6 +283,7 @@ def cast_vote(request, pk):
         request,
         f"Vote cast for {candidate.member.full_name} for {candidate.post}."
     )
+    invalidate_dashboard_cache()
     return redirect("elections:election_detail", pk=election.id)
 
 
@@ -335,6 +340,8 @@ def handover_list(request):
 @login_required
 def handover_detail(request, pk):
     """Display comprehensive handover details."""
+    from django.db.models import Sum, Count
+
     handover = get_object_or_404(
         HandoverLedger.objects.select_related("executive__member", "election"),
         pk=pk
@@ -349,10 +356,10 @@ def handover_detail(request, pk):
     start = handover.tenure_start
     end = handover.tenure_end
 
-    # Operations details
-    taskforce_members = TaskForceMember.objects.select_related("member").all()
-    motorcycles = Motorcycle.objects.select_related("assigned_to").all()
-    cases = CaseFile.objects.select_related("respondent", "created_by").all()
+    # Operations details — capped to avoid unbounded queries
+    taskforce_members = TaskForceMember.objects.select_related("member")[:50]
+    motorcycles = Motorcycle.objects.select_related("assigned_to")[:50]
+    cases = CaseFile.objects.select_related("respondent", "created_by")[:50]
 
     # Finance details
     recent_income = Income.objects.filter(
@@ -370,24 +377,38 @@ def handover_detail(request, pk):
         created_at__date__lte=end
     ).select_related("member", "recorded_by").order_by("-created_at")[:10]
 
-    # Project details with donations during tenure
-    projects = Project.objects.all().order_by("-created_at")
+    # ONE query: per-project donation totals/counts within the tenure window.
+    donation_stats = (
+        ProjectDonation.objects.filter(
+            status="CONFIRMED", donation_date__range=(start, end)
+        )
+        .values("project_id")
+        .annotate(total=Sum("amount"), count=Count("id"))
+    )
+    stats_by_project = {row["project_id"]: row for row in donation_stats}
+
+    # ONE query: top 5 donations per project only for projects that had donations.
+    project_ids_with_donations = list(stats_by_project.keys())
+    donations_qs = ProjectDonation.objects.filter(
+        project_id__in=project_ids_with_donations,
+        status="CONFIRMED",
+        donation_date__range=(start, end),
+    ).select_related("member", "outside_donor").order_by("project_id", "-donation_date")
+
+    donations_by_project = {}
+    for d in donations_qs:
+        donations_by_project.setdefault(d.project_id, []).append(d)
+
+    # Cap unbounded project list
+    projects = Project.objects.all().order_by("-created_at")[:100]
     projects_with_donations = []
     for project in projects:
-        donations = ProjectDonation.objects.filter(
-            project=project,
-            status="CONFIRMED",
-            donation_date__gte=start,
-            donation_date__lte=end
-        ).select_related("member", "outside_donor").order_by("-donation_date")
-
-        donation_total = donations.aggregate(total=Sum("amount"))["total"] or 0
-
+        stats = stats_by_project.get(project.id, {"total": 0, "count": 0})
         projects_with_donations.append({
             "project": project,
-            "donations": donations[:5],
-            "donation_total": donation_total,
-            "donation_count": donations.count(),
+            "donations": donations_by_project.get(project.id, [])[:5],
+            "donation_total": stats["total"] or 0,
+            "donation_count": stats["count"],
         })
 
     context = {
@@ -423,6 +444,7 @@ def handover_create(request):
                 description=f"Created handover ledger for {handover.executive} (₦{handover.net_financial_position:,.2f})"
             )
             messages.success(request, "Handover ledger created successfully with auto-calculated aggregates.")
+            invalidate_dashboard_cache()
             return redirect("elections:handover_detail", pk=handover.id)
         else:
             for error in form.errors.values():
@@ -459,6 +481,7 @@ def handover_update(request, pk):
                 description=f"Updated handover ledger for {handover.executive}"
             )
             messages.success(request, "Handover ledger updated and aggregates recalculated.")
+            invalidate_dashboard_cache()
             return redirect("elections:handover_detail", pk=handover.id)
         else:
             for error in form.errors.values():
@@ -495,6 +518,7 @@ def handover_delete(request, pk):
             description=f"Deleted handover ledger for {executive_name}"
         )
         messages.success(request, f"Handover ledger for {executive_name} deleted.")
+        invalidate_dashboard_cache()
         return redirect("elections:handover_list")
 
     return render(request, "elections/handover_confirm_delete.html", {"handover": handover})

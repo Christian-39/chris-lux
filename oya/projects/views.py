@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Count
 from auditlogs.services import log_action
 from .models import Project
 from .forms import ProjectForm
@@ -34,13 +34,13 @@ def project_list(request):
     page = request.GET.get("page", 1)
     projects = paginator.get_page(page)
 
-    # Statistics
-    stats = {
-        "future": Project.objects.filter(status="FUTURE").count(),
-        "at_hand": Project.objects.filter(status="AT_HAND").count(),
-        "finished": Project.objects.filter(status="FINISHED").count(),
-        "total": Project.objects.count(),
-    }
+    # Statistics — single query
+    stats = Project.objects.aggregate(
+        future=Count("id", filter=Q(status="FUTURE")),
+        at_hand=Count("id", filter=Q(status="AT_HAND")),
+        finished=Count("id", filter=Q(status="FINISHED")),
+        total=Count("id"),
+    )
 
     context = {
         "projects": projects,
@@ -123,6 +123,7 @@ def project_create(request):
                 description=f"Created project: {project.title}"
             )
             messages.success(request, f"Project '{project.title}' created successfully.")
+            invalidate_dashboard_cache()
             return redirect("projects:project_list")
         else:
             for error in form.errors.values():
@@ -159,6 +160,7 @@ def project_update(request, pk):
                 description=f"Updated project: {project.title}"
             )
             messages.success(request, "Project updated successfully.")
+            invalidate_dashboard_cache()
             return redirect("projects:project_list")
         else:
             for error in form.errors.values():
@@ -195,6 +197,7 @@ def project_delete(request, pk):
             description=f"Deleted project: {title}"
         )
         messages.success(request, f"Project '{title}' deleted.")
+        invalidate_dashboard_cache()
         return redirect("projects:project_list")
 
     return render(request, "projects/project_confirm_delete.html", {"project": project})

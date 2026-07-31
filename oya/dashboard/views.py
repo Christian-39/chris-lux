@@ -22,6 +22,7 @@ from .services import (
     get_dashboard_kpis,
     get_member_statistics,
     get_finance_statistics,
+    get_dashboard_extras,
     get_recent_activities,
     get_clan_distribution,
     get_urgent_cases,
@@ -30,6 +31,7 @@ from .services import (
     get_recent_notices,
     get_member_contributions,
     get_income_expense_trend,
+    invalidate_dashboard_cache,
 )
 
 logger = logging.getLogger("oya")
@@ -243,14 +245,12 @@ def index(request):
     treasury_balance = finance_stats.get("treasury_balance", 0) if isinstance(finance_stats, dict) else 0
     total_expenses = finance_stats.get("total_expenses", 0) if isinstance(finance_stats, dict) else 0
 
-    recent_activities = get_recent_activities()
+    # Cached extras: recent activities, urgent cases, executives, task force,
+    # notices, fundraising stats — all from one cache hit instead of ~8 queries.
+    extras = get_dashboard_extras()
 
     # Real data for dashboard components
     clan_distribution = get_clan_distribution()
-    urgent_cases = get_urgent_cases()
-    executives = get_current_executives()
-    task_force = get_active_task_force()
-    notices = get_recent_notices()
 
     # Financial trend data for charts - auto-detects year with data
     trend_data = get_income_expense_trend()
@@ -263,12 +263,12 @@ def index(request):
         "kpis": kpis,
         "member_stats": member_stats,
         "finance_stats": finance_stats,
-        "recent_activities": recent_activities,
+        "recent_activities": extras["recent_activities"],
         "clan_distribution": clan_distribution,
-        "urgent_cases": urgent_cases,
-        "executives": executives,
-        "task_force": task_force,
-        "notices": notices,
+        "urgent_cases": extras["urgent_cases"],
+        "executives": extras["executives"],
+        "task_force": extras["task_force"],
+        "notices": extras["notices"],
         "trend_data": trend_data,
         "is_admin": is_admin,
         "is_executive": is_executive,
@@ -278,13 +278,9 @@ def index(request):
         "total_expenses": total_expenses,
         # Project donations
         "total_project_donations": total_project_donations,
-        "active_fundraising_projects": Project.objects.filter(
-            enable_fundraising=True, fundraising_status="ACTIVE"
-        ).count(),
-        "total_outside_donors": OutsideDonor.objects.count(),
-        "total_raised_through_invitees": ProjectDonation.objects.filter(
-            status="CONFIRMED", invited_by__isnull=False
-        ).aggregate(total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField())))["total"],
+        "active_fundraising_projects": extras["active_fundraising_projects"],
+        "total_outside_donors": extras["total_outside_donors"],
+        "total_raised_through_invitees": extras["total_raised_through_invitees"],
         # Prepaid dues
         "total_prepaid": total_prepaid,
     }
@@ -322,11 +318,11 @@ def member_dashboard(request):
     # Floor members get restricted activities (money + member add/remove only)
     member_activities = get_member_recent_activities(limit=5)
 
+    # Cached extras for shared dashboard data
+    extras = get_dashboard_extras()
+
     # Real data for member dashboard
     clan_distribution = get_clan_distribution()
-    executives = get_current_executives()
-    task_force = get_active_task_force()
-    notices = get_recent_notices()
 
     # Financial trend data for charts
     trend_data = get_income_expense_trend()
@@ -350,18 +346,14 @@ def member_dashboard(request):
         "total_income": total_income,
         "treasury_balance": treasury_balance,
         "total_project_donations": total_project_donations,
-        "active_fundraising_projects": Project.objects.filter(
-            enable_fundraising=True, fundraising_status="ACTIVE"
-        ).count(),
-        "total_outside_donors": OutsideDonor.objects.count(),
-        "total_raised_through_invitees": ProjectDonation.objects.filter(
-            status="CONFIRMED", invited_by__isnull=False
-        ).aggregate(total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField())))["total"],
+        "active_fundraising_projects": extras["active_fundraising_projects"],
+        "total_outside_donors": extras["total_outside_donors"],
+        "total_raised_through_invitees": extras["total_raised_through_invitees"],
         "recent_activities": member_activities,  # restricted view for members
         "clan_distribution": clan_distribution,
-        "executives": executives,
-        "task_force": task_force,
-        "notices": notices,
+        "executives": extras["executives"],
+        "task_force": extras["task_force"],
+        "notices": extras["notices"],
         "member": member,
         "contributions": contributions,
         "total_contributed": total_contributed,

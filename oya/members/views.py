@@ -2,6 +2,7 @@
 Views for OYA members.
 """
 import logging
+from dashboard.services import invalidate_dashboard_cache
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -49,12 +50,12 @@ def member_list(request):
     page = request.GET.get("page", 1)
     members = paginator.get_page(page)
 
-    stats = {
-        "total": Member.objects.count(),
-        "active": Member.objects.filter(status="ACTIVE").count(),
-        "past": Member.objects.filter(status="PAST_MEMBER").count(),
-        "removed": Member.objects.filter(status="REMOVED").count(),
-    }
+    stats = Member.objects.aggregate(
+        total=Count("id"),
+        active=Count("id", filter=Q(status="ACTIVE")),
+        past=Count("id", filter=Q(status="PAST_MEMBER")),
+        removed=Count("id", filter=Q(status="REMOVED")),
+    )
 
     return render(request, "members/member_list.html", {
         "members": members,
@@ -131,6 +132,7 @@ def member_create(request):
                 description=f"Created member {member.serial_number} with login account"
             )
             messages.success(request, f"Member {member.serial_number} created successfully.")
+            invalidate_dashboard_cache()
 
             # Render form with PIN banner (don't redirect — admin needs to see PIN!)
             return render(request, "members/member_form.html", {
@@ -185,6 +187,7 @@ def member_update(request, pk):
                 description=f"Updated member {member.serial_number}"
             )
             messages.success(request, f"Member {member.serial_number} updated successfully.")
+            invalidate_dashboard_cache()
 
             # Render form with PIN banner
             return render(request, "members/member_form.html", {
@@ -242,6 +245,7 @@ def member_remove(request, pk):
                 description=f"Removed member {member.serial_number}: {member.removal_reason}"
             )
             messages.success(request, f"Member {member.serial_number} has been removed.")
+            invalidate_dashboard_cache()
             return redirect("members:member_list")
     else:
         form = MemberRemoveForm(instance=member)
@@ -281,6 +285,7 @@ def member_delete(request, pk):
             description=f"Deleted member {serial}"
         )
         messages.success(request, f"Member {serial} deleted permanently.")
+        invalidate_dashboard_cache()
         return redirect("members:member_list")
 
     return render(request, "members/member_confirm_delete.html", {"member": member})
@@ -324,6 +329,7 @@ def clan_create(request):
                 })
 
             messages.success(request, f"Clan '{clan.name}' created successfully.")
+            invalidate_dashboard_cache()
             return redirect("members:clan_list")
         else:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
