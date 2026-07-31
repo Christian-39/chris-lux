@@ -120,3 +120,33 @@ class User(AbstractBaseUser, PermissionsMixin):
             )
         except Member.DoesNotExist:
             return None
+
+
+    @cached_property
+    def member(self):
+        """Get the associated Member record based on matching serial number.
+        Cached per-instance so repeated access within one request reuses
+        the same object — no extra queries after the first hit."""
+        from members.models import Member
+        try:
+            return Member.objects.select_related("umu_nna_clan").prefetch_related(
+                "executive_roles"
+            ).get(serial_number=self.serial_number)
+        except Member.DoesNotExist:
+            return None
+
+    @property
+    def display_role(self):
+        """
+        Return the user's current executive position if they hold one,
+        otherwise fall back to their role display name.
+        """
+        if self.role == "ADMIN" or self.is_superuser:
+            return self.get_role_display()
+
+        member = self.member
+        if member:
+            position = member.position
+            if position:
+                return position
+        return self.get_role_display()

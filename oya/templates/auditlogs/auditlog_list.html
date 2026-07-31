@@ -218,8 +218,7 @@
           </td>
           <td>
             {% if log.user %}
-              <span class="cell-name">{{ log.user.get_role_display|default:"User" }} ({{ log.user.full_name|default:log.user.serial_number }})</span>
-            {% else %}
+              <span class="cell-name">{{ log.user.display_role|default:"User" }} ({{ log.user.full_name|default:log.user.serial_number }})</span>            {% else %}
               <span class="cell-muted">System</span>
             {% endif %}
           </td>
