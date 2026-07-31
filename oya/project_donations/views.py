@@ -155,12 +155,7 @@ def outside_donor_update(request, pk):
     else:
         form = OutsideDonorForm(instance=donor)
 
-    return render(request, "project_donations/outside_donor_form.html", {
-        "form": form,
-        "title": "Update Outside Donor",
-        "action": "Update",
-        "donor": donor
-    })
+    return redirect("project_donations:outside_donor_list")
 
 
 @login_required
@@ -348,12 +343,7 @@ def donation_update(request, pk):
     else:
         form = DonationForm(instance=donation)
 
-    return render(request, "project_donations/donation_form.html", {
-        "form": form,
-        "title": "Update Donation",
-        "action": "Update",
-        "donation": donation
-    })
+    return render(request, "project_donations/donation_list.html")
 
 
 @login_required

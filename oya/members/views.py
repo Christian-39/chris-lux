@@ -190,13 +190,7 @@ def member_update(request, pk):
             invalidate_dashboard_cache()
 
             # Render form with PIN banner
-            return render(request, "members/member_form.html", {
-                "form": form,
-                "title": "Update Member",
-                "action": "Update",
-                "member": member,
-                "updated_pin": updated_pin,
-            })
+            return redirect("members:member_list")
         else:
             # CRITICAL FIX: Properly iterate through nested error lists
             for field_name, error_list in form.errors.items():

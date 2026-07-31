@@ -139,13 +139,14 @@ def election_update(request, pk):
     else:
         form = ElectionForm(instance=election)
 
+    # FIX: Render the form on GET, only redirect after successful POST
     return render(request, "elections/election_form.html", {
         "form": form,
         "title": "Update Election",
         "action": "Update",
         "election": election
     })
-
+    
 
 @login_required
 def candidate_create(request):
@@ -222,12 +223,7 @@ def candidate_update(request, pk):
     else:
         form = CandidateForm(instance=candidate)
 
-    return render(request, "elections/candidate_form.html", {
-        "form": form,
-        "title": "Edit Candidate",
-        "action": "Update",
-        "candidate": candidate
-    })
+    return render(request, "elections/candidate_list.html")
 
 
 @login_required
@@ -490,12 +486,7 @@ def handover_update(request, pk):
     else:
         form = HandoverLedgerForm(instance=handover)
 
-    return render(request, "elections/handover_form.html", {
-        "form": form,
-        "title": "Update Handover Ledger",
-        "action": "Update",
-        "handover": handover
-    })
+    return render(request, "elections/handover_list.html")
 
 
 @login_required
