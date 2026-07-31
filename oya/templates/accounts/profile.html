@@ -80,28 +80,42 @@
     </div>
     <div class="card-body" style="padding:0;">
       <div class="activity-feed" style="padding:0 1.25rem;">
-        {% for ys in year_status %}
+        {% for group in year_status_grouped %}
         <div class="activity-item">
-          {% if ys.status == "PAID" %}
+          {% if group.status == "PAID" %}
           <div class="activity-icon success">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <div class="activity-content">
-            <div class="activity-text"><strong>{{ ys.year }} Dues</strong> — Paid</div>
+            <div class="activity-text">
+              <strong>
+                {% if group.start_year == group.end_year %}{{ group.start_year }}{% else %}{{ group.start_year }}–{{ group.end_year }}{% endif %}
+                Dues
+              </strong> — Paid
+              <span style="font-size:0.75rem;color:var(--oya-text-muted);">({{ group.count }} year{{ group.count|pluralize }})</span>
+            </div>
             <div class="activity-time">
-              Recorded {{ ys.payment.created_at|date:"M d, Y" }}
-              {% if ys.payment.recorded_by %}by {{ ys.payment.recorded_by.get_full_name }}{% endif %}
-              {% if ys.payment.notes %}&bull; {{ ys.payment.notes }}{% endif %}
+              {% if group.payment %}
+                Recorded {{ group.payment.created_at|date:"M d, Y" }}
+                {% if group.payment.recorded_by %}by {{ group.payment.recorded_by.get_full_name }}{% endif %}
+                {% if group.payment.notes %}&bull; {{ group.payment.notes }}{% endif %}
+              {% endif %}
             </div>
           </div>
-          <span class="badge badge-success">&#x20A6;{{ yearly_dues|intcomma }}</span>
+          <span class="badge badge-success">&#x20A6;{{ group.total_amount|intcomma }}</span>
           {% else %}
           <div class="activity-icon danger">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </div>
           <div class="activity-content">
-            <div class="activity-text"><strong>{{ ys.year }} Dues</strong> — Outstanding</div>
-            <div class="activity-time">&#x20A6;{{ yearly_dues|intcomma }} due</div>
+            <div class="activity-text">
+              <strong>
+                {% if group.start_year == group.end_year %}{{ group.start_year }}{% else %}{{ group.start_year }}–{{ group.end_year }}{% endif %}
+                Dues
+              </strong> — Outstanding
+              <span style="font-size:0.75rem;color:var(--oya-text-muted);">({{ group.count }} year{{ group.count|pluralize }})</span>
+            </div>
+            <div class="activity-time">&#x20A6;{{ group.total_amount|intcomma }} total due</div>
           </div>
           <span class="badge badge-danger">Owed</span>
           {% endif %}
@@ -163,7 +177,7 @@
   <div class="card-header">
     <div>
       <div class="card-header-title">Dues Payment History</div>
-      <div class="card-header-subtitle">All recorded yearly dues payments</div>
+      <div class="card-header-subtitle">Grouped by deposit — click view to see full year tracker</div>
     </div>
   </div>
   <div class="card-body" style="padding:0;">
@@ -171,21 +185,36 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>Year</th>
+            <th>Description</th>
             <th>Amount</th>
-            <th>Recorded</th>
-            <th>By</th>
-            <th>Notes</th>
+            <th>Recorded By</th>
+            <th>Date</th>
+            <th class="text-end" style="width: 80px">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {% for payment in dues_payments %}
+          {% for item in dues_transactions_grouped %}
           <tr>
-            <td><span class="cell-name">{{ payment.year }}</span></td>
-            <td style="font-weight:600;color:var(--oya-success);">&#x20A6;{{ payment.amount_paid|floatformat:2|intcomma }}</td>
-            <td class="cell-muted">{{ payment.created_at|date:"M d, Y" }}</td>
-            <td class="cell-muted">{{ payment.recorded_by.get_full_name|default:"System" }}</td>
-            <td class="cell-muted">{{ payment.notes|default:"—"|truncatechars:40 }}</td>
+            <td style="white-space: nowrap">
+              <span class="badge badge-success">Dues</span>
+              <span class="cell-name">{{ item.reason }}</span>
+              {% if item.is_prepaid %}
+              <span class="badge badge-prepaid-mini">Prepaid</span>
+              {% endif %}
+            </td>
+            <td style="font-weight:600;color:var(--oya-success); white-space: nowrap;">&#x20A6;{{ item.amount|floatformat:2|intcomma }}</td>
+            <td class="cell-muted" style="white-space: nowrap;">{{ item.recorded_by.get_full_name|default:"System" }}</td>
+            <td class="cell-muted" style="white-space: nowrap;">{{ item.payment_date|date:"M d, Y" }}</td>
+            <td style="white-space: nowrap;">
+              <div class="table-actions" style="flex-wrap: nowrap; gap: 0.25rem;">
+                <a href="{% url 'finance:member_dues_detail' user.id %}" class="table-action-btn" title="View Full Tracker">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </a>
+              </div>
+            </td>
           </tr>
           {% empty %}
           <tr>
@@ -229,10 +258,13 @@
         <tbody>
           {% for payment in payments %}
           <tr>
-            <td class="cell-muted">{{ payment.created_at|date:"M d, Y" }}</td>
+            <td class="cell-muted">{{ payment.date_display|date:"M d, Y" }}</td>
             <td>
               {% if payment.income_type == "DUES" %}
                 <span class="badge badge-success">Dues</span>
+                {% if payment.is_prepaid %}
+                <span class="badge badge-prepaid-mini">Prepaid</span>
+                {% endif %}
               {% elif payment.income_type == "DONATION" %}
                 <span class="badge badge-info">Donation</span>
               {% elif payment.income_type == "EVENT" %}
@@ -243,7 +275,7 @@
             </td>
             <td><span class="cell-name">{{ payment.reason }}</span></td>
             <td style="font-weight:600;color:var(--oya-success);">&#x20A6;{{ payment.amount|floatformat:2|intcomma }}</td>
-            <td class="cell-muted">{{ payment.created_by.get_full_name|default:"System" }}</td>
+            <td class="cell-muted">{{ payment.recorded_by.get_full_name|default:"System" }}</td>
           </tr>
           {% empty %}
           <tr>
@@ -399,6 +431,16 @@
 </div>
 
 <style>
+  .badge-prepaid-mini {
+    background: var(--oya-info-bg);
+    color: var(--oya-info);
+    padding: 0.125rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    margin-left: 0.25rem;
+  }
+  
 @media (max-width: 768px) {
   .detail-meta-grid { grid-template-columns: 1fr 1fr !important; }
   .dashboard-grid-2 { grid-template-columns: 1fr !important; }

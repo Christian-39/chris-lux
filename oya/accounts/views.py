@@ -281,11 +281,12 @@ def pin_reset(request):
 @login_required
 def profile_view(request):
     """View own profile with dues, donations, and full contribution tracking."""
-    from finance.models import Income, Expense, DuesPayment
+    from finance.models import Income, Expense, DuesPayment, DuesPaymentTransaction
     from notifications.models import Notification
     from django.conf import settings
     from django.db.models import Sum, Value, DecimalField
     from django.db.models.functions import Coalesce
+    from datetime import datetime as _datetime, date as _date
 
     user = request.user
     PLATFORM_START_YEAR = 2020
@@ -299,6 +300,7 @@ def profile_view(request):
         total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
     )["total"]
 
+    # Year-by-year status (raw, for grouping)
     years = list(range(PLATFORM_START_YEAR, current_year + 1))
     year_status = []
     for year in years:
@@ -307,6 +309,69 @@ def profile_view(request):
             "year": year,
             "status": "PAID" if payment else "OWED",
             "payment": payment,
+        })
+
+    # Group consecutive years with same status
+    year_status_grouped = []
+    if year_status:
+        current_group = {
+            "status": year_status[0]["status"],
+            "start_year": year_status[0]["year"],
+            "end_year": year_status[0]["year"],
+            "payment": year_status[0]["payment"],
+            "count": 1,
+        }
+        for ys in year_status[1:]:
+            if ys["status"] == current_group["status"]:
+                current_group["end_year"] = ys["year"]
+                current_group["count"] += 1
+                if ys["status"] == "PAID" and ys["payment"]:
+                    current_group["payment"] = ys["payment"]
+            else:
+                current_group["total_amount"] = current_group["count"] * YEARLY_DUES
+                year_status_grouped.append(current_group)
+                current_group = {
+                    "status": ys["status"],
+                    "start_year": ys["year"],
+                    "end_year": ys["year"],
+                    "payment": ys["payment"],
+                    "count": 1,
+                }
+        current_group["total_amount"] = current_group["count"] * YEARLY_DUES
+        year_status_grouped.append(current_group)
+
+    # Group dues by transaction (deposit-level)
+    dues_txns = DuesPaymentTransaction.objects.filter(
+        member=user
+    ).select_related("recorded_by").order_by("-payment_date")
+
+    dues_transactions_grouped = []
+    for txn in dues_txns:
+        dues_records = DuesPayment.objects.filter(
+            transactions=txn
+        ).values_list("year", flat=True).order_by("year")
+
+        years_list = list(dues_records)
+        if years_list:
+            if len(years_list) == 1:
+                year_display = str(years_list[0])
+                reason = f"Yearly Dues — {year_display}"
+            else:
+                year_display = f"{years_list[0]}–{years_list[-1]}"
+                has_prepaid = any(y > current_year for y in years_list)
+                prepaid_label = " (Prepaid)" if has_prepaid else ""
+                reason = f"Yearly Dues — {year_display}{prepaid_label}"
+        else:
+            reason = "Yearly Dues"
+
+        dues_transactions_grouped.append({
+            "transaction": txn,
+            "reason": reason,
+            "amount": txn.total_amount,
+            "recorded_by": txn.recorded_by,
+            "payment_date": txn.payment_date,
+            "years": years_list,
+            "is_prepaid": any(y > current_year for y in years_list) if years_list else False,
         })
 
     # --- DONATIONS DATA ---
@@ -323,18 +388,54 @@ def profile_view(request):
     # --- COMBINED CONTRIBUTIONS ---
     total_contributions = total_dues_paid + total_donations
 
-    # --- ALL PAYMENTS (for general history) ---
-    all_payments_qs = Income.objects.filter(
+    # --- ALL PAYMENTS (unified: grouped dues + other income) ---
+    all_payments_list = []
+
+    # 1) Grouped dues transactions
+    for item in dues_transactions_grouped:
+        payment_dt = item["payment_date"]
+        if isinstance(payment_dt, _date) and not isinstance(payment_dt, _datetime):
+            payment_dt = _datetime.combine(payment_dt, _datetime.min.time())
+        if payment_dt.tzinfo is None:
+            payment_dt = timezone.make_aware(payment_dt)
+
+        all_payments_list.append({
+            "type": "dues_grouped",
+            "created_at": payment_dt,
+            "date_display": item["payment_date"],
+            "reason": item["reason"],
+            "amount": item["amount"],
+            "recorded_by": item["recorded_by"],
+            "is_prepaid": item["is_prepaid"],
+            "income_type": "DUES",
+        })
+
+    # 2) Non-dues income
+    other_incomes = Income.objects.exclude(income_type="DUES").filter(
         Q(paid_by__icontains=user.full_name) |
         Q(paid_by__icontains=user.serial_number) |
         Q(created_by=user)
     ).select_related("created_by").order_by("-created_at")
 
-    payments_paginator = Paginator(all_payments_qs, 10)
+    for income in other_incomes:
+        all_payments_list.append({
+            "type": "income",
+            "created_at": income.created_at,
+            "date_display": income.created_at,
+            "reason": income.reason,
+            "amount": income.amount,
+            "recorded_by": income.created_by,
+            "income_type": income.income_type,
+        })
+
+    # Sort by date descending
+    all_payments_list.sort(key=lambda x: x["created_at"], reverse=True)
+
+    payments_paginator = Paginator(all_payments_list, 10)
     payments_page = request.GET.get("payments_page", 1)
     payments = payments_paginator.get_page(payments_page)
 
-    # Get recent notifications (global + personal)
+    # Notifications
     notifications = Notification.objects.filter(
         Q(recipient=user) | Q(is_global=True) | Q(recipient__isnull=True)
     ).order_by("-created_at")[:10]
@@ -350,10 +451,10 @@ def profile_view(request):
         "total_dues_paid": total_dues_paid,
         "total_donations": total_donations,
         "debt_info": debt_info,
-        "year_status": year_status,
+        "year_status_grouped": year_status_grouped,
         "yearly_dues": YEARLY_DUES,
         "current_year": current_year,
-        "dues_payments": dues_payments,
+        "dues_transactions_grouped": dues_transactions_grouped,
         "donations": donations_qs,
         "notifications": notifications,
         "profile_form": profile_form,
@@ -361,7 +462,7 @@ def profile_view(request):
         "currency_symbol": getattr(settings, "OYA_SETTINGS", {}).get("CURRENCY_SYMBOL", "₦"),
     }
     return render(request, "accounts/profile.html", context)
-
+    
 
 @login_required
 @require_POST
