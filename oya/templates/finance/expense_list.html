@@ -15,10 +15,6 @@
     <p style="font-size:clamp(0.75rem, 2vw, 0.875rem);">Track all association expenditures</p>
   </div>
   <div class="page-header-actions" style="flex-wrap:wrap;gap:0.5rem;">
-    <a href="{% url 'finance:finance_summary' %}" class="btn btn-secondary">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      Dashboard
-    </a>
     {% if user.has_executive_access %}
     <a href="{% url 'finance:expense_create' %}" class="btn btn-danger">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>

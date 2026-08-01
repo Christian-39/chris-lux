@@ -16,19 +16,6 @@
     </p>
   </div>
   <div class="page-header-actions" style="flex-wrap: wrap; gap: 0.5rem">
-    <a href="{% url 'finance:finance_summary' %}" class="btn btn-secondary">
-      <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <polyline points="9 18 15 12 9 6" />
-      </svg>
-      Dashboard
-    </a>
     {% if user.has_executive_access %}
     <a href="{% url 'finance:income_create' %}" class="btn btn-success">
       <svg

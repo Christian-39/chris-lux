@@ -311,7 +311,7 @@
       </div>
       <div class="kpi-card accent-success">
         <div class="kpi-value" style="color: var(--oya-success)">
-          &#x20A6;{{ total_raised_through_invitees|floatformat:2|intcomma }}
+          &#x20A6;{{ total_raised_through_invitees|floatformat:0|intcomma }}
         </div>
         <div class="kpi-label">Total Raised Through Invitees</div>
       </div>
@@ -348,7 +348,7 @@
             </td>
             <td>{{ donor.projects_supported }}</td>
             <td style="font-weight: 600">
-              &#x20A6;{{ donor.total_donations|floatformat:2|intcomma }}
+              &#x20A6;{{ donor.total_donations|floatformat:0|intcomma }}
             </td>
           </tr>
           {% endfor %}
@@ -385,7 +385,7 @@
       </div>
       <div class="kpi-card accent-success">
         <div class="kpi-value" style="color: var(--oya-success)">
-          &#x20A6;{{ total_personal_donations|floatformat:2|intcomma }}
+          &#x20A6;{{ total_personal_donations|floatformat:0|intcomma }}
         </div>
         <div class="kpi-label">Total Personal Donations</div>
       </div>
@@ -409,7 +409,7 @@
               <a href="{% url 'projects:project_detail' pk=d.project.pk %}">{{ d.project.title|truncatechars:30 }}</a>
             </td>
             <td style="font-weight: 600">
-              &#x20A6;{{ d.amount|floatformat:2|intcomma }}
+              &#x20A6;{{ d.amount|floatformat:0|intcomma }}
             </td>
             <td>{{ d.donation_date|date:"M d, Y" }}</td>
             <td>

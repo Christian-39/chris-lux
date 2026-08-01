@@ -161,9 +161,9 @@
                 <span style="color:var(--oya-text-muted);">—</span>
               {% endif %}
             </td>
-            <td class="text-end" style="white-space:nowrap;">&#8358;{{ handover.bank_balance|floatformat:2|intcomma }}</td>
-            <td class="text-end" style="white-space:nowrap;">&#8358;{{ handover.cash_balance|floatformat:2|intcomma }}</td>
-            <td class="text-end fw-bold" style="color:var(--oya-primary);white-space:nowrap;">&#8358;{{ handover.total_balance|floatformat:2|intcomma }}</td>
+            <td class="text-end" style="white-space:nowrap;">&#8358;{{ handover.bank_balance|floatformat:0|intcomma }}</td>
+            <td class="text-end" style="white-space:nowrap;">&#8358;{{ handover.cash_balance|floatformat:0|intcomma }}</td>
+            <td class="text-end fw-bold" style="color:var(--oya-primary);white-space:nowrap;">&#8358;{{ handover.total_balance|floatformat:0|intcomma }}</td>
             <td class="cell-muted" style="white-space:nowrap;">{{ handover.created_at|date:"M j, Y" }}</td>
           </tr>
           {% endfor %}

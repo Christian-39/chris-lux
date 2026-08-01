@@ -18,10 +18,6 @@
     <p style="color:var(--oya-text-secondary);">{{ handover.executive.post }} · {{ handover.tenure_start|date:"M j, Y" }} – {{ handover.tenure_end|date:"M j, Y" }}</p>
   </div>
   <div class="page-header-actions">
-    <a href="{% url 'elections:handover_list' %}" class="btn btn-secondary">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      Back
-    </a>
     {% if user.has_executive_access %}
     <a href="{% url 'elections:handover_update' handover.pk %}" class="btn btn-primary">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -66,39 +62,39 @@
       <div style="display:grid;gap:0.5rem;font-size:0.875rem;">
         <div style="display:flex;justify-content:space-between;">
           <span style="color:var(--oya-text-muted);">Total Income</span>
-          <strong style="color:var(--oya-success);">₦{{ handover.total_income|floatformat:2 }}</strong>
+          <strong style="color:var(--oya-success);">₦{{ handover.total_income|floatformat:0 }}</strong>
         </div>
         <div style="display:flex;justify-content:space-between;">
           <span style="color:var(--oya-text-muted);">Dues Collected</span>
-          <strong style="color:var(--oya-success);">₦{{ handover.total_dues|floatformat:2 }}</strong>
+          <strong style="color:var(--oya-success);">₦{{ handover.total_dues|floatformat:0 }}</strong>
         </div>
         <div style="display:flex;justify-content:space-between;">
           <span style="color:var(--oya-text-muted);">Project Donations</span>
-          <strong style="color:var(--oya-success);">₦{{ handover.total_donations|floatformat:2 }}</strong>
+          <strong style="color:var(--oya-success);">₦{{ handover.total_donations|floatformat:0 }}</strong>
         </div>
         <div style="display:flex;justify-content:space-between;">
           <span style="color:var(--oya-text-muted);">Taskforce Revenue</span>
-          <strong style="color:var(--oya-success);">₦{{ handover.taskforce_revenue|floatformat:2 }}</strong>
+          <strong style="color:var(--oya-success);">₦{{ handover.taskforce_revenue|floatformat:0 }}</strong>
         </div>
         <div style="border-top:1px solid var(--oya-border);padding-top:0.5rem;margin-top:0.25rem;display:flex;justify-content:space-between;">
           <span style="color:var(--oya-text-muted);"><strong>Total Revenue</strong></span>
-          <strong style="color:var(--oya-primary);">₦{{ handover.total_revenue|floatformat:2 }}</strong>
+          <strong style="color:var(--oya-primary);">₦{{ handover.total_revenue|floatformat:0 }}</strong>
         </div>
         <div style="display:flex;justify-content:space-between;">
           <span style="color:var(--oya-text-muted);">Total Expenses</span>
-          <strong style="color:var(--oya-danger);">₦{{ handover.total_expenses|floatformat:2 }}</strong>
+          <strong style="color:var(--oya-danger);">₦{{ handover.total_expenses|floatformat:0 }}</strong>
         </div>
         <div style="display:flex;justify-content:space-between;">
           <span style="color:var(--oya-text-muted);">Bank Balance</span>
-          <strong>₦{{ handover.bank_balance|floatformat:2 }}</strong>
+          <strong>₦{{ handover.bank_balance|floatformat:0 }}</strong>
         </div>
         <div style="display:flex;justify-content:space-between;">
           <span style="color:var(--oya-text-muted);">Cash Balance</span>
-          <strong>₦{{ handover.cash_balance|floatformat:2 }}</strong>
+          <strong>₦{{ handover.cash_balance|floatformat:0 }}</strong>
         </div>
         <div style="border-top:1px solid var(--oya-border);padding-top:0.5rem;margin-top:0.25rem;display:flex;justify-content:space-between;">
           <span style="color:var(--oya-text-muted);"><strong>Net Position</strong></span>
-          <strong style="color:var(--oya-primary);font-size:1.125rem;">₦{{ handover.net_financial_position|floatformat:2 }}</strong>
+          <strong style="color:var(--oya-primary);font-size:1.125rem;">₦{{ handover.net_financial_position|floatformat:0 }}</strong>
         </div>
       </div>
     </div>
@@ -258,11 +254,11 @@
       <div style="background:var(--oya-bg-secondary);padding:0.625rem;border-radius:0.375rem;margin-bottom:0.75rem;">
         <div style="display:flex;justify-content:space-between;font-size:0.8125rem;margin-bottom:0.25rem;">
           <span style="color:var(--oya-text-muted);">Target</span>
-          <strong>₦{{ item.project.target_amount|floatformat:2 }}</strong>
+          <strong>₦{{ item.project.target_amount|floatformat:0 }}</strong>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:0.8125rem;margin-bottom:0.25rem;">
           <span style="color:var(--oya-text-muted);">Raised (this regime)</span>
-          <strong style="color:var(--oya-success);">₦{{ item.donation_total|floatformat:2 }}</strong>
+          <strong style="color:var(--oya-success);">₦{{ item.donation_total|floatformat:0 }}</strong>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:0.8125rem;">
           <span style="color:var(--oya-text-muted);">Donors (this regime)</span>
@@ -279,14 +275,14 @@
           <span>
             {% if d.member %}{{ d.member.full_name }}{% elif d.outside_donor %}{{ d.outside_donor.full_name }}{% else %}Anonymous{% endif %}
           </span>
-          <strong>₦{{ d.amount|floatformat:2 }}</strong>
+          <strong>₦{{ d.amount|floatformat:0 }}</strong>
         </div>
         {% endfor %}
       </div>
       {% endif %}
     </div>
     <div class="card-footer" style="font-size:0.75rem;color:var(--oya-text-muted);">
-      Budget: ₦{{ item.project.budget|floatformat:2 }} · Progress: {{ item.project.progress_percentage }}%
+      Budget: ₦{{ item.project.budget|floatformat:0 }} · Progress: {{ item.project.progress_percentage }}%
     </div>
   </div>
   {% empty %}
@@ -312,7 +308,7 @@
             <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ inc.reason|default:"—" }}</div>
             <div style="color:var(--oya-text-muted);font-size:0.75rem;">{{ inc.get_income_type_display }} · {{ inc.created_at|date:"M j, Y" }}</div>
           </div>
-          <strong style="color:var(--oya-success);margin-left:0.5rem;">₦{{ inc.amount|floatformat:2 }}</strong>
+          <strong style="color:var(--oya-success);margin-left:0.5rem;">₦{{ inc.amount|floatformat:0 }}</strong>
         </div>
         {% endfor %}
       </div>
@@ -334,7 +330,7 @@
             <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ exp.description|truncatechars:40 }}</div>
             <div style="color:var(--oya-text-muted);font-size:0.75rem;">{{ exp.get_category_display }} · {{ exp.created_at|date:"M j, Y" }}</div>
           </div>
-          <strong style="color:var(--oya-danger);margin-left:0.5rem;">₦{{ exp.amount|floatformat:2 }}</strong>
+          <strong style="color:var(--oya-danger);margin-left:0.5rem;">₦{{ exp.amount|floatformat:0 }}</strong>
         </div>
         {% endfor %}
       </div>
@@ -356,7 +352,7 @@
             <div style="font-weight:600;">{{ due.member.get_full_name|default:due.member.full_name }}</div>
             <div style="color:var(--oya-text-muted);font-size:0.75rem;">Year {{ due.year }} · {{ due.created_at|date:"M j, Y" }}</div>
           </div>
-          <strong style="color:var(--oya-success);margin-left:0.5rem;">₦{{ due.amount_paid|floatformat:2 }}</strong>
+          <strong style="color:var(--oya-success);margin-left:0.5rem;">₦{{ due.amount_paid|floatformat:0 }}</strong>
         </div>
         {% endfor %}
       </div>

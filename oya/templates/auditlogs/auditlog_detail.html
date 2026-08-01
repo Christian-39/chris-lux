@@ -11,7 +11,7 @@
   <div class="detail-value">
     {% if log.user %}
       <strong>{{ log.user.full_name|default:log.user.serial_number }}</strong><br>
-      <span style="color:var(--oya-text-muted);font-size:0.75rem;">{{ log.user.serial_number }} &bull; {{ log.user.display_role|default:"" }}</span>    {% else %}
+      <span style="color:var(--oya-text-muted);font-size:0.75rem;">{{ log.user.serial_number }} &bull; {% if member.position %}{{ member.position }}{% else %}{{ user.get_role_display|default:"Member" }}{% endif %}</span>    {% else %}
       <span class="cell-muted">System / Anonymous</span>
     {% endif %}
   </div>

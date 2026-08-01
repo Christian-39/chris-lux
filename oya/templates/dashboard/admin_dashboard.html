@@ -76,7 +76,7 @@
         </svg>
       </div>
     </div>
-    <div class="kpi-value">&#x20A6;{{ total_project_donations|floatformat:2|intcomma }}</div>
+    <div class="kpi-value">&#x20A6;{{ total_project_donations|floatformat:0|intcomma }}</div>
     <div class="kpi-label">Total Project Donations</div>
   </div>
 
@@ -117,7 +117,7 @@
       </div>
     </div>
     <div class="kpi-value" style="color: var(--oya-warning)">
-      &#x20A6;{{ total_raised_through_invitees|floatformat:2|intcomma }}
+      &#x20A6;{{ total_raised_through_invitees|floatformat:0|intcomma }}
     </div>
     <div class="kpi-label">Raised Through Invitees</div>
   </div>

@@ -288,7 +288,7 @@
             <div class="activity-text" style="flex-wrap: wrap; gap: 0.25rem;">
               <strong>{{ transaction.member.get_full_name }}</strong>
               <span>—</span>
-              <strong>&#x20A6;{{ transaction.amount|floatformat:2|intcomma }}</strong>
+              <strong>&#x20A6;{{ transaction.amount|floatformat:0|intcomma }}</strong>
               <span>— {{ transaction.description }}</span>
               <span class="badge badge-warning" style="margin-left: 0.5rem">Yearly Dues</span>
               {% if transaction.is_prepaid %}
@@ -316,7 +316,7 @@
                 <strong>{{ transaction.paid_by }}</strong>
               {% endif %}
               <span>—</span>
-              <strong>&#x20A6;{{ transaction.amount|floatformat:2|intcomma }}</strong>
+              <strong>&#x20A6;{{ transaction.amount|floatformat:0|intcomma }}</strong>
               <span>— {{ transaction.reason }}</span>
               {% if transaction.income_type == "CASE_FINE" %}
               <span class="badge badge-case" style="margin-left: 0.5rem">Case Fine</span>
@@ -339,7 +339,7 @@
           </div>
           <div class="activity-content">
             <div class="activity-text" style="flex-wrap: wrap; gap: 0.25rem;">
-              <strong>&#x20A6;{{ transaction.amount|floatformat:2|intcomma }}</strong>
+              <strong>&#x20A6;{{ transaction.amount|floatformat:0|intcomma }}</strong>
               <span>— {{ transaction.description }}</span>
               {% if transaction.category %}
               <strong>({{ transaction.expense_object.get_category_display }})</strong>
@@ -360,7 +360,7 @@
             <div class="activity-text" style="flex-wrap: wrap; gap: 0.25rem;">
               <strong>{{ transaction.donor_name }}</strong>
               <span>—</span>
-              <strong>&#x20A6;{{ transaction.amount|floatformat:2|intcomma }}</strong>
+              <strong>&#x20A6;{{ transaction.amount|floatformat:0|intcomma }}</strong>
               <span>— {{ transaction.reason }}</span>
               <span class="badge badge-success" style="margin-left: 0.5rem">Project Donation</span>
             </div>
@@ -392,19 +392,19 @@
       <div class="dashboard-grid dashboard-grid-4" style="margin-bottom: 1rem">
         <div class="kpi-card">
           <div class="kpi-value">
-            &#x20A6;{{ total_project_donations|floatformat:2|intcomma }}
+            &#x20A6;{{ total_project_donations|floatformat:0|intcomma }}
           </div>
           <div class="kpi-label">Total Project Donations</div>
         </div>
         <div class="kpi-card accent-success">
           <div class="kpi-value" style="color: var(--oya-success)">
-            &#x20A6;{{ total_member_project_donations|floatformat:2|intcomma }}
+            &#x20A6;{{ total_member_project_donations|floatformat:0|intcomma }}
           </div>
           <div class="kpi-label">Member Donations</div>
         </div>
         <div class="kpi-card accent-info">
           <div class="kpi-value" style="color: var(--oya-info)">
-            &#x20A6;{{ total_outside_project_donations|floatformat:2|intcomma }}
+            &#x20A6;{{ total_outside_project_donations|floatformat:0|intcomma }}
           </div>
           <div class="kpi-label">Outside Donor Donations</div>
         </div>
@@ -438,7 +438,7 @@
               <td>{{ p.project__title }}</td>
               <td>{{ p.count }}</td>
               <td style="font-weight: 600">
-                &#x20A6;{{ p.total|floatformat:2|intcomma }}
+                &#x20A6;{{ p.total|floatformat:0|intcomma }}
               </td>
             </tr>
             {% endfor %}
@@ -473,7 +473,7 @@
             font-weight: 600;
           "
         >
-          &#x20A6;{{ highest_fundraising_project.total|floatformat:2|intcomma }}
+          &#x20A6;{{ highest_fundraising_project.total|floatformat:0|intcomma }}
         </div>
       </div>
       {% endif %}

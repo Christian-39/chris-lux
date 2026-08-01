@@ -10,7 +10,7 @@
         Welcome back, {% if user.get_full_name %}{{ user.get_full_name|title }}{% else %}Administrator{% endif %}
       </h2>
       <p style="color:rgba(255,255,255,0.75);font-size:clamp(0.8125rem,3vw,0.9375rem);">
-        Here's what's happening with {{ association_name|default:"OKPO Youths Association" }} today.
+        Here's what's happening in {{ association_name|default:"OKPO Youths Association" }} today.
       </p>
     </div>
     {% if user.has_executive_access %}

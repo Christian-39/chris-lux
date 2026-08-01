@@ -29,7 +29,7 @@
       <h2 style="font-size:1.25rem;margin-bottom:0.5rem;color:var(--oya-danger);">Confirm Deletion</h2>
       <p style="color:var(--oya-text-secondary);margin-bottom:1.5rem;">
         You are about to permanently delete the donation of
-        <strong style="color:var(--oya-text-primary);">&#x20A6;{{ donation.amount|floatformat:2 }}</strong>
+        <strong style="color:var(--oya-text-primary);">&#x20A6;{{ donation.amount|floatformat:0 }}</strong>
         for <strong style="color:var(--oya-text-primary);">{{ donation.project.title }}</strong>.
         This action cannot be undone and will update the project fundraising totals.
       </p>
@@ -38,7 +38,7 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;font-size:0.875rem;">
           <div>
             <span style="color:var(--oya-text-muted);display:block;font-size:0.75rem;">Amount</span>
-            <span style="color:var(--oya-text-primary);font-weight:500;">&#x20A6;{{ donation.amount|floatformat:2 }}</span>
+            <span style="color:var(--oya-text-primary);font-weight:500;">&#x20A6;{{ donation.amount|floatformat:0 }}</span>
           </div>
           <div>
             <span style="color:var(--oya-text-muted);display:block;font-size:0.75rem;">Project</span>

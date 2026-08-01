@@ -32,21 +32,21 @@
     <div class="kpi-header">
       <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
     </div>
-    <div class="kpi-value">{{ total_donations|floatformat:2|intcomma }}</div>
+    <div class="kpi-value">{{ total_donations|floatformat:0|intcomma }}</div>
     <div class="kpi-label">Total Donations</div>
   </div>
   <div class="kpi-card accent-success">
     <div class="kpi-header">
       <div class="kpi-icon" style="background:var(--oya-success-bg);color:var(--oya-success);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
     </div>
-    <div class="kpi-value" style="color:var(--oya-success);">{{ member_total|floatformat:2|intcomma }}</div>
+    <div class="kpi-value" style="color:var(--oya-success);">{{ member_total|floatformat:0|intcomma }}</div>
     <div class="kpi-label">Member Donations</div>
   </div>
   <div class="kpi-card accent-info">
     <div class="kpi-header">
       <div class="kpi-icon" style="background:var(--oya-info-bg);color:var(--oya-info);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
     </div>
-    <div class="kpi-value" style="color:var(--oya-info);">{{ outside_total|floatformat:2|intcomma }}</div>
+    <div class="kpi-value" style="color:var(--oya-info);">{{ outside_total|floatformat:0|intcomma }}</div>
     <div class="kpi-label">Outside Donations</div>
   </div>
   <div class="kpi-card accent-warning">
@@ -151,7 +151,7 @@
               <span class="badge badge-info">Outside</span>
             {% endif %}
           </td>
-          <td style="font-weight:600;white-space:nowrap;">&#x20A6;{{ donation.amount|floatformat:2|intcomma }}</td>
+          <td style="font-weight:600;white-space:nowrap;">&#x20A6;{{ donation.amount|floatformat:0|intcomma }}</td>
           <td style="white-space:nowrap;"><span class="cell-muted">{{ donation.get_payment_method_display }}</span></td>
           <td style="white-space:nowrap;">
             {% if donation.status == "CONFIRMED" %}

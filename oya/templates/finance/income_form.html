@@ -14,13 +14,6 @@
           <h1 class="form-main-title mb-1">{{ title }}</h1>
           <p class="text-muted small mb-0 d-none d-sm-block">Record revenue records directly to active profile tracking channels</p>
         </div>
-        <div class="page-header-actions">
-          <a href="{% url 'finance:donation_list' %}" class="btn btn-back-custom d-flex align-items-center gap-1">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-            <span class="d-none d-sm-inline">Back to Contributions</span>
-            <span class="d-inline d-sm-none">Back</span>
-          </a>
-        </div>
       </div>
 
       {% if messages %}
@@ -106,7 +99,7 @@
                           data-reason="Case Fine — {{ case.case_number }}: {{ case.title }}"
                           data-payer="{{ case.respondent.full_name }}"
                           {% if form.case.value|stringformat:"s" == case.pk|stringformat:"s" %}selected{% endif %}>
-                    {{ case.case_number }} — {{ case.title }} (&#8358;{{ case.fine_amount|floatformat:2 }})
+                    {{ case.case_number }} — {{ case.title }} (&#8358;{{ case.fine_amount|floatformat:0 }})
                   </option>
                   {% endfor %}
                 </select>

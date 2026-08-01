@@ -32,9 +32,6 @@
           <h2 class="fw-bold mb-0" style="color:var(--oya-primary);"><i class="bi bi-receipt me-2"></i>Expense Detail</h2>
         </div>
         <div class="d-flex gap-2">
-          <a href="{% url 'finance:expense_list' %}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Back
-          </a>
           {% if user.has_admin_access %}
           <a href="{% url 'finance:expense_delete' expense.pk %}" class="btn btn-outline-danger">
             <i class="bi bi-trash me-1"></i> Delete

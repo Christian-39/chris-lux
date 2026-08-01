@@ -150,7 +150,7 @@
       <div class="dashboard-grid dashboard-grid-2" style="margin-bottom: 1rem">
         <div class="kpi-card">
           <div class="kpi-value">
-            &#x20A6;{{ donor.total_donations|floatformat:2|intcomma }}
+            &#x20A6;{{ donor.total_donations|floatformat:0|intcomma }}
           </div>
           <div class="kpi-label">Total Donated</div>
         </div>
@@ -270,7 +270,7 @@
               >
             </td>
             <td style="font-weight: 600">
-              &#x20A6;{{ d.amount|floatformat:2|intcomma }}
+              &#x20A6;{{ d.amount|floatformat:0|intcomma }}
             </td>
             <td>
               <span class="cell-muted">{{ d.get_payment_method_display }}</span>
