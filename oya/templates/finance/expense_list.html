@@ -235,21 +235,18 @@
 <style>
   .treasury-alert { background: linear-gradient(135deg, var(--oya-primary) 0%, var(--oya-primary-dark, #16213e) 100%); color: #fff; border-radius: 12px; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
   .treasury-label { font-size: 0.75rem; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.5px; }
-  .treasury-value { font-size: 1.75rem; font-weight: 700; }
+  .treasury-value { font-weight: 700; }
   .treasury-alert-right { display: flex; gap: 2rem; }
   .treasury-stat { text-align: center; }
   .treasury-stat-label { font-size: 0.75rem; opacity: 0.75; }
-  .treasury-stat-value { font-size: 1.1rem; font-weight: 600; }
+  .treasury-stat-value { font-weight: 600; }
   .badge-category { background: var(--oya-surface-hover); color: var(--oya-text); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; border: 1px solid var(--oya-border); }
   @media (max-width: 768px) {
     .treasury-alert { flex-direction: column; align-items: flex-start; }
     .treasury-alert-right { width: 100%; justify-content: space-between; gap: 1rem; }
-    .dashboard-grid-4 { grid-template-columns: 1fr 1fr !important; }
   }
   @media (max-width: 480px) {
-    .dashboard-grid-4 { grid-template-columns: 1fr !important; }
     .treasury-alert-right { gap: 0.75rem; }
-    .treasury-value { font-size: 1.4rem; }
   }
 </style>
 {% endblock %}
