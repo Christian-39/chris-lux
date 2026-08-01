@@ -3,385 +3,172 @@
 {% load static %}
 
 {% block title %}{{ title }} — OYA Finance{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block breadcrumb %}Finance{% endblock %}
 
 {% block content %}
-<div class="container py-3 py-md-4">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
 
-      <div class="page-header d-flex align-items-center justify-content-between mb-4 px-1">
-        <div class="page-header-left">
-          <h1 class="form-main-title mb-1">{{ title }}</h1>
-          <p class="text-muted small mb-0 d-none d-sm-block">Record revenue records directly to active profile tracking channels</p>
-        </div>
-      </div>
-
-      {% if messages %}
-      <div class="mb-3 px-1">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show custom-alert" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      {% if form.non_field_errors %}
-      <div class="alert alert-danger mb-3 custom-alert mx-1">
-        {% for error in form.non_field_errors %}
-        <div>{{ error }}</div>
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      <div class="custom-form-card shadow-sm">
-        <div class="card-body p-3 p-sm-4">
-          <form method="post" id="incomeForm" novalidate>
-            {% csrf_token %}
-
-            <div class="form-group-wrapper mb-3">
-              <label class="form-label custom-label">Select Association Member</label>
-              <div class="input-group custom-input-group">
-                <span class="input-group-text"><i class="bi bi-people"></i></span>
-                {{ form.member }}
-              </div>
-              <div class="custom-form-text">Click to open choices panel containing all active member accounts.</div>
-              {% if form.member.errors %}
-              <div class="invalid-feedback d-block">{{ form.member.errors.0 }}</div>
-              {% endif %}
-            </div>
-
-            <div class="form-group-wrapper mb-4">
-              <label class="form-label custom-label">Payer / Contributor Name <span class="text-danger">*</span></label>
-              <div class="custom-input-container">
-                {{ form.paid_by }}
-              </div>
-              <div class="custom-form-text">Auto-populates upon selecting a member, or type a custom name manually.</div>
-              {% if form.paid_by.errors %}
-              <div class="invalid-feedback d-block">{{ form.paid_by.errors.0 }}</div>
-              {% endif %}
-            </div>
-
-            <div class="custom-divider my-4"></div>
-
-            <div class="row g-3 mb-4">
-              <div class="col-12 col-md-6 form-group-wrapper">
-                <label class="form-label custom-label">Income Allocation Type <span class="text-danger">*</span></label>
-                <div class="custom-input-container">
-                  {{ form.income_type }}
-                </div>
-                {% if form.income_type.errors %}
-                <div class="invalid-feedback d-block">{{ form.income_type.errors.0 }}</div>
-                {% endif %}
-              </div>
-              <div class="col-12 col-md-6 form-group-wrapper">
-                <label class="form-label custom-label">Payment Amount <span class="text-danger">*</span></label>
-                <div class="input-group custom-input-group amount-group">
-                  <span class="input-group-text currency-symbol">&#8358;</span>
-                  {{ form.amount }}
-                </div>
-                {% if form.amount.errors %}
-                <div class="invalid-feedback d-block">{{ form.amount.errors.0 }}</div>
-                {% endif %}
-              </div>
-            </div>
-
-            <!-- NEW: Case selector (only visible for Case Fine) -->
-            <div class="form-group-wrapper mb-4" id="caseFieldGroup" style="display:none;">
-              <label class="form-label custom-label">Related Case <span class="text-danger">*</span></label>
-              <div class="custom-input-container">
-                <select name="case" class="form-select" id="id_case">
-                  <option value="">--------- Select Resolved Case ---------</option>
-                  {% for case in form.case.field.queryset %}
-                  <option value="{{ case.pk }}"
-                          data-amount="{{ case.fine_amount }}"
-                          data-reason="Case Fine — {{ case.case_number }}: {{ case.title }}"
-                          data-payer="{{ case.respondent.full_name }}"
-                          {% if form.case.value|stringformat:"s" == case.pk|stringformat:"s" %}selected{% endif %}>
-                    {{ case.case_number }} — {{ case.title }} (&#8358;{{ case.fine_amount|floatformat:0 }})
-                  </option>
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="custom-form-text">Select the resolved case this fine was collected from.</div>
-              {% if form.case.errors %}
-              <div class="invalid-feedback d-block">{{ form.case.errors.0 }}</div>
-              {% endif %}
-            </div>
-
-            <div class="form-group-wrapper mb-4">
-              <label class="form-label custom-label">Payment Reason / Description <span class="text-danger">*</span></label>
-              <div class="custom-input-container">
-                {{ form.reason }}
-              </div>
-              {% if form.reason.errors %}
-              <div class="invalid-feedback d-block">{{ form.reason.errors.0 }}</div>
-              {% endif %}
-
-              {% if common_reasons %}
-              <div class="mt-3">
-                <span class="quick-reason-title d-block mb-2">Quick suggestions:</span>
-                <div class="quick-reason-flex-wrapper">
-                  {% for r in common_reasons %}
-                  <button type="button" class="btn quick-reason-badge" data-reason="{{ r }}">{{ r }}</button>
-                  {% endfor %}
-                </div>
-              </div>
-              {% endif %}
-            </div>
-
-            <div class="action-buttons-layout-container pt-2">
-              <button type="submit" class="btn btn-primary-custom" id="submitBtn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                {{ action }}
-              </button>
-              <a href="{% url 'finance:donation_list' %}" class="btn btn-light-custom">Cancel</a>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+<!-- Page Header -->
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 style="font-size:clamp(1.125rem, 3vw, 1.5rem);">{{ title }}</h1>
+    <p>Record revenue records directly to active profile tracking channels</p>
+  </div>
+  <div class="page-header-actions" style="flex-wrap:wrap;gap:0.5rem;">
+    <a href="{% url 'finance:donation_list' %}" class="btn btn-secondary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Cancel
+    </a>
   </div>
 </div>
+
+{% if messages %}
+<div class="mb-3">
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if form.non_field_errors %}
+<div class="alert alert-danger mb-3">
+  {% for error in form.non_field_errors %}
+  <div>{{ error }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<form method="post" id="incomeForm" novalidate style="max-width:min(900px, 100%);">
+  {% csrf_token %}
+
+  <!-- Contributor Information -->
+  <div class="card" style="margin-bottom:clamp(0.625rem, 2.5vw, 1.25rem);">
+    <div class="card-header">
+      <div class="card-header-title" style="font-size:clamp(0.9375rem, 2.5vw, 1rem);">Contributor Information</div>
+    </div>
+    <div class="card-body">
+
+      <!-- Row 1: Member & Payer -->
+      <div class="form-row" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr));gap:1rem;margin-bottom:1rem;">
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Select Association Member</label>
+          {{ form.member }}
+          <div style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);color:var(--oya-text-muted);margin-top:0.25rem;">Click to open choices panel containing all active member accounts.</div>
+          {% if form.member.errors %}
+            <div class="form-error">{{ form.member.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Payer / Contributor Name <span style="color:var(--oya-danger);">*</span></label>
+          {{ form.paid_by }}
+          <div style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);color:var(--oya-text-muted);margin-top:0.25rem;">Auto-populates upon selecting a member, or type a custom name manually.</div>
+          {% if form.paid_by.errors %}
+            <div class="form-error">{{ form.paid_by.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Payment Details -->
+  <div class="card" style="margin-bottom:clamp(0.625rem, 2.5vw, 1.25rem);">
+    <div class="card-header">
+      <div class="card-header-title" style="font-size:clamp(0.9375rem, 2.5vw, 1rem);">Payment Details</div>
+    </div>
+    <div class="card-body">
+
+      <!-- Row 1: Income Type & Amount -->
+      <div class="form-row" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr));gap:1rem;margin-bottom:1rem;">
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Income Allocation Type <span style="color:var(--oya-danger);">*</span></label>
+          {{ form.income_type }}
+          {% if form.income_type.errors %}
+            <div class="form-error">{{ form.income_type.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Payment Amount <span style="color:var(--oya-danger);">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text">&#8358;</span>
+            {{ form.amount }}
+          </div>
+          {% if form.amount.errors %}
+            <div class="form-error">{{ form.amount.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Case Selector (only visible for Case Fine) -->
+      <div class="form-group" id="caseFieldGroup" style="display:none;margin-bottom:1rem;">
+        <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Related Case <span style="color:var(--oya-danger);">*</span></label>
+        <select name="case" class="form-select" id="id_case">
+          <option value="">--------- Select Resolved Case ---------</option>
+          {% for case in form.case.field.queryset %}
+          <option value="{{ case.pk }}"
+                  data-amount="{{ case.fine_amount }}"
+                  data-reason="Case Fine — {{ case.case_number }}: {{ case.title }}"
+                  data-payer="{{ case.respondent.full_name }}"
+                  {% if form.case.value|stringformat:"s" == case.pk|stringformat:"s" %}selected{% endif %}>
+            {{ case.case_number }} — {{ case.title }} (&#8358;{{ case.fine_amount|floatformat:0 }})
+          </option>
+          {% endfor %}
+        </select>
+        <div style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);color:var(--oya-text-muted);margin-top:0.25rem;">Select the resolved case this fine was collected from.</div>
+        {% if form.case.errors %}
+          <div class="form-error">{{ form.case.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Reason / Description -->
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label" style="font-size:clamp(0.8125rem, 2vw, 0.875rem);">Payment Reason / Description <span style="color:var(--oya-danger);">*</span></label>
+        {{ form.reason }}
+        {% if form.reason.errors %}
+          <div class="form-error">{{ form.reason.errors.0 }}</div>
+        {% endif %}
+
+        {% if common_reasons %}
+        <div class="mt-3">
+          <span style="font-size:clamp(0.625rem, 1.5vw, 0.75rem);font-weight:600;color:var(--oya-text-muted);text-transform:uppercase;letter-spacing:0.03em;display:block;margin-bottom:0.5rem;">Quick suggestions:</span>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            {% for r in common_reasons %}
+            <button type="button" class="btn quick-reason-badge" data-reason="{{ r }}" style="background:var(--oya-surface);border:1px solid var(--oya-border);color:var(--oya-text);padding:0.4rem 0.75rem;font-size:0.825rem;font-weight:500;border-radius:20px;transition:all 0.15s ease;">{{ r }}</button>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Form Actions -->
+  <div style="display:flex;gap:0.75rem;justify-content:flex-end;flex-wrap:wrap;padding:1rem 0;">
+    <a href="{% url 'finance:donation_list' %}" class="btn btn-secondary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Cancel
+    </a>
+    <button type="submit" class="btn btn-primary" id="submitBtn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      {{ action }}
+    </button>
+  </div>
+
+</form>
+
 {% endblock %}
 
 {% block extra_css %}
 <style>
-  /* Variables Fallback Support */
-  :root {
-    --primary-brand: var(--oya-primary, #0d6efd);
-    --bg-card: var(--oya-card, #ffffff);
-    --border-color: var(--oya-border, #e2e8f0);
-    --surface-bg: var(--oya-surface, #f8fafc);
-    --text-main: var(--oya-text, #1e293b83);
-    --text-muted-custom: var(--oya-text-muted, #64748b);
-  }
-
-  /* Form Header Enhancements */
-  .form-main-title {
-    font-size: clamp(1.25rem, 4vw, 1.65rem);
-    font-weight: 700;
-    color: var(--text-main);
-    letter-spacing: -0.025em;
-  }
-
-  .btn-back-custom {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-muted-custom);
-    padding: 0.45rem 0.85rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-  }
-  .btn-back-custom:hover {
-    background: var(--surface-bg);
-    color: var(--text-main);
-  }
-
-  /* Core Card Overhauls */
-  .custom-form-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    overflow: hidden;
-  }
-
-  /* Labels and Info Notes */
-  .custom-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-main);
-    margin-bottom: 0.5rem;
-    display: block;
-  }
-
-  .custom-form-text {
-    font-size: 0.785rem;
-    color: var(--text-muted-custom);
-    margin-top: 0.4rem;
-    padding-left: 2px;
-    line-height: 1.35;
-  }
-
-  /* Input and Selection Form Elements Modernization */
-  .form-control, .form-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    font-size: 1rem !important;
-    padding: 0.65rem 0.9rem;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-    background-color: var(--bg-card);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    width: 100%;
-  }
-
-  .form-select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 0.9rem center;
-    background-size: 14px 14px;
-    padding-right: 2.5rem;
-  }
-
-  .form-control:focus, .form-select:focus {
-    border-color: var(--primary-brand);
-    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
-    outline: 0;
-    background-color: var(--bg-card);
-  }
-
-  /* Elegant Input Group Integration */
-  .custom-input-group {
-    border-radius: 10px;
-    position: relative;
-    display: flex;
-    align-items: stretch;
-    width: 100%;
-  }
-  
-  .custom-input-group .input-group-text {
-    background-color: var(--surface-bg);
-    border: 1px solid var(--border-color);
-    border-right: none;
-    color: var(--text-muted-custom);
-    padding: 0.65rem 0.9rem;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-    display: flex;
-    align-items: center;
-  }
-
-  .custom-input-group .form-control, 
-  .custom-input-group .form-select {
-    border-top-left-radius: 0 !important;
-    border-bottom-left-radius: 0 !important;
-    flex: 1 1 auto;
-    width: 1%;
-  }
-
-  /* Currency Field Emphasis */
-  .amount-group .form-control {
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: var(--text-main);
-  }
-  .currency-symbol {
-    font-weight: 600;
-    color: var(--text-main) !important;
-  }
-
-  /* Native divider design layout */
-  .custom-divider {
-    height: 1px;
-    background: linear-gradient(to right, rgba(226, 232, 240, 0.2), var(--border-color), rgba(226, 232, 240, 0.2));
-  }
-
-  /* Quick Suggestion Badge Wrappers */
-  .quick-reason-title {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-muted-custom);
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-  }
-
-  .quick-reason-flex-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .quick-reason-badge {
-    background: var(--surface-bg);
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-    padding: 0.4rem 0.75rem;
-    font-size: 0.825rem;
-    font-weight: 500;
-    border-radius: 20px;
-    transition: all 0.15s ease;
-  }
-  .quick-reason-badge:hover, .quick-reason-badge:active {
-    background: var(--primary-brand) !important;
+  .quick-reason-badge:hover,
+  .quick-reason-badge:active {
+    background: var(--oya-primary) !important;
     color: #ffffff !important;
-    border-color: var(--primary-brand);
-  }
-
-  /* Custom Clean Alert Styling */
-  .custom-alert {
-    border-radius: 10px;
-    font-size: 0.875rem;
-    border: none;
-  }
-
-  /* Dynamic Flexible Responsive Button Layout Grid Rules */
-  .action-buttons-layout-container {
-    display: flex;
-    gap: 10px;
-  }
-
-  .btn-primary-custom, .btn-light-custom {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
-    font-size: 0.95rem;
-    border-radius: 10px;
-    transition: all 0.2s ease;
-    border: none;
-  }
-
-  .btn-primary-custom {
-    background: var(--primary-brand);
-    color: #ffffff;
-    flex: 2;
-  }
-  .btn-primary-custom:hover {
-    opacity: 0.92;
-  }
-
-  .btn-light-custom {
-    background: var(--surface-bg);
-    color: var(--text-main);
-    border: 1px solid var(--border-color);
-    flex: 1;
-  }
-  .btn-light-custom:hover {
-    background: #edf2f7;
-  }
-
-  @media (max-width: 575.98px) {
-    .container {
-      padding-left: 12px;
-      padding-right: 12px;
-    }
-    .card-body {
-      padding: 1.15rem 0.95rem !important;
-    }
-    .action-buttons-layout-container {
-      flex-direction: column;
-      gap: 8px;
-    }
-    .btn-primary-custom, .btn-light-custom {
-      width: 100%;
-      flex: none;
-      padding: 0.8rem 1.2rem;
-    }
-    .btn-light-custom {
-      order: 2;
-    }
-    .btn-primary-custom {
-      order: 1;
-    }
+    border-color: var(--oya-primary) !important;
   }
 </style>
 {% endblock %}
@@ -422,7 +209,7 @@
     });
   });
 
-  // NEW: Toggle case field based on income type
+  // Toggle case field based on income type
   function toggleCaseField() {
     if (incomeTypeSelect && incomeTypeSelect.value === 'CASE_FINE') {
       if (caseFieldGroup) caseFieldGroup.style.display = 'block';
@@ -446,7 +233,7 @@
     toggleCaseField();
   }
 
-  // NEW: Auto-fill amount, reason, paid_by from selected case
+  // Auto-fill amount, reason, paid_by from selected case
   function fillFromCase() {
     if (!caseSelect || caseSelect.selectedIndex <= 0) return;
     const option = caseSelect.options[caseSelect.selectedIndex];
