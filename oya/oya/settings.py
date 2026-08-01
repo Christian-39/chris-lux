@@ -100,6 +100,8 @@ DATABASES = {
         "PASSWORD": config("DB_PASSWORD", default=""),
         "HOST": config("DB_HOST", default=""),
         "PORT": config("DB_PORT", default=""),
+        "CONN_MAX_AGE": 60,
+        "CONN_HEALTH_CHECKS": True,
         "OPTIONS": {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
         }
@@ -169,7 +171,7 @@ AWS_S3_ENDPOINT_URL = config("B2_ENDPOINT_URL", default="https://s3.us-east-005.
 AWS_S3_ADDRESSING_STYLE = "virtual"
 AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_QUERYSTRING_AUTH = False
-AWS_DEFAULT_ACL = "public-read"  # Must match bucket's public ACL
+AWS_DEFAULT_ACL = "public-read"
 AWS_S3_FILE_OVERWRITE = True
 
 # Media URL
@@ -201,6 +203,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Session settings
 SESSION_COOKIE_AGE = 86400
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+if DEBUG:
+    SESSION_ENGINE = "django.contrib.sessions.backends.db"
+else:
+    SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+    SESSION_CACHE_ALIAS = "default"
 
 # Login settings
 LOGIN_URL = "/accounts/login/"
@@ -266,14 +274,28 @@ LOGGING = {
     },
 }
 
-# Cache settings
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        "LOCATION": "oya-cache",
-        "TIMEOUT": 300,
+# Cache settings — Redis in production, LocMemCache locally (no Redis server needed)
+if DEBUG:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "oya-local-cache",
+            "TIMEOUT": 300,
+        }
     }
-}
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": config("REDIS_URL", default="redis://localhost:6379/1"),
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "SOCKET_CONNECT_TIMEOUT": 5,
+                "SOCKET_TIMEOUT": 5,
+            },
+            "TIMEOUT": 300,
+        }
+    }
 
 # Celery settings
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://localhost:6379/0")

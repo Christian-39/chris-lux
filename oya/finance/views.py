@@ -485,15 +485,24 @@ def income_list(request):
         donation_qs = donation_qs.filter(created_at__date__lte=date_to)
         dues_txns_qs = dues_txns_qs.filter(payment_date__lte=date_to)
 
+    from django.db.models import Prefetch
+
     # Build grouped dues data for display
     current_year = timezone.now().year
-    dues_grouped = []
-    for txn in dues_txns_qs:
-        dues_records = DuesPayment.objects.filter(
-            transactions=txn
-        ).values_list("year", flat=True).order_by("year")
 
-        years_list = list(dues_records)
+    # Prefetch related DuesPayment records to eliminate N+1 queries
+    dues_txns_qs = dues_txns_qs.prefetch_related(
+        Prefetch("dues_allocations", queryset=DuesPayment.objects.order_by("year"))
+    )
+
+    # Paginate the QUERYSET first — only 10 rows hit the loop
+    dues_paginator = Paginator(dues_txns_qs, 10)
+    dues_page_num = request.GET.get("dues_page", 1)
+    dues_page = dues_paginator.get_page(dues_page_num)
+
+    dues_grouped = []
+    for txn in dues_page.object_list:
+        years_list = [dp.year for dp in txn.dues_allocations.all()]
         if years_list:
             if len(years_list) == 1:
                 year_display = str(years_list[0])
@@ -517,10 +526,9 @@ def income_list(request):
             "is_prepaid": any(y > current_year for y in years_list) if years_list else False,
         })
 
-    # Pagination for DUES (grouped transactions)
-    dues_paginator = Paginator(dues_grouped, 10)
-    dues_page = request.GET.get("dues_page", 1)
-    dues_incomes = dues_paginator.get_page(dues_page)
+    # Swap the page's raw objects with the enriched dicts — zero template changes needed
+    dues_page.object_list = dues_grouped
+    dues_incomes = dues_page
 
     # Pagination for DONATIONS
     donation_paginator = Paginator(donation_qs, 10)
