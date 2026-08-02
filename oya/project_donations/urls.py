@@ -27,6 +27,15 @@ urlpatterns = [
     path("reports/member/<int:pk>/", views.member_donation_history_pdf, name="member_donation_history"),
     path("reports/history/", views.donation_history_report, name="donation_history_report"),
 
+    # Pledges
+    path("pledges/", views.pledge_list, name="pledge_list"),
+    path("pledges/create/", views.pledge_create, name="pledge_create"),
+    path("pledges/<int:pk>/", views.pledge_detail, name="pledge_detail"),
+    path("pledges/<int:pk>/update/", views.pledge_update, name="pledge_update"),
+    path("pledges/<int:pk>/delete/", views.pledge_delete, name="pledge_delete"),
+    path("pledges/<int:pk>/payments/create/", views.pledge_payment_create, name="pledge_payment_create"),
+    path("pledges/<int:pk>/payments/<int:payment_pk>/delete/", views.pledge_payment_delete, name="pledge_payment_delete"),
+
     # AJAX
     path("api/search-outside-donors/", views.search_outside_donors_ajax, name="search_outside_donors_ajax"),
     path("api/donor-inviter/", views.get_outside_donor_inviter_ajax, name="get_donor_inviter_ajax"),

@@ -14,8 +14,9 @@ from django.db import transaction
 from django.utils import timezone
 from auditlogs.services import log_action
 from projects.models import Project
-from .models import OutsideDonor, Donation
-from .forms import OutsideDonorForm, DonationForm
+from settingsapp.models import DonationGroup, DonationGroupMembership
+from .models import OutsideDonor, Donation, Pledge, PledgePayment
+from .forms import OutsideDonorForm, DonationForm, PledgeForm, PledgePaymentForm
 from .reports import (
     generate_project_fundraising_report,
     generate_donation_history_report,
@@ -218,6 +219,39 @@ def donation_list(request):
     if donor_type_filter:
         queryset = queryset.filter(donor_type=donor_type_filter)
 
+    donation_type_filter = request.GET.get("donation_type", "")
+    if donation_type_filter:
+        queryset = queryset.filter(donation_type=donation_type_filter)
+
+    group_filter = request.GET.get("group", "")
+    if group_filter:
+        member_ids = DonationGroupMembership.objects.filter(
+            group_id=group_filter
+        ).values_list("member_id", flat=True)
+        queryset = queryset.filter(member_id__in=member_ids)
+
+    amount_min = request.GET.get("amount_min", "")
+    if amount_min:
+        try:
+            queryset = queryset.filter(amount__gte=Decimal(amount_min))
+        except Exception:
+            pass
+
+    amount_max = request.GET.get("amount_max", "")
+    if amount_max:
+        try:
+            queryset = queryset.filter(amount__lte=Decimal(amount_max))
+        except Exception:
+            pass
+
+    date_from = request.GET.get("date_from", "")
+    if date_from:
+        queryset = queryset.filter(donation_date__gte=date_from)
+
+    date_to = request.GET.get("date_to", "")
+    if date_to:
+        queryset = queryset.filter(donation_date__lte=date_to)
+
     status_filter = request.GET.get("status", "")
     if status_filter:
         queryset = queryset.filter(status=status_filter)
@@ -247,13 +281,21 @@ def donation_list(request):
         "search_term": search_term,
         "project_filter": project_filter,
         "donor_type_filter": donor_type_filter,
+        "donation_type_filter": donation_type_filter,
+        "group_filter": group_filter,
+        "amount_min": amount_min,
+        "amount_max": amount_max,
+        "date_from": date_from,
+        "date_to": date_to,
         "status_filter": status_filter,
         "donor_type_choices": Donation.DONOR_TYPE_CHOICES,
+        "donation_type_choices": Donation.DONATION_TYPE_CHOICES,
         "status_choices": Donation.STATUS_CHOICES,
         "total_donations": total_donations,
         "member_total": member_total,
         "outside_total": outside_total,
         "fundraising_projects": Project.objects.filter(enable_fundraising=True).order_by("-created_at"),
+        "donation_groups": DonationGroup.objects.filter(is_active=True).order_by("name"),
     }
     return render(request, "project_donations/donation_list.html", context)
 
@@ -493,3 +535,246 @@ def get_outside_donor_inviter_ajax(request):
         })
     except OutsideDonor.DoesNotExist:
         return JsonResponse({"invited_by_id": None})
+
+
+# ============================================================
+# PLEDGES (Feature 6, 7, 9)
+# ============================================================
+
+@login_required
+def pledge_list(request):
+    """List all pledges with search, filter (status/overdue), and pagination (Feature 9)."""
+    queryset = Pledge.objects.select_related("member", "project", "created_by").all()
+
+    search_term = request.GET.get("search", "")
+    if search_term:
+        queryset = queryset.filter(
+            Q(member__full_name__icontains=search_term) |
+            Q(member__serial_number__icontains=search_term) |
+            Q(project__title__icontains=search_term)
+        )
+
+    status_filter = request.GET.get("status", "")
+    if status_filter == "OVERDUE":
+        queryset = queryset.filter(
+            due_date__lt=timezone.now().date()
+        ).exclude(status__in=["COMPLETED", "CANCELLED"])
+    elif status_filter:
+        queryset = queryset.filter(status=status_filter)
+
+    project_filter = request.GET.get("project", "")
+    if project_filter:
+        queryset = queryset.filter(project_id=project_filter)
+
+    paginator = Paginator(queryset, 25)
+    page = request.GET.get("page", 1)
+    pledges = paginator.get_page(page)
+
+    all_pledges = Pledge.objects.exclude(status="CANCELLED")
+    total_pledged = all_pledges.aggregate(
+        total=Coalesce(Sum("pledged_amount"), Value(0, output_field=DecimalField()))
+    )["total"]
+    total_outstanding = sum((p.outstanding_balance for p in all_pledges), Decimal("0"))
+
+    context = {
+        "pledges": pledges,
+        "search_term": search_term,
+        "status_filter": status_filter,
+        "project_filter": project_filter,
+        "status_choices": Pledge.STATUS_CHOICES,
+        "stats": {
+            "total": Pledge.objects.count(),
+            "pending": Pledge.objects.filter(status="PENDING").count(),
+            "partially_paid": Pledge.objects.filter(status="PARTIALLY_PAID").count(),
+            "completed": Pledge.objects.filter(status="COMPLETED").count(),
+            "cancelled": Pledge.objects.filter(status="CANCELLED").count(),
+            "total_pledged": total_pledged,
+            "total_outstanding": total_outstanding,
+        },
+        "fundraising_projects": Project.objects.filter(enable_fundraising=True).order_by("-created_at"),
+    }
+    return render(request, "project_donations/pledge_list.html", context)
+
+
+@login_required
+def pledge_create(request):
+    """Record a new pledge (Feature 6)."""
+    if not request.user.has_executive_access():
+        messages.error(request, "Executive access required.")
+        return redirect("project_donations:pledge_list")
+
+    if request.method == "POST":
+        form = PledgeForm(request.POST)
+        if form.is_valid():
+            pledge = form.save(commit=False)
+            pledge.created_by = request.user
+            pledge.status = "PENDING"
+            pledge.save()
+            log_action(
+                user=request.user,
+                action="CREATE",
+                object_type="Pledge",
+                object_id=pledge.id,
+                ip_address=getattr(request, "client_ip", ""),
+                description=f"Recorded pledge: ₦{pledge.pledged_amount:,.2f} by {pledge.member.full_name} for {pledge.project.title}"
+            )
+            messages.success(request, "Pledge recorded successfully.")
+            return redirect("project_donations:pledge_detail", pk=pledge.pk)
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+    else:
+        form = PledgeForm()
+
+    return render(request, "project_donations/pledge_form.html", {
+        "form": form,
+        "title": "Record Pledge",
+        "action": "Save Pledge",
+    })
+
+
+@login_required
+def pledge_update(request, pk):
+    """Edit a pledge (notes, due date, or cancel it). Executive access required."""
+    if not request.user.has_executive_access():
+        messages.error(request, "Executive access required.")
+        return redirect("project_donations:pledge_list")
+
+    pledge = get_object_or_404(Pledge, pk=pk)
+
+    if request.method == "POST":
+        form = PledgeForm(request.POST, instance=pledge)
+        if form.is_valid():
+            form.save()
+            log_action(
+                user=request.user,
+                action="UPDATE",
+                object_type="Pledge",
+                object_id=pledge.id,
+                ip_address=getattr(request, "client_ip", ""),
+                description=f"Updated pledge #{pledge.id}"
+            )
+            messages.success(request, "Pledge updated successfully.")
+            return redirect("project_donations:pledge_detail", pk=pledge.pk)
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+    else:
+        form = PledgeForm(instance=pledge)
+
+    return render(request, "project_donations/pledge_form.html", {
+        "form": form,
+        "pledge": pledge,
+        "title": "Edit Pledge",
+        "action": "Update Pledge",
+    })
+
+
+@login_required
+def pledge_detail(request, pk):
+    """View a pledge with its payment history and a form to record new payments (Feature 7)."""
+    pledge = get_object_or_404(
+        Pledge.objects.select_related("member", "project", "created_by"), pk=pk
+    )
+    payments = pledge.payments.select_related("recorded_by").order_by("-payment_date", "-created_at")
+    payment_form = PledgePaymentForm(pledge=pledge)
+
+    return render(request, "project_donations/pledge_detail.html", {
+        "pledge": pledge,
+        "payments": payments,
+        "payment_form": payment_form,
+        "can_manage": request.user.has_executive_access(),
+    })
+
+
+@login_required
+def pledge_delete(request, pk):
+    """Delete a pledge (admin only) — also removes its mirrored payment donations/income via signals."""
+    if not request.user.has_admin_access():
+        messages.error(request, "Admin access required.")
+        return redirect("project_donations:pledge_list")
+
+    pledge = get_object_or_404(Pledge, pk=pk)
+
+    if request.method == "POST":
+        member_name = pledge.member.full_name
+        amount = pledge.pledged_amount
+        pledge.delete()
+        log_action(
+            user=request.user,
+            action="DELETE",
+            object_type="Pledge",
+            object_id=pk,
+            ip_address=getattr(request, "client_ip", ""),
+            description=f"Deleted pledge: ₦{amount:,.2f} by {member_name}"
+        )
+        messages.success(request, "Pledge deleted.")
+        return redirect("project_donations:pledge_list")
+
+    return render(request, "project_donations/pledge_confirm_delete.html", {"pledge": pledge})
+
+
+@login_required
+def pledge_payment_create(request, pk):
+    """Record a payment (partial or full) against a pledge (Feature 7, 8)."""
+    if not request.user.has_executive_access():
+        messages.error(request, "Executive access required.")
+        return redirect("project_donations:pledge_detail", pk=pk)
+
+    pledge = get_object_or_404(Pledge, pk=pk)
+
+    if pledge.status == "CANCELLED":
+        messages.error(request, "Cannot record a payment against a cancelled pledge.")
+        return redirect("project_donations:pledge_detail", pk=pk)
+
+    if request.method == "POST":
+        form = PledgePaymentForm(request.POST, pledge=pledge)
+        if form.is_valid():
+            with transaction.atomic():
+                payment = form.save(commit=False)
+                payment.pledge = pledge
+                payment.recorded_by = request.user
+                payment.save()
+            log_action(
+                user=request.user,
+                action="CREATE",
+                object_type="PledgePayment",
+                object_id=payment.id,
+                ip_address=getattr(request, "client_ip", ""),
+                description=f"Recorded payment ₦{payment.amount:,.2f} on pledge #{pledge.id} ({pledge.member.full_name})"
+            )
+            messages.success(request, "Payment recorded successfully.")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+
+    return redirect("project_donations:pledge_detail", pk=pk)
+
+
+@login_required
+def pledge_payment_delete(request, pk, payment_pk):
+    """Delete a pledge payment (admin only) — removes the mirrored donation/income via signals."""
+    if not request.user.has_admin_access():
+        messages.error(request, "Admin access required.")
+        return redirect("project_donations:pledge_detail", pk=pk)
+
+    pledge = get_object_or_404(Pledge, pk=pk)
+    payment = get_object_or_404(PledgePayment, pk=payment_pk, pledge=pledge)
+
+    if request.method == "POST":
+        amount = payment.amount
+        payment.delete()
+        log_action(
+            user=request.user,
+            action="DELETE",
+            object_type="PledgePayment",
+            object_id=payment_pk,
+            ip_address=getattr(request, "client_ip", ""),
+            description=f"Deleted payment ₦{amount:,.2f} on pledge #{pledge.id}"
+        )
+        messages.success(request, "Payment deleted.")
+
+    return redirect("project_donations:pledge_detail", pk=pk)

@@ -283,6 +283,17 @@ def index(request):
         "total_raised_through_invitees": extras["total_raised_through_invitees"],
         # Prepaid dues
         "total_prepaid": total_prepaid,
+        # Feature 14: Donation Groups, donation types, pledges, dues
+        "total_donation_groups": extras["total_donation_groups"],
+        "members_in_donation_groups": extras["members_in_donation_groups"],
+        "total_money_donations": extras["total_money_donations"],
+        "total_material_donations": extras["total_material_donations"],
+        "total_labour_contributions": extras["total_labour_contributions"],
+        "pending_pledges": extras["pending_pledges"],
+        "completed_pledges": extras["completed_pledges"],
+        "outstanding_pledge_amount": extras["outstanding_pledge_amount"],
+        "yearly_dues_debtors": extras["yearly_dues_debtors"],
+        "outstanding_dues": extras["outstanding_dues"],
     }
     return render(request, "dashboard/admin_dashboard.html", context)
 

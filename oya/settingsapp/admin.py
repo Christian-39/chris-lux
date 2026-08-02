@@ -3,7 +3,41 @@ Admin configuration for settingsapp.
 """
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import SystemSettings
+from .models import SystemSettings, DonationGroup, DonationGroupMembership
+
+
+class DonationGroupMembershipInline(admin.TabularInline):
+    model = DonationGroupMembership
+    extra = 0
+    autocomplete_fields = []
+    fields = ["member", "date_added", "added_by"]
+    readonly_fields = ["date_added"]
+
+
+@admin.register(DonationGroup)
+class DonationGroupAdmin(admin.ModelAdmin):
+    list_display = ["name", "minimum_amount", "maximum_amount", "is_active", "member_count", "created_by", "created_at"]
+    list_filter = ["is_active"]
+    search_fields = ["name", "description"]
+    readonly_fields = ["created_at", "updated_at", "created_by"]
+    inlines = [DonationGroupMembershipInline]
+
+    def member_count(self, obj):
+        return obj.member_count
+    member_count.short_description = "Members"
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
+
+
+@admin.register(DonationGroupMembership)
+class DonationGroupMembershipAdmin(admin.ModelAdmin):
+    list_display = ["member", "group", "date_added", "added_by"]
+    list_filter = ["group"]
+    search_fields = ["member__full_name", "member__serial_number", "group__name"]
+    readonly_fields = ["date_added"]
 
 
 @admin.register(SystemSettings)

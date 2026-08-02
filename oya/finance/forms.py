@@ -5,6 +5,7 @@ from django.utils import timezone
 from decimal import Decimal
 from .models import Income, Expense, DuesPayment, DuesPaymentTransaction
 from accounts.models import User  # Ensure this import matches your user model path
+from core.widgets import AutocompleteSelectWidget
 
 
 class IncomeForm(forms.ModelForm):
@@ -26,7 +27,11 @@ class IncomeForm(forms.ModelForm):
                 "class": "form-control",
                 "placeholder": "e.g., Donation for project, Event ticket sales"
             }),
-            "member": forms.Select(attrs={"class": "form-select", "id": "id_member"}),
+            "member": AutocompleteSelectWidget(
+                search_url_name="accounts:user_search_ajax",
+                placeholder="Search member by name, no. or phone (optional)…",
+                attrs={"id": "id_member"},
+            ),
             "paid_by": forms.TextInput(attrs={
                 "class": "form-control",
                 "placeholder": "Name of payer / contributor (if not a member)"
@@ -41,7 +46,7 @@ class IncomeForm(forms.ModelForm):
 
         # Member dropdown
         self.fields["member"].queryset = User.objects.filter(serial_number__isnull=False).exclude(serial_number="").exclude(is_staff=True).exclude(is_superuser=True).order_by("full_name")
-        self.fields["member"].empty_label = "--------- Select Active Member ---------"
+        self.fields["member"].widget.display_queryset = self.fields["member"].queryset
         self.fields["member"].required = False
         self.fields["paid_by"].required = False
 
@@ -115,10 +120,10 @@ class DuesPaymentAllocationForm(forms.ModelForm):
         model = DuesPaymentTransaction
         fields = ["member", "total_amount", "payment_method", "receipt_reference", "payment_date", "notes"]
         widgets = {
-            "member": forms.Select(attrs={
-                "class": "form-select",
-                "data-search": "members",
-            }),
+            "member": AutocompleteSelectWidget(
+                search_url_name="accounts:user_search_ajax",
+                placeholder="Search member by name, no. or phone…",
+            ),
             "total_amount": forms.NumberInput(attrs={
                 "class": "form-control",
                 "step": "0.01",
@@ -155,7 +160,7 @@ class DuesPaymentAllocationForm(forms.ModelForm):
         ).exclude(
             is_superuser=True
         ).order_by("full_name")
-        self.fields["member"].empty_label = "--------- Select Member ---------"
+        self.fields["member"].widget.display_queryset = self.fields["member"].queryset
 
     def clean_total_amount(self):
         amount = self.cleaned_data.get("total_amount")

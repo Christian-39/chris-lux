@@ -15,7 +15,7 @@ class ProjectForm(forms.ModelForm):
         fields = [
             "title", "budget", "description", "status", "progress_percentage",
             "enable_fundraising", "target_amount", "fundraising_start_date",
-            "fundraising_end_date", "fundraising_status"
+            "fundraising_end_date", "fundraising_status", "include_in_group_reports"
         ]
         widgets = {
             "title": forms.TextInput(attrs={
@@ -59,6 +59,10 @@ class ProjectForm(forms.ModelForm):
                 "type": "date"
             }),
             "fundraising_status": forms.Select(attrs={"class": "form-select"}),
+            "include_in_group_reports": forms.CheckboxInput(attrs={
+                "class": "form-check-input",
+                "id": "id_include_in_group_reports"
+            }),
         }
 
     def clean_progress_percentage(self):

@@ -95,6 +95,17 @@ class Project(BaseModel):
         verbose_name="Fundraising Status"
     )
 
+    # ─── DONATION GROUP REPORTING ───
+    include_in_group_reports = models.BooleanField(
+        default=True,
+        verbose_name="Include in Donation Group Reports?",
+        help_text=(
+            "If disabled, this project's donations are excluded from donation "
+            "group reports only. Treasury, finance, and project totals are "
+            "unaffected and donation records remain intact."
+        )
+    )
+
     class Meta:
         db_table = "projects_project"
         verbose_name = "Project"
@@ -105,6 +116,7 @@ class Project(BaseModel):
             models.Index(fields=["progress_percentage"]),
             models.Index(fields=["enable_fundraising"]),
             models.Index(fields=["fundraising_status"]),
+            models.Index(fields=["include_in_group_reports"]),
         ]
 
     def __str__(self):

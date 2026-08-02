@@ -123,6 +123,88 @@
   </div>
 </div>
 
+<!-- Feature 14: Donation Groups, Donations, Pledges & Dues -->
+<div class="section-header" style="margin-bottom: 0.75rem;">
+  <h2 style="font-size: 1rem; font-weight: 700; color: var(--oya-text-primary);">Donation Groups, Pledges &amp; Dues</h2>
+</div>
+<div class="dashboard-grid dashboard-grid-4" style="margin-bottom: 1.5rem">
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg></div>
+    </div>
+    <div class="kpi-value">{{ total_donation_groups }}</div>
+    <div class="kpi-label">Donation Groups</div>
+  </div>
+  <div class="kpi-card accent-info">
+    <div class="kpi-header">
+      <div class="kpi-icon" style="background: var(--oya-info-bg); color: var(--oya-info)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+    </div>
+    <div class="kpi-value" style="color: var(--oya-info)">{{ members_in_donation_groups }}</div>
+    <div class="kpi-label">Members in Donation Groups</div>
+  </div>
+  <div class="kpi-card accent-success">
+    <div class="kpi-header">
+      <div class="kpi-icon" style="background: var(--oya-success-bg); color: var(--oya-success)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+    </div>
+    <div class="kpi-value" style="color: var(--oya-success)">&#x20A6;{{ total_money_donations|floatformat:0|intcomma }}</div>
+    <div class="kpi-label">Total Money Donations</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/></svg></div>
+    </div>
+    <div class="kpi-value">{{ total_material_donations }}</div>
+    <div class="kpi-label">Material Donations</div>
+  </div>
+</div>
+<div class="dashboard-grid dashboard-grid-4" style="margin-bottom: 1.5rem">
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+    </div>
+    <div class="kpi-value">{{ total_labour_contributions }}</div>
+    <div class="kpi-label">Labour Contributions</div>
+  </div>
+  <div class="kpi-card accent-warning">
+    <div class="kpi-header">
+      <div class="kpi-icon" style="background: var(--oya-warning-bg); color: var(--oya-warning)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+    </div>
+    <div class="kpi-value" style="color: var(--oya-warning)">{{ pending_pledges }}</div>
+    <div class="kpi-label">Pending Pledges</div>
+  </div>
+  <div class="kpi-card accent-success">
+    <div class="kpi-header">
+      <div class="kpi-icon" style="background: var(--oya-success-bg); color: var(--oya-success)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+    </div>
+    <div class="kpi-value" style="color: var(--oya-success)">{{ completed_pledges }}</div>
+    <div class="kpi-label">Completed Pledges</div>
+  </div>
+  <div class="kpi-card accent-warning">
+    <div class="kpi-header">
+      <div class="kpi-icon" style="background: var(--oya-warning-bg); color: var(--oya-warning)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+    </div>
+    <div class="kpi-value" style="color: var(--oya-warning)">&#x20A6;{{ outstanding_pledge_amount|floatformat:0|intcomma }}</div>
+    <div class="kpi-label">Outstanding Pledge Amount</div>
+  </div>
+</div>
+<div class="dashboard-grid dashboard-grid-2" style="margin-bottom: 1.5rem">
+  <div class="kpi-card accent-danger">
+    <div class="kpi-header">
+      <div class="kpi-icon" style="background: var(--oya-danger-bg); color: var(--oya-danger)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+    </div>
+    <div class="kpi-value" style="color: var(--oya-danger)">{{ yearly_dues_debtors }}</div>
+    <div class="kpi-label">Yearly Dues Debtors</div>
+    <a href="{% url 'finance:dues_debtors_list' %}" style="font-size:0.75rem;color:var(--oya-primary);">View debtors &rarr;</a>
+  </div>
+  <div class="kpi-card accent-danger">
+    <div class="kpi-header">
+      <div class="kpi-icon" style="background: var(--oya-danger-bg); color: var(--oya-danger)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+    </div>
+    <div class="kpi-value" style="color: var(--oya-danger)">&#x20A6;{{ outstanding_dues|floatformat:0|intcomma }}</div>
+    <div class="kpi-label">Outstanding Dues</div>
+  </div>
+</div>
+
 <!-- Charts Row 1 -->
 <div class="dashboard-grid dashboard-grid-2" style="margin-bottom: 1.5rem">
 

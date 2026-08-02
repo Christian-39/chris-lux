@@ -16,4 +16,5 @@ urlpatterns = [
     path("clans/", views.clan_list, name="clan_list"),
     path("clans/create/", views.clan_create, name="clan_create"),
     path("api/stats/", views.member_stats_ajax, name="member_stats_ajax"),
+    path("api/autocomplete/", views.member_autocomplete_search, name="member_autocomplete_search"),
 ]

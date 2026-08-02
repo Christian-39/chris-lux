@@ -1407,3 +1407,93 @@ def prepaid_detail(request, member_id):
         "yearly_dues": YEARLY_DUES,
     }
     return render(request, "finance/prepaid_detail.html", context)
+
+# ============================================================
+# YEARLY DUES DEBTORS (Feature 10, 11)
+# ============================================================
+
+@login_required
+def dues_debtors_list(request):
+    """
+    Yearly Dues Debtors report: aggregated by member.
+    Shows each member's total outstanding debt across all years,
+    sorted by highest debtor first. Supports search and year filter.
+    """
+    current_year = timezone.now().year
+
+    search_term = request.GET.get("search", "").strip()
+    year_filter = request.GET.get("year", "")
+
+    members_qs = User.objects.filter(
+        serial_number__isnull=False
+    ).exclude(serial_number="").exclude(is_staff=True).exclude(is_superuser=True)
+
+    if search_term:
+        members_qs = members_qs.filter(
+            Q(full_name__icontains=search_term) |
+            Q(serial_number__icontains=search_term) |
+            Q(phone__icontains=search_term)
+        )
+
+    debtor_list = []
+    for member in members_qs:
+        debt_info = DuesPayment.get_member_debt(member)
+        debt_owed = debt_info.get("debt_owed", Decimal("0"))
+
+        if debt_owed <= 0:
+            continue
+
+        # If year filter is applied, only show members who owe for that year
+        if year_filter:
+            year_int = int(year_filter)
+            join_year = DuesPayment.get_member_join_year(member)
+            if year_int < join_year or year_int > current_year:
+                continue
+            dp = DuesPayment.objects.filter(member=member, year=year_int).first()
+            if dp and dp.is_fully_paid:
+                continue
+
+        years_expected = debt_info.get("years_expected", [])
+        years_paid = debt_info.get("years_paid", [])
+        years_missed = len(years_expected) - len(years_paid)
+
+        total_due = len(years_expected) * DuesPayment.YEARLY_DUES_AMOUNT
+        total_paid = total_due - debt_owed
+
+        # Get last payment date
+        last_payment = DuesPaymentTransaction.objects.filter(
+            member=member
+        ).aggregate(max_date=Max("payment_date"))["max_date"]
+
+        debtor_list.append({
+            "member": member,
+            "total_due": total_due,
+            "total_paid": total_paid,
+            "debt": debt_owed,
+            "years_missed": years_missed,
+            "years_expected": years_expected,
+            "years_paid": years_paid,
+            "last_payment_date": last_payment,
+        })
+
+    # Sort by highest debt first
+    debtor_list.sort(key=lambda x: x["debt"], reverse=True)
+
+    total_outstanding = sum(d["debt"] for d in debtor_list)
+    total_debtor_members = len(debtor_list)
+
+    paginator = Paginator(debtor_list, 25)
+    page_obj = paginator.get_page(request.GET.get("page", 1))
+
+    context = {
+        "debtors": page_obj,
+        "search_term": search_term,
+        "year_filter": year_filter,
+        "years": list(range(PLATFORM_START_YEAR, current_year + 1)),
+        "stats": {
+            "total_records": len(debtor_list),
+            "total_members": total_debtor_members,
+            "total_outstanding": total_outstanding,
+        },
+    }
+    return render(request, "finance/dues_debtors_list.html", context)

@@ -13,7 +13,8 @@ from projects.models import Project
 from operations.models import TaskForceMember, Motorcycle, CaseFile
 from elections.models import Election
 from notifications.models import Notification
-from project_donations.models import Donation as ProjectDonation, OutsideDonor
+from project_donations.models import Donation as ProjectDonation, OutsideDonor, Pledge
+from settingsapp.models import DonationGroup, DonationGroupMembership
 
 logger = logging.getLogger("oya")
 
@@ -359,6 +360,17 @@ def get_dashboard_extras():
         ).aggregate(
             total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
         )["total"],
+        # ─── Feature 14: Donation Groups, donation types, pledges, dues ───
+        "total_donation_groups": _get_total_donation_groups(),
+        "members_in_donation_groups": _get_members_in_donation_groups(),
+        "total_money_donations": _get_total_money_donations(),
+        "total_material_donations": _get_total_material_donations(),
+        "total_labour_contributions": _get_total_labour_contributions(),
+        "pending_pledges": _get_pending_pledges_count(),
+        "completed_pledges": _get_completed_pledges_count(),
+        "outstanding_pledge_amount": _get_outstanding_pledge_amount(),
+        "yearly_dues_debtors": _get_yearly_dues_debtors_count(),
+        "outstanding_dues": _get_outstanding_dues_amount(),
     }
     cache.set(cache_key, extras, CACHE_TIMEOUT)
     return extras
@@ -462,5 +474,144 @@ def _get_upcoming_elections():
     """Get count of upcoming elections."""
     try:
         return Election.objects.filter(status__in=["UPCOMING", "ONGOING"]).count()
+    except Exception:
+        return 0
+
+def _get_total_donation_groups():
+    """Get count of active donation groups (Feature 14)."""
+    try:
+        return DonationGroup.objects.filter(is_active=True).count()
+    except Exception:
+        return 0
+
+
+def _get_members_in_donation_groups():
+    """Get count of distinct members assigned to at least one donation group (Feature 14)."""
+    try:
+        return DonationGroupMembership.objects.values("member").distinct().count()
+    except Exception:
+        return 0
+
+
+def _get_total_money_donations():
+    """Get total confirmed Money donations across all projects (Feature 14)."""
+    try:
+        return ProjectDonation.objects.filter(
+            status="CONFIRMED", donation_type="MONEY"
+        ).aggregate(
+            total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
+        )["total"]
+    except Exception:
+        return 0
+
+
+def _get_total_material_donations():
+    """Get count of confirmed Material donations (Feature 14)."""
+    try:
+        return ProjectDonation.objects.filter(
+            status="CONFIRMED", donation_type="MATERIAL"
+        ).count()
+    except Exception:
+        return 0
+
+
+def _get_total_labour_contributions():
+    """Get count of confirmed Labour contributions (Feature 14)."""
+    try:
+        return ProjectDonation.objects.filter(
+            status="CONFIRMED", donation_type="LABOUR"
+        ).count()
+    except Exception:
+        return 0
+
+
+def _get_pending_pledges_count():
+    """Get count of pending + partially paid pledges (Feature 14)."""
+    try:
+        return Pledge.objects.filter(status__in=["PENDING", "PARTIALLY_PAID"]).count()
+    except Exception:
+        return 0
+
+
+def _get_completed_pledges_count():
+    """Get count of completed pledges (Feature 14)."""
+    try:
+        return Pledge.objects.filter(status="COMPLETED").count()
+    except Exception:
+        return 0
+
+
+def _get_outstanding_pledge_amount():
+    """Get total outstanding balance across active pledges (Feature 14)."""
+    try:
+        active = Pledge.objects.exclude(status__in=["COMPLETED", "CANCELLED"])
+        return sum((p.outstanding_balance for p in active), 0)
+    except Exception:
+        return 0
+
+
+def _get_yearly_dues_debtors_count():
+    """Get count of distinct members with any outstanding yearly dues (Feature 14)."""
+    try:
+        from accounts.models import User
+        current_year = datetime.now().year
+
+        members = list(
+            User.objects.filter(serial_number__isnull=False)
+            .exclude(serial_number="").exclude(is_staff=True).exclude(is_superuser=True)
+        )
+        # One query for all fully-paid (member, year) pairs instead of N queries.
+        paid_pairs = set(
+            DuesPayment.objects.filter(
+                member__in=members, amount_paid__gte=DuesPayment.YEARLY_DUES_AMOUNT
+            ).values_list("member_id", "year")
+        )
+
+        debtor_count = 0
+        for member in members:
+            join_year = DuesPayment.get_member_join_year(member)
+            start_year = max(join_year, 2020)
+            if start_year > current_year:
+                continue
+            owed_years = set(range(start_year, current_year + 1))
+            paid_years = {year for (mid, year) in paid_pairs if mid == member.id}
+            if owed_years - paid_years:
+                debtor_count += 1
+        return debtor_count
+    except Exception:
+        return 0
+
+
+def _get_outstanding_dues_amount():
+    """Get total outstanding yearly dues amount across all active members (Feature 14)."""
+    try:
+        from accounts.models import User
+        current_year = datetime.now().year
+
+        members = list(
+            User.objects.filter(serial_number__isnull=False)
+            .exclude(serial_number="").exclude(is_staff=True).exclude(is_superuser=True)
+        )
+        # One query for total paid per member instead of N queries.
+        paid_by_member = {
+            row["member_id"]: row["total"]
+            for row in DuesPayment.objects.filter(
+                member__in=members, year__lte=current_year
+            ).values("member_id").annotate(
+                total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
+            )
+        }
+
+        total_outstanding = 0
+        for member in members:
+            join_year = DuesPayment.get_member_join_year(member)
+            start_year = max(join_year, 2020)
+            expected_years = current_year - start_year + 1
+            if expected_years <= 0:
+                continue
+            total_expected = expected_years * DuesPayment.YEARLY_DUES_AMOUNT
+            total_paid = paid_by_member.get(member.id, 0)
+            total_outstanding += max(total_expected - total_paid, 0)
+        return total_outstanding
     except Exception:
         return 0

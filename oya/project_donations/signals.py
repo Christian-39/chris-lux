@@ -5,7 +5,7 @@ import logging
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
-from .models import Donation
+from .models import Donation, PledgePayment
 
 logger = logging.getLogger("oya")
 
@@ -14,12 +14,30 @@ logger = logging.getLogger("oya")
 def sync_donation_to_finance(sender, instance, created, **kwargs):
     """
     Auto-maintain a linked Income record for confirmed donations.
-    Removes the Income if the donation is cancelled or zeroed out.
+    - Money donations always sync to finance (existing behaviour).
+    - Material donations sync ONLY when update_treasury is enabled, using
+      estimated_value as the income amount (Feature 5/8).
+    - Labour donations never touch treasury.
+    Removes the Income if the donation is cancelled, zeroed out, or the
+    type/flag no longer qualifies.
     """
-    if instance.status == "CONFIRMED" and instance.amount and instance.amount > 0:
-        _ensure_donation_income(instance)
+    should_sync = False
+    income_amount = None
+
+    if instance.status == "CONFIRMED":
+        if instance.donation_type == "MONEY" and instance.amount and instance.amount > 0:
+            should_sync = True
+            income_amount = instance.amount
+        elif instance.donation_type == "MATERIAL" and instance.update_treasury and instance.estimated_value and instance.estimated_value > 0:
+            should_sync = True
+            income_amount = instance.estimated_value
+
+    if should_sync:
+        _ensure_donation_income(instance, income_amount)
     else:
         _remove_donation_income(instance)
+
+    instance.project.update_fundraising_stats()
 
 
 @receiver(post_delete, sender=Donation)
@@ -30,9 +48,14 @@ def cleanup_donation_finance(sender, instance, **kwargs):
             instance.income.delete()
         except Exception:
             pass
+    try:
+        instance.project.update_fundraising_stats()
+    except Exception:
+        # Project itself may have been deleted (cascade); nothing to update.
+        pass
 
 
-def _ensure_donation_income(donation):
+def _ensure_donation_income(donation, income_amount):
     """Create or update the finance Income record for a donation."""
     from finance.models import Income
 
@@ -47,10 +70,14 @@ def _ensure_donation_income(donation):
     elif donation.donor_type == "OUTSIDE" and donation.outside_donor:
         payer_name = donation.outside_donor.full_name
 
+    reason = f"Project Donation — {donation.project.title}"
+    if donation.donation_type == "MATERIAL":
+        reason = f"Project Donation (Material: {donation.material_name}) — {donation.project.title}"
+
     if donation.income:
         # Update existing income
-        donation.income.amount = donation.amount
-        donation.income.reason = f"Project Donation — {donation.project.title}"
+        donation.income.amount = income_amount
+        donation.income.reason = reason
         donation.income.paid_by = payer_name
         donation.income.income_type = "PROJECT_DONATION"
         if member_user:
@@ -60,8 +87,8 @@ def _ensure_donation_income(donation):
         # Create new income and link back without re-firing signals
         income = Income.objects.create(
             income_type="PROJECT_DONATION",
-            amount=donation.amount,
-            reason=f"Project Donation — {donation.project.title}",
+            amount=income_amount,
+            reason=reason,
             paid_by=payer_name,
             member=member_user,
             created_by=donation.recorded_by,
@@ -78,3 +105,63 @@ def _remove_donation_income(donation):
             income.delete()
         except Exception:
             pass
+
+# ═══════════════════════════════════════════════════════════════
+# PLEDGE PAYMENT → TREASURY INTEGRATION (Feature 8)
+# ═══════════════════════════════════════════════════════════════
+
+@receiver(post_save, sender=PledgePayment)
+def sync_pledge_payment(sender, instance, created, **kwargs):
+    """
+    Whenever a pledge payment is saved: mirror it as a confirmed Money
+    Donation (which drives the existing treasury/Income sync above),
+    recompute the pledge's paid/outstanding/status, and refresh the
+    project's fundraising totals. One Donation per PledgePayment
+    (OneToOneField) prevents duplicate accounting on repeated saves.
+    """
+    _ensure_pledge_payment_donation(instance)
+    instance.pledge.recalculate_status()
+
+
+@receiver(post_delete, sender=PledgePayment)
+def cleanup_pledge_payment(sender, instance, **kwargs):
+    """Remove the mirrored Donation (and therefore its Income) when a pledge payment is deleted."""
+    if instance.donation_id:
+        try:
+            instance.donation.delete()
+        except Exception:
+            pass
+    try:
+        instance.pledge.recalculate_status()
+    except Exception:
+        pass
+
+
+def _ensure_pledge_payment_donation(payment):
+    """Create or update the mirrored Donation record for a pledge payment."""
+    narration = f"Pledge payment — {payment.pledge.project.title} (Pledge #{payment.pledge_id})"
+
+    if payment.donation_id:
+        donation = payment.donation
+        donation.amount = payment.amount
+        donation.donation_date = payment.payment_date
+        donation.payment_method = payment.payment_method
+        donation.reference_number = payment.reference_number
+        donation.narration = narration
+        donation.recorded_by = payment.recorded_by or donation.recorded_by
+        donation.save()
+    else:
+        donation = Donation.objects.create(
+            project=payment.pledge.project,
+            donor_type="MEMBER",
+            member=payment.pledge.member,
+            donation_type="MONEY",
+            amount=payment.amount,
+            payment_method=payment.payment_method,
+            reference_number=payment.reference_number,
+            narration=narration,
+            recorded_by=payment.recorded_by,
+            donation_date=payment.payment_date,
+            status="CONFIRMED",
+        )
+        PledgePayment.objects.filter(pk=payment.pk).update(donation=donation)

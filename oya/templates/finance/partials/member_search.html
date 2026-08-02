@@ -1,102 +1,24 @@
-<!--
-  NOTE: Not currently included anywhere, but the JS below calls a real,
-  working endpoint (finance:search_members). The markup previously used
-  Bootstrap utility classes (.d-none, .input-group, .rounded-circle, etc.)
-  that have no CSS in this project, so the widget would have rendered
-  unstyled/broken if ever wired up. Fixed with project-consistent styling;
-  the JS logic is unchanged.
--->
-<style>
-  #memberSearchWidget .msw-hidden { display: none !important; }
-  #memberSearchWidget .msw-flex { display: flex !important; }
-</style>
-<div style="position: relative;" id="memberSearchWidget">
-  <label class="form-label">{{ label|default:'Member' }} {% if required %}<span style="color: var(--oya-danger);">*</span>{% endif %}</label>
-  <div id="memberSearchContainer">
-    <input type="text" class="form-control" id="memberSearchInput" placeholder="{{ placeholder|default:'Type member name or serial...' }}" autocomplete="off">
-    <div class="msw-hidden" id="searchResults" style="position:absolute;top:100%;left:0;right:0;z-index:1000;background:var(--oya-bg-white);border:1px solid var(--oya-border);border-radius:0 0 var(--radius-md) var(--radius-md);max-height:300px;overflow-y:auto;box-shadow:var(--shadow-md);">
-    </div>
-  </div>
-  <div class="msw-hidden" id="memberSelected" style="margin-top: 0.5rem; align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: var(--radius-md); background: var(--oya-bg);">
-    <div style="width:32px;height:32px;border-radius:50%;background:var(--oya-text-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0;" id="selectedAvatar">AB</div>
-    <div style="flex: 1; min-width: 0;">
-      <div style="font-weight:600;font-size:0.875rem;" id="selectedName"></div>
-      <div style="color:var(--oya-text-muted);font-size:.75rem;" id="selectedMeta"></div>
-    </div>
-    <button type="button" class="btn btn-sm btn-secondary" id="changeMember">Change</button>
-  </div>
-  <input type="hidden" name="{{ field_name|default:'member' }}" id="{{ field_id|default:'id_member' }}">
-</div>
+{% comment %}
+DEPRECATED — do not use.
 
-<script>
-(function() {
-  const searchInput = document.getElementById('memberSearchInput');
-  const searchResults = document.getElementById('searchResults');
-  const memberSelected = document.getElementById('memberSelected');
-  const memberSearchContainer = document.getElementById('memberSearchContainer');
-  const changeMemberBtn = document.getElementById('changeMember');
-  const hiddenInput = document.getElementById('{{ field_id|default:"id_member" }}');
-  let searchTimeout;
+This partial predates the project-wide member/user autocomplete component
+and was never wired into any page (nothing includes it), and it called a
+finance:search_members endpoint that does not exist in finance/urls.py.
 
-  searchInput.addEventListener('input', function() {
-    const q = this.value.trim();
-    clearTimeout(searchTimeout);
-    if (q.length < 2) { searchResults.classList.add('msw-hidden'); return; }
-    searchTimeout = setTimeout(function() {
-      fetch('{% url "finance:search_members" %}?q=' + encodeURIComponent(q), {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      })
-      .then(r => r.json())
-      .then(data => {
-        searchResults.innerHTML = '';
-        if (data.results && data.results.length) {
-          data.results.forEach(function(item) {
-            const div = document.createElement('div');
-            div.className = 'search-result-item';
-            div.style.cssText = 'padding:.75rem 1rem;cursor:pointer;border-bottom:1px solid #f0f0f0;transition:background .15s;';
-            div.innerHTML = item.html;
-            div.addEventListener('click', function() { selectMember(item); });
-            div.addEventListener('mouseenter', function() { this.style.background = '#f8f9fa'; });
-            div.addEventListener('mouseleave', function() { this.style.background = ''; });
-            searchResults.appendChild(div);
-          });
-          searchResults.classList.remove('msw-hidden');
-        } else {
-          searchResults.innerHTML = '<div style="padding:1rem;color:var(--oya-text-muted);">No members found.</div>';
-          searchResults.classList.remove('msw-hidden');
-        }
-      })
-      .catch(function() {
-        searchResults.innerHTML = '<div style="padding:1rem;color:var(--oya-danger);">Search failed.</div>';
-        searchResults.classList.remove('msw-hidden');
-      });
-    }, 300);
-  });
+The single, live implementation for "search and select a member" anywhere
+in the project is now:
+  - Widget:   core.widgets.AutocompleteSelectWidget
+  - Template: templates/widgets/autocomplete_select.html
+  - JS:       static/js/autocomplete.js  (loaded globally in base.html)
+  - Endpoints: members:member_autocomplete_search / accounts:user_search_ajax
 
-  function selectMember(item) {
-    hiddenInput.value = item.id;
-    searchInput.value = item.text;
-    searchResults.classList.add('msw-hidden');
-    memberSearchContainer.classList.add('msw-hidden');
-    memberSelected.classList.remove('msw-hidden');
-    memberSelected.classList.add('msw-flex');
-    document.getElementById('selectedName').textContent = item.name;
-    document.getElementById('selectedMeta').textContent = item.serial + ' \u00b7 ' + item.role;
-    document.getElementById('selectedAvatar').textContent = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-  }
+Usage in a form's Meta.widgets:
+    "member": AutocompleteSelectWidget(
+        search_url_name="members:member_autocomplete_search",
+        placeholder="Search member by name, no. or phone…",
+    )
 
-  changeMemberBtn.addEventListener('click', function() {
-    hiddenInput.value = '';
-    searchInput.value = '';
-    memberSearchContainer.classList.remove('msw-hidden');
-    memberSelected.classList.add('msw-hidden');
-    memberSelected.classList.remove('msw-flex');
-  });
-
-  document.addEventListener('click', function(e) {
-    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-      searchResults.classList.add('msw-hidden');
-    }
-  });
-})();
-</script>
+See project_donations/forms.py or finance/forms.py for real examples.
+This file is kept only so any old reference doesn't hard-404; it renders
+nothing.
+{% endcomment %}

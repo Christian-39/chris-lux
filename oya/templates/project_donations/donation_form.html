@@ -73,6 +73,25 @@
           </div>
         </div>
 
+        <div
+          class="form-row"
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+          "
+        >
+          <div class="form-group">
+            <label for="{{ form.donation_type.id_for_label }}" class="form-label"
+              >Donation Type <span style="color: var(--oya-danger)">*</span></label
+            >
+            {{ form.donation_type }} {% if form.donation_type.errors %}
+            <div class="form-error">{{ form.donation_type.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+
         <!-- Helper: jump to create donor if missing -->
         <div id="add-donor-helper" style="display: none; margin-bottom: 1rem">
           <div
@@ -147,31 +166,101 @@
           </div>
         </div>
 
-        <div
-          class="form-row"
-          style="
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-          "
-        >
-          <div class="form-group">
-            <label for="{{ form.amount.id_for_label }}" class="form-label"
-              >Amount (₦) <span style="color: var(--oya-danger)">*</span></label
-            >
-            {{ form.amount }} {% if form.amount.errors %}
-            <div class="form-error">{{ form.amount.errors.0 }}</div>
+        <div id="money-fields-group">
+          <div
+            class="form-row"
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 1rem;
+              margin-bottom: 1rem;
+            "
+          >
+            <div class="form-group">
+              <label for="{{ form.amount.id_for_label }}" class="form-label"
+                >Amount (₦) <span style="color: var(--oya-danger)">*</span></label
+              >
+              {{ form.amount }} {% if form.amount.errors %}
+              <div class="form-error">{{ form.amount.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label
+                for="{{ form.payment_method.id_for_label }}"
+                class="form-label"
+                >Payment Method</label
+              >
+              {{ form.payment_method }} {% if form.payment_method.errors %}
+              <div class="form-error">{{ form.payment_method.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1rem">
+            <label for="{{ form.receipt.id_for_label }}" class="form-label">Receipt</label>
+            {{ form.receipt }} {% if form.receipt.errors %}
+            <div class="form-error">{{ form.receipt.errors.0 }}</div>
             {% endif %}
           </div>
-          <div class="form-group">
-            <label
-              for="{{ form.payment_method.id_for_label }}"
-              class="form-label"
-              >Payment Method</label
-            >
-            {{ form.payment_method }} {% if form.payment_method.errors %}
-            <div class="form-error">{{ form.payment_method.errors.0 }}</div>
+        </div>
+
+        <div id="material-fields-group" style="display:none;">
+          <div
+            class="form-row"
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;"
+          >
+            <div class="form-group">
+              <label for="{{ form.material_name.id_for_label }}" class="form-label">Material Name</label>
+              {{ form.material_name }} {% if form.material_name.errors %}
+              <div class="form-error">{{ form.material_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="{{ form.quantity.id_for_label }}" class="form-label">Quantity</label>
+              {{ form.quantity }} {% if form.quantity.errors %}
+              <div class="form-error">{{ form.quantity.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <div class="form-check" style="display:flex;align-items:center;gap:0.5rem;">
+              {{ form.update_treasury }}
+              <label for="{{ form.update_treasury.id_for_label }}" class="form-label" style="margin:0;">Update Treasury with Estimated Value</label>
+            </div>
+          </div>
+        </div>
+
+        <div id="labour-fields-group" style="display:none;">
+          <div
+            class="form-row"
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;"
+          >
+            <div class="form-group">
+              <label for="{{ form.labour_type.id_for_label }}" class="form-label">Labour Type</label>
+              {{ form.labour_type }} {% if form.labour_type.errors %}
+              <div class="form-error">{{ form.labour_type.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="{{ form.number_of_days.id_for_label }}" class="form-label">Number of Days</label>
+              {{ form.number_of_days }} {% if form.number_of_days.errors %}
+              <div class="form-error">{{ form.number_of_days.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div id="shared-material-labour-group" style="display:none;">
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label for="{{ form.estimated_value.id_for_label }}" class="form-label">Estimated Value (₦) — Optional</label>
+            {{ form.estimated_value }} {% if form.estimated_value.errors %}
+            <div class="form-error">{{ form.estimated_value.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label for="{{ form.remarks.id_for_label }}" class="form-label">Remarks</label>
+            {{ form.remarks }} {% if form.remarks.errors %}
+            <div class="form-error">{{ form.remarks.errors.0 }}</div>
             {% endif %}
           </div>
         </div>
@@ -263,9 +352,20 @@
     const donorType = document.getElementById("id_donor_type");
     const memberGroup = document.getElementById("member-field-group");
     const outsideGroup = document.getElementById("outside-donor-field-group");
-    const memberSelect = document.getElementById("id_member");
+    // Member/invited_by are now the shared autocomplete widget: the
+    // hidden input (id_member / id_invited_by) carries the real value,
+    // the visible search box (id_member_search / id_invited_by_search)
+    // shows the typed/selected text.
+    const memberHidden = document.getElementById("id_member");
+    const memberSearch = document.getElementById("id_member_search");
     const outsideSelect = document.getElementById("id_outside_donor");
-    const invitedBy = document.getElementById("id_invited_by");
+    const invitedByHidden = document.getElementById("id_invited_by");
+    const invitedBySearch = document.getElementById("id_invited_by_search");
+
+    function clearAutocomplete(hiddenEl, searchEl) {
+      if (hiddenEl) hiddenEl.value = "";
+      if (searchEl) searchEl.value = "";
+    }
 
     function toggleFields() {
       if (donorType.value === "MEMBER") {
@@ -275,7 +375,7 @@
       } else if (donorType.value === "OUTSIDE") {
         memberGroup.style.display = "none";
         outsideGroup.style.display = "block";
-        memberSelect.value = "";
+        clearAutocomplete(memberHidden, memberSearch);
       } else {
         memberGroup.style.display = "block";
         outsideGroup.style.display = "block";
@@ -294,7 +394,8 @@
           .then((r) => r.json())
           .then((data) => {
             if (data.invited_by_id) {
-              invitedBy.value = data.invited_by_id;
+              if (invitedByHidden) invitedByHidden.value = data.invited_by_id;
+              if (invitedBySearch) invitedBySearch.value = data.invited_by_name || "";
             }
           });
       }
@@ -311,6 +412,26 @@
   }
   donorType.addEventListener("change", toggleHelper);
   toggleHelper();
+
+  // ─── Donation Type toggle: Money / Material / Labour (Feature 5) ───
+  (function () {
+    const donationType = document.getElementById("id_donation_type");
+    const moneyGroup = document.getElementById("money-fields-group");
+    const materialGroup = document.getElementById("material-fields-group");
+    const labourGroup = document.getElementById("labour-fields-group");
+    const sharedGroup = document.getElementById("shared-material-labour-group");
+
+    function toggleDonationType() {
+      const type = donationType.value;
+      moneyGroup.style.display = type === "MONEY" ? "block" : "none";
+      materialGroup.style.display = type === "MATERIAL" ? "block" : "none";
+      labourGroup.style.display = type === "LABOUR" ? "block" : "none";
+      sharedGroup.style.display = (type === "MATERIAL" || type === "LABOUR") ? "block" : "none";
+    }
+
+    donationType.addEventListener("change", toggleDonationType);
+    toggleDonationType();
+  })();
 </script>
 
 {% endblock %}

@@ -1318,3 +1318,101 @@ textarea.form-control {
     font-size: 0.6875rem;
   }
 }
+/* ─────────────────────────────────────────────────────────
+   Shared Member/User Autocomplete Widget
+   Used across all forms per the global smart-search requirement.
+   ───────────────────────────────────────────────────────── */
+.autocomplete-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.autocomplete-search-input {
+  padding-right: 2.25rem;
+}
+
+.autocomplete-clear-btn {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--oya-text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem 0.4rem;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.autocomplete-clear-btn:hover {
+  color: var(--oya-danger);
+  background: var(--oya-border-light);
+}
+
+.autocomplete-results {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--oya-bg-white);
+  border: 1.5px solid var(--oya-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+
+.autocomplete-results.hidden {
+  display: none;
+}
+
+.autocomplete-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.55rem 0.875rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--oya-border-light);
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.active {
+  background: var(--oya-primary-50);
+}
+
+.autocomplete-item-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--oya-text-primary);
+}
+
+.autocomplete-item-sub {
+  font-size: 0.75rem;
+  color: var(--oya-text-muted);
+}
+
+.autocomplete-item.autocomplete-empty,
+.autocomplete-item.autocomplete-loading {
+  cursor: default;
+  color: var(--oya-text-muted);
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+.autocomplete-item.autocomplete-empty:hover,
+.autocomplete-item.autocomplete-loading:hover {
+  background: transparent;
+}
+
+@media (max-width: 768px) {
+  .autocomplete-results {
+    max-height: 220px;
+  }
+}

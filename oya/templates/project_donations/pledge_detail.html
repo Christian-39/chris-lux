@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load static humanize %}
+
+{% block title %}Pledge — {{ pledge.member.full_name }}{% endblock %}
+{% block page_title %}Pledge Detail{% endblock %}
+{% block breadcrumb %}Fundraising{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>{{ pledge.member.full_name }}</h1>
+    <p>Pledge for <strong>{{ pledge.project.title }}</strong></p>
+  </div>
+  <div class="page-header-actions">
+    <a href="{% url 'project_donations:pledge_list' %}" class="btn btn-secondary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back to Pledges
+    </a>
+    {% if can_manage and pledge.status != "CANCELLED" %}
+    <a href="{% url 'project_donations:pledge_update' pk=pledge.pk %}" class="btn btn-secondary">Edit</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="dashboard-grid dashboard-grid-4" style="margin-bottom:1.5rem;">
+  <div class="kpi-card">
+    <div class="kpi-value">&#x20A6;{{ pledge.pledged_amount|floatformat:0|intcomma }}</div>
+    <div class="kpi-label">Pledged</div>
+  </div>
+  <div class="kpi-card accent-success">
+    <div class="kpi-value" style="color:var(--oya-success);">&#x20A6;{{ pledge.total_paid|floatformat:0|intcomma }}</div>
+    <div class="kpi-label">Total Paid</div>
+  </div>
+  <div class="kpi-card accent-warning">
+    <div class="kpi-value" style="color:var(--oya-warning);">&#x20A6;{{ pledge.outstanding_balance|floatformat:0|intcomma }}</div>
+    <div class="kpi-label">Outstanding Balance</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">
+      {% if pledge.status == "COMPLETED" %}<span class="badge badge-success">Completed</span>
+      {% elif pledge.status == "PARTIALLY_PAID" %}<span class="badge badge-info">Partially Paid</span>
+      {% elif pledge.status == "CANCELLED" %}<span class="badge badge-secondary">Cancelled</span>
+      {% else %}<span class="badge badge-warning">Pending</span>{% endif %}
+      {% if pledge.is_overdue %}<span class="badge badge-danger">Overdue</span>{% endif %}
+    </div>
+    <div class="kpi-label">Status{% if pledge.due_date %} · Due {{ pledge.due_date|date:"M d, Y" }}{% endif %}</div>
+  </div>
+</div>
+
+{% if pledge.notes %}
+<div class="card" style="margin-bottom:1.5rem;">
+  <div class="card-body" style="padding:1rem 1.25rem;">
+    <p style="color:var(--oya-text-secondary);margin:0;"><strong>Notes:</strong> {{ pledge.notes }}</p>
+  </div>
+</div>
+{% endif %}
+
+<div class="dashboard-grid" style="grid-template-columns:1fr 1.6fr;gap:1.5rem;align-items:start;">
+
+  {% if can_manage and pledge.status != "CANCELLED" %}
+  <div class="card">
+    <div class="card-header"><div class="card-header-title">Record a Payment</div></div>
+    <div class="card-body">
+      <form method="post" action="{% url 'project_donations:pledge_payment_create' pk=pledge.pk %}">
+        {% csrf_token %}
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label for="{{ payment_form.amount.id_for_label }}" class="form-label">Amount (&#x20A6;) <span style="color:var(--oya-danger);">*</span></label>
+          {{ payment_form.amount }}
+          {% if payment_form.amount.errors %}<div class="form-error">{{ payment_form.amount.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label for="{{ payment_form.payment_date.id_for_label }}" class="form-label">Payment Date</label>
+          {{ payment_form.payment_date }}
+        </div>
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label for="{{ payment_form.payment_method.id_for_label }}" class="form-label">Payment Method</label>
+          {{ payment_form.payment_method }}
+        </div>
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label for="{{ payment_form.reference_number.id_for_label }}" class="form-label">Reference Number</label>
+          {{ payment_form.reference_number }}
+        </div>
+        <div class="form-group" style="margin-bottom:1.25rem;">
+          <label for="{{ payment_form.notes.id_for_label }}" class="form-label">Notes</label>
+          {{ payment_form.notes }}
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Record Payment
+        </button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-header"><div class="card-header-title">Payment History</div></div>
+    <div class="table-container" style="overflow-x:auto;">
+      <table class="data-table" style="white-space:nowrap;">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Reference</th>
+            <th>Recorded By</th>
+            {% if can_manage %}<th style="width:60px;"></th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for payment in payments %}
+          <tr>
+            <td><span class="cell-muted">{{ payment.payment_date|date:"M d, Y" }}</span></td>
+            <td style="font-weight:600;">&#x20A6;{{ payment.amount|floatformat:0|intcomma }}</td>
+            <td><span class="cell-muted">{{ payment.get_payment_method_display }}</span></td>
+            <td><span class="cell-muted">{{ payment.reference_number|default:"—" }}</span></td>
+            <td><span class="cell-muted">{{ payment.recorded_by.full_name|default:"—" }}</span></td>
+            {% if can_manage %}
+            <td>
+              <form method="post" action="{% url 'project_donations:pledge_payment_delete' pk=pledge.pk payment_pk=payment.pk %}" onsubmit="return confirm('Delete this payment of ₦{{ payment.amount|floatformat:0 }}? This also removes its linked finance record.');">
+                {% csrf_token %}
+                <button type="submit" class="table-action-btn" title="Delete">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </form>
+            </td>
+            {% endif %}
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" style="text-align:center;padding:2.5rem 1rem;color:var(--oya-text-muted);">No payments recorded yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

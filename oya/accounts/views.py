@@ -522,21 +522,29 @@ def change_pin(request):
 @login_required
 @require_http_methods(["GET"])
 def user_search_ajax(request):
-    """AJAX endpoint for user search."""
-    search_term = request.GET.get("q", "")
-    if len(search_term) < 2:
+    """
+    Shared AJAX autocomplete endpoint for selecting a User (used wherever a
+    form needs to attach a record to a login account, e.g. finance income
+    and yearly dues). Searches by full name, serial/membership number, and
+    phone number. Powers the global member-autocomplete widget — see
+    core/widgets.py and static/js/autocomplete.js.
+    """
+    search_term = request.GET.get("q", "").strip()
+    if len(search_term) < 1:
         return JsonResponse({"results": []})
 
-    users = User.objects.filter(
+    users = User.objects.filter(is_active=True).filter(
         Q(serial_number__icontains=search_term) |
-        Q(full_name__icontains=search_term)
-    )[:10]
+        Q(full_name__icontains=search_term) |
+        Q(phone__icontains=search_term)
+    ).order_by("full_name")[:15]
 
     results = [
         {
             "id": u.id,
             "serial_number": u.serial_number,
             "full_name": u.full_name,
+            "phone": u.phone,
             "role": u.role,
             "photo_url": u.photo.url if u.photo else ""
         }

@@ -387,7 +387,22 @@
         <div class="kpi-value" style="color: var(--oya-success)">
           &#x20A6;{{ total_personal_donations|floatformat:0|intcomma }}
         </div>
-        <div class="kpi-label">Total Personal Donations</div>
+        <div class="kpi-label">Total Money Donated</div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid dashboard-grid-3" style="margin-bottom: 1.25rem">
+      <div class="kpi-card">
+        <div class="kpi-value">{{ money_donations.count }}</div>
+        <div class="kpi-label">Money Donations</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">{{ material_donations.count }}</div>
+        <div class="kpi-label">Material Donations</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">{{ labour_contributions.count }}</div>
+        <div class="kpi-label">Labour Contributions</div>
       </div>
     </div>
 
@@ -397,9 +412,9 @@
         <thead>
           <tr>
             <th>Project</th>
-            <th>Amount</th>
+            <th>Type</th>
+            <th>Value</th>
             <th>Date</th>
-            <th>Method</th>
           </tr>
         </thead>
         <tbody>
@@ -408,13 +423,9 @@
             <td>
               <a href="{% url 'projects:project_detail' pk=d.project.pk %}">{{ d.project.title|truncatechars:30 }}</a>
             </td>
-            <td style="font-weight: 600">
-              &#x20A6;{{ d.amount|floatformat:0|intcomma }}
-            </td>
+            <td><span class="badge {{ d.donation_type_badge_class }}">{{ d.get_donation_type_display }}</span></td>
+            <td style="font-weight: 600">{{ d.display_value }}</td>
             <td>{{ d.donation_date|date:"M d, Y" }}</td>
-            <td>
-              <span class="cell-muted">{{ d.get_payment_method_display }}</span>
-            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -424,6 +435,82 @@
     <p style="font-size: 0.875rem; color: var(--oya-text-muted)">
       No project donations recorded yet.
     </p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Feature 13: Donation Groups -->
+<div class="card" style="margin-top: 1.5rem">
+  <div class="card-header">
+    <div class="card-header-title">Donation Groups</div>
+  </div>
+  <div class="card-body">
+    {% if donation_groups %}
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+      {% for membership in donation_groups %}
+      <span class="badge badge-info" title="Added {{ membership.date_added|date:'M d, Y' }}">{{ membership.group.name }}</span>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p style="font-size: 0.875rem; color: var(--oya-text-muted)">Not currently in any donation group.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Feature 13: Pledges -->
+<div class="card" style="margin-top: 1.5rem">
+  <div class="card-header">
+    <div class="card-header-title">Pledges</div>
+  </div>
+  <div class="card-body">
+    <div class="dashboard-grid dashboard-grid-3" style="margin-bottom: 1.25rem">
+      <div class="kpi-card">
+        <div class="kpi-value">{{ active_pledges.count }}</div>
+        <div class="kpi-label">Active Pledges</div>
+      </div>
+      <div class="kpi-card accent-success">
+        <div class="kpi-value" style="color: var(--oya-success)">{{ completed_pledges.count }}</div>
+        <div class="kpi-label">Completed Pledges</div>
+      </div>
+      <div class="kpi-card accent-warning">
+        <div class="kpi-value" style="color: var(--oya-warning)">&#x20A6;{{ outstanding_pledge_total|floatformat:0|intcomma }}</div>
+        <div class="kpi-label">Outstanding Pledge Amount</div>
+      </div>
+    </div>
+
+    {% if active_pledges or completed_pledges %}
+    <div class="table-container" style="overflow-x: auto">
+      <table class="data-table" style="white-space: nowrap">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th>Pledged</th>
+            <th>Outstanding</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pledge in active_pledges %}
+          <tr>
+            <td><a href="{% url 'project_donations:pledge_detail' pk=pledge.pk %}">{{ pledge.project.title|truncatechars:30 }}</a></td>
+            <td style="font-weight:600;">&#x20A6;{{ pledge.pledged_amount|floatformat:0|intcomma }}</td>
+            <td style="color:var(--oya-warning);">&#x20A6;{{ pledge.outstanding_balance|floatformat:0|intcomma }}</td>
+            <td>{% if pledge.status == "PARTIALLY_PAID" %}<span class="badge badge-info">Partially Paid</span>{% else %}<span class="badge badge-warning">Pending</span>{% endif %}</td>
+          </tr>
+          {% endfor %}
+          {% for pledge in completed_pledges %}
+          <tr>
+            <td><a href="{% url 'project_donations:pledge_detail' pk=pledge.pk %}">{{ pledge.project.title|truncatechars:30 }}</a></td>
+            <td style="font-weight:600;">&#x20A6;{{ pledge.pledged_amount|floatformat:0|intcomma }}</td>
+            <td>&#x20A6;0</td>
+            <td><span class="badge badge-success">Completed</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p style="font-size: 0.875rem; color: var(--oya-text-muted)">No pledges recorded yet.</p>
     {% endif %}
   </div>
 </div>

@@ -11,6 +11,7 @@ urlpatterns = [
 
     # Dues Tracker
     path("dues/", views.dues_tracker, name="dues_tracker"),
+    path("dues/debtors/", views.dues_debtors_list, name="dues_debtors_list"),
     # Smart allocation (replaces old single-year dues_create)
     path("dues/allocate/", views.dues_allocate, name="dues_allocate"),
     # Legacy single-year create (kept for backward compatibility, redirects to allocate)

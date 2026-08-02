@@ -66,8 +66,10 @@
       <button type="button" class="tab-btn" data-tab="tab-members">Members</button>
       <button type="button" class="tab-btn" data-tab="tab-clans">Clans</button>
       <button type="button" class="tab-btn" data-tab="tab-finance">Finance & Theme</button>
+      <a href="{% url 'settingsapp:donation_group_list' %}" class="tab-btn tab-btn-link" title="Donation Groups has its own module — opens as a separate page">Donation Groups</a>
     </div>
 
+  <!-- System Config Tab (trimmed — Core System Behavior Settings removed, not yet implemented) -->
   <!-- System Config Tab -->
   <div class="tab-content active" id="tab-system">
     <div class="card" style="margin-top:0;">
@@ -171,63 +173,6 @@
       </div>
     </div>
 
-    <div class="card" style="margin-top:1.25rem;">
-      <div class="card-header">
-        <div>
-          <div class="card-header-title">System Configuration</div>
-          <div class="card-header-subtitle">Core system behavior settings</div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="settings-row">
-          <div class="settings-info">
-            <h4>Auto-Generate Member IDs</h4>
-            <p>Automatically assign sequential member IDs on registration</p>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" checked disabled>
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-        <div class="settings-row">
-          <div class="settings-info">
-            <h4>Require Approval for New Members</h4>
-            <p>New registrations need executive approval before activation</p>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" disabled>
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-        <div class="settings-row">
-          <div class="settings-info">
-            <h4>Enable SMS Notifications</h4>
-            <p>Send SMS alerts for important announcements and reminders</p>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" checked disabled>
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-        <div class="settings-row">
-          <div class="settings-info">
-            <h4>Email Notifications</h4>
-            <p>Send email notifications for system events and updates</p>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" checked disabled>
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-        <div class="settings-row">
-          <div class="settings-info">
-            <h4>Session Timeout (minutes)</h4>
-            <p>Automatically log out inactive users after specified time</p>
-          </div>
-          <input type="number" class="form-control" value="30" style="width:80px;text-align:center;" disabled>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Users & Access Tab -->
@@ -637,6 +582,11 @@
 <script>
 // Tab switching
 document.querySelectorAll('.tab-btn').forEach(btn => {
+  // Donation Groups is a real link to its own page/module, not a local pane —
+  // let it navigate normally instead of trying to toggle a #tab-donation-groups
+  // pane that doesn't exist.
+  if (btn.tagName === 'A') return;
+
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));

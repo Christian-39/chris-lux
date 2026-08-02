@@ -2,6 +2,7 @@
 Views for OYA members.
 """
 import logging
+from decimal import Decimal
 from dashboard.services import invalidate_dashboard_cache
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -73,7 +74,7 @@ def member_detail(request, pk):
     """Display member details with outside donors and donation data."""
     member = get_object_or_404(Member.objects.select_related("umu_nna_clan"), pk=pk)
     
-    from project_donations.models import Donation, OutsideDonor
+    from project_donations.models import Donation, OutsideDonor, Pledge
     from django.db.models import Sum, Value, DecimalField
     from django.db.models.functions import Coalesce
     
@@ -92,6 +93,22 @@ def member_detail(request, pk):
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
     )["total"] or 0
     projects_supported = personal_donations.values("project").distinct().count()
+
+    # ─── Feature 13: donation type breakdown ───
+    money_donations = personal_donations.filter(donation_type="MONEY")
+    material_donations = personal_donations.filter(donation_type="MATERIAL")
+    labour_contributions = personal_donations.filter(donation_type="LABOUR")
+
+    # ─── Feature 13: donation groups ───
+    donation_groups = member.donation_group_memberships.select_related("group").order_by("-date_added")
+
+    # ─── Feature 13: pledges ───
+    member_pledges = Pledge.objects.filter(member=member).select_related("project").order_by("-created_at")
+    active_pledges = member_pledges.filter(status__in=["PENDING", "PARTIALLY_PAID"])
+    completed_pledges = member_pledges.filter(status="COMPLETED")
+    outstanding_pledge_total = sum(
+        (p.outstanding_balance for p in active_pledges), Decimal("0")
+    )
     
     return render(request, "members/member_detail.html", {
         "member": member,
@@ -101,6 +118,13 @@ def member_detail(request, pk):
         "personal_donations": personal_donations,
         "total_personal_donations": total_personal_donations,
         "projects_supported": projects_supported,
+        "money_donations": money_donations,
+        "material_donations": material_donations,
+        "labour_contributions": labour_contributions,
+        "donation_groups": donation_groups,
+        "active_pledges": active_pledges,
+        "completed_pledges": completed_pledges,
+        "outstanding_pledge_total": outstanding_pledge_total,
     })
 
 
@@ -352,6 +376,49 @@ def clan_create(request):
 
 @login_required
 @require_http_methods(["GET"])
+@login_required
+@require_http_methods(["GET"])
+def member_autocomplete_search(request):
+    """
+    Shared AJAX autocomplete endpoint for selecting a Member — used by the
+    global member-autocomplete widget (core/widgets.py +
+    static/js/autocomplete.js) wherever a form needs to attach a record to
+    a Member: project donations, donation groups, outside-donor referrals,
+    etc. Searches by full name, membership (serial) number, and phone.
+    Response shape matches accounts.views.user_search_ajax so both feed the
+    same JS component without extra config.
+    """
+    search_term = request.GET.get("q", "").strip()
+    if len(search_term) < 1:
+        return JsonResponse({"results": []})
+
+    status_filter = request.GET.get("status", "ACTIVE")
+    members = Member.objects.select_related("umu_nna_clan")
+    if status_filter:
+        members = members.filter(status=status_filter)
+
+    members = members.filter(
+        Q(full_name__icontains=search_term) |
+        Q(serial_number__icontains=search_term) |
+        Q(phone__icontains=search_term)
+    ).order_by("full_name")[:15]
+
+    results = [
+        {
+            "id": m.id,
+            "serial_number": m.serial_number,
+            "full_name": m.full_name,
+            "phone": m.phone,
+            "role": m.status,
+            "photo_url": m.photo.url if m.photo else ""
+        }
+        for m in members
+    ]
+
+    return JsonResponse({"results": results})
+
+
+@login_required
 def member_stats_ajax(request):
     """AJAX endpoint for member statistics."""
     stats = {

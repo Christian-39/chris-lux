@@ -136,6 +136,25 @@
           </div>
         </div>
 
+        <!-- Donation Group Reporting -->
+        <div style="border-top:1px solid var(--oya-border);padding-top:1.25rem;margin-top:1.5rem;">
+          <div class="form-group" style="margin-bottom:0;">
+            <div class="form-check" style="display:flex;align-items:center;gap:0.5rem;">
+              {{ form.include_in_group_reports }}
+              <label for="{{ form.include_in_group_reports.id_for_label }}" class="form-label" style="margin:0;">
+                Include this project in Donation Group Reports
+              </label>
+            </div>
+            <p style="font-size:0.8125rem;color:var(--oya-text-muted);margin-top:0.35rem;">
+              Disabling this only hides this project's donations from Donation Group reports.
+              Treasury, finance, and project totals are unaffected.
+            </p>
+            {% if form.include_in_group_reports.errors %}
+              <div class="form-error">{{ form.include_in_group_reports.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+
         <div style="display:flex;gap:0.75rem;justify-content:flex-end;border-top:1px solid var(--oya-border);padding-top:1.25rem;">
           <a href="{% url 'projects:project_list' %}" class="btn btn-secondary">Cancel</a>
           <button type="submit" class="btn btn-primary">

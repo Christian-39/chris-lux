@@ -177,6 +177,8 @@
 <script>
 (function() {
   const memberSelect = document.getElementById('id_member');
+  const memberSearchInput = document.getElementById('id_member_search');
+  const memberWrapper = memberSelect ? memberSelect.closest('.autocomplete-wrapper') : null;
   const paidByInput = document.getElementById('id_paid_by');
   const amountInput = document.getElementById('id_amount');
   const reasonInput = document.getElementById('id_reason');
@@ -186,15 +188,12 @@
   const caseFieldGroup = document.getElementById('caseFieldGroup');
   const caseSelect = document.getElementById('id_case');
 
-  // Member dropdown -> auto-fill paid_by
-  if (memberSelect) {
-    memberSelect.addEventListener('change', function() {
-      if (this.selectedIndex > 0) {
-        const selectedText = this.options[this.selectedIndex].text;
-        const cleanName = selectedText.split(' (')[0].split(' - ').pop().trim();
-        if (paidByInput) {
-          paidByInput.value = cleanName;
-        }
+  // Member selected via autocomplete -> auto-fill paid_by
+  if (memberWrapper) {
+    memberWrapper.addEventListener('autocomplete:select', function(e) {
+      const item = e.detail;
+      if (paidByInput && item && item.full_name) {
+        paidByInput.value = item.full_name;
       }
     });
   }
@@ -214,9 +213,10 @@
     if (incomeTypeSelect && incomeTypeSelect.value === 'CASE_FINE') {
       if (caseFieldGroup) caseFieldGroup.style.display = 'block';
       if (caseSelect) caseSelect.setAttribute('required', 'required');
-      if (memberSelect) {
-        memberSelect.value = '';
-        memberSelect.disabled = true;
+      if (memberSelect) memberSelect.value = '';
+      if (memberSearchInput) {
+        memberSearchInput.value = '';
+        memberSearchInput.disabled = true;
       }
     } else {
       if (caseFieldGroup) caseFieldGroup.style.display = 'none';
@@ -224,7 +224,7 @@
         caseSelect.removeAttribute('required');
         caseSelect.value = '';
       }
-      if (memberSelect) memberSelect.disabled = false;
+      if (memberSearchInput) memberSearchInput.disabled = false;
     }
   }
 
