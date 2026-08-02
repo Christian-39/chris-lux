@@ -24,6 +24,7 @@ ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS", default="localhost,127.0.0.1").sp
 
 # Application definition
 DJANGO_APPS = [
+    'django.forms',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -90,6 +91,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "oya.wsgi.application"
 ASGI_APPLICATION = "oya.asgi.application"
+# settings.py
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 # Database
 DATABASES = {

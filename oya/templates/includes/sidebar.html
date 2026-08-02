@@ -308,6 +308,27 @@
       </a>
 
       <a
+        href="{% url 'project_donations:pledge_list' %}"
+        class="nav-item {% if request.resolver_match.url_name == 'pledge_list' or request.resolver_match.url_name == 'pledge_create' or request.resolver_match.url_name == 'pledge_update' or request.resolver_match.url_name == 'pledge_detail' or request.resolver_match.url_name == 'pledge_delete' %}active{% endif %}"
+      >
+        <svg
+          class="nav-icon"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M9 11l3 3L22 4" />
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+        </svg>
+        <span class="nav-label">Pledges</span>
+      </a>
+
+      <a
         href="{% url 'finance:expense_list' %}"
         class="nav-item {% if request.resolver_match.url_name == 'expense_list' or request.resolver_match.url_name == 'expense_create' or request.resolver_match.url_name == 'expense_detail' or request.resolver_match.url_name == 'expense_delete' %}active{% endif %}"
       >
