@@ -22,4 +22,4 @@ class MemberAdmin(admin.ModelAdmin):
     search_fields = ["serial_number", "full_name", "phone", "state_or_abroad"]
     list_select_related = ["umu_nna_clan"]
     ordering = ["-created_at"]
-    date_hierarchy = "created_at"
+ 
