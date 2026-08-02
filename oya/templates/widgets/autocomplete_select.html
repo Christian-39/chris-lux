@@ -1,126 +1,21 @@
-<div class="autocomplete-select" data-min-chars="{{ widget.min_chars }}">
-  <input type="hidden"
-         name="{{ widget.name }}"
-         {% if widget.value != None %}value="{{ widget.value }}"{% endif %}
-         id="{{ widget.attrs.id }}">
-
-  <div class="autocomplete-select-input-wrap" style="position:relative;">
+<div data-autocomplete-wrapper style="position:relative;">
     <input type="text"
-           id="{{ widget.search_input_id }}"
-           class="form-control autocomplete-select-search"
+           data-autocomplete-input
+           data-search-url="{{ widget.search_url }}"
+           data-min-chars="{{ widget.min_chars }}"
+           class="form-control"
            placeholder="{{ widget.placeholder }}"
-           value="{{ widget.display_value }}"
+           value="{{ widget.display_text|default:'' }}"
            autocomplete="off">
-
-    {% if widget.allow_clear %}
-    <button type="button" class="autocomplete-select-clear"
-            style="display:{% if widget.display_value %}block{% else %}none{% endif %};position:absolute;right:8px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:#999;font-size:1.1rem;line-height:1;"
-            title="Clear">&times;</button>
+    <input type="hidden"
+           name="{{ widget.name }}"
+           data-autocomplete-value
+           value="{{ widget.value|default:'' }}">
+    <div data-autocomplete-results class="hidden"
+         style="position:absolute;top:100%;left:0;right:0;z-index:999;background:#fff;border:1px solid var(--oya-border);border-radius:var(--oya-radius);max-height:220px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.1);margin-top:2px;">
+    </div>
+    {% if widget.value %}
+    <button type="button" data-autocomplete-clear
+            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--oya-text-muted);font-size:1rem;line-height:1;">×</button>
     {% endif %}
-
-    <div class="autocomplete-select-results"
-         style="display:none;position:absolute;z-index:1000;top:100%;left:0;background:#fff;border:1px solid #ddd;border-radius:4px;width:100%;max-height:240px;overflow-y:auto;box-shadow:0 2px 8px rgba(0,0,0,0.12);margin-top:2px;"></div>
-  </div>
 </div>
-
-<script>
-(function () {
-  var hiddenInput = document.getElementById("{{ widget.attrs.id }}");
-  var searchInput = document.getElementById("{{ widget.search_input_id }}");
-  if (!hiddenInput || !searchInput) return;
-
-  var container = searchInput.closest(".autocomplete-select-input-wrap");
-  var resultsBox = container.querySelector(".autocomplete-select-results");
-  var clearBtn = container.querySelector(".autocomplete-select-clear");
-  var searchUrl = "{{ widget.search_url }}";
-  var minChars = parseInt("{{ widget.min_chars }}", 10) || 1;
-  var debounceTimer = null;
-  var activeController = null;
-
-  function hideResults() {
-    resultsBox.style.display = "none";
-    resultsBox.innerHTML = "";
-  }
-
-  function selectItem(id, text) {
-    hiddenInput.value = id;
-    searchInput.value = text;
-    hideResults();
-    if (clearBtn) clearBtn.style.display = "block";
-    hiddenInput.dispatchEvent(new Event("change", { bubbles: true }));
-  }
-
-  function renderResults(items) {
-    resultsBox.innerHTML = "";
-    if (!items || !items.length) {
-      var empty = document.createElement("div");
-      empty.textContent = "No results found";
-      empty.style.cssText = "padding:8px 12px;color:#999;font-size:0.875rem;";
-      resultsBox.appendChild(empty);
-      resultsBox.style.display = "block";
-      return;
-    }
-    items.forEach(function (item) {
-      var label = item.text != null ? item.text
-        : (item.full_name || item.name || String(item.id));
-      var row = document.createElement("div");
-      row.textContent = label;
-      row.style.cssText = "padding:8px 12px;cursor:pointer;font-size:0.875rem;";
-      row.addEventListener("mousedown", function (e) {
-        e.preventDefault();
-        selectItem(item.id, label);
-      });
-      row.addEventListener("mouseenter", function () { row.style.background = "#f5f5f5"; });
-      row.addEventListener("mouseleave", function () { row.style.background = ""; });
-      resultsBox.appendChild(row);
-    });
-    resultsBox.style.display = "block";
-  }
-
-  function doSearch(term) {
-    if (activeController) activeController.abort();
-    activeController = new AbortController();
-    fetch(searchUrl + "?q=" + encodeURIComponent(term), { signal: activeController.signal })
-      .then(function (resp) { return resp.json(); })
-      .then(function (data) {
-        var items = data.results || data.data || data;
-        renderResults(Array.isArray(items) ? items : []);
-      })
-      .catch(function (err) {
-        if (err.name !== "AbortError") hideResults();
-      });
-  }
-
-  searchInput.addEventListener("input", function () {
-    var term = searchInput.value.trim();
-    hiddenInput.value = "";
-    if (clearBtn) clearBtn.style.display = "none";
-    clearTimeout(debounceTimer);
-    if (term.length < minChars) {
-      hideResults();
-      return;
-    }
-    debounceTimer = setTimeout(function () { doSearch(term); }, 300);
-  });
-
-  searchInput.addEventListener("focus", function () {
-    if (searchInput.value.trim().length >= minChars && resultsBox.innerHTML) {
-      resultsBox.style.display = "block";
-    }
-  });
-
-  document.addEventListener("click", function (e) {
-    if (!container.contains(e.target)) hideResults();
-  });
-
-  if (clearBtn) {
-    clearBtn.addEventListener("click", function () {
-      hiddenInput.value = "";
-      searchInput.value = "";
-      clearBtn.style.display = "none";
-      hiddenInput.dispatchEvent(new Event("change", { bubbles: true }));
-      searchInput.focus();
-    });
-  }
-})();
-</script>

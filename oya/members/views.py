@@ -375,13 +375,8 @@ def clan_create(request):
 @login_required
 @require_http_methods(["GET"])
 def member_autocomplete_search(request):
-    """
-    Shared AJAX autocomplete endpoint for selecting a Member.
-    Searches by full name, serial number, and phone.
-    Returns: {"results": [{"id": 1, "text": "Name (ID)", ...}, ...]}
-    """
-    search_term = request.GET.get("q", "").strip()
-    if len(search_term) < 1:
+    q = request.GET.get("q", "").strip()
+    if len(q) < 1:
         return JsonResponse({"results": []})
 
     status_filter = request.GET.get("status", "ACTIVE")
@@ -390,26 +385,20 @@ def member_autocomplete_search(request):
         members = members.filter(status=status_filter)
 
     members = members.filter(
-        Q(full_name__icontains=search_term) |
-        Q(serial_number__icontains=search_term) |
-        Q(phone__icontains=search_term)
+        Q(full_name__icontains=q) |
+        Q(serial_number__icontains=q) |
+        Q(phone__icontains=q)
     ).order_by("full_name")[:15]
 
     results = []
     for m in members:
-        # 'text' is REQUIRED by Select2 / AutocompleteSelectWidget
-        label = f"{m.full_name}"
-        if m.serial_number:
-            label += f" ({m.serial_number})"
-        
         results.append({
             "id": m.id,
-            "text": label,                       # ← this is what the widget displays
-            "serial_number": m.serial_number,
-            "full_name": m.full_name,
-            "phone": m.phone,
+            "full_name": m.full_name,          # ← JS displays this
+            "serial_number": m.serial_number,  # ← JS shows as subtitle
+            "phone": m.phone,                  # ← JS shows as subtitle
             "role": m.status,
-            "photo_url": m.photo.url if m.photo and hasattr(m.photo, 'url') else ""
+            "photo_url": m.photo.url if m.photo and hasattr(m.photo, "url") else ""
         })
 
     return JsonResponse({"results": results})
