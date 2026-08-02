@@ -11,4 +11,4 @@ class NotificationAdmin(admin.ModelAdmin):
     list_filter = ["notification_type", "is_read", "is_global", "created_at"]
     search_fields = ["title", "message"]
     ordering = ["-created_at"]
-    date_hierarchy = "created_at"
+    
