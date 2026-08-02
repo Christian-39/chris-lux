@@ -14,4 +14,3 @@ class ProjectAdmin(admin.ModelAdmin):
     list_filter = ["status", "enable_fundraising", "fundraising_status", "created_at"]
     search_fields = ["title", "description"]
     ordering = ["-created_at"]
-    date_hierarchy = "created_at"
