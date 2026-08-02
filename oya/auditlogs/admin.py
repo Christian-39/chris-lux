@@ -17,7 +17,6 @@ class AuditLogAdmin(admin.ModelAdmin):
         "description", "ip_address", "object_type"
     ]
     ordering = ["-created_at"]
-    date_hierarchy = "created_at"
     readonly_fields = [
         "user", "action", "object_type", "object_id",
         "description", "ip_address", "created_at"
