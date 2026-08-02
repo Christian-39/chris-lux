@@ -27,4 +27,3 @@ class CaseFileAdmin(admin.ModelAdmin):
     list_filter = ["status", "created_at"]
     search_fields = ["case_number", "title", "respondent__full_name", "reported_to__member__full_name", "resolved_by__member__full_name"]
     list_select_related = ["respondent", "reported_to", "reported_to__member", "resolved_by", "resolved_by__member"]
-    date_hierarchy = "created_at"
