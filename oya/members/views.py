@@ -128,7 +128,6 @@ def member_detail(request, pk):
     })
 
 
-
 @login_required
 def member_create(request):
     """Create a new member with login account and PIN."""
@@ -373,20 +372,13 @@ def clan_create(request):
         "action": "Create"
     })
 
-
-@login_required
-@require_http_methods(["GET"])
 @login_required
 @require_http_methods(["GET"])
 def member_autocomplete_search(request):
     """
-    Shared AJAX autocomplete endpoint for selecting a Member — used by the
-    global member-autocomplete widget (core/widgets.py +
-    static/js/autocomplete.js) wherever a form needs to attach a record to
-    a Member: project donations, donation groups, outside-donor referrals,
-    etc. Searches by full name, membership (serial) number, and phone.
-    Response shape matches accounts.views.user_search_ajax so both feed the
-    same JS component without extra config.
+    Shared AJAX autocomplete endpoint for selecting a Member.
+    Searches by full name, serial number, and phone.
+    Returns: {"results": [{"id": 1, "text": "Name (ID)", ...}, ...]}
     """
     search_term = request.GET.get("q", "").strip()
     if len(search_term) < 1:
@@ -403,17 +395,22 @@ def member_autocomplete_search(request):
         Q(phone__icontains=search_term)
     ).order_by("full_name")[:15]
 
-    results = [
-        {
+    results = []
+    for m in members:
+        # 'text' is REQUIRED by Select2 / AutocompleteSelectWidget
+        label = f"{m.full_name}"
+        if m.serial_number:
+            label += f" ({m.serial_number})"
+        
+        results.append({
             "id": m.id,
+            "text": label,                       # ← this is what the widget displays
             "serial_number": m.serial_number,
             "full_name": m.full_name,
             "phone": m.phone,
             "role": m.status,
-            "photo_url": m.photo.url if m.photo else ""
-        }
-        for m in members
-    ]
+            "photo_url": m.photo.url if m.photo and hasattr(m.photo, 'url') else ""
+        })
 
     return JsonResponse({"results": results})
 

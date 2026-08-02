@@ -42,7 +42,7 @@
       <div class="card-header-title">Donation Information</div>
     </div>
     <div class="card-body">
-      <form method="post" novalidate id="donationForm">
+      <form method="post" enctype="multipart/form-data" novalidate id="donationForm">
         {% csrf_token %}
 
         <div
@@ -347,19 +347,19 @@
 </div>
 
 <script>
+  // ─── Donor Type Toggle + Helper + Auto-fill ───
   (function () {
     const donorType = document.getElementById("id_donor_type");
     const memberGroup = document.getElementById("member-field-group");
     const outsideGroup = document.getElementById("outside-donor-field-group");
-    // Member/invited_by are now the shared autocomplete widget: the
-    // hidden input (id_member / id_invited_by) carries the real value,
-    // the visible search box (id_member_search / id_invited_by_search)
-    // shows the typed/selected text.
     const memberHidden = document.getElementById("id_member");
     const memberSearch = document.getElementById("id_member_search");
     const outsideSelect = document.getElementById("id_outside_donor");
     const invitedByHidden = document.getElementById("id_invited_by");
     const invitedBySearch = document.getElementById("id_invited_by_search");
+    const donorHelper = document.getElementById("add-donor-helper");
+
+    if (!donorType) return;
 
     function clearAutocomplete(hiddenEl, searchEl) {
       if (hiddenEl) hiddenEl.value = "";
@@ -370,7 +370,7 @@
       if (donorType.value === "MEMBER") {
         memberGroup.style.display = "block";
         outsideGroup.style.display = "none";
-        outsideSelect.value = "";
+        if (outsideSelect) outsideSelect.value = "";
       } else if (donorType.value === "OUTSIDE") {
         memberGroup.style.display = "none";
         outsideGroup.style.display = "block";
@@ -381,44 +381,43 @@
       }
     }
 
+    function toggleHelper() {
+      if (!donorHelper) return;
+      donorHelper.style.display = donorType.value === "OUTSIDE" ? "block" : "none";
+    }
+
     donorType.addEventListener("change", toggleFields);
     toggleFields();
 
-    // Auto-fill invited_by for outside donors
-    outsideSelect.addEventListener("change", function () {
-      if (donorType.value === "OUTSIDE" && outsideSelect.value) {
-        fetch(
-          `/project-donations/api/donor-inviter/?donor_id=${outsideSelect.value}`,
-        )
-          .then((r) => r.json())
-          .then((data) => {
-            if (data.invited_by_id) {
-              if (invitedByHidden) invitedByHidden.value = data.invited_by_id;
-              if (invitedBySearch) invitedBySearch.value = data.invited_by_name || "";
-            }
-          });
-      }
-    });
-  })();
-  // Show helper when OUTSIDE is selected and donor list is empty or user seems stuck
-  const donorHelper = document.getElementById("add-donor-helper");
-  function toggleHelper() {
-    if (donorType.value === "OUTSIDE") {
-      donorHelper.style.display = "block";
-    } else {
-      donorHelper.style.display = "none";
-    }
-  }
-  donorType.addEventListener("change", toggleHelper);
-  toggleHelper();
+    donorType.addEventListener("change", toggleHelper);
+    toggleHelper();
 
-  // ─── Donation Type toggle: Money / Material / Labour (Feature 5) ───
+    // Auto-fill invited_by for outside donors
+    if (outsideSelect) {
+      outsideSelect.addEventListener("change", function () {
+        if (donorType.value === "OUTSIDE" && outsideSelect.value) {
+          fetch(`/project-donations/api/donor-inviter/?donor_id=${outsideSelect.value}`)
+            .then((r) => r.json())
+            .then((data) => {
+              if (data.invited_by_id) {
+                if (invitedByHidden) invitedByHidden.value = data.invited_by_id;
+                if (invitedBySearch) invitedBySearch.value = data.invited_by_name || "";
+              }
+            });
+        }
+      });
+    }
+  })();
+
+  // ─── Donation Type toggle: Money / Material / Labour ───
   (function () {
     const donationType = document.getElementById("id_donation_type");
     const moneyGroup = document.getElementById("money-fields-group");
     const materialGroup = document.getElementById("material-fields-group");
     const labourGroup = document.getElementById("labour-fields-group");
     const sharedGroup = document.getElementById("shared-material-labour-group");
+
+    if (!donationType || !moneyGroup || !materialGroup || !labourGroup) return;
 
     function toggleDonationType() {
       const type = donationType.value;
