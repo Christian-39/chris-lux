@@ -1,22 +1,3 @@
-/**
- * OYA Autocomplete Component
- * Single, reusable searchable-select used everywhere a form needs to pick
- * a Member or a User: yearly dues, project/general donations, pledges,
- * donation-group assignment, outside-donor referrals, etc.
- *
- * Server-side search only — never preloads the full member list.
- * Backed by members:member_autocomplete_search / accounts:user_search_ajax,
- * both returning: {results: [{id, full_name, serial_number, phone, role, photo_url}]}
- *
- * Markup contract (see templates/widgets/autocomplete_select.html):
- *   [data-autocomplete-wrapper]
- *     input[data-autocomplete-input][data-search-url][data-min-chars]
- *     input[data-autocomplete-value]   (hidden - the real field value)
- *     [data-autocomplete-clear]        (optional)
- *     [data-autocomplete-results]
- */
-alert('Autocomplete JS loaded!');
-
 (function () {
   'use strict';
 
@@ -41,10 +22,18 @@ alert('Autocomplete JS loaded!');
       this.hidden = wrapper.querySelector('[data-autocomplete-value]');
       this.resultsBox = wrapper.querySelector('[data-autocomplete-results]');
       this.clearBtn = wrapper.querySelector('[data-autocomplete-clear]');
+      
       if (!this.input || !this.hidden || !this.resultsBox) return;
 
       this.searchUrl = this.input.dataset.searchUrl;
       this.minChars = parseInt(this.input.dataset.minChars || '1', 10);
+      
+      // DEBUG: show URL on load
+      if (!this.searchUrl) {
+        this.resultsBox.innerHTML = '<div style="color:red;font-size:12px;">ERROR: searchUrl is empty!</div>';
+        this.resultsBox.classList.remove('hidden');
+      }
+
       this.items = [];
       this.activeIndex = -1;
       this.abortController = null;
@@ -64,8 +53,6 @@ alert('Autocomplete JS loaded!');
       if (this.clearBtn) {
         this.clearBtn.addEventListener('click', () => this.clear());
       }
-      // If the field was pre-filled (edit form), typing again should
-      // invalidate the stale selection until a new one is confirmed.
       this.input.addEventListener('input', () => {
         if (!this.input.value) this.hidden.value = '';
       });
@@ -82,29 +69,35 @@ alert('Autocomplete JS loaded!');
     }
 
     search(q) {
+      if (!this.searchUrl) {
+        this.resultsBox.innerHTML = '<div style="color:red;">No search URL configured</div>';
+        this.showResults();
+        return;
+      }
+
       if (this.abortController) this.abortController.abort();
       this.abortController = new AbortController();
 
+      const url = `${this.searchUrl}?q=${encodeURIComponent(q)}`;
       this.resultsBox.innerHTML = '<div class="autocomplete-item autocomplete-loading">Searching…</div>';
       this.showResults();
 
-      fetch(`${this.searchUrl}?q=${encodeURIComponent(q)}`, {
-  signal: this.abortController.signal,
-  headers: { 'X-Requested-With': 'XMLHttpRequest' }
-})
-  .then((r) => {
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json();
-  })
-  .then((data) => {
-    this.items = Array.isArray(data.results) ? data.results : [];
-    this.render(q);
-  })
-  .catch((err) => {
-    if (err.name === 'AbortError') return;
-    this.resultsBox.innerHTML = '<div class="autocomplete-item autocomplete-empty">Search unavailable. Try again.</div>';
-  });
-
+      fetch(url, {
+        signal: this.abortController.signal,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+        .then((r) => {
+          if (!r.ok) throw new Error(`Server error ${r.status}`);
+          return r.json();
+        })
+        .then((data) => {
+          this.items = Array.isArray(data.results) ? data.results : [];
+          this.render(q);
+        })
+        .catch((err) => {
+          if (err.name === 'AbortError') return;
+          this.resultsBox.innerHTML = `<div class="autocomplete-item autocomplete-empty" style="color:red;">${err.message}</div>`;
+        });
     }
 
     render(q) {
@@ -200,6 +193,5 @@ alert('Autocomplete JS loaded!');
     initAll();
   }
 
-  // Expose for dynamically-injected forms (e.g. modals loaded via AJAX)
   window.OYAAutocomplete = { init: initAll, MemberAutocomplete };
 })();
