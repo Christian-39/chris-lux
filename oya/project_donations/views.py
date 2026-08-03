@@ -123,6 +123,8 @@ def outside_donor_create(request):
     })
 
 
+
+
 @login_required
 def outside_donor_update(request, pk):
     """Update an existing outside donor."""
@@ -156,7 +158,13 @@ def outside_donor_update(request, pk):
     else:
         form = OutsideDonorForm(instance=donor)
 
-    return redirect("project_donations:outside_donor_list")
+    return render(request, "project_donations/outside_donor_form.html", {
+        "form": form,
+        "donor": donor,
+        "title": "Edit Outside Donor",
+        "action": "Update"
+    })
+
 
 
 @login_required
@@ -385,7 +393,12 @@ def donation_update(request, pk):
     else:
         form = DonationForm(instance=donation)
 
-    return render(request, "project_donations/donation_list.html")
+    return render(request, "project_donations/donation_form.html", {
+        "form": form,
+        "donation": donation,
+        "title": "Edit Donation",
+        "action": "Update"
+    })
 
 
 @login_required
