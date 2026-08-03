@@ -383,6 +383,9 @@ def member_autocomplete_search(request):
     members = Member.objects.select_related("umu_nna_clan")
     if status_filter:
         members = members.filter(status=status_filter)
+    # Defense-in-depth: no matter what status filter (or lack of one) is
+    # requested, a Removed member must never be selectable here.
+    members = members.exclude(status="REMOVED")
 
     members = members.filter(
         Q(full_name__icontains=q) |

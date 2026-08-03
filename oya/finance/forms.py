@@ -6,6 +6,7 @@ from decimal import Decimal
 from .models import Income, Expense, DuesPayment, DuesPaymentTransaction
 from accounts.models import User  # Ensure this import matches your user model path
 from core.widgets import AutocompleteSelectWidget
+from core.utils import exclude_removed_users
 
 
 class IncomeForm(forms.ModelForm):
@@ -44,8 +45,9 @@ class IncomeForm(forms.ModelForm):
         choices = [c for c in Income.INCOME_TYPE_CHOICES if c[0] != "DUES"]
         self.fields["income_type"].choices = choices
 
-        # Member dropdown
-        self.fields["member"].queryset = User.objects.filter(serial_number__isnull=False).exclude(serial_number="").exclude(is_staff=True).exclude(is_superuser=True).order_by("full_name")
+        # Member dropdown — Removed members must never be selectable.
+        member_qs = User.objects.filter(serial_number__isnull=False).exclude(serial_number="").exclude(is_staff=True).exclude(is_superuser=True)
+        self.fields["member"].queryset = exclude_removed_users(member_qs).order_by("full_name")
         self.fields["member"].widget.display_queryset = self.fields["member"].queryset
         self.fields["member"].required = False
         self.fields["paid_by"].required = False
@@ -151,7 +153,8 @@ class DuesPaymentAllocationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["payment_date"].initial = timezone.now().date()
         # FIX Issue 2: Ensure only registered members appear in dues allocation form
-        self.fields["member"].queryset = User.objects.filter(
+        # Removed members must never be selectable for new dues payments.
+        member_qs = User.objects.filter(
             serial_number__isnull=False
         ).exclude(
             serial_number=""
@@ -159,7 +162,8 @@ class DuesPaymentAllocationForm(forms.ModelForm):
             is_staff=True
         ).exclude(
             is_superuser=True
-        ).order_by("full_name")
+        )
+        self.fields["member"].queryset = exclude_removed_users(member_qs).order_by("full_name")
         self.fields["member"].widget.display_queryset = self.fields["member"].queryset
 
     def clean_total_amount(self):

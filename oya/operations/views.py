@@ -62,13 +62,18 @@ def taskforce_create(request):
         messages.error(request, "Executive access required.")
         return redirect("operations:taskforce_list")
 
-    # Get active members not already in task force
+    # Get active members not already in task force, and not currently
+    # serving as an executive (mirrors TaskForceMemberForm's queryset).
     from members.models import Member
+    from executives.models import Executive
     assigned_ids = TaskForceMember.objects.filter(is_active=True).values_list("member_id", flat=True)
+    current_executive_ids = Executive.objects.filter(is_current=True).values_list("member_id", flat=True)
     available_members = Member.objects.filter(
         status="ACTIVE"
     ).exclude(
         id__in=assigned_ids
+    ).exclude(
+        id__in=current_executive_ids
     ).order_by("full_name")
 
     if request.method == "POST":

@@ -72,3 +72,34 @@ def build_search_query(fields, search_term):
     for field in fields:
         query |= Q(**{f"{field}__icontains": search_term})
     return query
+
+
+def exclude_removed_members(queryset):
+    """
+    Exclude Member records whose status is REMOVED from a Member queryset.
+
+    Use this (instead of ad-hoc status filters) on every queryset that
+    powers a member-selection input — dropdowns, autocomplete/search
+    endpoints, etc. — so removed members can never be picked for new
+    activities (payments, dues, donations, fines, task force, elections,
+    asset assignment, and so on).
+    """
+    return queryset.exclude(status="REMOVED")
+
+
+def exclude_removed_users(queryset):
+    """
+    Exclude User accounts linked (by matching serial_number) to a Member
+    whose status is REMOVED.
+
+    The User and Member models are matched by serial_number rather than a
+    direct foreign key, so User-based selection endpoints (e.g. dues /
+    income "member" pickers) need this explicit exclusion — filtering
+    User.is_active alone does not account for a member being marked
+    Removed on the Member record.
+    """
+    from members.models import Member
+    removed_serials = Member.objects.filter(status="REMOVED").values_list(
+        "serial_number", flat=True
+    )
+    return queryset.exclude(serial_number__in=removed_serials)
