@@ -88,7 +88,7 @@
         // search_url_name on the server side) — this is a configuration
         // problem, not a transient network issue, so say so distinctly
         // rather than the generic message.
-        console.error('OYA Autocomplete: no search URL configured for this field.', this.input);
+        console.error('OYA Autocomplete: no search URL configured for field id="' + (this.input.id || '(no id)') + '". Check the server logs for a matching AutocompleteSelectWidget warning/error.', this.input);
         this.resultsBox.innerHTML = '<div class="autocomplete-item autocomplete-empty">Search is not configured for this field.</div>';
         this.showResults();
         return;
