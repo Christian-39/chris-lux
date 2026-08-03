@@ -346,5 +346,41 @@
   </div>
 </div>
 
+<script>
+(function () {
+  const donationTypeSelect = document.getElementById('id_donation_type');
+  const moneyGroup = document.getElementById('money-fields-group');
+  const materialGroup = document.getElementById('material-fields-group');
+  const labourGroup = document.getElementById('labour-fields-group');
+  const sharedGroup = document.getElementById('shared-material-labour-group');
+
+  function toggleDonationFields() {
+    const value = donationTypeSelect ? donationTypeSelect.value : '';
+
+    // Hide all first
+    moneyGroup.style.display = 'none';
+    materialGroup.style.display = 'none';
+    labourGroup.style.display = 'none';
+    sharedGroup.style.display = 'none';
+
+    if (value === 'MONEY') {
+      moneyGroup.style.display = '';
+    } else if (value === 'MATERIAL') {
+      materialGroup.style.display = '';
+      sharedGroup.style.display = '';
+    } else if (value === 'LABOUR') {
+      labourGroup.style.display = '';
+      sharedGroup.style.display = '';
+    }
+  }
+
+  if (donationTypeSelect) {
+    donationTypeSelect.addEventListener('change', toggleDonationFields);
+  }
+
+  // Initialize on page load (handles edit mode)
+  toggleDonationFields();
+})();
+</script>
 
 {% endblock %}
