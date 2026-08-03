@@ -230,6 +230,24 @@
 
 <!-- Projects Section -->
 <h2 style="font-size:1.125rem;margin-bottom:0.75rem;">Projects</h2>
+<div class="card" style="margin-bottom:1rem;">
+  <div class="card-body">
+    <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:0.5rem;text-align:center;">
+      <div style="background:var(--oya-bg-secondary);padding:0.5rem;border-radius:0.375rem;">
+        <div style="font-size:1.25rem;font-weight:700;color:var(--oya-success);">{{ handover.projects_completed }}</div>
+        <div style="font-size:0.75rem;color:var(--oya-text-muted);">Completed</div>
+      </div>
+      <div style="background:var(--oya-bg-secondary);padding:0.5rem;border-radius:0.375rem;">
+        <div style="font-size:1.25rem;font-weight:700;color:var(--oya-warning);">{{ handover.projects_at_hand }}</div>
+        <div style="font-size:0.75rem;color:var(--oya-text-muted);">In Progress / Handed Over</div>
+      </div>
+      <div style="background:var(--oya-bg-secondary);padding:0.5rem;border-radius:0.375rem;">
+        <div style="font-size:1.25rem;font-weight:700;color:var(--oya-info);">{{ handover.projects_future }}</div>
+        <div style="font-size:0.75rem;color:var(--oya-text-muted);">Future / Planned</div>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="dashboard-grid" style="grid-template-columns:repeat(auto-fill, minmax(min(100%, 340px), 1fr));gap:1rem;margin-bottom:1.5rem;">
   {% for item in projects_with_donations %}
   <div class="card" style="display:flex;flex-direction:column;">
