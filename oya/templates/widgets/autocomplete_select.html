@@ -14,7 +14,7 @@
     type="hidden"
     name="{{ widget.name }}"
     id="{{ widget.attrs.id }}"
-    {% if widget.value %}value="{{ widget.value }}"{% endif %}
+    value="{{ widget.value|default:'' }}"
     data-autocomplete-value
   />
   {% if widget.allow_clear %}
