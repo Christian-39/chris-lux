@@ -43,6 +43,119 @@ class Election(BaseModel):
     def __str__(self):
         return self.title
 
+    def process_election_results(self):
+        """
+        Automatically applied when this election's status transitions to
+        COMPLETED (see elections/signals.py):
+
+        - For every post actually contested in this election (i.e. with at
+          least one Candidate), the candidate with the highest vote count
+          becomes the new current Executive for that post.
+        - The previous current holder of that post (if a different member)
+          is ended (is_current=False, end_date=today) — i.e. reverted to a
+          regular member — UNLESS they also won a different contested post
+          in this same election, in which case only their old post ends
+          and their new one is created; they are not left without a post.
+        - Posts not contested in this election are left completely
+          untouched — this is not a "wipe the whole executive body" reset,
+          only the posts actually up for election are affected.
+        - A tie for the top vote count, or a post with zero votes cast, is
+          left for manual resolution rather than guessed automatically.
+        - A candidate's post value that doesn't match one of
+          Executive.POST_CHOICES is also left for manual resolution,
+          rather than silently creating an inconsistent Executive record.
+
+        Returns a summary dict:
+            {
+                "winners": {post: Candidate, ...},
+                "tied_posts": [post, ...],
+                "no_votes_posts": [post, ...],
+                "invalid_post_names": [post, ...],
+                "errors": {post: error_message, ...},
+            }
+        """
+        from django.db import transaction
+        from django.utils import timezone
+        from executives.models import Executive
+
+        today = timezone.now().date()
+        valid_post_values = {choice[0] for choice in Executive.POST_CHOICES}
+
+        contested_posts = list(
+            self.candidates.values_list("post", flat=True).distinct()
+        )
+
+        winners = {}
+        tied_posts = []
+        no_votes_posts = []
+        invalid_post_names = []
+        errors = {}
+
+        for post in contested_posts:
+            if post not in valid_post_values:
+                invalid_post_names.append(post)
+                continue
+
+            candidates = list(
+                self.candidates.filter(post=post).select_related("member").order_by("-votes")
+            )
+            if not candidates:
+                continue
+
+            top_votes = candidates[0].votes
+            if top_votes <= 0:
+                no_votes_posts.append(post)
+                continue
+
+            top_candidates = [c for c in candidates if c.votes == top_votes]
+            if len(top_candidates) > 1:
+                tied_posts.append(post)
+                continue
+
+            winner = top_candidates[0]
+
+            try:
+                with transaction.atomic():
+                    current_holder = Executive.objects.filter(post=post, is_current=True).first()
+                    if current_holder and current_holder.member_id == winner.member_id:
+                        # Re-elected to the same post they already hold — no change needed.
+                        winners[post] = winner
+                        continue
+
+                    # Outgoing: end the previous holder of this specific post.
+                    if current_holder:
+                        current_holder.is_current = False
+                        current_holder.end_date = today
+                        current_holder.save(update_fields=["is_current", "end_date", "updated_at"])
+
+                    # If the winner currently holds a different post, end that
+                    # one too — a member holds one executive post at a time.
+                    Executive.objects.filter(
+                        member=winner.member, is_current=True
+                    ).exclude(post=post).update(is_current=False, end_date=today)
+
+                    Executive.objects.create(
+                        member=winner.member,
+                        post=post,
+                        start_date=today,
+                        is_current=True,
+                    )
+                winners[post] = winner
+            except Exception as exc:
+                # Isolated per-post: a problem with one post (e.g. a rare
+                # unique_together collision on re-election to a previously
+                # held, non-consecutive post) must not roll back or block
+                # every other post's results.
+                errors[post] = str(exc)
+
+        return {
+            "winners": winners,
+            "tied_posts": tied_posts,
+            "no_votes_posts": no_votes_posts,
+            "invalid_post_names": invalid_post_names,
+            "errors": errors,
+        }
+
 
 class Candidate(BaseModel):
     """Candidate model for election contestants."""
