@@ -113,11 +113,11 @@
       <table class="data-table dues-grid" id="duesGrid" style="white-space: nowrap;">
         <thead>
           <tr>
-            <th style="min-width: clamp(140px, 30vw, 220px); position:sticky; left:0; background:var(--oya-surface); background-color:#ffffff; z-index:30; box-shadow:2px 0 5px rgba(0,0,0,0.08); font-size: clamp(0.75rem, 1.8vw, 0.875rem); padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.5rem, 2vw, 1rem);">Name</th>
+            <th class="dues-col-name">Name</th>
             {% for year in years %}
-            <th style="text-align:center; min-width: clamp(48px, 10vw, 64px); font-size: clamp(0.6875rem, 1.8vw, 0.8125rem); padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.25rem, 1vw, 0.5rem);">{{ year }}</th>
+            <th class="dues-col-year">{{ year }}</th>
             {% endfor %}
-            <th style="text-align:right; min-width: clamp(80px, 15vw, 110px); font-size: clamp(0.75rem, 1.8vw, 0.875rem); padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.5rem, 2vw, 1rem);">Total Debt</th>
+            <th class="dues-col-total">Total Debt</th>
           </tr>
         </thead>
         <tbody>
@@ -135,19 +135,7 @@
             </td>
             {% for year in years %}
             {% with status=row.years|get_item:year %}
-            <td style="text-align:center; padding: clamp(0.375rem, 1.5vw, 0.625rem) clamp(0.25rem, 1vw, 0.375rem);">
-              {% if status.before_join %}
-              <span class="dues-badge na" title="Not applicable — member joined in {{ row.join_year }}.member.get_full_name }}">
-                  {{ row.member.get_full_name }}
-                </a>
-                {% if row.join_year > PLATFORM_START_YEAR %}
-                <span class="join-year-badge" title="Joined in {{ row.join_year }}">J{{ row.join_year }}</span>
-                {% endif %}
-              </div>
-            </td>
-            {% for year in years %}
-            {% with status=row.years|get_item:year %}
-            <td style="text-align:center; padding: clamp(0.375rem, 1.5vw, 0.625rem) clamp(0.25rem, 1vw, 0.375rem);">
+            <td class="dues-year-cell">
               {% if status.before_join %}
               <span class="dues-badge na" title="Not applicable — member joined in {{ row.join_year }}">&mdash;</span>
               {% elif status.status == "PAID" %}
@@ -162,13 +150,15 @@
             </td>
             {% endwith %}
             {% endfor %}
-            <td style="text-align:right; font-weight:600; font-size: clamp(0.75rem, 1.8vw, 0.875rem); padding: clamp(0.375rem, 1.5vw, 0.625rem) clamp(0.5rem, 2vw, 1rem); {% if row.total_debt > 0 %}color:var(--oya-danger);{% else %}color:var(--oya-success);{% endif %}">
-              {% if row.total_debt > 0 %}
+            {% if row.total_debt > 0 %}
+            <td class="dues-total-cell dues-total-debt">
               &#x20A6;{{ row.total_debt|floatformat:0|intcomma }}
-              {% else %}
-              <span style="font-size: clamp(0.6875rem, 1.5vw, 0.75rem);">Paid Up</span>
-              {% endif %}
             </td>
+            {% else %}
+            <td class="dues-total-cell dues-total-paid">
+              <span class="dues-total-paid-text">Paid Up</span>
+            </td>
+            {% endif %}
           </tr>
           {% empty %}
           <tr>
@@ -191,49 +181,92 @@
 
 <style>
 .dues-grid { border-collapse: separate; border-spacing: 0; }
-.dues-grid th { 
-  background: var(--oya-surface); 
-  font-weight: 600; 
-  color: var(--oya-text-secondary); 
-  border-bottom: 1px solid var(--oya-border); 
-  white-space: nowrap; 
+.dues-grid th {
+  background: var(--oya-surface);
+  font-weight: 600;
+  color: var(--oya-text-secondary);
+  border-bottom: 1px solid var(--oya-border);
+  white-space: nowrap;
 }
-.dues-grid td { 
-  border-bottom: 1px solid var(--oya-border); 
+.dues-grid td {
+  border-bottom: 1px solid var(--oya-border);
   vertical-align: middle;
 }
 .dues-grid tbody tr:hover td { background: var(--oya-surface-hover); }
 .dues-grid tbody tr:hover td:first-child { background: var(--oya-surface-hover); background-color: #f8f9fa; }
 
-.dues-badge { 
-  display: inline-flex; 
-  align-items: center; 
-  justify-content: center; 
-  border-radius: 50%; 
-  font-weight: 700; 
+/* Column sizing */
+.dues-col-name {
+  min-width: 220px;
+  position: sticky;
+  left: 0;
+  background: var(--oya-surface);
+  background-color: #ffffff;
+  z-index: 30;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.08);
+  font-size: 0.8125rem;
+  padding: 0.75rem 1rem;
+}
+.dues-col-year {
+  text-align: center;
+  min-width: 64px;
+  font-size: 0.8125rem;
+  padding: 0.75rem 0.5rem;
+}
+.dues-col-total {
+  text-align: right;
+  min-width: 110px;
+  font-size: 0.8125rem;
+  padding: 0.75rem 1rem;
+}
+
+.dues-year-cell {
+  text-align: center;
+  padding: 0.625rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.dues-total-cell {
+  text-align: right;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.625rem 1rem;
+}
+.dues-total-debt { color: var(--oya-danger); }
+.dues-total-paid { color: var(--oya-success); }
+.dues-total-paid-text { font-size: 0.75rem; }
+
+.dues-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-weight: 700;
 }
 .dues-badge.paid { background: var(--oya-success-bg); color: var(--oya-success); }
 .dues-badge.owed { background: var(--oya-danger-bg); color: var(--oya-danger); }
-.dues-badge.na { 
-  background: transparent; 
-  color: var(--oya-text-muted); 
-  font-size: clamp(0.875rem, 2vw, 1rem); 
-  width: auto; 
-  height: auto; 
-  border-radius: 0; 
-  font-weight: 400; 
+.dues-badge.na {
+  background: transparent;
+  color: var(--oya-text-muted);
+  font-size: 1rem;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  font-weight: 400;
 }
 
-.join-year-badge { 
-  display: inline-block; 
-  background: var(--oya-info-bg); 
-  color: var(--oya-info); 
-  font-size: clamp(0.625rem, 1.5vw, 0.6875rem); 
-  padding: 2px 6px; 
-  border-radius: 4px; 
-  margin-left: 4px; 
-  font-weight: 600; 
-  vertical-align: middle; 
+.join-year-badge {
+  display: inline-block;
+  background: var(--oya-info-bg);
+  color: var(--oya-info);
+  font-size: 0.6875rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+  font-weight: 600;
+  vertical-align: middle;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -248,6 +281,9 @@
   font-weight: 500;
   box-shadow: 2px 0 5px rgba(0,0,0,0.05);
   border-bottom: 1px solid var(--oya-border);
+  padding: 0.625rem 1rem;
+  min-width: 220px;
+  max-width: 220px;
 }
 
 .dues-name-wrapper {
@@ -269,6 +305,7 @@
   text-overflow: ellipsis;
   min-width: 0;
   flex-shrink: 1;
+  font-size: 0.875rem;
 }
 
 .dues-name-link:hover {
@@ -292,7 +329,6 @@
   z-index: 20;
   box-shadow: 2px 0 5px rgba(0,0,0,0.05);
 }
-/* Ensure hover doesn't make background transparent */
 .dues-grid tbody tr:hover td:first-child {
   background: var(--oya-surface-hover);
   background-color: #f8f9fa;
@@ -313,151 +349,54 @@
   background-color: #0f172a;
 }
 
-/* Desktop / Base */
-.dues-grid th { 
-  padding: 0.75rem 0.5rem; 
-  font-size: 0.8125rem;
-}
-.dues-grid td { 
-  padding: 0.625rem 0.5rem; 
-  font-size: 0.875rem; 
-}
-.dues-name-cell {
-  padding: 0.625rem 1rem;
-  min-width: 220px;
-  max-width: 220px;
-}
-.dues-name-link {
-  font-size: 0.875rem;
-}
-.dues-badge { 
-  width: 32px; 
-  height: 32px; 
-  font-size: 0.75rem; 
-}
-.dues-badge.na { 
-  font-size: 1rem; 
-}
-
 /* Tablet */
 @media (max-width: 768px) {
-  .dues-grid th { 
-    padding: 0.625rem 0.375rem; 
-    font-size: 0.75rem;
-  }
-  .dues-grid td { 
-    padding: 0.5rem 0.375rem; 
-    font-size: 0.8125rem; 
-  }
-  .dues-name-cell { 
-    min-width: 180px; 
-    max-width: 180px;
-    padding: 0.5rem 0.75rem;
-  }
-  .dues-name-link { 
-    font-size: 0.8125rem; 
-  }
-  .dues-badge { 
-    width: 28px; 
-    height: 28px; 
-    font-size: 0.6875rem; 
-  }
-  .dues-badge.na { 
-    font-size: 0.875rem; 
-  }
-  .join-year-badge { 
-    font-size: 0.625rem; 
-    padding: 1px 4px; 
-  }
-  .dashboard-grid-4 { 
-    grid-template-columns: 1fr !important; 
-  }
-  .page-header { 
-    flex-direction: column !important; 
-    align-items: flex-start !important; 
-  }
-  .page-header-actions { 
-    width: 100% !important; 
-    flex-wrap: wrap !important; 
-  }
+  .dues-col-name { min-width: 180px; max-width: 180px; padding: 0.625rem 0.75rem; font-size: 0.75rem; }
+  .dues-col-year { min-width: 56px; padding: 0.625rem 0.375rem; font-size: 0.75rem; }
+  .dues-col-total { min-width: 90px; padding: 0.625rem 0.75rem; font-size: 0.75rem; }
+  .dues-name-cell { min-width: 180px !important; max-width: 180px !important; padding: 0.5rem 0.75rem !important; }
+  .dues-name-link { font-size: 0.8125rem !important; }
+  .dues-year-cell { padding: 0.5rem 0.375rem !important; font-size: 0.8125rem !important; }
+  .dues-total-cell { padding: 0.5rem 0.75rem !important; font-size: 0.8125rem !important; }
+  .dues-badge { width: 28px !important; height: 28px !important; font-size: 0.6875rem !important; }
+  .dues-badge.na { width: auto !important; height: auto !important; font-size: 0.875rem !important; }
+  .dues-badge svg { width: 12px !important; height: 12px !important; }
+  .join-year-badge { font-size: 0.625rem !important; padding: 1px 4px !important; }
+  .dashboard-grid-4 { grid-template-columns: 1fr !important; }
+  .page-header { flex-direction: column !important; align-items: flex-start !important; }
+  .page-header-actions { width: 100% !important; flex-wrap: wrap !important; }
 }
 
 /* Mobile */
 @media (max-width: 480px) {
-  .dues-grid th { 
-    padding: 0.5rem 0.25rem; 
-    font-size: 0.6875rem;
-  }
-  .dues-grid td { 
-    padding: 0.375rem 0.25rem; 
-    font-size: 0.75rem; 
-  }
-  .dues-name-cell { 
-    min-width: 140px !important; 
-    max-width: 140px !important;
-    padding: 0.5rem 0.5rem !important; 
-  }
-  .dues-name-wrapper { 
-    gap: 0.25rem !important; 
-  }
-  .dues-name-link { 
-    font-size: 0.8125rem !important; 
-  }
-  .dues-badge { 
-    width: 28px !important; 
-    height: 28px !important; 
-    font-size: 0.625rem !important; 
-  }
-  .dues-badge svg { 
-    width: 12px !important; 
-    height: 12px !important; 
-  }
-  .dues-badge.na { 
-    width: auto !important; 
-    height: auto !important; 
-    font-size: 0.875rem !important; 
-  }
-  .join-year-badge { 
-    font-size: 0.5625rem !important; 
-    padding: 1px 3px !important; 
-  }
+  .dues-col-name { min-width: 140px !important; max-width: 140px !important; padding: 0.5rem 0.5rem !important; font-size: 0.6875rem !important; }
+  .dues-col-year { min-width: 48px !important; padding: 0.5rem 0.25rem !important; font-size: 0.6875rem !important; }
+  .dues-col-total { min-width: 80px !important; padding: 0.5rem 0.5rem !important; font-size: 0.6875rem !important; }
+  .dues-name-cell { min-width: 140px !important; max-width: 140px !important; padding: 0.5rem 0.5rem !important; }
+  .dues-name-wrapper { gap: 0.25rem !important; }
+  .dues-name-link { font-size: 0.8125rem !important; }
+  .dues-year-cell { padding: 0.375rem 0.25rem !important; font-size: 0.75rem !important; }
+  .dues-total-cell { padding: 0.375rem 0.5rem !important; font-size: 0.75rem !important; }
+  .dues-badge { width: 28px !important; height: 28px !important; font-size: 0.625rem !important; }
+  .dues-badge svg { width: 12px !important; height: 12px !important; }
+  .dues-badge.na { width: auto !important; height: auto !important; font-size: 0.875rem !important; }
+  .join-year-badge { font-size: 0.5625rem !important; padding: 1px 3px !important; }
 }
 
 /* Small mobile */
 @media (max-width: 360px) {
-  .dues-grid th { 
-    padding: 0.375rem 0.125rem; 
-    font-size: 0.625rem;
-  }
-  .dues-grid td { 
-    padding: 0.25rem 0.125rem; 
-    font-size: 0.6875rem; 
-  }
-  .dues-name-cell { 
-    min-width: 120px !important; 
-    max-width: 120px !important;
-    padding: 0.375rem 0.375rem !important; 
-  }
-  .dues-name-wrapper { 
-    gap: 0.2rem !important; 
-  }
-  .dues-name-link { 
-    font-size: 0.75rem !important; 
-  }
-  .dues-badge { 
-    width: 24px !important; 
-    height: 24px !important; 
-  }
-  .dues-badge svg { 
-    width: 10px !important; 
-    height: 10px !important; 
-  }
-  .dues-badge.na { 
-    font-size: 0.75rem !important; 
-  }
-  .join-year-badge { 
-    display: none !important; 
-  }
+  .dues-col-name { min-width: 120px !important; max-width: 120px !important; padding: 0.375rem 0.375rem !important; font-size: 0.625rem !important; }
+  .dues-col-year { min-width: 44px !important; padding: 0.375rem 0.125rem !important; font-size: 0.625rem !important; }
+  .dues-col-total { min-width: 70px !important; padding: 0.375rem 0.375rem !important; font-size: 0.625rem !important; }
+  .dues-name-cell { min-width: 120px !important; max-width: 120px !important; padding: 0.375rem 0.375rem !important; }
+  .dues-name-wrapper { gap: 0.2rem !important; }
+  .dues-name-link { font-size: 0.75rem !important; }
+  .dues-year-cell { padding: 0.25rem 0.125rem !important; font-size: 0.6875rem !important; }
+  .dues-total-cell { padding: 0.25rem 0.375rem !important; font-size: 0.6875rem !important; }
+  .dues-badge { width: 24px !important; height: 24px !important; }
+  .dues-badge svg { width: 10px !important; height: 10px !important; }
+  .dues-badge.na { font-size: 0.75rem !important; }
+  .join-year-badge { display: none !important; }
 }
 </style>
 
