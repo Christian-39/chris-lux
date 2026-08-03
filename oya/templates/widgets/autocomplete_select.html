@@ -1,21 +1,24 @@
-<div data-autocomplete-wrapper style="position:relative;">
-    <input type="text"
-           data-autocomplete-input
-           data-search-url="{{ widget.search_url }}"
-           data-min-chars="{{ widget.min_chars }}"
-           class="form-control"
-           placeholder="{{ widget.placeholder }}"
-           value="{{ widget.display_text|default:'' }}"
-           autocomplete="off">
-    <input type="hidden"
-           name="{{ widget.name }}"
-           data-autocomplete-value
-           value="{{ widget.value|default:'' }}">
-    <div data-autocomplete-results class="hidden"
-         style="position:absolute;top:100%;left:0;right:0;z-index:999;background:#fff;border:1px solid var(--oya-border);border-radius:var(--oya-radius);max-height:220px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.1);margin-top:2px;">
-    </div>
-    {% if widget.value %}
-    <button type="button" data-autocomplete-clear
-            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--oya-text-muted);font-size:1rem;line-height:1;">×</button>
-    {% endif %}
+<div class="autocomplete-wrapper" data-autocomplete-wrapper>
+  <input
+    type="text"
+    class="form-control autocomplete-search-input"
+    id="{{ widget.search_input_id }}"
+    placeholder="{{ widget.placeholder }}"
+    value="{{ widget.display_text|default:'' }}"
+    autocomplete="off"
+    data-autocomplete-input
+    data-search-url="{{ widget.search_url }}"
+    data-min-chars="{{ widget.min_chars }}"
+  />
+  <input
+    type="hidden"
+    name="{{ widget.name }}"
+    id="{{ widget.attrs.id }}"
+    {% if widget.value %}value="{{ widget.value }}"{% endif %}
+    data-autocomplete-value
+  />
+  {% if widget.allow_clear %}
+  <button type="button" class="autocomplete-clear-btn" data-autocomplete-clear title="Clear" tabindex="-1">&times;</button>
+  {% endif %}
+  <div class="autocomplete-results hidden" data-autocomplete-results role="listbox"></div>
 </div>
