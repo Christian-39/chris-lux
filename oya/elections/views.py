@@ -223,7 +223,12 @@ def candidate_update(request, pk):
     else:
         form = CandidateForm(instance=candidate)
 
-    return render(request, "elections/candidate_list.html")
+    return render(request, "elections/candidate_form.html", {
+        "form": form,
+        "candidate": candidate,
+        "title": "Edit Candidate",
+        "action": "Update"
+    })
 
 
 @login_required
@@ -486,7 +491,12 @@ def handover_update(request, pk):
     else:
         form = HandoverLedgerForm(instance=handover)
 
-    return render(request, "elections/handover_list.html")
+    return render(request, "elections/handover_form.html", {
+        "form": form,
+        "handover": handover,
+        "title": "Edit Handover Ledger",
+        "action": "Update"
+    })
 
 
 @login_required
