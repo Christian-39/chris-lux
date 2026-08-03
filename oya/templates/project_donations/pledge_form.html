@@ -61,11 +61,14 @@
         </div>
 
         {% if form.instance.pk %}
-        <div class="form-group">
-        <label class="form-label">Status</label>
-        {{ form.status }}
-        </div>
-        {% endif %}
+<div class="form-group">
+  <label class="form-label">Status</label>
+{% endif %}
+  {{ form.status }}
+{% if form.instance.pk %}
+</div>
+{% endif %}
+
 
         <div class="form-group" style="margin-bottom:0;">
         <label class="form-label">Notes</label>
