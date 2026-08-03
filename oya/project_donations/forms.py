@@ -247,28 +247,29 @@ class PledgeForm(forms.ModelForm):
             "status": forms.Select(attrs={"class": "form-select"}),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["member"].queryset = Member.objects.filter(status="ACTIVE").order_by("full_name")
-        self.fields["member"].widget.display_queryset = self.fields["member"].queryset
+def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.fields["member"].queryset = Member.objects.filter(status="ACTIVE").order_by("full_name")
+    self.fields["member"].widget.display_queryset = self.fields["member"].queryset
 
-        from projects.models import Project
-        from django.db.models import Q
-        qs = Project.objects.filter(enable_fundraising=True)
-        if self.instance and self.instance.pk and self.instance.project_id:
-            qs = Project.objects.filter(Q(enable_fundraising=True) | Q(pk=self.instance.project_id))
-        self.fields["project"].queryset = qs.order_by("-created_at")
-        self.fields["project"].empty_label = "-- Select Fundraising Project --"
+    from projects.models import Project
+    from django.db.models import Q
+    qs = Project.objects.filter(enable_fundraising=True)
+    if self.instance and self.instance.pk and self.instance.project_id:
+        qs = Project.objects.filter(Q(enable_fundraising=True) | Q(pk=self.instance.project_id))
+    self.fields["project"].queryset = qs.order_by("-created_at")
+    self.fields["project"].empty_label = "-- Select Fundraising Project --"
 
-        # Status is admin-managed automatically via payments; only allow
-        # manual selection of PENDING (initial) or CANCELLED (explicit cancel).
-        if not (self.instance and self.instance.pk):
-            self.fields["status"].widget = forms.HiddenInput()
-            self.initial["status"] = "PENDING"
-        else:
-            self.fields["status"].choices = [
-                c for c in Pledge.STATUS_CHOICES if c[0] in ("CANCELLED", self.instance.status)
-            ]
+    # Status handling
+    if not (self.instance and self.instance.pk):
+        self.fields["status"].widget = forms.HiddenInput()
+        self.fields["status"].required = False   # <-- ADD THIS LINE
+        self.initial["status"] = "PENDING"
+    else:
+        self.fields["status"].choices = [
+            c for c in Pledge.STATUS_CHOICES if c[0] in ("CANCELLED", self.instance.status)
+        ]
+
 
     def clean_pledged_amount(self):
         amount = self.cleaned_data.get("pledged_amount")
