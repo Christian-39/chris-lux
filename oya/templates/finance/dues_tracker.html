@@ -82,184 +82,169 @@
 </div>
 
 <!-- Dues Grid -->
-<div class="card dues-card">
-  <div class="card-header dues-header">
-    <div>
-      <div class="card-header-title">Member Dues Grid</div>
-      <div class="card-header-subtitle">Green = Paid, Red = Owed, — = Before Joining</div>
+<div class="card" style="overflow-x:auto; -webkit-overflow-scrolling: touch;">
+  <div class="card-header" style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--oya-border);">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--oya-primary)" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <span style="font-weight: 600; font-size: clamp(0.875rem, 2.5vw, 1rem);">Member Dues Grid</span>
+      <span class="badge bg-light text-dark" style="margin-left: auto; font-size: clamp(0.6875rem, 1.5vw, 0.75rem);">
+        {{ member_rows|length }} members &bull; {{ years|length }} years
+      </span>
+    </div>
+    <div class="card-header-subtitle" style="font-size: clamp(0.75rem, 2vw, 0.875rem); color: var(--oya-text-secondary); margin-top: 0.25rem;">
+      <span style="display: inline-flex; align-items: center; gap: 0.375rem;">
+        <span style="display:inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--oya-success);"></span> Paid
+      </span>
+      <span style="display: inline-flex; align-items: center; gap: 0.375rem; margin-left: 0.75rem;">
+        <span style="display:inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--oya-danger);"></span> Owed
+      </span>
+      <span style="display: inline-flex; align-items: center; gap: 0.375rem; margin-left: 0.75rem;">
+        <span style="display:inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--oya-border);"></span> Before Joining
+      </span>
     </div>
   </div>
-  
-  <div class="dues-scroll-hint">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <polyline points="9 18 15 12 9 6"/>
-    </svg>
-    Swipe horizontally to view all years
-  </div>
-  
-  <div class="dues-table-wrap">
-    <table class="data-table dues-grid" id="duesGrid">
-      <thead>
-        <tr>
-          <th class="dues-col-name">Member</th>
-          {% for year in years %}
-          <th class="dues-col-year">{{ year }}</th>
-          {% endfor %}
-          <th class="dues-col-total">Total Debt</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in member_rows %}
-        <tr>
-          <td class="dues-name-cell">
-            <div class="dues-name-wrapper">
-              <a href="{% url 'finance:member_dues_detail' row.member.id %}" class="dues-name-link" title="{{ row.member.get_full_name }}">
-                {{ row.member.get_full_name }}
-              </a>
-              {% if row.join_year > PLATFORM_START_YEAR %}
-              <span class="join-year-badge">Joined {{ row.join_year }}</span>
-              {% endif %}
-            </div>
-          </td>
-          {% for year in years %}
-          {% with status=row.years|get_item:year %}
-          <td class="dues-year-cell">
-            {% if status.before_join %}
-            <span class="dues-status dues-status-na" title="Not applicable — member joined in {{ row.join_year }}">—</span>
-            {% elif status.status == "PAID" %}
-            <span class="dues-status dues-status-paid" title="Paid on {{ status.payment.created_at|date:'M d, Y' }}">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            </span>
-            {% else %}
-            <span class="dues-status dues-status-owed" title="&#x20A6;{{ yearly_dues|intcomma }} owed">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </span>
-            {% endif %}
-          </td>
-          {% endwith %}
-          {% endfor %}
-          <td class="dues-total-cell">
-            {% if row.total_debt > 0 %}
-            <span class="dues-debt-amount">&#x20A6;{{ row.total_debt|floatformat:0|intcomma }}</span>
-            {% else %}
-            <span class="dues-debt-paid">Paid Up</span>
-            {% endif %}
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="{{ years|length|add:2 }}" class="dues-empty-cell">
-            <div class="empty-state">
-              <div class="empty-state-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                </svg>
+  <div class="card-body" style="padding:0;">
+    <div class="table-container" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+      <table class="data-table dues-grid" id="duesGrid" style="white-space: nowrap;">
+        <thead>
+          <tr>
+            <th style="min-width: clamp(160px, 30vw, 240px); position:sticky; left:0; background:var(--oya-surface); background-color:#ffffff; z-index:30; box-shadow:2px 0 5px rgba(0,0,0,0.08); font-size: clamp(0.8125rem, 2vw, 0.875rem);">Name</th>
+            {% for year in years %}
+            <th style="text-align:center; min-width: clamp(56px, 10vw, 80px); font-size: clamp(0.8125rem, 2vw, 0.875rem);">{{ year }}</th>
+            {% endfor %}
+            <th style="text-align:right; min-width: clamp(90px, 15vw, 120px); font-size: clamp(0.8125rem, 2vw, 0.875rem);">Total Debt</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in member_rows %}
+          <tr>
+            <td class="dues-name-cell">
+              <div class="dues-name-wrapper">
+                <a href="{% url 'finance:member_dues_detail' row.member.id %}" class="dues-name-link" title="{{ row.member.get_full_name }}">
+                  {{ row.member.get_full_name }}
+                </a>
+                {% if row.join_year > PLATFORM_START_YEAR %}
+                <span class="join-year-badge" title="Joined in {{ row.join_year }}">J{{ row.join_year }}</span>
+                {% endif %}
               </div>
-              <h3>No active members found</h3>
-              <p>Add members to start tracking dues.</p>
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+            </td>
+            {% for year in years %}
+            {% with status=row.years|get_item:year %}
+            <td style="text-align:center; padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.375rem, 1.5vw, 0.5rem);">
+              {% if status.before_join %}
+              <span class="dues-badge na" title="Not applicable — member joined in {{ row.join_year }}">____</span>
+              {% elif status.status == "PAID" %}
+              <span class="dues-badge paid" title="Paid on {{ status.payment.created_at|date:'M d, Y' }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              {% else %}
+              <span class="dues-badge owed" title="&#x20A6;{{ yearly_dues|intcomma }} owed">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </span>
+              {% endif %}
+            </td>
+            {% endwith %}
+            {% endfor %}
+            <td style="text-align:right; font-weight:600; font-size: clamp(0.8125rem, 2vw, 0.875rem); padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.5rem, 2vw, 1rem); {% if row.total_debt > 0 %}color:var(--oya-danger);{% else %}color:var(--oya-success);{% endif %}">
+              {% if row.total_debt > 0 %}
+              &#x20A6;{{ row.total_debt|floatformat:0|intcomma }}
+              {% else %}
+              <span style="font-size: clamp(0.6875rem, 1.5vw, 0.75rem);">Paid Up</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="{{ years|length|add:2 }}" style="text-align:center; padding: clamp(2rem, 8vw, 3rem);">
+              <div class="empty-state" style="padding:0;">
+                <div class="empty-state-icon" style="width: clamp(48px, 15vw, 60px); height: clamp(48px, 15vw, 60px); margin-bottom: 1rem;">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+                </div>
+                <h3 style="font-size: clamp(0.875rem, 2.5vw, 1rem);">No active members found</h3>
+                <p style="font-size: clamp(0.75rem, 2vw, 0.875rem);">Add members to start tracking dues.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
 <style>
-/* ============================================================
-   DUES GRID — Professional Restyle
-   ============================================================ */
-
-/* ----- Container & Scroll Hint ----- */
-.dues-card {
-  overflow: visible;
+.dues-grid { border-collapse: separate; border-spacing: 0; }
+.dues-grid th { 
+  background: var(--oya-surface); 
+  font-weight: 600; 
+  color: var(--oya-text-secondary); 
+  padding: clamp(0.625rem, 2vw, 0.875rem) clamp(0.375rem, 1.5vw, 0.5rem); 
+  border-bottom: 1px solid var(--oya-border); 
+  white-space: nowrap; 
 }
-
-.dues-header {
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--oya-border);
+.dues-grid td { 
+  padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.375rem, 1.5vw, 0.5rem); 
+  border-bottom: 1px solid var(--oya-border); 
+  font-size: clamp(0.8125rem, 2vw, 0.875rem); 
 }
+.dues-grid tbody tr:hover td { background: var(--oya-surface-hover); }
+.dues-grid tbody tr:hover td:first-child { background: var(--oya-surface-hover); background-color: #f8f9fa; }
 
-.dues-scroll-hint {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--oya-text-muted);
-  background: var(--oya-surface);
-  border-bottom: 1px solid var(--oya-border);
+.dues-badge { 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+  width: clamp(26px, 6vw, 32px); 
+  height: clamp(26px, 6vw, 32px); 
+  border-radius: 50%; 
+  font-size: clamp(0.6875rem, 1.5vw, 0.75rem); 
+  font-weight: 700; 
 }
+.dues-badge.paid { background: var(--oya-success-bg); color: var(--oya-success); }
+.dues-badge.owed { background: var(--oya-danger-bg); color: var(--oya-danger); }
+.dues-badge.na { background: transparent; color: var(--oya-text-muted); font-size: clamp(0.625rem, 1.5vw, 0.75rem); width: auto; height: auto; border-radius: 0; font-weight: 400; letter-spacing: 1px; }
 
-.dues-table-wrap {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* ----- Grid Structure ----- */
-.dues-grid {
-  border-collapse: separate;
-  border-spacing: 0;
-  width: 100%;
-  min-width: max-content;
-}
-
-.dues-grid th {
-  background: var(--oya-surface);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--oya-text-secondary);
-  padding: 0.875rem 0.625rem;
-  border-bottom: 1px solid var(--oya-border);
+.join-year-badge { 
+  display: inline-block; 
+  background: var(--oya-info-bg); 
+  color: var(--oya-info); 
+  font-size: clamp(0.625rem, 1.5vw, 0.6875rem); 
+  padding: 2px 6px; 
+  border-radius: 4px; 
+  margin-left: 4px; 
+  font-weight: 600; 
+  vertical-align: middle; 
   white-space: nowrap;
-  text-align: center;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  flex-shrink: 0;
 }
 
-.dues-grid td {
-  padding: 0.625rem;
-  border-bottom: 1px solid var(--oya-border);
-  vertical-align: middle;
-  transition: background 0.15s ease;
-}
-
-.dues-grid tbody tr:hover td {
-  background: var(--oya-surface-hover);
-}
-
-/* ----- Sticky Name Column ----- */
-.dues-col-name,
+/* Name cell: sticky + nowrap + ellipsis */
 .dues-name-cell {
   position: sticky;
   left: 0;
-  min-width: 220px;
-  text-align: left;
   background: var(--oya-surface);
   background-color: #ffffff;
   z-index: 20;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
-}
-
-.dues-col-name {
-  z-index: 30;
-  padding-left: 1.25rem;
-}
-
-.dues-name-cell {
-  padding: 0.625rem 0.75rem;
+  font-weight: 500;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+  padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.5rem, 2vw, 1rem);
+  border-bottom: 1px solid var(--oya-border);
+  min-width: clamp(160px, 30vw, 240px);
+  max-width: clamp(160px, 30vw, 240px);
 }
 
 .dues-name-wrapper {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   min-width: 0;
 }
 
@@ -267,322 +252,119 @@
   color: var(--oya-text-primary);
   text-decoration: none;
   font-weight: 500;
-  font-size: 0.9375rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
-  flex: 1;
+  flex-shrink: 1;
+  font-size: clamp(0.8125rem, 2vw, 0.875rem);
 }
 
 .dues-name-link:hover {
   color: var(--oya-primary);
-  text-decoration: underline;
 }
 
-.join-year-badge {
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
-  background: var(--oya-info-bg);
-  color: var(--oya-info);
-  font-size: 0.6875rem;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-weight: 600;
-  white-space: nowrap;
+/* Ensure sticky column has solid background and visual separation */
+.dues-grid th:first-child,
+.dues-grid td:first-child {
+  background: var(--oya-surface);
+  background-color: #ffffff;
+}
+.dues-grid thead th:first-child {
+  z-index: 30;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.08);
+}
+.dues-grid thead th:not(:first-child) {
+  z-index: 1;
+}
+.dues-grid tbody td:first-child {
+  z-index: 20;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+}
+/* Ensure hover doesn't make background transparent */
+.dues-grid tbody tr:hover td:first-child {
+  background: var(--oya-surface-hover);
+  background-color: #f8f9fa;
 }
 
-/* ----- Year Columns ----- */
-.dues-col-year {
-  min-width: 72px;
-}
-
-.dues-year-cell {
-  text-align: center;
-}
-
-/* ----- Status Indicators ----- */
-.dues-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-weight: 700;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  cursor: default;
-}
-
-.dues-status-paid {
-  background: #dcfce7;
-  color: #16a34a;
-}
-
-.dues-status-owed {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-.dues-status-na {
-  background: transparent;
-  color: var(--oya-text-muted);
-  width: auto;
-  height: auto;
-  border-radius: 0;
-  font-weight: 400;
-  font-size: 0.875rem;
-  letter-spacing: 0.5px;
-}
-
-.dues-status:hover {
-  transform: scale(1.1);
-}
-
-/* ----- Total Column ----- */
-.dues-col-total {
-  min-width: 110px;
-  text-align: right;
-  padding-right: 1.25rem;
-}
-
-.dues-total-cell {
-  text-align: right;
-  padding-right: 1.25rem;
-}
-
-.dues-debt-amount {
-  font-weight: 600;
-  color: var(--oya-danger);
-  font-size: 0.9375rem;
-  white-space: nowrap;
-}
-
-.dues-debt-paid {
-  display: inline-block;
-  font-size: 0.8125rem;
-  color: var(--oya-success);
-  font-weight: 600;
-  background: var(--oya-success-bg);
-  padding: 4px 12px;
-  border-radius: 999px;
-  white-space: nowrap;
-}
-
-/* ----- Empty State ----- */
-.dues-empty-cell {
-  text-align: center;
-  padding: 3rem 1rem;
-}
-
-.dues-empty-cell .empty-state {
-  padding: 0;
-}
-
-.dues-empty-cell .empty-state-icon {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 1rem;
-}
-
-.dues-empty-cell h3 {
-  font-size: 1rem;
-  margin-bottom: 0.25rem;
-}
-
-.dues-empty-cell p {
-  font-size: 0.875rem;
-  color: var(--oya-text-muted);
-}
-
-/* ============================================================
-   DARK MODE
-   ============================================================ */
-[data-theme="dark"] .dues-col-name,
+/* Dark mode support for name cell */
 [data-theme="dark"] .dues-name-cell {
   background: var(--oya-bg-card);
   background-color: #1e293b;
 }
-
-[data-theme="dark"] .dues-grid tbody tr:hover td {
-  background: var(--oya-surface-hover);
+[data-theme="dark"] .dues-grid th:first-child,
+[data-theme="dark"] .dues-grid td:first-child {
+  background: var(--oya-bg-card);
+  background-color: #1e293b;
+}
+[data-theme="dark"] .dues-grid tbody tr:hover td:first-child {
+  background: var(--oya-bg-white);
+  background-color: #0f172a;
 }
 
-[data-theme="dark"] .dues-status-paid {
-  background: #14532d;
-  color: #4ade80;
-}
-
-[data-theme="dark"] .dues-status-owed {
-  background: #7f1d1d;
-  color: #f87171;
-}
-
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-@media (max-width: 1024px) {
-  .dues-col-name,
-  .dues-name-cell {
-    min-width: 200px;
-  }
-
-  .dues-name-link {
-    font-size: 0.875rem;
-  }
-
-  .dues-status {
-    width: 30px;
-    height: 30px;
-  }
-}
-
+/* Mobile refinements */
 @media (max-width: 768px) {
-  .dues-scroll-hint {
-    display: flex;
+  .dues-grid th, .dues-grid td { 
+    padding: clamp(0.375rem, 1.5vw, 0.5rem) clamp(0.25rem, 1vw, 0.375rem) !important; 
   }
-
-  .dues-col-name,
-  .dues-name-cell {
-    min-width: 170px;
+  .dues-grid th:first-child, .dues-grid td:first-child { 
+    min-width: 160px !important; 
+    max-width: 160px !important;
   }
-
-  .dues-col-name {
-    padding-left: 1rem;
+  .dues-name-cell { 
+    min-width: 160px !important; 
+    max-width: 160px !important;
+    padding: clamp(0.375rem, 1.5vw, 0.5rem) clamp(0.375rem, 1.5vw, 0.5rem) !important; 
   }
-
-  .dues-name-cell {
-    padding: 0.5rem 0.625rem;
-  }
-
-  .dues-name-link {
-    font-size: 0.875rem;
-  }
-
-  .join-year-badge {
-    font-size: 0.625rem;
-    padding: 1px 6px;
-  }
-
-  .dues-grid th {
-    padding: 0.75rem 0.5rem;
-    font-size: 0.75rem;
-  }
-
-  .dues-grid td {
-    padding: 0.5rem;
-  }
-
-  .dues-col-year {
-    min-width: 64px;
-  }
-
-  .dues-status {
-    width: 28px;
-    height: 28px;
-  }
-
-  .dues-status svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  .dues-col-total {
-    min-width: 90px;
-    padding-right: 1rem;
-  }
-
-  .dues-total-cell {
-    padding-right: 1rem;
-  }
-
-  .dues-debt-amount {
-    font-size: 0.875rem;
-  }
-
-  .dues-debt-paid {
-    font-size: 0.75rem;
-    padding: 3px 8px;
-  }
-
-  .dashboard-grid-4 {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .page-header-actions {
-    width: 100%;
-    flex-wrap: wrap;
-  }
+  .dues-name-wrapper { gap: 0.25rem !important; }
+  .dues-name-link { font-size: clamp(0.75rem, 1.8vw, 0.8125rem) !important; }
+  .dues-badge { width: clamp(24px, 5vw, 28px) !important; height: clamp(24px, 5vw, 28px) !important; }
+  .dues-badge.na { width: auto !important; height: auto !important; font-size: clamp(0.5rem, 1.2vw, 0.625rem) !important; }
+  .dues-badge svg { width: 12px !important; height: 12px !important; }
+  .join-year-badge { font-size: clamp(0.5rem, 1.2vw, 0.625rem) !important; padding: 1px 4px !important; }
+  .dashboard-grid-4 { grid-template-columns: 1fr !important; }
+  .page-header { flex-direction: column !important; align-items: flex-start !important; }
+  .page-header-actions { width: 100% !important; flex-wrap: wrap !important; }
 }
 
 @media (max-width: 480px) {
-  .dues-header {
-    padding: 1rem;
+  .dues-grid th, .dues-grid td { 
+    padding: clamp(0.25rem, 1vw, 0.375rem) clamp(0.125rem, 0.8vw, 0.25rem) !important; 
   }
+  .dues-grid th:first-child, .dues-grid td:first-child { 
+    min-width: 140px !important; 
+    max-width: 140px !important;
+  }
+  .dues-name-cell { 
+    min-width: 140px !important; 
+    max-width: 140px !important;
+    padding: clamp(0.25rem, 1vw, 0.375rem) clamp(0.25rem, 1vw, 0.375rem) !important; 
+  }
+  .dues-name-wrapper { gap: 0.2rem !important; }
+  .dues-name-link { font-size: clamp(0.6875rem, 1.5vw, 0.75rem) !important; }
+  .dues-badge { width: clamp(22px, 5vw, 24px) !important; height: clamp(22px, 5vw, 24px) !important; }
+  .dues-badge.na { width: auto !important; height: auto !important; font-size: clamp(0.45rem, 1vw, 0.5rem) !important; }
+  .dues-badge svg { width: 10px !important; height: 10px !important; }
+  .join-year-badge { display: none !important; }
+}
 
-  .dues-col-name,
-  .dues-name-cell {
-    min-width: 150px;
+@media (max-width: 360px) {
+  .dues-grid th, .dues-grid td { 
+    padding: 0.2rem 0.1rem !important; 
   }
-
-  .dues-name-link {
-    font-size: 0.8125rem;
+  .dues-grid th:first-child, .dues-grid td:first-child { 
+    min-width: 120px !important; 
+    max-width: 120px !important;
   }
-
-  .join-year-badge {
-    font-size: 0.5625rem;
-    padding: 1px 5px;
+  .dues-name-cell { 
+    min-width: 120px !important; 
+    max-width: 120px !important;
+    padding: 0.2rem 0.1rem !important; 
   }
-
-  .dues-grid th {
-    padding: 0.625rem 0.375rem;
-    font-size: 0.6875rem;
-  }
-
-  .dues-grid td {
-    padding: 0.375rem;
-  }
-
-  .dues-col-year {
-    min-width: 56px;
-  }
-
-  .dues-status {
-    width: 26px;
-    height: 26px;
-  }
-
-  .dues-status svg {
-    width: 12px;
-    height: 12px;
-  }
-
-  .dues-status-na {
-    font-size: 0.75rem;
-  }
-
-  .dues-col-total {
-    min-width: 80px;
-    padding-right: 0.75rem;
-  }
-
-  .dues-total-cell {
-    padding-right: 0.75rem;
-  }
-
-  .dues-debt-amount {
-    font-size: 0.8125rem;
-  }
-
-  .dashboard-grid-4 {
-    grid-template-columns: 1fr;
-  }
+  .dues-name-wrapper { gap: 0.15rem !important; }
+  .dues-name-link { font-size: 0.6875rem !important; }
+  .dues-badge { width: 20px !important; height: 20px !important; }
+  .dues-badge.na { width: auto !important; height: auto !important; }
 }
 </style>
 
