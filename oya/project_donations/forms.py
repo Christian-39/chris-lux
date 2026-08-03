@@ -229,53 +229,82 @@ class PledgeForm(forms.ModelForm):
 
     class Meta:
         model = Pledge
-        fields = ["member", "project", "pledged_amount", "due_date", "notes", "status"]
+        fields = [
+            "member",
+            "project",
+            "pledged_amount",
+            "due_date",
+            "notes",
+            "status",
+        ]
         widgets = {
             "member": AutocompleteSelectWidget(
                 search_url_name="members:member_autocomplete_search",
                 placeholder="Search member by name, no. or phone…",
             ),
             "project": forms.Select(attrs={"class": "form-select"}),
-            "pledged_amount": forms.NumberInput(attrs={
-                "class": "form-control",
-                "step": "0.01",
-                "min": "0.01",
-                "placeholder": "0.00"
-            }),
-            "due_date": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
-            "notes": forms.Textarea(attrs={"class": "form-control", "rows": 3, "placeholder": "Notes..."}),
+            "pledged_amount": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "step": "0.01",
+                    "min": "0.01",
+                    "placeholder": "0.00",
+                }
+            ),
+            "due_date": forms.DateInput(
+                attrs={"class": "form-control", "type": "date"}
+            ),
+            "notes": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Notes...",
+                }
+            ),
             "status": forms.Select(attrs={"class": "form-select"}),
         }
 
-def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    self.fields["member"].queryset = Member.objects.filter(status="ACTIVE").order_by("full_name")
-    self.fields["member"].widget.display_queryset = self.fields["member"].queryset
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    from projects.models import Project
-    from django.db.models import Q
-    qs = Project.objects.filter(enable_fundraising=True)
-    if self.instance and self.instance.pk and self.instance.project_id:
-        qs = Project.objects.filter(Q(enable_fundraising=True) | Q(pk=self.instance.project_id))
-    self.fields["project"].queryset = qs.order_by("-created_at")
-    self.fields["project"].empty_label = "-- Select Fundraising Project --"
+        self.fields["member"].queryset = Member.objects.filter(
+            status="ACTIVE"
+        ).order_by("full_name")
+        self.fields["member"].widget.display_queryset = self.fields[
+            "member"
+        ].queryset
 
-    # Status handling
-    if not (self.instance and self.instance.pk):
-        self.fields["status"].widget = forms.HiddenInput()
-        self.fields["status"].required = False   # <-- ADD THIS LINE
-        self.initial["status"] = "PENDING"
-    else:
-        self.fields["status"].choices = [
-            c for c in Pledge.STATUS_CHOICES if c[0] in ("CANCELLED", self.instance.status)
-        ]
+        from projects.models import Project
+        from django.db.models import Q
 
+        qs = Project.objects.filter(enable_fundraising=True)
+        if self.instance and self.instance.pk and self.instance.project_id:
+            qs = Project.objects.filter(
+                Q(enable_fundraising=True) | Q(pk=self.instance.project_id)
+            )
+        self.fields["project"].queryset = qs.order_by("-created_at")
+        self.fields["project"].empty_label = "-- Select Fundraising Project --"
+
+        # Status handling
+        if not (self.instance and self.instance.pk):
+            self.fields["status"].widget = forms.HiddenInput()
+            self.fields["status"].required = False
+            self.initial["status"] = "PENDING"
+        else:
+            self.fields["status"].choices = [
+                c
+                for c in Pledge.STATUS_CHOICES
+                if c[0] in ("CANCELLED", self.instance.status)
+            ]
 
     def clean_pledged_amount(self):
         amount = self.cleaned_data.get("pledged_amount")
         if amount and amount <= 0:
-            raise forms.ValidationError("Pledged amount must be greater than zero.")
+            raise forms.ValidationError(
+                "Pledged amount must be greater than zero."
+            )
         return amount
+
 
 
 class PledgePaymentForm(forms.ModelForm):
