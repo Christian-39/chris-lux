@@ -1,5 +1,8 @@
+import logging
 from django import forms
-from django.urls import reverse
+from django.urls import reverse, NoReverseMatch
+
+logger = logging.getLogger("oya")
 
 
 class AutocompleteSelectWidget(forms.Widget):
@@ -37,10 +40,22 @@ class AutocompleteSelectWidget(forms.Widget):
 
         # Resolve the AJAX endpoint URL
         search_url = ""
-        if self.search_url_name:
+        if not self.search_url_name:
+            logger.warning(
+                "AutocompleteSelectWidget for field '%s' has no search_url_name set — "
+                "the search box will render but searching will not work.",
+                name,
+            )
+        else:
             try:
                 search_url = reverse(self.search_url_name)
-            except Exception:
+            except NoReverseMatch:
+                logger.error(
+                    "AutocompleteSelectWidget for field '%s': search_url_name=%r "
+                    "did not resolve via reverse(). Check that this URL name exists "
+                    "and is namespaced correctly (app_name + include()).",
+                    name, self.search_url_name,
+                )
                 search_url = ""
         widget["search_url"] = search_url
         widget["placeholder"] = self.placeholder
