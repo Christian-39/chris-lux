@@ -15,6 +15,8 @@
  *     [data-autocomplete-clear]        (optional)
  *     [data-autocomplete-results]
  */
+alert('Autocomplete JS loaded!');
+
 (function () {
   'use strict';
 
