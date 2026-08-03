@@ -87,18 +87,22 @@
       this.showResults();
 
       fetch(`${this.searchUrl}?q=${encodeURIComponent(q)}`, {
-        signal: this.abortController.signal,
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      })
-        .then((r) => r.json())
-        .then((data) => {
-          this.items = Array.isArray(data.results) ? data.results : [];
-          this.render(q);
-        })
-        .catch((err) => {
-          if (err.name === 'AbortError') return;
-          this.resultsBox.innerHTML = '<div class="autocomplete-item autocomplete-empty">Search unavailable. Try again.</div>';
-        });
+  signal: this.abortController.signal,
+  headers: { 'X-Requested-With': 'XMLHttpRequest' }
+})
+  .then((r) => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  })
+  .then((data) => {
+    this.items = Array.isArray(data.results) ? data.results : [];
+    this.render(q);
+  })
+  .catch((err) => {
+    if (err.name === 'AbortError') return;
+    this.resultsBox.innerHTML = '<div class="autocomplete-item autocomplete-empty">Search unavailable. Try again.</div>';
+  });
+
     }
 
     render(q) {
