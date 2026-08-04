@@ -978,7 +978,7 @@ def finance_summary(request):
     treasury_balance = total_income - total_expenses
 
     # FIX Issue 3: Count only registered members (exclude admins, staff, system users)
-    active_members = User.objects.filter(
+    members_qs = User.objects.filter(
         is_active=True,
         serial_number__isnull=False
     ).exclude(
@@ -987,11 +987,38 @@ def finance_summary(request):
         is_staff=True
     ).exclude(
         is_superuser=True
-    ).count()
+    )
+    active_members = members_qs.count()
 
-    years_count = current_year - PLATFORM_START_YEAR + 1
-    total_dues_possible = active_members * years_count * YEARLY_DUES
-    dues_collection_rate = round((total_dues / total_dues_possible * 100), 1) if total_dues_possible > 0 else 0
+    # Sum all dues payments for current/past years (same logic as dues_tracker)
+    total_dues = DuesPayment.objects.filter(
+        year__lte=current_year
+    ).aggregate(
+        total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
+
+    # Add prepaid dues (future years fully paid)
+    total_prepaid = DuesPayment.objects.filter(
+        year__gt=current_year,
+        amount_paid__gte=YEARLY_DUES,
+    ).aggregate(
+        total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
+    )["total"] or Decimal("0")
+    total_dues = total_dues + total_prepaid
+
+    # ============================================================
+    # FIX: total_dues_possible must respect each member's join year
+    # ============================================================
+    total_dues_possible = Decimal("0")
+    for member in members_qs:
+        join_year = DuesPayment.get_member_join_year(member)
+        start_year = max(join_year, PLATFORM_START_YEAR)
+        expected_years = current_year - start_year + 1
+        total_dues_possible += expected_years * YEARLY_DUES
+
+    dues_collection_rate = round(
+        (total_dues / total_dues_possible * 100), 1
+    ) if total_dues_possible > 0 else 0
 
     this_year_dues_paid = DuesPayment.objects.filter(
         year=current_year,
