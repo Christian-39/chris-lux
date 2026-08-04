@@ -305,6 +305,16 @@ class DuesPayment(BaseModel):
                         return year_from_serial
                 except (ValueError, IndexError):
                     pass
+        # Final fallback: the member's actual registration date. Never
+        # blindly default to the platform's inception year — that would
+        # retroactively charge dues to years before the member existed at
+        # all if year_joined is ever missing/invalid and the serial number
+        # doesn't parse to a year.
+        registration_date = getattr(member, "created_at", None) or getattr(member, "date_joined", None)
+        if registration_date:
+            registration_year = registration_date.year
+            if registration_year >= platform_start:
+                return registration_year
         return platform_start
 
     @classmethod
