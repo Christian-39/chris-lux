@@ -80,11 +80,11 @@ def settings_view(request):
 
 @login_required
 def donation_group_list(request):
-    """List all donation groups with search, filter, and pagination."""
-    if not request.user.has_executive_access():
-        messages.error(request, "Executive access required.")
-        return redirect("dashboard:index")
-
+    """List all donation groups with search, filter, and pagination.
+    
+    Visible to ALL authenticated users. Management actions restricted
+    to Admin/Executive via the can_manage flag in the template.
+    """
     queryset = DonationGroup.objects.annotate(
         members_count=Count("memberships", distinct=True)
     ).order_by("name")
@@ -115,6 +115,7 @@ def donation_group_list(request):
         "status_filter": status_filter,
         "can_manage": request.user.has_admin_access() or request.user.has_executive_access(),
     })
+
 
 
 @login_required
@@ -232,13 +233,11 @@ def donation_group_toggle_active(request, pk):
 @login_required
 def donation_group_detail(request, pk):
     """
-    View a donation group: report totals (Feature 3) plus member
-    management (Feature 2) and donation history table.
+    View a donation group: report totals, member list, and donation history.
+    
+    Visible to ALL authenticated users. Management actions restricted
+    to Admin/Executive via the can_manage flag in the template.
     """
-    if not request.user.has_executive_access():
-        messages.error(request, "Executive access required.")
-        return redirect("dashboard:index")
-
     group = get_object_or_404(DonationGroup, pk=pk)
 
     memberships = group.memberships.select_related(
