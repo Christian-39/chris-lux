@@ -21,4 +21,8 @@ urlpatterns = [
     path("handovers/<int:pk>/", views.handover_detail, name="handover_detail"),
     path("handovers/<int:pk>/update/", views.handover_update, name="handover_update"),
     path("handovers/<int:pk>/delete/", views.handover_delete, name="handover_delete"),
+
+    # Executive Handover Report URLs
+    path("administrations/", views.administration_list, name="administration_list"),
+    path("administrations/<str:key>/", views.administration_report, name="administration_report"),
 ]

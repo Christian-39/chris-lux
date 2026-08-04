@@ -118,7 +118,12 @@ class Election(BaseModel):
                 with transaction.atomic():
                     current_holder = Executive.objects.filter(post=post, is_current=True).first()
                     if current_holder and current_holder.member_id == winner.member_id:
-                        # Re-elected to the same post they already hold — no change needed.
+                        # Re-elected to the same post they already hold — no new
+                        # term record needed, but re-tag them into this election's
+                        # administration so handover reports group them correctly.
+                        if current_holder.elected_via_id != self.id:
+                            current_holder.elected_via = self
+                            current_holder.save(update_fields=["elected_via", "updated_at"])
                         winners[post] = winner
                         continue
 
@@ -139,6 +144,7 @@ class Election(BaseModel):
                         post=post,
                         start_date=today,
                         is_current=True,
+                        elected_via=self,
                     )
                 winners[post] = winner
             except Exception as exc:
@@ -346,6 +352,19 @@ class HandoverLedger(BaseModel):
     )
     notes = models.TextField(blank=True, verbose_name="Notes")
 
+    # Cash physically remaining in hand at the moment of handover. Defaults
+    # to ₦0.00 and is only ever edited by an administrator (enforced in
+    # HandoverLedgerForm / elections.views) — everyone else sees it read-only.
+    # Once set, it automatically flows into total_balance / closing balance
+    # and the net financial position below.
+    cash_remaining = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name="Cash Remaining",
+        help_text="Cash physically remaining in hand at handover. Administrator-only field.",
+    )
+
     class Meta:
         db_table = "elections_handoverledger"
         verbose_name = "Handover Ledger"
@@ -357,8 +376,13 @@ class HandoverLedger(BaseModel):
 
     @property
     def total_balance(self):
-        """Physical balance being handed over (bank + cash)."""
-        return self.bank_balance + self.cash_balance
+        """Physical balance being handed over (bank + cash + cash remaining)."""
+        return self.bank_balance + self.cash_balance + self.cash_remaining
+
+    @property
+    def closing_balance(self):
+        """Alias of total_balance — the administration's closing balance."""
+        return self.total_balance
     
     @property
     def net_financial_position(self):

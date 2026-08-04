@@ -25,7 +25,7 @@ class CandidateAdmin(admin.ModelAdmin):
 class HandoverLedgerAdmin(admin.ModelAdmin):
     list_display = [
         "executive", "election", "tenure_start", "tenure_end",
-        "total_balance", "net_financial_position", "created_at"
+        "cash_remaining", "total_balance", "net_financial_position", "created_at"
     ]
     list_filter = ["election", "tenure_start"]
     search_fields = ["executive__member__full_name", "election__title", "notes"]
@@ -43,7 +43,8 @@ class HandoverLedgerAdmin(admin.ModelAdmin):
             "fields": ("election", "executive", "tenure_start", "tenure_end", "notes")
         }),
         ("Physical Balances", {
-            "fields": ("bank_balance", "cash_balance", "assets_description")
+            "fields": ("bank_balance", "cash_balance", "cash_remaining", "assets_description"),
+            "description": "cash_remaining is administrator-only in the app UI; here in Django admin it follows normal staff permissions."
         }),
         ("Auto-Calculated Finance", {
             "fields": (

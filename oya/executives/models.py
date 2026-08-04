@@ -49,6 +49,20 @@ class Executive(BaseModel):
         default=True,
         verbose_name="Is Current"
     )
+    elected_via = models.ForeignKey(
+        "elections.Election",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="executives_elected",
+        verbose_name="Elected Via Election",
+        help_text=(
+            "The election that produced this executive term. Used to group "
+            "executives into administrations for Executive Handover Reports. "
+            "Left blank for executives who predate this tracking (treated as "
+            "the 'Founding Administration')."
+        ),
+    )
 
     class Meta:
         db_table = "executives_executive"

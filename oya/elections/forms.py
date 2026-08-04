@@ -88,13 +88,19 @@ class CandidateForm(forms.ModelForm):
 
 
 class HandoverLedgerForm(forms.ModelForm):
-    """Form for creating and updating comprehensive handover ledgers."""
+    """Form for creating and updating comprehensive handover ledgers.
+
+    `cash_remaining` is administrator-only: pass `user=` into the
+    constructor and the field is removed entirely for non-admin users
+    (so it can never be tampered with via POST), keeping the model default
+    of ₦0.00 until an administrator sets it.
+    """
 
     class Meta:
         model = HandoverLedger
         fields = [
             "election", "executive", "tenure_start", "tenure_end",
-            "bank_balance", "cash_balance",
+            "bank_balance", "cash_balance", "cash_remaining",
             "assets_description", "notes"
         ]
         widgets = {
@@ -120,6 +126,12 @@ class HandoverLedgerForm(forms.ModelForm):
                 "min": "0",
                 "placeholder": "0.00"
             }),
+            "cash_remaining": forms.NumberInput(attrs={
+                "class": "form-control",
+                "step": "0.01",
+                "min": "0",
+                "placeholder": "0.00"
+            }),
             "assets_description": forms.Textarea(attrs={
                 "class": "form-control",
                 "rows": 4,
@@ -131,6 +143,14 @@ class HandoverLedgerForm(forms.ModelForm):
                 "placeholder": "Additional notes about the handover..."
             }),
         }
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        is_admin = bool(user and user.has_admin_access())
+        if not is_admin:
+            # Non-admins never see or can submit this field — the model
+            # default (₦0.00) or the existing stored value is preserved.
+            self.fields.pop("cash_remaining", None)
 
     def clean(self):
         cleaned_data = super().clean()

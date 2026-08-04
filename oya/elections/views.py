@@ -434,7 +434,7 @@ def handover_create(request):
         return redirect("elections:handover_list")
 
     if request.method == "POST":
-        form = HandoverLedgerForm(request.POST)
+        form = HandoverLedgerForm(request.POST, user=request.user)
         if form.is_valid():
             handover = form.save()
             log_action(
@@ -452,7 +452,7 @@ def handover_create(request):
             for error in form.errors.values():
                 messages.error(request, error)
     else:
-        form = HandoverLedgerForm()
+        form = HandoverLedgerForm(user=request.user)
 
     return render(request, "elections/handover_form.html", {
         "form": form,
@@ -471,7 +471,7 @@ def handover_update(request, pk):
     handover = get_object_or_404(HandoverLedger, pk=pk)
 
     if request.method == "POST":
-        form = HandoverLedgerForm(request.POST, instance=handover)
+        form = HandoverLedgerForm(request.POST, instance=handover, user=request.user)
         if form.is_valid():
             handover = form.save()
             log_action(
@@ -489,7 +489,7 @@ def handover_update(request, pk):
             for error in form.errors.values():
                 messages.error(request, error)
     else:
-        form = HandoverLedgerForm(instance=handover)
+        form = HandoverLedgerForm(instance=handover, user=request.user)
 
     return render(request, "elections/handover_form.html", {
         "form": form,
@@ -524,3 +524,42 @@ def handover_delete(request, pk):
         return redirect("elections:handover_list")
 
     return render(request, "elections/handover_confirm_delete.html", {"handover": handover})
+
+
+@login_required
+def administration_list(request):
+    """Previous Administrations page — every executive administration
+    ordered by election, newest first, with a link into its full
+    Executive Handover Report."""
+    from .administrations import list_administrations
+
+    administrations = list_administrations()
+    return render(request, "elections/administration_list.html", {
+        "administrations": administrations,
+    })
+
+
+@login_required
+def administration_report(request, key):
+    """The comprehensive, automatically generated Executive Handover
+    Report for a single administration."""
+    from .administrations import build_administration_report
+
+    report = build_administration_report(key)
+    if report is None:
+        messages.error(request, "That administration could not be found.")
+        return redirect("elections:administration_list")
+
+    log_action(
+        user=request.user,
+        action="VIEW",
+        object_type="ExecutiveHandoverReport",
+        object_id=None,
+        ip_address=getattr(request, "client_ip", ""),
+        description=f"Viewed Executive Handover Report for {report['administration']['name']}"
+    )
+
+    return render(request, "elections/administration_report.html", {
+        "report": report,
+        "administration": report["administration"],
+    })
