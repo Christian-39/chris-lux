@@ -309,8 +309,13 @@ def profile_view(request):
         total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
     )["total"]
 
-    # Year-by-year status (raw, for grouping)
-    years = list(range(PLATFORM_START_YEAR, current_year + 1))
+    # Year-by-year status (raw, for grouping) — only from the member's own
+    # join year onward. Years before they joined are never "owed" (matches
+    # the same join-year-aware logic used in the Dues Tracker and Debtors
+    # List, via DuesPayment.get_member_join_year()).
+    join_year = DuesPayment.get_member_join_year(user)
+    start_year = max(join_year, PLATFORM_START_YEAR)
+    years = list(range(start_year, current_year + 1))
     year_status = []
     for year in years:
         payment = dues_payments.filter(year=year).first()
@@ -384,11 +389,15 @@ def profile_view(request):
         })
 
     # --- DONATIONS DATA ---
+    # Credit only the actual donor. `member` is the FK the donor is recorded
+    # against; `created_by` is just who entered the record (an executive
+    # recording on someone else's behalf must never get credit for it —
+    # created_by is for audit trails only, never for attribution/totals).
     donations_qs = Income.objects.exclude(income_type="DUES").filter(
+        Q(member=user) |
         Q(paid_by__icontains=user.full_name) |
-        Q(paid_by__icontains=user.serial_number) |
-        Q(created_by=user)
-    ).select_related("created_by").order_by("-created_at")
+        Q(paid_by__icontains=user.serial_number)
+    ).select_related("created_by", "member").order_by("-created_at")
 
     total_donations = donations_qs.aggregate(
         total=Coalesce(Sum("amount"), Value(0, output_field=DecimalField()))
@@ -419,12 +428,12 @@ def profile_view(request):
             "income_type": "DUES",
         })
 
-    # 2) Non-dues income
+    # 2) Non-dues income — same donor-only attribution as donations_qs above.
     other_incomes = Income.objects.exclude(income_type="DUES").filter(
+        Q(member=user) |
         Q(paid_by__icontains=user.full_name) |
-        Q(paid_by__icontains=user.serial_number) |
-        Q(created_by=user)
-    ).select_related("created_by").order_by("-created_at")
+        Q(paid_by__icontains=user.serial_number)
+    ).select_related("created_by", "member").order_by("-created_at")
 
     for income in other_incomes:
         all_payments_list.append({
