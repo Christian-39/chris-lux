@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}{{ administration.name }} — Handover Report{% endblock %}
 {% block page_title %}Executive Handover Report{% endblock %}
@@ -118,7 +119,7 @@
   <h2>Achievements</h2>
   <div class="stat-grid">
     <div class="stat-mini"><div class="value">{{ report.achievements.projects_completed }}</div><div class="label">Projects Completed</div></div>
-    <div class="stat-mini"><div class="value">₦{{ report.achievements.funds_raised|floatformat:0 }}</div><div class="label">Funds Raised</div></div>
+    <div class="stat-mini"><div class="value">₦{{ report.achievements.funds_raised|floatformat:0|intcomma }}</div><div class="label">Funds Raised</div></div>
     <div class="stat-mini"><div class="value">{{ report.achievements.cases_resolved }}</div><div class="label">Cases Resolved</div></div>
     <div class="stat-mini"><div class="value">{{ report.achievements.assets_acquired }}</div><div class="label">Assets Acquired</div></div>
     <div class="stat-mini"><div class="value">{{ report.achievements.committees_established }}</div><div class="label">Task Force Added</div></div>
@@ -130,7 +131,7 @@
       {% for a in report.achievements.major_activities %}
       <div class="kv-row">
         <span>{{ a.label|default:"—"|truncatechars:60 }} <span class="badge badge-secondary" style="font-size:0.625rem;">{{ a.type }}</span></span>
-        <strong>₦{{ a.amount|floatformat:0 }}</strong>
+        <strong>₦{{ a.amount|floatformat:0|intcomma }}</strong>
       </div>
       {% endfor %}
     </div>
@@ -145,25 +146,25 @@
     <div class="card">
       <div class="card-body">
         <h3 style="font-size:1rem;margin-bottom:0.75rem;">Financial Summary</h3>
-        <div class="kv-row"><span style="color:var(--oya-text-muted);">Yearly Dues Collected</span><strong style="color:var(--oya-success);">₦{{ report.finance.total_dues|floatformat:0 }}</strong></div>
-        <div class="kv-row"><span style="color:var(--oya-text-muted);">Other Income</span><strong style="color:var(--oya-success);">₦{{ report.finance.total_income|floatformat:0 }}</strong></div>
-        <div class="kv-row"><span style="color:var(--oya-text-muted);">Project Donations</span><strong style="color:var(--oya-success);">₦{{ report.finance.total_donations|floatformat:0 }}</strong></div>
-        <div class="kv-row"><span style="color:var(--oya-text-muted);">Task Force Revenue (Fines)</span><strong style="color:var(--oya-success);">₦{{ report.finance.taskforce_revenue|floatformat:0 }}</strong></div>
-        <div class="subtotal-row"><span><strong>Total Income</strong></span><strong style="color:var(--oya-primary);">₦{{ report.finance.total_revenue|floatformat:0 }}</strong></div>
-        <div class="kv-row"><span style="color:var(--oya-text-muted);">Total Expenses</span><strong style="color:var(--oya-danger);">₦{{ report.finance.total_expenses|floatformat:0 }}</strong></div>
-        <div class="subtotal-row"><span><strong>Remaining Balance</strong></span><strong>₦{{ report.finance.remaining_balance|floatformat:0 }}</strong></div>
+        <div class="kv-row"><span style="color:var(--oya-text-muted);">Yearly Dues Collected</span><strong style="color:var(--oya-success);">₦{{ report.finance.total_dues|floatformat:0|intcomma }}</strong></div>
+        <div class="kv-row"><span style="color:var(--oya-text-muted);">Other Income</span><strong style="color:var(--oya-success);">₦{{ report.finance.total_income|floatformat:0|intcomma }}</strong></div>
+        <div class="kv-row"><span style="color:var(--oya-text-muted);">Project Donations</span><strong style="color:var(--oya-success);">₦{{ report.finance.total_donations|floatformat:0|intcomma }}</strong></div>
+        <div class="kv-row"><span style="color:var(--oya-text-muted);">Task Force Revenue (Fines)</span><strong style="color:var(--oya-success);">₦{{ report.finance.taskforce_revenue|floatformat:0|intcomma }}</strong></div>
+        <div class="subtotal-row"><span><strong>Total Income</strong></span><strong style="color:var(--oya-primary);">₦{{ report.finance.total_revenue|floatformat:0|intcomma }}</strong></div>
+        <div class="kv-row"><span style="color:var(--oya-text-muted);">Total Expenses</span><strong style="color:var(--oya-danger);">₦{{ report.finance.total_expenses|floatformat:0|intcomma }}</strong></div>
+        <div class="subtotal-row"><span><strong>Remaining Balance</strong></span><strong>₦{{ report.finance.remaining_balance|floatformat:0|intcomma }}</strong></div>
       </div>
     </div>
     <div class="card">
       <div class="card-body">
         <h3 style="font-size:1rem;margin-bottom:0.75rem;">Physical Balances &amp; Closing Position</h3>
-        <div class="kv-row"><span style="color:var(--oya-text-muted);">Bank Balance</span><strong>₦{{ report.finance.bank_balance|floatformat:0 }}</strong></div>
-        <div class="kv-row"><span style="color:var(--oya-text-muted);">Cash Balance</span><strong>₦{{ report.finance.cash_balance|floatformat:0 }}</strong></div>
+        <div class="kv-row"><span style="color:var(--oya-text-muted);">Bank Balance</span><strong>₦{{ report.finance.bank_balance|floatformat:0|intcomma }}</strong></div>
+        <div class="kv-row"><span style="color:var(--oya-text-muted);">Cash Balance</span><strong>₦{{ report.finance.cash_balance|floatformat:0|intcomma }}</strong></div>
         <div class="kv-row">
           <span style="color:var(--oya-text-muted);">Cash Remaining <span class="badge badge-secondary" style="font-size:0.625rem;">Admin-only</span></span>
-          <strong>₦{{ report.finance.cash_remaining|floatformat:0 }}</strong>
+          <strong>₦{{ report.finance.cash_remaining|floatformat:0|intcomma }}</strong>
         </div>
-        <div class="subtotal-row"><span><strong>Closing Balance</strong></span><strong style="color:var(--oya-primary);font-size:1.125rem;">₦{{ report.finance.closing_balance|floatformat:0 }}</strong></div>
+        <div class="subtotal-row"><span><strong>Closing Balance</strong></span><strong style="color:var(--oya-primary);font-size:1.125rem;">₦{{ report.finance.closing_balance|floatformat:0|intcomma }}</strong></div>
       </div>
     </div>
   </div>
@@ -177,7 +178,7 @@
           {% for inc in report.finance.recent_income %}
           <div class="kv-row" style="border-bottom:1px solid var(--oya-border);">
             <span>{{ inc.reason|default:"—"|truncatechars:30 }}</span>
-            <strong style="color:var(--oya-success);">₦{{ inc.amount|floatformat:0 }}</strong>
+            <strong style="color:var(--oya-success);">₦{{ inc.amount|floatformat:0|intcomma }}</strong>
           </div>
           {% empty %}<p style="color:var(--oya-text-muted);font-size:0.8125rem;">None recorded.</p>{% endfor %}
         </div>
@@ -190,7 +191,7 @@
           {% for exp in report.finance.recent_expenses %}
           <div class="kv-row" style="border-bottom:1px solid var(--oya-border);">
             <span>{{ exp.description|truncatechars:30 }}</span>
-            <strong style="color:var(--oya-danger);">₦{{ exp.amount|floatformat:0 }}</strong>
+            <strong style="color:var(--oya-danger);">₦{{ exp.amount|floatformat:0|intcomma }}</strong>
           </div>
           {% empty %}<p style="color:var(--oya-text-muted);font-size:0.8125rem;">None recorded.</p>{% endfor %}
         </div>
@@ -203,7 +204,7 @@
           {% for due in report.finance.recent_dues %}
           <div class="kv-row" style="border-bottom:1px solid var(--oya-border);">
             <span>{{ due.member.get_full_name }} · {{ due.year }}</span>
-            <strong style="color:var(--oya-success);">₦{{ due.amount_paid|floatformat:0 }}</strong>
+            <strong style="color:var(--oya-success);">₦{{ due.amount_paid|floatformat:0|intcomma }}</strong>
           </div>
           {% empty %}<p style="color:var(--oya-text-muted);font-size:0.8125rem;">None recorded.</p>{% endfor %}
         </div>
@@ -358,7 +359,7 @@
             {% for row in report.donation_groups.rows %}
             <tr>
               <td class="cell-name">{{ row.group.name }}{% if row.created_in_tenure %} <span class="badge badge-primary" style="font-size:0.625rem;">This tenure</span>{% endif %}</td>
-              <td style="color:var(--oya-success);">₦{{ row.total_realized|floatformat:0 }}</td>
+              <td style="color:var(--oya-success);">₦{{ row.total_realized|floatformat:0|intcomma }}</td>
               <td class="cell-muted">{{ row.member_count }}</td>
               <td class="cell-muted">{{ row.group.created_at|date:"M j, Y" }}</td>
             </tr>
@@ -376,7 +377,7 @@
 <div class="report-section" id="donations">
   <h2>Donations</h2>
   <div class="stat-grid">
-    <div class="stat-mini"><div class="value">₦{{ report.donations.total_amount|floatformat:0 }}</div><div class="label">Total Confirmed (Money)</div></div>
+    <div class="stat-mini"><div class="value">₦{{ report.donations.total_amount|floatformat:0|intcomma }}</div><div class="label">Total Confirmed (Money)</div></div>
     <div class="stat-mini"><div class="value">{{ report.donations.count }}</div><div class="label">Confirmed Donations</div></div>
   </div>
   <div class="card">
@@ -409,7 +410,7 @@
   <div class="stat-grid">
     <div class="stat-mini"><div class="value">{{ report.pledges.counts.created_in_tenure }}</div><div class="label">Made This Tenure</div></div>
     <div class="stat-mini"><div class="value" style="color:var(--oya-warning);">{{ report.pledges.counts.outstanding }}</div><div class="label">Outstanding</div></div>
-    <div class="stat-mini"><div class="value" style="color:var(--oya-danger);">₦{{ report.pledges.total_outstanding|floatformat:0 }}</div><div class="label">Outstanding Balance</div></div>
+    <div class="stat-mini"><div class="value" style="color:var(--oya-danger);">₦{{ report.pledges.total_outstanding|floatformat:0|intcomma }}</div><div class="label">Outstanding Balance</div></div>
   </div>
   <div class="card">
     <div class="card-body" style="padding:0;">
@@ -421,8 +422,8 @@
             <tr>
               <td class="cell-name">{{ p.member.full_name }}</td>
               <td class="cell-muted">{{ p.project.title }}</td>
-              <td>₦{{ p.pledged_amount|floatformat:0 }}</td>
-              <td style="color:var(--oya-warning);">₦{{ p.outstanding_balance|floatformat:0 }}</td>
+              <td>₦{{ p.pledged_amount|floatformat:0|intcomma }}</td>
+              <td style="color:var(--oya-warning);">₦{{ p.outstanding_balance|floatformat:0|intcomma }}</td>
               <td><span class="badge {% if p.status == 'COMPLETED' %}badge-success{% elif p.status == 'CANCELLED' %}badge-danger{% else %}badge-warning{% endif %}">{{ p.get_status_display }}</span></td>
             </tr>
             {% empty %}
@@ -439,7 +440,7 @@
 <div class="report-section" id="materials-labour">
   <h2>Materials &amp; Labour</h2>
   <div class="stat-grid">
-    <div class="stat-mini"><div class="value">₦{{ report.materials_labour.total_estimated_value|floatformat:0 }}</div><div class="label">Total Estimated Value</div></div>
+    <div class="stat-mini"><div class="value">₦{{ report.materials_labour.total_estimated_value|floatformat:0|intcomma }}</div><div class="label">Total Estimated Value</div></div>
   </div>
   <div class="dashboard-grid" style="grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:1rem;">
     <div class="card">
@@ -448,7 +449,7 @@
         {% for m in report.materials_labour.materials %}
         <div class="kv-row" style="border-bottom:1px solid var(--oya-border);">
           <span>{{ m.material_name }} ({{ m.quantity }}) — {{ m.project.title }}</span>
-          <strong>{% if m.estimated_value %}₦{{ m.estimated_value|floatformat:0 }}{% else %}—{% endif %}</strong>
+          <strong>{% if m.estimated_value %}₦{{ m.estimated_value|floatformat:0|intcomma }}{% else %}—{% endif %}</strong>
         </div>
         {% empty %}<p style="color:var(--oya-text-muted);font-size:0.8125rem;">None recorded.</p>{% endfor %}
       </div>
@@ -459,7 +460,7 @@
         {% for l in report.materials_labour.labour %}
         <div class="kv-row" style="border-bottom:1px solid var(--oya-border);">
           <span>{{ l.labour_type }} ({{ l.number_of_days }} day(s)) — {{ l.project.title }}</span>
-          <strong>{% if l.estimated_value %}₦{{ l.estimated_value|floatformat:0 }}{% else %}—{% endif %}</strong>
+          <strong>{% if l.estimated_value %}₦{{ l.estimated_value|floatformat:0|intcomma }}{% else %}—{% endif %}</strong>
         </div>
         {% empty %}<p style="color:var(--oya-text-muted);font-size:0.8125rem;">None recorded.</p>{% endfor %}
       </div>
@@ -603,7 +604,7 @@
       <div class="card-body">
         <h3 style="font-size:0.9375rem;margin-bottom:0.5rem;">Outstanding Pledges</h3>
         {% for p in report.handed_over.outstanding_pledges %}
-        <div class="kv-row"><span>{{ p.member.full_name|truncatechars:20 }}</span><strong style="color:var(--oya-warning);">₦{{ p.outstanding_balance|floatformat:0 }}</strong></div>
+        <div class="kv-row"><span>{{ p.member.full_name|truncatechars:20 }}</span><strong style="color:var(--oya-warning);">₦{{ p.outstanding_balance|floatformat:0|intcomma }}</strong></div>
         {% empty %}<p style="color:var(--oya-text-muted);font-size:0.8125rem;">None outstanding.</p>{% endfor %}
       </div>
     </div>
