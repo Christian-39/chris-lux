@@ -78,12 +78,24 @@ def _administration_summary(election, executives):
     end_dates = [e.end_date for e in executives if e.end_date]
     is_current = any(e.is_current for e in executives)
 
-    if election is not None:
-        tenure_start = election.end_date.date() if election.end_date else (
-            min(start_dates) if start_dates else None
-        )
+    # Tenure boundaries are always derived from the Executive records
+    # themselves — the single source of truth for when this administration
+    # actually took office (Executive.start_date, stamped the moment
+    # process_election_results() ran) and was replaced (Executive.end_date).
+    # Election.start_date/end_date are independently editable voting-period
+    # fields that are not guaranteed to line up with those dates, so mixing
+    # the two (e.g. election.end_date for the start boundary but
+    # Executive.end_date for the end boundary) can produce a skewed or even
+    # inverted tenure window — which silently empties every report section
+    # that filters by [tenure_start, tenure_end], even though the records
+    # exist. Election.end_date is therefore only used as a last-resort
+    # fallback when there are no executives to derive a start date from.
+    if start_dates:
+        tenure_start = min(start_dates)
+    elif election is not None and election.end_date:
+        tenure_start = election.end_date.date()
     else:
-        tenure_start = min(start_dates) if start_dates else None
+        tenure_start = None
 
     if is_current or not executives or len(end_dates) < len(executives):
         tenure_end = None  # still current / ongoing
@@ -188,6 +200,12 @@ def build_administration_report(key, limit=200):
 
     start = admin["tenure_start"] or date(2020, 1, 1)
     end = admin["tenure_end"] or _today()
+    if start > end:
+        # Defensive only — with tenure boundaries now derived consistently
+        # from Executive.start_date/end_date this shouldn't happen, but an
+        # inverted range would silently empty every section below, so guard
+        # against it rather than let bad data produce a misleading report.
+        start, end = end, start
 
     report = {"administration": admin}
     report["finance"] = _finance_section(start, end)
@@ -319,13 +337,15 @@ def _projects_section(start, end, limit):
 def _cases_section(start, end, limit):
     from operations.models import CaseFile
 
-    handled = CaseFile.objects.filter(
+    handled_qs = CaseFile.objects.filter(
         created_at__date__gte=start, created_at__date__lte=end
-    ).select_related("respondent", "created_by").order_by("-created_at")[:limit]
+    )
+    handled = handled_qs.select_related("respondent", "created_by").order_by("-created_at")[:limit]
 
-    resolved = CaseFile.objects.filter(
+    resolved_qs = CaseFile.objects.filter(
         status="RESOLVED", resolved_date__gte=start, resolved_date__lte=end
-    ).select_related("respondent").order_by("-resolved_date")[:limit]
+    )
+    resolved = resolved_qs.select_related("respondent").order_by("-resolved_date")[:limit]
 
     pending_handed_over = CaseFile.objects.filter(
         status__in=["OPEN", "IN_PROGRESS"]
@@ -336,12 +356,16 @@ def _cases_section(start, end, limit):
         "resolved": resolved,
         "pending_handed_over": pending_handed_over,
         "counts": {
-            "handled": CaseFile.objects.filter(
-                created_at__date__gte=start, created_at__date__lte=end
-            ).count(),
-            "resolved": CaseFile.objects.filter(
-                status="RESOLVED", resolved_date__gte=start, resolved_date__lte=end
-            ).count(),
+            "handled": handled_qs.count(),
+            # Resolved this tenure (by resolution date — may include cases
+            # originally filed under an earlier administration).
+            "resolved": resolved_qs.count(),
+            # Of the cases *filed* during this tenure, how many currently
+            # sit in each status — the backlog this administration created.
+            "open": handled_qs.filter(status="OPEN").count(),
+            "in_progress": handled_qs.filter(status="IN_PROGRESS").count(),
+            # Association-wide open/in-progress backlog at report time,
+            # regardless of tenure — used by the Records Handed Over section.
             "pending": CaseFile.objects.filter(status__in=["OPEN", "IN_PROGRESS"]).count(),
         },
     }
