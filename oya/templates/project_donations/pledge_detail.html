@@ -10,9 +10,15 @@
 <!-- Page Header -->
 <div class="page-header" style="flex-wrap: wrap; gap: 0.75rem">
   <div class="page-header-left">
-    <h1 style="font-size: clamp(1.125rem, 3vw, 1.5rem)">{{ pledge.member.full_name }}</h1>
+    <h1 style="font-size: clamp(1.125rem, 3vw, 1.5rem)">
+      {% if pledge.member %}{{ pledge.member.full_name }}{% elif pledge.outside_donor %}{{ pledge.outside_donor.full_name }} <span class="badge badge-info" style="font-size:0.625rem;">Outside Donor</span>{% else %}Anonymous{% endif %}
+    </h1>
     <p style="font-size: clamp(0.75rem, 2vw, 0.875rem)">
-      Pledge for <strong>{{ pledge.project.title }}</strong>
+      <span class="badge {{ pledge.donation_type_badge_class }}">{{ pledge.get_donation_type_display }}</span>
+      pledge for <strong>{{ pledge.project.title }}</strong>
+      {% if pledge.source_donation %}
+      · originated from <a href="{% url 'project_donations:donation_detail' pk=pledge.source_donation.pk %}">Project Donation</a>
+      {% endif %}
     </p>
   </div>
   <div class="page-header-actions" style="flex-wrap: wrap; gap: 0.5rem">
@@ -46,9 +52,10 @@
     <div class="kpi-header">
       <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
     </div>
-    <div class="kpi-value" style="font-size: clamp(1.25rem, 4vw, 1.75rem)">&#x20A6;{{ pledge.pledged_amount|floatformat:0|intcomma }}</div>
+    <div class="kpi-value" style="font-size: clamp(1.125rem, 4vw, 1.5rem)">{{ pledge.display_value }}</div>
     <div class="kpi-label">Pledged</div>
   </div>
+  {% if pledge.donation_type == "MONEY" %}
   <div class="kpi-card accent-success">
     <div class="kpi-header">
       <div class="kpi-icon" style="background: var(--oya-success-bg); color: var(--oya-success)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
@@ -63,6 +70,22 @@
     <div class="kpi-value" style="color: var(--oya-warning); font-size: clamp(1.25rem, 4vw, 1.75rem)">&#x20A6;{{ pledge.outstanding_balance|floatformat:0|intcomma }}</div>
     <div class="kpi-label">Outstanding Balance</div>
   </div>
+  {% else %}
+  <div class="kpi-card accent-info">
+    <div class="kpi-header">
+      <div class="kpi-icon" style="background: var(--oya-info-bg); color: var(--oya-info)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.42 4.58a5.4 5.4 0 0 1 0 7.65L12 20.65l-8.42-8.42a5.4 5.4 0 1 1 7.65-7.65L12 5.24l.77-.66a5.4 5.4 0 0 1 7.65 0z"/></svg></div>
+    </div>
+    <div class="kpi-value" style="font-size: clamp(1.125rem, 4vw, 1.5rem)">{{ pledge.estimated_value|default_if_none:"" }}{% if pledge.estimated_value %}&#x20A6;{{ pledge.estimated_value|floatformat:0|intcomma }}{% else %}<span class="cell-muted" style="font-size:1rem;">Not valued</span>{% endif %}</div>
+    <div class="kpi-label">Estimated Value</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+    </div>
+    <div class="kpi-value" style="font-size: clamp(1rem, 3.5vw, 1.25rem)">{% if pledge.status == "COMPLETED" %}Fulfilled{% elif pledge.status == "CANCELLED" %}Cancelled{% else %}Outstanding{% endif %}</div>
+    <div class="kpi-label">Fulfilment</div>
+  </div>
+  {% endif %}
   <div class="kpi-card accent-info">
     <div class="kpi-header">
       <div class="kpi-icon" style="background: var(--oya-info-bg); color: var(--oya-info)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
@@ -85,7 +108,8 @@
   align-items: start;
 ">
 
-  {% if can_manage and pledge.status != "CANCELLED" %}
+  {% if can_manage and pledge.status != "CANCELLED" and pledge.status != "COMPLETED" %}
+  {% if pledge.donation_type == "MONEY" %}
   <div class="card">
     <div class="card-header" style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--oya-border)">
       <div class="card-header-title" style="font-size: clamp(0.875rem, 2.5vw, 1rem)">Record a Payment</div>
@@ -121,8 +145,36 @@
       </form>
     </div>
   </div>
+  {% else %}
+  <div class="card">
+    <div class="card-header" style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--oya-border)">
+      <div class="card-header-title" style="font-size: clamp(0.875rem, 2.5vw, 1rem)">Fulfil This Pledge</div>
+    </div>
+    <div class="card-body">
+      <p style="color:var(--oya-text-secondary);font-size:0.875rem;margin-bottom:1rem;">
+        {{ pledge.get_donation_type_display }} pledges are fulfilled in one step once the
+        {% if pledge.donation_type == "LABOUR" %}work is completed{% else %}materials are delivered{% endif %}.
+        {% if pledge.source_donation %}This will also confirm the linked Project Donation.{% endif %}
+      </p>
+      <form method="post" action="{% url 'project_donations:pledge_fulfill' pk=pledge.pk %}" style="margin-bottom:0.75rem;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary" style="width:100%;" onclick="return confirm('Mark this pledge as fulfilled?');">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Mark Fulfilled
+        </button>
+      </form>
+      <form method="post" action="{% url 'project_donations:pledge_cancel' pk=pledge.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-secondary" style="width:100%;" onclick="return confirm('Cancel this pledge?');">
+          Cancel Pledge
+        </button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
   {% endif %}
 
+  {% if pledge.donation_type == "MONEY" %}
   <div class="card">
     <div class="card-header" style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--oya-border)">
       <div class="card-header-title" style="font-size: clamp(0.875rem, 2.5vw, 1rem)">Payment History</div>
@@ -177,6 +229,40 @@
       </div>
     </div>
   </div>
+  {% else %}
+  <div class="card">
+    <div class="card-header" style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--oya-border)">
+      <div class="card-header-title" style="font-size: clamp(0.875rem, 2.5vw, 1rem)">Pledge Details</div>
+    </div>
+    <div class="card-body">
+      <div class="detail-meta-grid">
+        {% if pledge.donation_type == "MATERIAL" %}
+        <div class="meta-item">
+          <span class="meta-label">Material</span>
+          <span class="meta-value">{{ pledge.material_name }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Quantity</span>
+          <span class="meta-value">{{ pledge.quantity }}</span>
+        </div>
+        {% else %}
+        <div class="meta-item">
+          <span class="meta-label">Labour Type</span>
+          <span class="meta-value">{{ pledge.labour_type }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Number of Days</span>
+          <span class="meta-value">{{ pledge.number_of_days }}</span>
+        </div>
+        {% endif %}
+        <div class="meta-item">
+          <span class="meta-label">Estimated Value</span>
+          <span class="meta-value">{% if pledge.estimated_value %}&#x20A6;{{ pledge.estimated_value|floatformat:0|intcomma }}{% else %}Not valued{% endif %}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 
 </div>
 

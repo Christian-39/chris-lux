@@ -225,24 +225,37 @@ class DonationForm(forms.ModelForm):
         return amount
 
 class PledgeForm(forms.ModelForm):
-    """Form for recording a pledge (Feature 6)."""
+    """Form for recording a pledge directly from the Pledges module
+    (Feature 6). Supports every donor and contribution type, mirroring
+    DonationForm — a pledge made this way behaves exactly like a Donation
+    saved with status="Pledge" except there's no Project Donation record
+    driving it (it's fulfilled by editing this pledge's status directly)."""
 
     class Meta:
         model = Pledge
         fields = [
-            "member",
-            "project",
-            "pledged_amount",
-            "due_date",
-            "notes",
-            "status",
+            "project", "donor_type", "member", "outside_donor",
+            "donation_type", "pledged_amount",
+            "material_name", "quantity", "labour_type", "number_of_days",
+            "estimated_value",
+            "due_date", "notes", "status",
         ]
         widgets = {
+            "project": forms.Select(attrs={"class": "form-select"}),
+            "donor_type": forms.Select(attrs={
+                "class": "form-select", "id": "id_donor_type"
+            }),
             "member": AutocompleteSelectWidget(
                 search_url_name="members:member_autocomplete_search",
                 placeholder="Search member by name, no. or phone…",
+                attrs={"id": "id_member"},
             ),
-            "project": forms.Select(attrs={"class": "form-select"}),
+            "outside_donor": forms.Select(attrs={
+                "class": "form-select", "id": "id_outside_donor"
+            }),
+            "donation_type": forms.Select(attrs={
+                "class": "form-select", "id": "id_donation_type"
+            }),
             "pledged_amount": forms.NumberInput(
                 attrs={
                     "class": "form-control",
@@ -251,6 +264,29 @@ class PledgeForm(forms.ModelForm):
                     "placeholder": "0.00",
                 }
             ),
+            "material_name": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "e.g. Bags of Cement, Roofing Sheets"
+            }),
+            "quantity": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "e.g. 50 bags, 20 sheets"
+            }),
+            "labour_type": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "e.g. Roofing, Carpentry, Electrical Wiring"
+            }),
+            "number_of_days": forms.NumberInput(attrs={
+                "class": "form-control",
+                "min": "1",
+                "placeholder": "Number of days"
+            }),
+            "estimated_value": forms.NumberInput(attrs={
+                "class": "form-control",
+                "step": "0.01",
+                "min": "0",
+                "placeholder": "Optional"
+            }),
             "due_date": forms.DateInput(
                 attrs={"class": "form-control", "type": "date"}
             ),
@@ -273,6 +309,13 @@ class PledgeForm(forms.ModelForm):
         self.fields["member"].widget.display_queryset = self.fields[
             "member"
         ].queryset
+        self.fields["member"].required = False
+
+        self.fields["outside_donor"].queryset = OutsideDonor.objects.select_related(
+            "invited_by"
+        ).order_by("full_name")
+        self.fields["outside_donor"].empty_label = "-- Select Outside Donor --"
+        self.fields["outside_donor"].required = False
 
         from projects.models import Project
         from django.db.models import Q
@@ -285,7 +328,11 @@ class PledgeForm(forms.ModelForm):
         self.fields["project"].queryset = qs.order_by("-created_at")
         self.fields["project"].empty_label = "-- Select Fundraising Project --"
 
-        # Status handling
+        # Status handling — a brand-new pledge always starts PENDING; once
+        # it exists it can only be edited toward Cancelled or Completed
+        # (Completed drives Money pledges too if you want to force-close
+        # one without going through PledgePayments; Partially Paid stays
+        # system-managed via recalculate_status for Money pledges).
         if not (self.instance and self.instance.pk):
             self.fields["status"].widget = forms.HiddenInput()
             self.fields["status"].required = False
@@ -294,8 +341,42 @@ class PledgeForm(forms.ModelForm):
             self.fields["status"].choices = [
                 c
                 for c in Pledge.STATUS_CHOICES
-                if c[0] in ("CANCELLED", self.instance.status)
+                if c[0] in ("CANCELLED", "COMPLETED", self.instance.status)
             ]
+
+    def clean(self):
+        cleaned = super().clean()
+        donor_type = cleaned.get("donor_type")
+        member = cleaned.get("member")
+        outside_donor = cleaned.get("outside_donor")
+
+        if donor_type == "MEMBER":
+            if not member:
+                self.add_error("member", "Please select a member.")
+            if outside_donor:
+                self.add_error("outside_donor", "Clear outside donor for member pledges.")
+        elif donor_type == "OUTSIDE":
+            if not outside_donor:
+                self.add_error("outside_donor", "Please select an outside donor.")
+            if member:
+                self.add_error("member", "Clear member for outside pledges.")
+
+        donation_type = cleaned.get("donation_type")
+        if donation_type == "MONEY":
+            if not cleaned.get("pledged_amount"):
+                self.add_error("pledged_amount", "Pledged amount is required for Money pledges.")
+        elif donation_type == "MATERIAL":
+            if not cleaned.get("material_name"):
+                self.add_error("material_name", "Material name is required.")
+            if not cleaned.get("quantity"):
+                self.add_error("quantity", "Quantity is required.")
+        elif donation_type == "LABOUR":
+            if not cleaned.get("labour_type"):
+                self.add_error("labour_type", "Labour type is required.")
+            if not cleaned.get("number_of_days"):
+                self.add_error("number_of_days", "Number of days is required.")
+
+        return cleaned
 
     def clean_pledged_amount(self):
         amount = self.cleaned_data.get("pledged_amount")

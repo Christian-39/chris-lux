@@ -10,6 +10,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q, Sum, Count, Value, DecimalField
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse, HttpResponse
+from django.views.decorators.http import require_http_methods
 from django.db import transaction
 from django.utils import timezone
 from auditlogs.services import log_action
@@ -432,6 +433,64 @@ def donation_delete(request, pk):
     )
 
 
+@login_required
+@require_http_methods(["POST"])
+def donation_fulfill(request, pk):
+    """Mark a Pledge-status donation as fulfilled. Confirming the donation
+    also marks its linked Pledge record Completed automatically (via the
+    sync_donation_pledge signal), and — for Money/Material — creates or
+    updates the treasury Income record (via sync_donation_to_finance)."""
+    if not request.user.has_executive_access():
+        messages.error(request, "Executive access required.")
+        return redirect("project_donations:donation_detail", pk=pk)
+
+    donation = get_object_or_404(Donation, pk=pk)
+    if donation.status != "PLEDGE":
+        messages.error(request, "Only donations still at Pledge status can be fulfilled.")
+        return redirect("project_donations:donation_detail", pk=pk)
+
+    donation.status = "CONFIRMED"
+    donation.save()
+    log_action(
+        user=request.user,
+        action="UPDATE",
+        object_type="Donation",
+        object_id=donation.id,
+        ip_address=getattr(request, "client_ip", ""),
+        description=f"Marked pledge fulfilled: {donation.display_value} for {donation.project.title}"
+    )
+    messages.success(request, "Pledge marked as fulfilled — donation confirmed and pledge completed.")
+    return redirect("project_donations:donation_detail", pk=pk)
+
+
+@login_required
+@require_http_methods(["POST"])
+def donation_cancel_pledge(request, pk):
+    """Cancel a Pledge-status donation (the donor withdrew their commitment).
+    Marks the linked Pledge Cancelled too, automatically."""
+    if not request.user.has_executive_access():
+        messages.error(request, "Executive access required.")
+        return redirect("project_donations:donation_detail", pk=pk)
+
+    donation = get_object_or_404(Donation, pk=pk)
+    if donation.status != "PLEDGE":
+        messages.error(request, "Only donations still at Pledge status can be cancelled this way.")
+        return redirect("project_donations:donation_detail", pk=pk)
+
+    donation.status = "CANCELLED"
+    donation.save()
+    log_action(
+        user=request.user,
+        action="UPDATE",
+        object_type="Donation",
+        object_id=donation.id,
+        ip_address=getattr(request, "client_ip", ""),
+        description=f"Cancelled pledge: {donation.display_value} for {donation.project.title}"
+    )
+    messages.success(request, "Pledge cancelled.")
+    return redirect("project_donations:donation_detail", pk=pk)
+
+
 # ============================================================
 # REPORTS
 # ============================================================
@@ -557,15 +616,20 @@ def get_outside_donor_inviter_ajax(request):
 @login_required
 def pledge_list(request):
     """List all pledges with search, filter (status/overdue), and pagination (Feature 9)."""
-    queryset = Pledge.objects.select_related("member", "project", "created_by").all()
+    queryset = Pledge.objects.select_related("member", "outside_donor", "project", "created_by").all()
 
     search_term = request.GET.get("search", "")
     if search_term:
         queryset = queryset.filter(
             Q(member__full_name__icontains=search_term) |
             Q(member__serial_number__icontains=search_term) |
+            Q(outside_donor__full_name__icontains=search_term) |
             Q(project__title__icontains=search_term)
         )
+
+    donation_type_filter = request.GET.get("donation_type", "")
+    if donation_type_filter:
+        queryset = queryset.filter(donation_type=donation_type_filter)
 
     status_filter = request.GET.get("status", "")
     if status_filter == "OVERDUE":
@@ -594,7 +658,9 @@ def pledge_list(request):
         "search_term": search_term,
         "status_filter": status_filter,
         "project_filter": project_filter,
+        "donation_type_filter": donation_type_filter,
         "status_choices": Pledge.STATUS_CHOICES,
+        "donation_type_choices": Donation.DONATION_TYPE_CHOICES,
         "stats": {
             "total": Pledge.objects.count(),
             "pending": Pledge.objects.filter(status="PENDING").count(),
@@ -790,4 +856,64 @@ def pledge_payment_delete(request, pk, payment_pk):
         )
         messages.success(request, "Payment deleted.")
 
+    return redirect("project_donations:pledge_detail", pk=pk)
+
+
+@login_required
+@require_http_methods(["POST"])
+def pledge_fulfill(request, pk):
+    """Mark a Material/Labour (or manually force-closed Money) pledge as
+    fulfilled in one step. If this pledge originated from a Project
+    Donation, that donation is confirmed automatically too (via the
+    sync_pledge_donation signal), including the treasury sync for
+    Money/Material donations."""
+    if not request.user.has_executive_access():
+        messages.error(request, "Executive access required.")
+        return redirect("project_donations:pledge_detail", pk=pk)
+
+    pledge = get_object_or_404(Pledge, pk=pk)
+    if pledge.status in ("COMPLETED", "CANCELLED"):
+        messages.error(request, "This pledge is already closed.")
+        return redirect("project_donations:pledge_detail", pk=pk)
+
+    pledge.status = "COMPLETED"
+    pledge.save()
+    log_action(
+        user=request.user,
+        action="UPDATE",
+        object_type="Pledge",
+        object_id=pledge.id,
+        ip_address=getattr(request, "client_ip", ""),
+        description=f"Marked pledge fulfilled: {pledge.display_value} by {pledge.donor} for {pledge.project.title}"
+    )
+    messages.success(request, "Pledge marked as fulfilled.")
+    return redirect("project_donations:pledge_detail", pk=pk)
+
+
+@login_required
+@require_http_methods(["POST"])
+def pledge_cancel(request, pk):
+    """Cancel a pledge directly (donor withdrew their commitment). Syncs
+    back to the source Donation, if any, via the sync_pledge_donation
+    signal."""
+    if not request.user.has_executive_access():
+        messages.error(request, "Executive access required.")
+        return redirect("project_donations:pledge_detail", pk=pk)
+
+    pledge = get_object_or_404(Pledge, pk=pk)
+    if pledge.status in ("COMPLETED", "CANCELLED"):
+        messages.error(request, "This pledge is already closed.")
+        return redirect("project_donations:pledge_detail", pk=pk)
+
+    pledge.status = "CANCELLED"
+    pledge.save()
+    log_action(
+        user=request.user,
+        action="UPDATE",
+        object_type="Pledge",
+        object_id=pledge.id,
+        ip_address=getattr(request, "client_ip", ""),
+        description=f"Cancelled pledge #{pledge.id} by {pledge.donor} for {pledge.project.title}"
+    )
+    messages.success(request, "Pledge cancelled.")
     return redirect("project_donations:pledge_detail", pk=pk)

@@ -34,12 +34,8 @@
     <div style="font-size:1.5rem;font-weight:700;color:var(--oya-text-primary);">{{ stats.total }}</div>
   </div>
   <div class="card" style="padding:1rem;">
-    <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-bottom:0.25rem;">Total Bank Held</div>
-    <div style="font-size:1.5rem;font-weight:700;color:var(--oya-success);">₦{{ stats.total_bank|floatformat:0 }}</div>
-  </div>
-  <div class="card" style="padding:1rem;">
-    <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-bottom:0.25rem;">Total Cash Held</div>
-    <div style="font-size:1.5rem;font-weight:700;color:var(--oya-success);">₦{{ stats.total_cash|floatformat:0 }}</div>
+    <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-bottom:0.25rem;">Total Physical Cash at Hand</div>
+    <div style="font-size:1.5rem;font-weight:700;color:var(--oya-success);">₦{{ stats.total_cash_remaining|floatformat:0 }}</div>
   </div>
   <div class="card" style="padding:1rem;">
     <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-bottom:0.25rem;">Total Revenue Recorded</div>

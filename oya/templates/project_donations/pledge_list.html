@@ -52,7 +52,7 @@
 <div class="dashboard-grid dashboard-grid-2" style="margin-bottom:1.5rem;">
   <div class="kpi-card">
     <div class="kpi-value">&#x20A6;{{ stats.total_pledged|floatformat:0|intcomma }}</div>
-    <div class="kpi-label">Total Pledged (active)</div>
+    <div class="kpi-label">Total Pledged (active, money)</div>
   </div>
   <div class="kpi-card accent-warning">
     <div class="kpi-value" style="color:var(--oya-warning);">&#x20A6;{{ stats.total_outstanding|floatformat:0|intcomma }}</div>
@@ -73,6 +73,12 @@
           {% endfor %}
           <option value="OVERDUE" {% if status_filter == "OVERDUE" %}selected{% endif %}>Overdue</option>
         </select>
+        <select name="donation_type" class="form-select" style="max-width:160px;" onchange="this.form.submit()">
+          <option value="" {% if not donation_type_filter %}selected{% endif %}>All Types</option>
+          {% for value, label in donation_type_choices %}
+          <option value="{{ value }}" {% if donation_type_filter == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
         <select name="project" class="form-select" style="max-width:220px;" onchange="this.form.submit()">
           <option value="">All Projects</option>
           {% for p in fundraising_projects %}
@@ -87,7 +93,8 @@
     <table class="data-table" style="white-space:nowrap;">
       <thead>
         <tr>
-          <th>Member</th>
+          <th>Donor</th>
+          <th>Type</th>
           <th>Project</th>
           <th>Pledged</th>
           <th>Paid</th>
@@ -100,11 +107,20 @@
       <tbody>
         {% for pledge in pledges %}
         <tr>
-          <td><span class="cell-name">{{ pledge.member.full_name }}</span></td>
+          <td>
+            <span class="cell-name">
+              {% if pledge.member %}{{ pledge.member.full_name }}{% elif pledge.outside_donor %}{{ pledge.outside_donor.full_name }} <span class="badge badge-info" style="font-size:0.625rem;">Outside</span>{% else %}<span class="cell-muted">—</span>{% endif %}
+            </span>
+          </td>
+          <td><span class="badge {{ pledge.donation_type_badge_class|default:'badge-secondary' }}">{{ pledge.get_donation_type_display }}</span></td>
           <td><span class="cell-muted">{{ pledge.project.title }}</span></td>
-          <td style="font-weight:600;">&#x20A6;{{ pledge.pledged_amount|floatformat:0|intcomma }}</td>
-          <td>&#x20A6;{{ pledge.total_paid|floatformat:0|intcomma }}</td>
-          <td style="color:var(--oya-warning);font-weight:600;">&#x20A6;{{ pledge.outstanding_balance|floatformat:0|intcomma }}</td>
+          <td style="font-weight:600;">{{ pledge.display_value }}</td>
+          <td>
+            {% if pledge.donation_type == "MONEY" %}&#x20A6;{{ pledge.total_paid|floatformat:0|intcomma }}{% else %}<span class="cell-muted">—</span>{% endif %}
+          </td>
+          <td style="color:var(--oya-warning);font-weight:600;">
+            {% if pledge.donation_type == "MONEY" %}&#x20A6;{{ pledge.outstanding_balance|floatformat:0|intcomma }}{% elif pledge.status == "COMPLETED" %}<span class="cell-muted" style="font-weight:400;">Fulfilled</span>{% else %}<span style="font-weight:600;">Outstanding</span>{% endif %}
+          </td>
           <td>
             {% if pledge.due_date %}
               {% if pledge.is_overdue %}
@@ -127,7 +143,7 @@
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="8" style="text-align:center;padding:3rem 1rem;color:var(--oya-text-muted);">No pledges found.</td></tr>
+        <tr><td colspan="9" style="text-align:center;padding:3rem 1rem;color:var(--oya-text-muted);">No pledges found.</td></tr>
         {% endfor %}
       </tbody>
     </table>

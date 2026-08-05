@@ -411,6 +411,7 @@
   <h2>Pledges</h2>
   <div class="stat-grid">
     <div class="stat-mini"><div class="value">{{ report.pledges.counts.created_in_tenure }}</div><div class="label">Made This Tenure</div></div>
+    <div class="stat-mini"><div class="value">₦{{ report.pledges.total_pledged_value|floatformat:0|intcomma }}</div><div class="label">Total Pledge Value (Money)</div></div>
     <div class="stat-mini"><div class="value" style="color:var(--oya-warning);">{{ report.pledges.counts.outstanding }}</div><div class="label">Outstanding</div></div>
     <div class="stat-mini"><div class="value" style="color:var(--oya-danger);">₦{{ report.pledges.total_outstanding|floatformat:0|intcomma }}</div><div class="label">Outstanding Balance</div></div>
   </div>
@@ -418,18 +419,19 @@
     <div class="card-body" style="padding:0;">
       <div class="table-container">
         <table class="data-table">
-          <thead><tr><th>Member</th><th>Project</th><th>Pledged</th><th>Outstanding</th><th>Status</th></tr></thead>
+          <thead><tr><th>Donor</th><th>Type</th><th>Project</th><th>Pledged</th><th>Outstanding</th><th>Status</th></tr></thead>
           <tbody>
             {% for p in report.pledges.in_tenure %}
             <tr>
-              <td class="cell-name">{{ p.member.full_name }}</td>
+              <td class="cell-name">{% if p.member %}{{ p.member.full_name }}{% elif p.outside_donor %}{{ p.outside_donor.full_name }} <span class="badge badge-info" style="font-size:0.625rem;">Outside</span>{% else %}<span class="cell-muted">—</span>{% endif %}</td>
+              <td><span class="badge {{ p.donation_type_badge_class }}">{{ p.get_donation_type_display }}</span></td>
               <td class="cell-muted">{{ p.project.title }}</td>
-              <td>₦{{ p.pledged_amount|floatformat:0|intcomma }}</td>
-              <td style="color:var(--oya-warning);">₦{{ p.outstanding_balance|floatformat:0|intcomma }}</td>
+              <td>{{ p.display_value }}</td>
+              <td style="color:var(--oya-warning);">{% if p.donation_type == "MONEY" %}₦{{ p.outstanding_balance|floatformat:0|intcomma }}{% elif p.status == "COMPLETED" %}<span class="cell-muted">Fulfilled</span>{% else %}Outstanding{% endif %}</td>
               <td><span class="badge {% if p.status == 'COMPLETED' %}badge-success{% elif p.status == 'CANCELLED' %}badge-danger{% else %}badge-warning{% endif %}">{{ p.get_status_display }}</span></td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" class="cell-muted" style="text-align:center;">No pledges recorded during this tenure.</td></tr>
+            <tr><td colspan="6" class="cell-muted" style="text-align:center;">No pledges recorded during this tenure.</td></tr>
             {% endfor %}
           </tbody>
         </table>

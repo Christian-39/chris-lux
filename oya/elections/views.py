@@ -312,8 +312,7 @@ def handover_list(request):
 
     # Summary stats — plain Sum, then fall back to Decimal("0") in Python
     agg = HandoverLedger.objects.aggregate(
-        total_bank=Sum("bank_balance"),
-        total_cash=Sum("cash_balance"),
+        total_cash_remaining=Sum("cash_remaining"),
         sum_income=Sum("total_income"),
         sum_dues=Sum("total_dues"),
         sum_donations=Sum("total_donations"),
@@ -322,8 +321,7 @@ def handover_list(request):
 
     stats = {
         "total": HandoverLedger.objects.count(),
-        "total_bank": agg["total_bank"] or Decimal("0"),
-        "total_cash": agg["total_cash"] or Decimal("0"),
+        "total_cash_remaining": agg["total_cash_remaining"] or Decimal("0"),
         "total_revenue": (
             (agg["sum_income"] or Decimal("0")) +
             (agg["sum_dues"] or Decimal("0")) +
@@ -341,52 +339,61 @@ def handover_list(request):
 
 @login_required
 def handover_detail(request, pk):
-    """Display comprehensive handover details."""
+    """Display comprehensive handover details. Tenure-scoped data (cases,
+    finance) is fetched via elections.administrations — the same
+    calculation engine that powers the Executive Handover Report and
+    HandoverLedger.recalculate_aggregates() — so this page, the ledger's
+    own stored figures, and the full report always agree and nothing is
+    queried twice."""
     from django.db.models import Sum, Count
+    from elections.administrations import (
+        _cases_section, _taskforce_section, _motorcycles_section, _finance_section,
+    )
 
     handover = get_object_or_404(
         HandoverLedger.objects.select_related("executive__member", "election"),
         pk=pk
     )
 
-    # Fetch detailed records for the tenure period
-    from operations.models import TaskForceMember, Motorcycle, CaseFile
     from projects.models import Project
     from project_donations.models import Donation as ProjectDonation
-    from finance.models import Income, Expense, DuesPayment
+    from operations.models import CaseFile, TaskForceMember, Motorcycle
 
     start = handover.tenure_start
     end = handover.tenure_end
 
-    # Operations details — capped to avoid unbounded queries
-    taskforce_members = TaskForceMember.objects.select_related("member")[:50]
-    motorcycles = Motorcycle.objects.select_related("assigned_to")[:50]
-    cases = CaseFile.objects.select_related("respondent", "created_by")[:50]
-
-    # Finance details
-    recent_income = Income.objects.filter(
-        created_at__date__gte=start,
-        created_at__date__lte=end
-    ).exclude(income_type__in=["DUES", "PROJECT_DONATION"]).select_related("created_by", "member").order_by("-created_at")[:10]
-
-    recent_expenses = Expense.objects.filter(
-        created_at__date__gte=start,
-        created_at__date__lte=end
-    ).select_related("created_by").order_by("-created_at")[:10]
-
-    recent_dues = DuesPayment.objects.filter(
-        created_at__date__gte=start,
-        created_at__date__lte=end
-    ).select_related("member", "recorded_by").order_by("-created_at")[:10]
+    if start and end:
+        cases_data = _cases_section(start, end, limit=50)
+        taskforce_data = _taskforce_section(start, end, limit=50)
+        motorcycles_data = _motorcycles_section(start, end, limit=50)
+        finance_data = _finance_section(start, end)
+        cases = cases_data["handled"]
+        taskforce_members = taskforce_data["all_current"]
+        motorcycles = motorcycles_data["all_motorcycles"]
+        recent_income = finance_data["recent_income"][:10]
+        recent_expenses = finance_data["recent_expenses"][:10]
+        recent_dues = finance_data["recent_dues"][:10]
+    else:
+        # No resolvable tenure window (shouldn't happen for a saved ledger,
+        # since recalculate_aggregates() always derives one from the
+        # executive record) — degrade to empty rather than showing
+        # unrelated, unscoped data.
+        cases = CaseFile.objects.none()
+        taskforce_members = TaskForceMember.objects.none()
+        motorcycles = Motorcycle.objects.none()
+        recent_income = recent_expenses = recent_dues = []
 
     # ONE query: per-project donation totals/counts within the tenure window.
-    donation_stats = (
-        ProjectDonation.objects.filter(
-            status="CONFIRMED", donation_date__range=(start, end)
+    if start and end:
+        donation_stats = (
+            ProjectDonation.objects.filter(
+                status="CONFIRMED", donation_date__range=(start, end)
+            )
+            .values("project_id")
+            .annotate(total=Sum("amount"), count=Count("id"))
         )
-        .values("project_id")
-        .annotate(total=Sum("amount"), count=Count("id"))
-    )
+    else:
+        donation_stats = ProjectDonation.objects.none()
     stats_by_project = {row["project_id"]: row for row in donation_stats}
 
     # ONE query: top 5 donations per project only for projects that had donations.
@@ -395,7 +402,7 @@ def handover_detail(request, pk):
         project_id__in=project_ids_with_donations,
         status="CONFIRMED",
         donation_date__range=(start, end),
-    ).select_related("member", "outside_donor").order_by("project_id", "-donation_date")
+    ).select_related("member", "outside_donor").order_by("project_id", "-donation_date") if (start and end) else ProjectDonation.objects.none()
 
     donations_by_project = {}
     for d in donations_qs:

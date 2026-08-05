@@ -34,7 +34,7 @@ class DonationAdmin(admin.ModelAdmin):
         "reference_number", "narration"
     ]
     raw_id_fields = [
-        "project", "member", "outside_donor", "invited_by", "recorded_by"
+        "project", "member", "outside_donor", "invited_by", "recorded_by", "pledge"
     ]
     date_hierarchy = "donation_date"
 
@@ -56,12 +56,15 @@ class PledgePaymentInline(admin.TabularInline):
 @admin.register(Pledge)
 class PledgeAdmin(admin.ModelAdmin):
     list_display = [
-        "member", "project", "pledged_amount", "total_paid",
+        "donor", "project", "donation_type", "display_value", "total_paid",
         "outstanding_balance", "status", "due_date"
     ]
-    list_filter = ["status", "due_date"]
-    search_fields = ["member__full_name", "member__serial_number", "project__title"]
-    raw_id_fields = ["member", "project", "created_by"]
+    list_filter = ["status", "donation_type", "donor_type", "due_date"]
+    search_fields = [
+        "member__full_name", "member__serial_number",
+        "outside_donor__full_name", "project__title"
+    ]
+    raw_id_fields = ["member", "outside_donor", "project", "created_by"]
     readonly_fields = ["total_paid", "outstanding_balance"]
     date_hierarchy = "due_date"
     inlines = [PledgePaymentInline]

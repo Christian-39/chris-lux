@@ -17,12 +17,12 @@
       "
     >
       <h1 style="font-size: 1.5rem">
-        &#x20A6;{{ donation.amount|floatformat:0|intcomma }}
+        {{ donation.display_value }}
       </h1>
       {% if donation.status == "CONFIRMED" %}
       <span class="badge badge-success">Confirmed</span>
-      {% elif donation.status == "PENDING" %}
-      <span class="badge badge-warning">Pending</span>
+      {% elif donation.status == "PLEDGE" %}
+      <span class="badge badge-warning">Pledge</span>
       {% else %}
       <span class="badge badge-danger">Cancelled</span>
       {% endif %}
@@ -31,11 +31,26 @@
       Donation to {{ donation.project.title }}
     </p>
   </div>
-  <div class="page-header-actions">
+  <div class="page-header-actions" style="display:flex;gap:0.5rem;flex-wrap:wrap;">
     {% if user.has_executive_access %}
+    {% if donation.status == "PLEDGE" %}
+    <form method="post" action="{% url 'project_donations:donation_fulfill' pk=donation.pk %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary" onclick="return confirm('Mark this pledge as fulfilled? This confirms the donation and completes the linked pledge.');">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Mark Fulfilled
+      </button>
+    </form>
+    <form method="post" action="{% url 'project_donations:donation_cancel_pledge' pk=donation.pk %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-secondary" onclick="return confirm('Cancel this pledge? The donor withdrew their commitment.');">
+        Cancel Pledge
+      </button>
+    </form>
+    {% endif %}
     <a
       href="{% url 'project_donations:donation_update' pk=donation.pk %}"
-      class="btn btn-primary"
+      class="btn btn-secondary"
     >
       <svg
         width="18"
@@ -66,10 +81,8 @@
           <span class="meta-value">{{ donation.project.title }}</span>
         </div>
         <div class="meta-item">
-          <span class="meta-label">Amount</span>
-          <span class="meta-value"
-            >&#x20A6;{{ donation.amount|floatformat:0|intcomma }}</span
-          >
+          <span class="meta-label">Value</span>
+          <span class="meta-value">{{ donation.display_value }}</span>
         </div>
         <div class="meta-item">
           <span class="meta-label">Donor Type</span>
@@ -114,6 +127,16 @@
             >{{ donation.invited_by.full_name|default:"N/A" }}</span
           >
         </div>
+        {% if donation.pledge %}
+        <div class="meta-item">
+          <span class="meta-label">Linked Pledge</span>
+          <span class="meta-value">
+            <a href="{% url 'project_donations:pledge_detail' pk=donation.pledge.pk %}">
+              View Pledge — {{ donation.pledge.get_status_display }}
+            </a>
+          </span>
+        </div>
+        {% endif %}
         <div class="meta-item" style="grid-column: 1 / -1">
           <span class="meta-label">Narration</span>
           <span class="meta-value" style="font-weight: 400; line-height: 1.6"

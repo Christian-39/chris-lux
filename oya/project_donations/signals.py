@@ -5,7 +5,7 @@ import logging
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
-from .models import Donation, PledgePayment
+from .models import Donation, Pledge, PledgePayment
 
 logger = logging.getLogger("oya")
 
@@ -19,7 +19,8 @@ def sync_donation_to_finance(sender, instance, created, **kwargs):
       estimated_value as the income amount (Feature 5/8).
     - Labour donations never touch treasury.
     Removes the Income if the donation is cancelled, zeroed out, or the
-    type/flag no longer qualifies.
+    type/flag no longer qualifies. A donation still at "Pledge" status
+    never touches treasury either — nothing has actually been received yet.
     """
     should_sync = False
     income_amount = None
@@ -165,3 +166,97 @@ def _ensure_pledge_payment_donation(payment):
             status="CONFIRMED",
         )
         PledgePayment.objects.filter(pk=payment.pk).update(donation=donation)
+
+
+# ═══════════════════════════════════════════════════════════════
+# PROJECT DONATIONS ↔ PLEDGES INTEGRATION
+# ═══════════════════════════════════════════════════════════════
+#
+# A Donation saved with status="Pledge" (any contribution type — money,
+# material, or labour) automatically gets a mirrored Pledge record, so the
+# donor doesn't have to be entered twice and the pledge immediately shows
+# up in the Pledges module. When that same Donation is later fulfilled
+# (status -> Confirmed) or withdrawn (status -> Cancelled), the linked
+# Pledge is updated to match automatically, and vice versa — marking the
+# Pledge Completed/Cancelled directly also updates the Donation. One
+# Pledge per Donation (OneToOneField via Donation.pledge) keeps this a
+# single source of truth, the same pattern used for PledgePayment <-> 
+# Donation above.
+
+_PLEDGE_MIRROR_FIELDS = (
+    "donor_type", "member_id", "outside_donor_id", "project_id", "donation_type",
+    "material_name", "quantity", "labour_type", "number_of_days", "estimated_value",
+)
+
+
+@receiver(post_save, sender=Donation)
+def sync_donation_pledge(sender, instance, created, **kwargs):
+    """Keep a Donation with status="Pledge" and its mirrored Pledge record
+    in sync in both directions."""
+    if instance.status == "PLEDGE":
+        _ensure_donation_pledge(instance)
+        return
+
+    if not instance.pledge_id:
+        return
+
+    target_status = {"CONFIRMED": "COMPLETED", "CANCELLED": "CANCELLED"}.get(instance.status)
+    if target_status and instance.pledge.status != target_status:
+        Pledge.objects.filter(pk=instance.pledge_id).update(status=target_status)
+
+
+@receiver(post_delete, sender=Donation)
+def cleanup_donation_pledge(sender, instance, **kwargs):
+    """Remove the mirrored Pledge when its originating Donation is deleted —
+    it only ever existed to represent this donation in the Pledges module."""
+    if instance.pledge_id:
+        try:
+            instance.pledge.delete()
+        except Exception:
+            pass
+
+
+@receiver(post_save, sender=Pledge)
+def sync_pledge_donation(sender, instance, created, **kwargs):
+    """Reverse direction: fulfilling/cancelling a Pledge from the Pledges
+    module (for a pledge that originated from a Donation) updates that
+    Donation to match, so both modules always agree without double entry.
+    Goes through donation.save() (not a bare .update()) so the existing
+    treasury signal (sync_donation_to_finance) still fires and creates/
+    updates the Income record when a pledge is fulfilled this way. This
+    can't loop forever: sync_donation_pledge's own equality check on the
+    way back finds the Pledge already at the target status and stops."""
+    try:
+        donation = instance.source_donation
+    except Donation.DoesNotExist:
+        return
+
+    target_status = {"COMPLETED": "CONFIRMED", "CANCELLED": "CANCELLED"}.get(instance.status)
+    if target_status and donation.status != target_status:
+        donation.status = target_status
+        donation.save(update_fields=["status", "updated_at"])
+
+
+def _ensure_donation_pledge(donation):
+    """Create or update the mirrored Pledge record for a Pledge-status donation."""
+    field_values = {
+        "donor_type": donation.donor_type,
+        "member_id": donation.member_id,
+        "outside_donor_id": donation.outside_donor_id,
+        "project_id": donation.project_id,
+        "donation_type": donation.donation_type,
+        "pledged_amount": donation.amount,
+        "material_name": donation.material_name,
+        "quantity": donation.quantity,
+        "labour_type": donation.labour_type,
+        "number_of_days": donation.number_of_days,
+        "estimated_value": donation.estimated_value,
+        "notes": donation.narration,
+        "created_by_id": donation.recorded_by_id,
+    }
+
+    if donation.pledge_id:
+        Pledge.objects.filter(pk=donation.pledge_id).update(**field_values)
+    else:
+        pledge = Pledge.objects.create(status="PENDING", **field_values)
+        Donation.objects.filter(pk=donation.pk).update(pledge=pledge)

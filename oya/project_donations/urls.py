@@ -20,6 +20,8 @@ urlpatterns = [
     path("donations/<int:pk>/", views.donation_detail, name="donation_detail"),
     path("donations/<int:pk>/update/", views.donation_update, name="donation_update"),
     path("donations/<int:pk>/delete/", views.donation_delete, name="donation_delete"),
+    path("donations/<int:pk>/fulfill/", views.donation_fulfill, name="donation_fulfill"),
+    path("donations/<int:pk>/cancel-pledge/", views.donation_cancel_pledge, name="donation_cancel_pledge"),
 
     # Reports
     path("reports/project/<int:project_id>/", views.project_fundraising_report, name="project_fundraising_report"),
@@ -35,6 +37,8 @@ urlpatterns = [
     path("pledges/<int:pk>/delete/", views.pledge_delete, name="pledge_delete"),
     path("pledges/<int:pk>/payments/create/", views.pledge_payment_create, name="pledge_payment_create"),
     path("pledges/<int:pk>/payments/<int:payment_pk>/delete/", views.pledge_payment_delete, name="pledge_payment_delete"),
+    path("pledges/<int:pk>/fulfill/", views.pledge_fulfill, name="pledge_fulfill"),
+    path("pledges/<int:pk>/cancel/", views.pledge_cancel, name="pledge_cancel"),
 
     # AJAX
     path("api/search-outside-donors/", views.search_outside_donors_ajax, name="search_outside_donors_ajax"),

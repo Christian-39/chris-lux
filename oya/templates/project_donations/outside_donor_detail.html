@@ -270,7 +270,7 @@
               >
             </td>
             <td style="font-weight: 600">
-              &#x20A6;{{ d.amount|floatformat:0|intcomma }}
+              {{ d.display_value }}
             </td>
             <td>
               <span class="cell-muted">{{ d.get_payment_method_display }}</span>
@@ -278,8 +278,8 @@
             <td>
               {% if d.status == "CONFIRMED" %}
               <span class="badge badge-success">Confirmed</span>
-              {% elif d.status == "PENDING" %}
-              <span class="badge badge-warning">Pending</span>
+              {% elif d.status == "PLEDGE" %}
+              <span class="badge badge-warning">Pledge</span>
               {% else %}
               <span class="badge badge-danger">Cancelled</span>
               {% endif %}

@@ -90,18 +90,24 @@
           <span style="color:var(--oya-text-muted);">Total Expenses</span>
           <strong style="color:var(--oya-danger);">₦{{ handover.total_expenses|floatformat:0 }}</strong>
         </div>
+        <div style="border-top:1px solid var(--oya-border);padding-top:0.5rem;margin-top:0.25rem;display:flex;justify-content:space-between;">
+          <span style="color:var(--oya-text-muted);"><strong>Net Balance</strong></span>
+          <strong>₦{{ handover.net_balance|floatformat:0 }}</strong>
+        </div>
+        {% if handover.bank_balance or handover.cash_balance %}
         <div style="display:flex;justify-content:space-between;">
-          <span style="color:var(--oya-text-muted);">Bank Balance</span>
+          <span style="color:var(--oya-text-muted);">Bank Balance <span class="badge badge-secondary" style="font-size:0.625rem;vertical-align:middle;">Legacy</span></span>
           <strong>₦{{ handover.bank_balance|floatformat:0 }}</strong>
         </div>
         <div style="display:flex;justify-content:space-between;">
-          <span style="color:var(--oya-text-muted);">Cash Balance</span>
+          <span style="color:var(--oya-text-muted);">Cash Balance <span class="badge badge-secondary" style="font-size:0.625rem;vertical-align:middle;">Legacy</span></span>
           <strong>₦{{ handover.cash_balance|floatformat:0 }}</strong>
         </div>
+        {% endif %}
         <div style="display:flex;justify-content:space-between;">
           <span style="color:var(--oya-text-muted);">
-            Cash Remaining
-            <span class="badge badge-secondary" style="font-size:0.625rem;vertical-align:middle;">Admin-only</span>
+            Physical Cash at Hand
+            <span class="badge badge-secondary" style="font-size:0.625rem;vertical-align:middle;">Admin-only, manual</span>
           </span>
           <strong>₦{{ handover.cash_remaining|floatformat:0 }}</strong>
         </div>
@@ -113,6 +119,48 @@
           <span style="color:var(--oya-text-muted);"><strong>Net Position</strong></span>
           <strong style="color:var(--oya-primary);font-size:1.125rem;">₦{{ handover.net_financial_position|floatformat:0 }}</strong>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h3 style="font-size:1rem;margin-bottom:0.75rem;">Achievements This Tenure <span class="badge badge-secondary" style="font-size:0.625rem;">Auto-calculated</span></h3>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--oya-text-muted);">Projects Created</span>
+        <strong>{{ handover.projects_created }}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--oya-text-muted);">Projects Completed</span>
+        <strong>{{ handover.projects_completed }}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--oya-text-muted);">Projects In Progress / Handed Over</span>
+        <strong>{{ handover.projects_at_hand }}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--oya-text-muted);">Cases Open</span>
+        <strong>{{ handover.cases_open }}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--oya-text-muted);">Cases In Progress</span>
+        <strong>{{ handover.cases_in_progress }}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--oya-text-muted);">Cases Resolved</span>
+        <strong>{{ handover.cases_resolved }}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--oya-text-muted);">Pledges Made</span>
+        <strong>{{ handover.pledges_made }}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--oya-text-muted);">Total Pledge Value</span>
+        <strong>₦{{ handover.pledge_total_value|floatformat:0 }}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--oya-text-muted);">Assets/Motorcycles Acquired</span>
+        <strong>{{ handover.motorcycle_acquired }}</strong>
       </div>
     </div>
   </div>

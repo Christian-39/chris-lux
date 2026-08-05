@@ -276,17 +276,23 @@ class HandoverLedger(BaseModel):
     )
 
     # Physical balances being handed over
+    # Deprecated: superseded by cash_remaining ("Physical Cash at Hand"),
+    # the single manual balance figure on this ledger. Kept only so
+    # historical records entered before that reform aren't lost; no longer
+    # exposed on HandoverLedgerForm.
     bank_balance = models.DecimalField(
         max_digits=15,
         decimal_places=2,
         default=0.00,
-        verbose_name="Bank Balance"
+        verbose_name="Bank Balance (Legacy)",
+        help_text="Deprecated — superseded by Physical Cash at Hand. Retained for historical records only."
     )
     cash_balance = models.DecimalField(
         max_digits=15,
         decimal_places=2,
         default=0.00,
-        verbose_name="Cash Balance"
+        verbose_name="Cash Balance (Legacy)",
+        help_text="Deprecated — superseded by Physical Cash at Hand. Retained for historical records only."
     )
     
     # Finance aggregates (auto-calculated during save)
@@ -294,36 +300,36 @@ class HandoverLedger(BaseModel):
         max_digits=15,
         decimal_places=2,
         default=0.00,
-        verbose_name="Total Income Realized",
-        help_text="All non-dues income recorded during the tenure period."
+        verbose_name="Other Income (Contributions)",
+        help_text="All non-dues, non-donation, non-case-fine income recorded during the tenure period. Auto-calculated."
     )
     total_dues = models.DecimalField(
         max_digits=15,
         decimal_places=2,
         default=0.00,
-        verbose_name="Total Dues Collected",
-        help_text="Dues payments recorded during the tenure period."
+        verbose_name="Yearly Dues Collected",
+        help_text="Dues payments recorded during the tenure period. Auto-calculated."
     )
     total_donations = models.DecimalField(
         max_digits=15,
         decimal_places=2,
         default=0.00,
         verbose_name="Total Project Donations",
-        help_text="Confirmed project donations received during the tenure period."
+        help_text="Confirmed project donations received during the tenure period. Auto-calculated."
     )
     taskforce_revenue = models.DecimalField(
         max_digits=15,
         decimal_places=2,
         default=0.00,
-        verbose_name="Taskforce Revenue",
-        help_text="Fines/revenue from resolved case files during the tenure period."
+        verbose_name="Case Fines Revenue",
+        help_text="Fines from resolved case files during the tenure period. Auto-calculated."
     )
     total_expenses = models.DecimalField(
         max_digits=15,
         decimal_places=2,
         default=0.00,
         verbose_name="Total Expenses",
-        help_text="Expenses recorded during the tenure period."
+        help_text="Expenses recorded during the tenure period. Auto-calculated."
     )
     
     # Operations aggregates
@@ -335,34 +341,57 @@ class HandoverLedger(BaseModel):
     motorcycle_excellent = models.PositiveIntegerField(default=0, verbose_name="Motorcycles Excellent")
     motorcycle_needs_service = models.PositiveIntegerField(default=0, verbose_name="Motorcycles Needs Service")
     motorcycle_grounded = models.PositiveIntegerField(default=0, verbose_name="Motorcycles Grounded")
-    
-    cases_total = models.PositiveIntegerField(default=0, verbose_name="Cases Total")
+    motorcycle_acquired = models.PositiveIntegerField(
+        default=0, verbose_name="Motorcycles Acquired",
+        help_text="Motorcycles acquired during the tenure period. Auto-calculated."
+    )
+
+    cases_total = models.PositiveIntegerField(default=0, verbose_name="Cases Handled")
     cases_open = models.PositiveIntegerField(default=0, verbose_name="Cases Open (Unattended)")
     cases_in_progress = models.PositiveIntegerField(default=0, verbose_name="Cases In Progress (Ongoing)")
     cases_resolved = models.PositiveIntegerField(default=0, verbose_name="Cases Resolved")
-    
+
     # Projects aggregates
+    projects_created = models.PositiveIntegerField(
+        default=0, verbose_name="Projects Created",
+        help_text="Projects created during the tenure period. Auto-calculated."
+    )
     projects_completed = models.PositiveIntegerField(default=0, verbose_name="Projects Completed")
-    projects_at_hand = models.PositiveIntegerField(default=0, verbose_name="Projects At Hand (Ongoing)")
+    projects_at_hand = models.PositiveIntegerField(
+        default=0, verbose_name="Projects In Progress / Handed Over"
+    )
     projects_future = models.PositiveIntegerField(default=0, verbose_name="Projects Future/Planned")
-    
+
+    # Pledges aggregates
+    pledges_made = models.PositiveIntegerField(
+        default=0, verbose_name="Pledges Made This Tenure",
+        help_text="Pledges (money, material, or labour) made during the tenure period. Auto-calculated."
+    )
+    pledge_total_value = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0.00,
+        verbose_name="Total Pledge Value",
+        help_text="Total pledged value of Money pledges made during the tenure period. Auto-calculated."
+    )
+
     assets_description = models.TextField(
         blank=True,
         verbose_name="Assets Description"
     )
     notes = models.TextField(blank=True, verbose_name="Notes")
 
-    # Cash physically remaining in hand at the moment of handover. Defaults
-    # to ₦0.00 and is only ever edited by an administrator (enforced in
-    # HandoverLedgerForm / elections.views) — everyone else sees it read-only.
-    # Once set, it automatically flows into total_balance / closing balance
-    # and the net financial position below.
+    # The ONLY manual figure on the entire ledger. Defaults to ₦0.00 and is
+    # only ever edited by an administrator (enforced in HandoverLedgerForm
+    # / elections.views) — everyone else sees it read-only. Every other
+    # number on this record is recalculated automatically from existing
+    # records — see recalculate_aggregates().
     cash_remaining = models.DecimalField(
         max_digits=15,
         decimal_places=2,
         default=Decimal("0.00"),
-        verbose_name="Cash Remaining",
-        help_text="Cash physically remaining in hand at handover. Administrator-only field.",
+        verbose_name="Physical Cash at Hand",
+        help_text="Cash physically counted and held at handover. The only figure on this ledger entered by hand. Administrator-only field.",
     )
 
     class Meta:
@@ -376,7 +405,10 @@ class HandoverLedger(BaseModel):
 
     @property
     def total_balance(self):
-        """Physical balance being handed over (bank + cash + cash remaining)."""
+        """Physical balance being handed over. bank_balance/cash_balance are
+        deprecated legacy fields (kept only so historical records entered
+        before this reform aren't lost) — cash_remaining ("Physical Cash
+        at Hand") is the only balance entered by hand going forward."""
         return self.bank_balance + self.cash_balance + self.cash_remaining
 
     @property
@@ -388,7 +420,14 @@ class HandoverLedger(BaseModel):
     def net_financial_position(self):
         """Net position: all revenue - expenses + physical balance."""
         return self.total_income + self.total_dues + self.total_donations + self.taskforce_revenue - self.total_expenses + self.total_balance
-    
+
+    @property
+    def net_balance(self):
+        """Net Balance: total revenue minus total expenses (excludes the
+        physical cash-at-hand figure) — alias matching the Executive
+        Handover Report's own terminology."""
+        return self.total_revenue - self.total_expenses
+
     @property
     def total_revenue(self):
         """Total revenue realized during tenure."""
@@ -396,76 +435,78 @@ class HandoverLedger(BaseModel):
     
     def recalculate_aggregates(self):
         """
-        Recalculate all auto-aggregated fields based on tenure dates.
-        Call this before saving. Skips if tenure dates are not set.
+        Recalculate every auto-aggregated figure on this ledger from
+        existing records — the only manual figure left is cash_remaining
+        ("Physical Cash at Hand").
+
+        Tenure dates are derived automatically from the outgoing
+        executive's own record (never entered by hand) so this always
+        reports exactly that executive's time in office. All the actual
+        counting/summing is delegated to elections.administrations — the
+        same calculation engine that powers the Executive Handover Report
+        — so the two never disagree and nothing is calculated twice.
         """
-        from finance.models import Income, Expense, DuesPayment
-        from project_donations.models import Donation as ProjectDonation
-        from operations.models import TaskForceMember, Motorcycle, CaseFile
-        from projects.models import Project
-        from django.db.models import Q
-        
-        # Guard: skip auto-calculation if tenure dates aren't set yet
+        from elections.administrations import (
+            _finance_section, _projects_section, _cases_section,
+            _pledges_section, _motorcycles_section, _taskforce_section,
+        )
+        from django.utils import timezone
+
+        # Tenure dates are derived, not entered — the outgoing executive's
+        # own start_date/end_date is the single source of truth (matches
+        # how elections.administrations bounds every other administration's
+        # report window).
+        if self.executive_id:
+            if not self.tenure_start:
+                self.tenure_start = self.executive.start_date
+            if not self.tenure_end:
+                self.tenure_end = self.executive.end_date or timezone.now().date()
+
+        # Guard: nothing to calculate without a resolvable tenure window.
         if not self.tenure_start or not self.tenure_end:
             return
-        
-        start = self.tenure_start
-        end = self.tenure_end
-        
+
+        start, end = self.tenure_start, self.tenure_end
+        if start > end:
+            start, end = end, start
+
         # ─── FINANCE ───
-        # Income (non-dues, non-project-donation)
-        income_agg = Income.objects.filter(
-            created_at__date__gte=start,
-            created_at__date__lte=end
-        ).exclude(income_type__in=["DUES", "PROJECT_DONATION"]).aggregate(total=Sum("amount"))
-        self.total_income = income_agg["total"] or Decimal("0")
-        
-        # Dues
-        dues_agg = DuesPayment.objects.filter(
-            created_at__date__gte=start,
-            created_at__date__lte=end
-        ).aggregate(total=Sum("amount_paid"))
-        self.total_dues = dues_agg["total"] or Decimal("0")
-        
-        # Project donations
-        donation_agg = ProjectDonation.objects.filter(
-            status="CONFIRMED",
-            donation_date__gte=start,
-            donation_date__lte=end
-        ).aggregate(total=Sum("amount"))
-        self.total_donations = donation_agg["total"] or Decimal("0")
-        
-        # Taskforce revenue (resolved case fines)
-        taskforce_agg = CaseFile.objects.filter(
-            status="RESOLVED",
-            resolved_date__gte=start,
-            resolved_date__lte=end
-        ).aggregate(total=Sum("fine_amount"))
-        self.taskforce_revenue = taskforce_agg["total"] or Decimal("0")
-        
-        # Expenses
-        expense_agg = Expense.objects.filter(
-            created_at__date__gte=start,
-            created_at__date__lte=end
-        ).aggregate(total=Sum("amount"))
-        self.total_expenses = expense_agg["total"] or Decimal("0")
-        
-        # ─── OPERATIONS ───
-        self.taskforce_total = TaskForceMember.objects.count()
-        self.taskforce_active = TaskForceMember.objects.filter(is_active=True).count()
-        self.taskforce_inactive = TaskForceMember.objects.filter(is_active=False).count()
-        
-        self.motorcycle_total = Motorcycle.objects.count()
-        self.motorcycle_excellent = Motorcycle.objects.filter(condition="EXCELLENT").count()
-        self.motorcycle_needs_service = Motorcycle.objects.filter(condition="NEEDS_SERVICE").count()
-        self.motorcycle_grounded = Motorcycle.objects.filter(condition="GROUNDED").count()
-        
-        self.cases_total = CaseFile.objects.count()
-        self.cases_open = CaseFile.objects.filter(status="OPEN").count()
-        self.cases_in_progress = CaseFile.objects.filter(status="IN_PROGRESS").count()
-        self.cases_resolved = CaseFile.objects.filter(status="RESOLVED").count()
-        
+        finance = _finance_section(start, end)
+        self.total_income = finance["total_income"]
+        self.total_dues = finance["total_dues"]
+        self.total_donations = finance["total_donations"]
+        self.taskforce_revenue = finance["taskforce_revenue"]
+        self.total_expenses = finance["total_expenses"]
+
         # ─── PROJECTS ───
-        self.projects_completed = Project.objects.filter(status="FINISHED").count()
-        self.projects_at_hand = Project.objects.filter(status="AT_HAND").count()
-        self.projects_future = Project.objects.filter(status="FUTURE").count()
+        projects = _projects_section(start, end, limit=1)
+        self.projects_created = projects["counts"]["created"]
+        self.projects_completed = projects["counts"]["completed"]
+        self.projects_at_hand = projects["counts"]["at_hand"]
+        self.projects_future = projects["counts"]["future"]
+
+        # ─── CASES ───
+        cases = _cases_section(start, end, limit=1)
+        self.cases_total = cases["counts"]["handled"]
+        self.cases_open = cases["counts"]["open"]
+        self.cases_in_progress = cases["counts"]["in_progress"]
+        self.cases_resolved = cases["counts"]["resolved"]
+
+        # ─── PLEDGES ───
+        pledges = _pledges_section(start, end, limit=1)
+        self.pledges_made = pledges["counts"]["created_in_tenure"]
+        self.pledge_total_value = pledges["total_pledged_value"]
+
+        # ─── TASK FORCE ───
+        taskforce = _taskforce_section(start, end, limit=1)
+        self.taskforce_total = taskforce["counts"]["total"]
+        self.taskforce_active = taskforce["counts"]["active"]
+        self.taskforce_inactive = taskforce["counts"]["inactive"]
+
+        # ─── MOTORCYCLES / ASSETS ───
+        motorcycles = _motorcycles_section(start, end, limit=1)
+        self.motorcycle_total = motorcycles["counts"]["total"]
+        self.motorcycle_excellent = motorcycles["counts"]["excellent"]
+        self.motorcycle_needs_service = motorcycles["counts"]["needs_service"]
+        self.motorcycle_grounded = motorcycles["counts"]["grounded"]
+        self.motorcycle_acquired = motorcycles["counts"]["acquired"]

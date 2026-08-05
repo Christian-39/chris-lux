@@ -88,44 +88,30 @@ class CandidateForm(forms.ModelForm):
 
 
 class HandoverLedgerForm(forms.ModelForm):
-    """Form for creating and updating comprehensive handover ledgers.
+    """Form for creating and updating handover ledgers.
 
-    `cash_remaining` is administrator-only: pass `user=` into the
-    constructor and the field is removed entirely for non-admin users
-    (so it can never be tampered with via POST), keeping the model default
-    of ₦0.00 until an administrator sets it.
+    Reformed so the only manual, editable figure is Physical Cash at Hand
+    (`cash_remaining`) — administrator-only: pass `user=` into the
+    constructor and the field is removed entirely for non-admin users (so
+    it can never be tampered with via POST), keeping the model default of
+    ₦0.00 until an administrator sets it. Tenure dates are derived
+    automatically from the selected executive's own record, and every
+    financial/statistical figure is recalculated automatically from
+    existing records for that tenure window — see
+    HandoverLedger.recalculate_aggregates(), which reuses the same
+    calculation engine as the Executive Handover Report
+    (elections.administrations) so the two always agree.
     """
 
     class Meta:
         model = HandoverLedger
         fields = [
-            "election", "executive", "tenure_start", "tenure_end",
-            "bank_balance", "cash_balance", "cash_remaining",
+            "election", "executive", "cash_remaining",
             "assets_description", "notes"
         ]
         widgets = {
             "election": forms.Select(attrs={"class": "form-select"}),
             "executive": forms.Select(attrs={"class": "form-select"}),
-            "tenure_start": forms.DateInput(attrs={
-                "class": "form-control",
-                "type": "date"
-            }),
-            "tenure_end": forms.DateInput(attrs={
-                "class": "form-control",
-                "type": "date"
-            }),
-            "bank_balance": forms.NumberInput(attrs={
-                "class": "form-control",
-                "step": "0.01",
-                "min": "0",
-                "placeholder": "0.00"
-            }),
-            "cash_balance": forms.NumberInput(attrs={
-                "class": "form-control",
-                "step": "0.01",
-                "min": "0",
-                "placeholder": "0.00"
-            }),
             "cash_remaining": forms.NumberInput(attrs={
                 "class": "form-control",
                 "step": "0.01",
@@ -152,19 +138,11 @@ class HandoverLedgerForm(forms.ModelForm):
             # default (₦0.00) or the existing stored value is preserved.
             self.fields.pop("cash_remaining", None)
 
-    def clean(self):
-        cleaned_data = super().clean()
-        tenure_start = cleaned_data.get("tenure_start")
-        tenure_end = cleaned_data.get("tenure_end")
-        
-        if tenure_start and tenure_end and tenure_end < tenure_start:
-            raise ValidationError("Tenure end date cannot be before start date.")
-        
-        return cleaned_data
-    
     def save(self, commit=True):
         instance = super().save(commit=False)
-        # Auto-calculate all aggregates before saving
+        # Tenure dates + every aggregate figure are derived automatically
+        # from the selected executive and existing records — see
+        # HandoverLedger.recalculate_aggregates().
         instance.recalculate_aggregates()
         if commit:
             instance.save()

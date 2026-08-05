@@ -70,25 +70,22 @@ def _executives_queryset():
     return Executive.objects.select_related("member", "elected_via").all()
 
 
-def _administration_summary(election, executives):
-    """Build the lightweight summary dict shared by the list page and the
-    report page header."""
+def _build_administration_base(election, executives):
+    """Build the parts of an administration summary that don't depend on
+    other administrations: identity, members, and tenure_start (always
+    derivable from the executives' own start_date). tenure_end and
+    is_current/status are filled in afterwards by list_administrations(),
+    which is the only place with enough context (every other
+    administration's tenure_start) to compute them correctly."""
     executives = list(executives)
     start_dates = [e.start_date for e in executives if e.start_date]
-    end_dates = [e.end_date for e in executives if e.end_date]
-    is_current = any(e.is_current for e in executives)
 
-    # Tenure boundaries are always derived from the Executive records
-    # themselves — the single source of truth for when this administration
-    # actually took office (Executive.start_date, stamped the moment
-    # process_election_results() ran) and was replaced (Executive.end_date).
-    # Election.start_date/end_date are independently editable voting-period
-    # fields that are not guaranteed to line up with those dates, so mixing
-    # the two (e.g. election.end_date for the start boundary but
-    # Executive.end_date for the end boundary) can produce a skewed or even
-    # inverted tenure window — which silently empties every report section
-    # that filters by [tenure_start, tenure_end], even though the records
-    # exist. Election.end_date is therefore only used as a last-resort
+    # Tenure start is always derived from the Executive records themselves
+    # — the single source of truth for when this administration actually
+    # took office (Executive.start_date, stamped the moment
+    # process_election_results() ran). Election.start_date/end_date are
+    # independently editable voting-period fields that are not guaranteed
+    # to line up with that date, so they're only used as a last-resort
     # fallback when there are no executives to derive a start date from.
     if start_dates:
         tenure_start = min(start_dates)
@@ -96,11 +93,6 @@ def _administration_summary(election, executives):
         tenure_start = election.end_date.date()
     else:
         tenure_start = None
-
-    if is_current or not executives or len(end_dates) < len(executives):
-        tenure_end = None  # still current / ongoing
-    else:
-        tenure_end = max(end_dates)
 
     key = str(election.pk) if election is not None else FOUNDING_KEY
     name = f"{election.title} Administration" if election is not None else "Founding Administration"
@@ -111,16 +103,27 @@ def _administration_summary(election, executives):
         "name": name,
         "executives": executives,
         "tenure_start": tenure_start,
-        "tenure_end": tenure_end,  # None means "Present"
-        "is_current": is_current,
-        "status": "Current Administration" if is_current else "Past Administration",
         "member_count": len(executives),
     }
 
 
 def list_administrations():
-    """Return every administration (newest election first, Founding last),
-    for the 'Previous Administrations' page."""
+    """Return every administration, chronologically newest-first, for the
+    'Previous Administrations' page. This is also the single source of
+    truth for tenure_end and Current/Past status: only the single most
+    recent administration (by tenure_start) is Current, and every
+    administration's tenure_end is bounded by the very next
+    administration's tenure_start.
+
+    This deliberately does NOT decide Current/Past per-administration by
+    checking whether any of its individual executives still has
+    is_current=True — a post that simply wasn't re-contested in a later
+    election would keep that executive current forever and wrongly mark
+    an otherwise-replaced administration as "Current" too. Only the
+    latest election's cohort is ever Current; everything before it is
+    Past — which also means every Past administration's report window is
+    always cleanly bounded, so it can never leak into the data of
+    whichever administration succeeded it."""
     from elections.models import Election
 
     executives = list(_executives_queryset())
@@ -141,37 +144,37 @@ def list_administrations():
         election = elections_map.get(election_id)
         if election is None:
             continue
-        administrations.append(_administration_summary(election, execs))
+        administrations.append(_build_administration_base(election, execs))
+    if founding:
+        administrations.append(_build_administration_base(None, founding))
 
-    # Newest election first
+    # Oldest first so each administration's tenure_end can be chained to
+    # the next one's tenure_start. Administrations with no derivable start
+    # date (only possible with corrupt/incomplete data) sort first —
+    # never treated as "the current one".
     administrations.sort(
-        key=lambda a: (a["election"].start_date if a["election"] else timezone.now()),
-        reverse=True,
+        key=lambda a: (a["tenure_start"] is None, a["tenure_start"] or date.min)
     )
 
-    if founding:
-        administrations.append(_administration_summary(None, founding))
+    for i, admin in enumerate(administrations):
+        is_last = (i == len(administrations) - 1)
+        admin["tenure_end"] = None if is_last else administrations[i + 1]["tenure_start"]
+        admin["is_current"] = is_last
+        admin["status"] = "Current Administration" if is_last else "Past Administration"
 
+    administrations.reverse()  # newest first, for display
     return administrations
 
 
 def get_administration(key):
-    """Return a single administration summary dict for `key`, or None."""
-    from elections.models import Election
-
-    if key == FOUNDING_KEY:
-        executives = [e for e in _executives_queryset() if not e.elected_via_id]
-        if not executives:
-            return None
-        return _administration_summary(None, executives)
-
-    try:
-        election = Election.objects.get(pk=key)
-    except (Election.DoesNotExist, ValueError, TypeError):
-        return None
-
-    executives = [e for e in _executives_queryset() if e.elected_via_id == election.id]
-    return _administration_summary(election, executives)
+    """Return a single administration summary dict for `key`, or None.
+    Delegates to list_administrations() so every report always agrees
+    with the Previous Administrations list on tenure boundaries and
+    Current/Past status — one source of truth, not two."""
+    for admin in list_administrations():
+        if admin["key"] == key:
+            return admin
+    return None
 
 
 def _previous_administration(current):
@@ -480,26 +483,32 @@ def _donations_section(start, end, limit):
 def _pledges_section(start, end, limit):
     from project_donations.models import Pledge
 
-    in_tenure = Pledge.objects.filter(
+    in_tenure_qs = Pledge.objects.filter(
         created_at__date__gte=start, created_at__date__lte=end
-    ).select_related("member", "project").order_by("-created_at")[:limit]
+    ).select_related("member", "outside_donor", "project")
+    in_tenure = in_tenure_qs.order_by("-created_at")[:limit]
 
     outstanding_qs = Pledge.objects.exclude(
         status__in=["COMPLETED", "CANCELLED"]
-    ).select_related("member", "project").order_by("-created_at")
+    ).select_related("member", "outside_donor", "project").order_by("-created_at")
     outstanding = outstanding_qs[:limit]
 
     total_outstanding = sum((p.outstanding_balance for p in outstanding_qs), Decimal("0"))
+
+    value_agg = in_tenure_qs.filter(donation_type="MONEY").aggregate(total=Sum("pledged_amount"))
+    total_pledged_value = value_agg["total"] or Decimal("0")
 
     return {
         "in_tenure": in_tenure,
         "outstanding": outstanding,
         "total_outstanding": total_outstanding,
+        "total_pledged_value": total_pledged_value,
         "counts": {
-            "created_in_tenure": Pledge.objects.filter(
-                created_at__date__gte=start, created_at__date__lte=end
-            ).count(),
+            "created_in_tenure": in_tenure_qs.count(),
             "outstanding": Pledge.objects.exclude(status__in=["COMPLETED", "CANCELLED"]).count(),
+            "money": in_tenure_qs.filter(donation_type="MONEY").count(),
+            "material": in_tenure_qs.filter(donation_type="MATERIAL").count(),
+            "labour": in_tenure_qs.filter(donation_type="LABOUR").count(),
         },
     }
 
@@ -654,7 +663,7 @@ def _records_handed_over_section(admin, limit):
         ).select_related("respondent").order_by("-created_at")[:limit],
         "outstanding_pledges": Pledge.objects.exclude(
             status__in=["COMPLETED", "CANCELLED"]
-        ).select_related("member", "project").order_by("-created_at")[:limit],
+        ).select_related("member", "outside_donor", "project").order_by("-created_at")[:limit],
     }
 
 

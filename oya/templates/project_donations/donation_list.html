@@ -151,13 +151,13 @@
               <span class="badge badge-info">Outside</span>
             {% endif %}
           </td>
-          <td style="font-weight:600;white-space:nowrap;">&#x20A6;{{ donation.amount|floatformat:0|intcomma }}</td>
+          <td style="font-weight:600;white-space:nowrap;">{{ donation.display_value }}</td>
           <td style="white-space:nowrap;"><span class="cell-muted">{{ donation.get_payment_method_display }}</span></td>
           <td style="white-space:nowrap;">
             {% if donation.status == "CONFIRMED" %}
               <span class="badge badge-success">Confirmed</span>
-            {% elif donation.status == "PENDING" %}
-              <span class="badge badge-warning">Pending</span>
+            {% elif donation.status == "PLEDGE" %}
+              <span class="badge badge-warning">Pledge</span>
             {% else %}
               <span class="badge badge-danger">Cancelled</span>
             {% endif %}

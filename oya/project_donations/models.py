@@ -94,7 +94,7 @@ class Donation(BaseModel):
     ]
 
     STATUS_CHOICES = [
-        ("PENDING", "Pending"),
+        ("PLEDGE", "Pledge"),
         ("CONFIRMED", "Confirmed"),
         ("CANCELLED", "Cancelled"),
     ]
@@ -156,6 +156,15 @@ class Donation(BaseModel):
         blank=True,
         related_name="project_donation",
         verbose_name="Linked Income Record"
+    )
+    pledge = models.OneToOneField(
+        "Pledge",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="source_donation",
+        verbose_name="Linked Pledge Record",
+        help_text="Auto-managed. Set when this donation's status is Pledge; keeps the Pledges module in sync."
     )
     amount = models.DecimalField(
         max_digits=15,
@@ -227,7 +236,8 @@ class Donation(BaseModel):
         max_length=20,
         choices=STATUS_CHOICES,
         default="CONFIRMED",
-        verbose_name="Status"
+        verbose_name="Status",
+        help_text="Pledge: donor has committed but not yet fulfilled — auto-creates a linked Pledge record. Confirmed: contribution received."
     )
 
     class Meta:
@@ -311,9 +321,18 @@ class Donation(BaseModel):
 
 class Pledge(BaseModel):
     """
-    A commitment by a member to donate a specific amount to a project,
-    to be paid immediately or over time via one or more PledgePayments
-    (Feature 6).
+    A commitment by a donor (member or outside donor) to provide a
+    contribution to a project — money, material, or labour — to be
+    fulfilled later.
+
+    A Pledge can originate two ways, both kept in sync by the signals in
+    signals.py:
+    - The original flow: created directly here (money only), fulfilled via
+      one or more PledgePayments over time.
+    - The Project Donation flow: created automatically when a Donation is
+      saved with status="PLEDGE" (any contribution type), linked back via
+      Donation.pledge, and fulfilled in one step when that Donation's
+      status changes to Confirmed/Cancelled.
     """
 
     STATUS_CHOICES = [
@@ -323,11 +342,34 @@ class Pledge(BaseModel):
         ("CANCELLED", "Cancelled"),
     ]
 
+    donor_type = models.CharField(
+        max_length=10,
+        choices=Donation.DONOR_TYPE_CHOICES,
+        default="MEMBER",
+        verbose_name="Donor Type"
+    )
+    donation_type = models.CharField(
+        max_length=10,
+        choices=Donation.DONATION_TYPE_CHOICES,
+        default="MONEY",
+        db_index=True,
+        verbose_name="Contribution Type"
+    )
     member = models.ForeignKey(
         "members.Member",
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
         related_name="pledges",
         verbose_name="Member"
+    )
+    outside_donor = models.ForeignKey(
+        OutsideDonor,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="pledges",
+        verbose_name="Outside Donor"
     )
     project = models.ForeignKey(
         "projects.Project",
@@ -338,9 +380,32 @@ class Pledge(BaseModel):
     pledged_amount = models.DecimalField(
         max_digits=15,
         decimal_places=2,
+        null=True,
+        blank=True,
         validators=[MinValueValidator(Decimal("0.01"))],
-        verbose_name="Pledged Amount"
+        verbose_name="Pledged Amount",
+        help_text="Required for Money pledges."
     )
+
+    # ─── MATERIAL PLEDGE FIELDS ───
+    material_name = models.CharField(max_length=255, blank=True, verbose_name="Material Name")
+    quantity = models.CharField(max_length=100, blank=True, verbose_name="Quantity")
+
+    # ─── LABOUR PLEDGE FIELDS ───
+    labour_type = models.CharField(max_length=255, blank=True, verbose_name="Labour Type")
+    number_of_days = models.PositiveIntegerField(null=True, blank=True, verbose_name="Number of Days")
+
+    # ─── SHARED MATERIAL / LABOUR FIELD ───
+    estimated_value = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(Decimal("0.00"))],
+        verbose_name="Estimated Value",
+        help_text="Optional. Informational only for Material/Labour pledges."
+    )
+
     due_date = models.DateField(null=True, blank=True, verbose_name="Due Date")
     notes = models.TextField(blank=True, verbose_name="Notes")
     status = models.CharField(
@@ -366,26 +431,86 @@ class Pledge(BaseModel):
         ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["member"]),
+            models.Index(fields=["outside_donor"]),
             models.Index(fields=["project"]),
             models.Index(fields=["status"]),
+            models.Index(fields=["donation_type"]),
             models.Index(fields=["due_date"]),
         ]
 
     def __str__(self):
-        return f"₦{self.pledged_amount:,.2f} pledge by {self.member} for {self.project.title}"
+        donor = self.member or self.outside_donor or "Anonymous"
+        if self.donation_type == "MONEY":
+            return f"₦{self.pledged_amount:,.2f} pledge by {donor} for {self.project.title}"
+        elif self.donation_type == "MATERIAL":
+            return f"{self.material_name} ({self.quantity}) pledge by {donor} for {self.project.title}"
+        return f"{self.labour_type} labour pledge by {donor} for {self.project.title}"
+
+    @property
+    def donor(self):
+        return self.member or self.outside_donor
+
+    @property
+    def donation_type_badge_class(self):
+        return {
+            "MONEY": "badge-success",
+            "MATERIAL": "badge-info",
+            "LABOUR": "badge-warning",
+        }.get(self.donation_type, "badge-secondary")
+
+    @property
+    def display_value(self):
+        """Human-readable pledged value regardless of contribution type."""
+        if self.donation_type == "MONEY":
+            return f"₦{self.pledged_amount:,.2f}" if self.pledged_amount else "—"
+        if self.donation_type == "MATERIAL":
+            return f"{self.material_name} — {self.quantity}"
+        if self.donation_type == "LABOUR":
+            days = f"{self.number_of_days} day(s)" if self.number_of_days else ""
+            return f"{self.labour_type} — {days}".strip(" —")
+        return "—"
 
     def clean(self):
-        if self.pledged_amount is not None and self.pledged_amount <= 0:
-            raise ValidationError({"pledged_amount": "Pledged amount must be greater than zero."})
+        if self.donor_type == "MEMBER" and not self.member:
+            raise ValidationError({"member": "Please select a member for member pledges."})
+        if self.donor_type == "OUTSIDE" and not self.outside_donor:
+            raise ValidationError({"outside_donor": "Please select an outside donor for outside pledges."})
+        if self.donor_type == "MEMBER" and self.outside_donor:
+            raise ValidationError({"outside_donor": "Outside donor should not be set for member pledges."})
+        if self.donor_type == "OUTSIDE" and self.member:
+            raise ValidationError({"member": "Member should not be set for outside pledges."})
+
+        if self.donation_type == "MONEY":
+            if self.pledged_amount is not None and self.pledged_amount <= 0:
+                raise ValidationError({"pledged_amount": "Pledged amount must be greater than zero."})
+            elif self.pledged_amount is None:
+                raise ValidationError({"pledged_amount": "Pledged amount is required for Money pledges."})
+        elif self.donation_type == "MATERIAL":
+            if not self.material_name:
+                raise ValidationError({"material_name": "Material name is required for Material pledges."})
+            if not self.quantity:
+                raise ValidationError({"quantity": "Quantity is required for Material pledges."})
+        elif self.donation_type == "LABOUR":
+            if not self.labour_type:
+                raise ValidationError({"labour_type": "Labour type is required for Labour pledges."})
+            if not self.number_of_days:
+                raise ValidationError({"number_of_days": "Number of days is required for Labour pledges."})
 
     @property
     def total_paid(self):
+        """Only meaningful for Money pledges — Material/Labour pledges are
+        fulfilled in one step (see Pledge.recalculate_status), not paid
+        toward incrementally."""
+        if self.donation_type != "MONEY":
+            return Decimal("0")
         from django.db.models import Sum
         return self.payments.aggregate(total=Sum("amount"))["total"] or Decimal("0")
 
     @property
     def outstanding_balance(self):
-        return max(self.pledged_amount - self.total_paid, Decimal("0"))
+        if self.donation_type != "MONEY":
+            return Decimal("0") if self.status == "COMPLETED" else (self.pledged_amount or Decimal("0"))
+        return max((self.pledged_amount or Decimal("0")) - self.total_paid, Decimal("0"))
 
     @property
     def is_overdue(self):
@@ -396,13 +521,18 @@ class Pledge(BaseModel):
         )
 
     def recalculate_status(self):
-        """Recompute status from actual payments. Never overrides CANCELLED."""
-        if self.status == "CANCELLED":
+        """Recompute status from actual PledgePayments — Money pledges from
+        the original (non-Donation-linked) flow only. Pledges that
+        originated from a Project Donation (Material/Labour, or Money
+        pledges created via the Donation form) are fulfilled as a single
+        step when their linked Donation is marked Confirmed — see
+        signals.sync_donation_pledge — so this is a no-op for those."""
+        if self.status == "CANCELLED" or self.donation_type != "MONEY" or self.source_donation_id:
             return
         total = self.total_paid
         if total <= 0:
             new_status = "PENDING"
-        elif total < self.pledged_amount:
+        elif total < (self.pledged_amount or Decimal("0")):
             new_status = "PARTIALLY_PAID"
         else:
             new_status = "COMPLETED"
@@ -479,3 +609,8 @@ class PledgePayment(models.Model):
             raise ValidationError({"amount": "Payment amount must be greater than zero."})
         if self.pledge_id and self.pledge.status == "CANCELLED":
             raise ValidationError("Cannot record a payment against a cancelled pledge.")
+        if self.pledge_id and self.pledge.donation_type != "MONEY":
+            raise ValidationError(
+                "Payments can only be recorded against Money pledges. "
+                "Material/Labour pledges are fulfilled directly on their Project Donation record."
+            )
