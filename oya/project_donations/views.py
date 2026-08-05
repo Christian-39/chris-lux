@@ -38,7 +38,14 @@ def _format_money(value):
 def _donation_log_description(donation, action_verb):
     """Build a crash-safe audit-log description for any donation type."""
     proj = donation.project.title if donation.project else "Unknown Project"
-    donor = donation.get_donor_display()
+
+    # Build donor label manually (Donation has no get_donor_display)
+    if donation.donor_type == "MEMBER" and donation.member:
+        donor = donation.member.full_name
+    elif donation.donor_type == "OUTSIDE" and donation.outside_donor:
+        donor = donation.outside_donor.full_name
+    else:
+        donor = donation.get_donor_type_display() if hasattr(donation, "get_donor_type_display") else str(donation.donor_type)
 
     if donation.donation_type == "CASH":
         return f"{action_verb} donation: {_format_money(donation.amount)} from {donor} for {proj}"
@@ -439,7 +446,6 @@ def donation_delete(request, pk):
     donation = get_object_or_404(Donation, pk=pk)
 
     if request.method == "POST":
-        project_title = donation.project.title if donation.project else "Unknown Project"
         desc = _donation_log_description(donation, "Deleted")
         donation.delete()
         log_action(
@@ -797,6 +803,7 @@ def pledge_detail(request, pk):
 
 @login_required
 def pledge_delete(request, pk):
+    """Delete a pledge (admin pledge_delete(request, pk):
     """Delete a pledge (admin only) — also removes its mirrored payment donations/income via signals."""
     if not request.user.has_admin_access():
         messages.error(request, "Admin access required.")
