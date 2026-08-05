@@ -52,6 +52,17 @@
 
 {% block content %}
 
+<div style="background:#ffeb3b;padding:1rem;margin-bottom:1rem;font-family:monospace;font-size:0.875rem;border-radius:0.375rem;">
+  <strong>DEBUG — Tenure Window</strong><br>
+  Start: {{ administration.tenure_start|default:"?" }} → End: {{ administration.tenure_end|default:"Now" }}<br>
+  Income: {{ report.finance.debug.income_count }} total / {{ report.finance.debug.income_in_range }} in range<br>
+  Expenses: {{ report.finance.debug.expense_count }} total / {{ report.finance.debug.expense_in_range }} in range<br>
+  Dues Txns: {{ report.finance.debug.dues_count }} total / {{ report.finance.debug.dues_in_range }} in range<br>
+  Projects: {{ report.projects.debug.total_projects }} total / {{ report.projects.debug.projects_in_range }} in range<br>
+  Pledges: {{ report.pledges.debug.total_pledges }} total / {{ report.pledges.debug.pledges_in_range }} in range
+</div>
+
+
 <!-- Page Header -->
 <div class="page-header no-print">
   <div class="page-header-left">
@@ -202,11 +213,12 @@
         <h3 style="font-size:0.9375rem;margin-bottom:0.5rem;">Dues Payments</h3>
         <div style="max-height:220px;overflow-y:auto;">
           {% for due in report.finance.recent_dues %}
-          <div class="kv-row" style="border-bottom:1px solid var(--oya-border);">
-            <span>{{ due.member.get_full_name }} · {{ due.year }}</span>
-            <strong style="color:var(--oya-success);">₦{{ due.amount_paid|floatformat:0|intcomma }}</strong>
-          </div>
-          {% empty %}<p style="color:var(--oya-text-muted);font-size:0.8125rem;">None recorded.</p>{% endfor %}
+<div class="kv-row" style="border-bottom:1px solid var(--oya-border);">
+  <span>{{ due.member.get_full_name }} · {{ due.payment_date|date:"M j, Y" }}</span>
+  <strong style="color:var(--oya-success);">₦{{ due.total_amount|floatformat:0|intcomma }}</strong>
+</div>
+{% empty %}<p style="color:var(--oya-text-muted);font-size:0.8125rem;">None recorded.</p>{% endfor %}
+
         </div>
       </div>
     </div>
