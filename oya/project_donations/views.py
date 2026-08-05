@@ -471,7 +471,7 @@ def donation_delete(request, pk):
 def donation_fulfill(request, pk):
     """Mark a Pledge-status donation as fulfilled. Confirming the donation
     also marks its linked Pledge record Completed automatically (via the
-    sync_donation_pledge signal), and — for Money/Material — creates or
+    sync_donation_pledge signal), and -- for Money/Material -- creates or
     updates the treasury Income record (via sync_donation_to_finance)."""
     if not request.user.has_executive_access():
         messages.error(request, "Executive access required.")
@@ -492,7 +492,7 @@ def donation_fulfill(request, pk):
         ip_address=getattr(request, "client_ip", ""),
         description=f"Marked pledge fulfilled: {donation.display_value} for {donation.project.title}"
     )
-    messages.success(request, "Pledge marked as fulfilled — donation confirmed and pledge completed.")
+    messages.success(request, "Pledge marked as fulfilled -- donation confirmed and pledge completed.")
     return redirect("project_donations:donation_detail", pk=pk)
 
 
@@ -803,8 +803,7 @@ def pledge_detail(request, pk):
 
 @login_required
 def pledge_delete(request, pk):
-    """Delete a pledge (admin pledge_delete(request, pk):
-    """Delete a pledge (admin only) — also removes its mirrored payment donations/income via signals."""
+    """Delete a pledge (admin only) -- also removes its mirrored payment donations/income via signals."""
     if not request.user.has_admin_access():
         messages.error(request, "Admin access required.")
         return redirect("project_donations:pledge_list")
@@ -869,7 +868,7 @@ def pledge_payment_create(request, pk):
 
 @login_required
 def pledge_payment_delete(request, pk, payment_pk):
-    """Delete a pledge payment (admin only) — removes the mirrored donation/income via signals."""
+    """Delete a pledge payment (admin only) -- removes the mirrored donation/income via signals."""
     if not request.user.has_admin_access():
         messages.error(request, "Admin access required.")
         return redirect("project_donations:pledge_detail", pk=pk)
