@@ -252,47 +252,67 @@ def build_administration_report(key, limit=200):
 # ─── Financial Records ─────────────────────────────────────────────────
 
 def _finance_section(start, end):
-    from finance.models import Income, Expense, DuesPayment
+    from finance.models import Income, Expense, DuesPaymentTransaction
     from project_donations.models import Donation as ProjectDonation
     from operations.models import CaseFile
     from elections.models import HandoverLedger
+    from datetime import datetime, time
 
-    income_agg = Income.objects.filter(
-        created_at__date__gte=start, created_at__date__lte=end
-    ).exclude(income_type__in=["DUES", "PROJECT_DONATION"]).aggregate(total=Sum("amount"))
+    # Robust datetime range: covers full days from midnight to 23:59:59
+    start_dt = datetime.combine(start, time.min)
+    end_dt = datetime.combine(end, time.max)
+
+    # ── INCOME (non-dues, non-project-donation) ──
+    income_qs = Income.objects.filter(
+        created_at__range=[start_dt, end_dt]
+    ).exclude(income_type__in=["DUES", "PROJECT_DONATION"])
+    income_agg = income_qs.aggregate(total=Sum("amount"))
     total_income = income_agg["total"] or Decimal("0")
 
-    dues_agg = DuesPayment.objects.filter(
-        created_at__date__gte=start, created_at__date__lte=end
-    ).aggregate(total=Sum("amount_paid"))
+    # ── DUES: use DuesPaymentTransaction.payment_date, NOT DuesPayment.created_at ──
+    dues_qs = DuesPaymentTransaction.objects.filter(
+        payment_date__range=[start, end]
+    )
+    dues_agg = dues_qs.aggregate(total=Sum("total_amount"))
     total_dues = dues_agg["total"] or Decimal("0")
 
+    # ── DONATIONS ──
     donation_agg = ProjectDonation.objects.filter(
-        status="CONFIRMED", donation_date__gte=start, donation_date__lte=end
+        status="CONFIRMED", donation_date__range=[start, end]
     ).aggregate(total=Sum("amount"))
     total_donations = donation_agg["total"] or Decimal("0")
 
+    # ── TASKFORCE fines ──
     taskforce_agg = CaseFile.objects.filter(
-        status="RESOLVED", resolved_date__gte=start, resolved_date__lte=end
+        status="RESOLVED", resolved_date__range=[start, end]
     ).aggregate(total=Sum("fine_amount"))
     taskforce_revenue = taskforce_agg["total"] or Decimal("0")
 
-    expense_agg = Expense.objects.filter(
-        created_at__date__gte=start, created_at__date__lte=end
-    ).aggregate(total=Sum("amount"))
+    # ── EXPENSES ──
+    expense_qs = Expense.objects.filter(created_at__range=[start_dt, end_dt])
+    expense_agg = expense_qs.aggregate(total=Sum("amount"))
     total_expenses = expense_agg["total"] or Decimal("0")
 
     total_revenue = total_income + total_dues + total_donations + taskforce_revenue
     remaining_balance = total_revenue - total_expenses
 
-    # Any HandoverLedger records tied to this window carry the physically
-    # recorded bank/cash/cash-remaining balances an admin entered by hand.
     ledgers = HandoverLedger.objects.filter(
         tenure_start__gte=start, tenure_end__lte=end
     ).select_related("executive__member")
+
     bank_balance = sum((l.bank_balance for l in ledgers), Decimal("0"))
     cash_balance = sum((l.cash_balance for l in ledgers), Decimal("0"))
     cash_remaining = sum((l.cash_remaining for l in ledgers), Decimal("0"))
+
+    # Debug counts so you can verify on the page
+    debug = {
+        "income_count": Income.objects.count(),
+        "income_in_range": income_qs.count(),
+        "expense_count": Expense.objects.count(),
+        "expense_in_range": expense_qs.count(),
+        "dues_count": DuesPaymentTransaction.objects.count(),
+        "dues_in_range": dues_qs.count(),
+    }
 
     return {
         "total_income": total_income,
@@ -307,29 +327,29 @@ def _finance_section(start, end):
         "cash_remaining": cash_remaining,
         "closing_balance": remaining_balance + bank_balance + cash_balance + cash_remaining,
         "ledgers": ledgers[:50],
-        "recent_income": Income.objects.filter(
-            created_at__date__gte=start, created_at__date__lte=end
-        ).select_related("member", "created_by").order_by("-created_at")[:50],
-        "recent_expenses": Expense.objects.filter(
-            created_at__date__gte=start, created_at__date__lte=end
-        ).select_related("created_by").order_by("-created_at")[:50],
-        "recent_dues": DuesPayment.objects.filter(
-            created_at__date__gte=start, created_at__date__lte=end
-        ).select_related("member", "recorded_by").order_by("-created_at")[:50],
+        "recent_income": income_qs.select_related("member", "created_by").order_by("-created_at")[:50],
+        "recent_expenses": expense_qs.select_related("created_by").order_by("-created_at")[:50],
+        "recent_dues": dues_qs.select_related("member", "recorded_by").order_by("-payment_date")[:50],
+        "debug": debug,
     }
+
 
 
 # ─── Projects ───────────────────────────────────────────────────────────
 
 def _projects_section(start, end, limit):
     from projects.models import Project
+    from datetime import datetime, time
+
+    start_dt = datetime.combine(start, time.min)
+    end_dt = datetime.combine(end, time.max)
 
     created_in_tenure = Project.objects.filter(
-        created_at__date__gte=start, created_at__date__lte=end
+        created_at__range=[start_dt, end_dt]
     ).order_by("-created_at")[:limit]
 
     completed_in_tenure = Project.objects.filter(
-        status="FINISHED", updated_at__date__gte=start, updated_at__date__lte=end
+        status="FINISHED", updated_at__range=[start_dt, end_dt]
     ).order_by("-updated_at")[:limit]
 
     handed_over_ongoing = Project.objects.filter(status="AT_HAND").order_by("-created_at")[:limit]
@@ -339,16 +359,19 @@ def _projects_section(start, end, limit):
         "completed_in_tenure": completed_in_tenure,
         "handed_over_ongoing": handed_over_ongoing,
         "counts": {
-            "created": Project.objects.filter(
-                created_at__date__gte=start, created_at__date__lte=end
-            ).count(),
+            "created": Project.objects.filter(created_at__range=[start_dt, end_dt]).count(),
             "completed": Project.objects.filter(
-                status="FINISHED", updated_at__date__gte=start, updated_at__date__lte=end
+                status="FINISHED", updated_at__range=[start_dt, end_dt]
             ).count(),
             "at_hand": Project.objects.filter(status="AT_HAND").count(),
             "future": Project.objects.filter(status="FUTURE").count(),
         },
+        "debug": {
+            "total_projects": Project.objects.count(),
+            "projects_in_range": created_in_tenure.count(),
+        },
     }
+
 
 
 # ─── Cases ──────────────────────────────────────────────────────────────
@@ -498,9 +521,13 @@ def _donations_section(start, end, limit):
 
 def _pledges_section(start, end, limit):
     from project_donations.models import Pledge
+    from datetime import datetime, time
+
+    start_dt = datetime.combine(start, time.min)
+    end_dt = datetime.combine(end, time.max)
 
     in_tenure_qs = Pledge.objects.filter(
-        created_at__date__gte=start, created_at__date__lte=end
+        created_at__range=[start_dt, end_dt]
     ).select_related("member", "outside_donor", "project")
     in_tenure = in_tenure_qs.order_by("-created_at")[:limit]
 
@@ -511,7 +538,9 @@ def _pledges_section(start, end, limit):
 
     total_outstanding = sum((p.outstanding_balance for p in outstanding_qs), Decimal("0"))
 
-    value_agg = in_tenure_qs.filter(donation_type="MONEY").aggregate(total=Sum("pledged_amount"))
+    value_agg = in_tenure_qs.filter(donation_type="MONEY").aggregate(
+        total=Sum("pledged_amount")
+    )
     total_pledged_value = value_agg["total"] or Decimal("0")
 
     return {
@@ -526,7 +555,12 @@ def _pledges_section(start, end, limit):
             "material": in_tenure_qs.filter(donation_type="MATERIAL").count(),
             "labour": in_tenure_qs.filter(donation_type="LABOUR").count(),
         },
+        "debug": {
+            "total_pledges": Pledge.objects.count(),
+            "pledges_in_range": in_tenure_qs.count(),
+        },
     }
+
 
 
 # ─── Materials & Labour ─────────────────────────────────────────────────
