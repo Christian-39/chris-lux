@@ -28,6 +28,39 @@ from .reports import (
 logger = logging.getLogger("oya")
 
 
+def _format_money(value):
+    """Safely format a numeric value as Naira."""
+    if value is None:
+        return "N/A"
+    return f"₦{value:,.2f}"
+
+
+def _donation_log_description(donation, action_verb):
+    """Build a crash-safe audit-log description for any donation type."""
+    proj = donation.project.title if donation.project else "Unknown Project"
+    donor = donation.get_donor_display()
+
+    if donation.donation_type == "CASH":
+        return f"{action_verb} donation: {_format_money(donation.amount)} from {donor} for {proj}"
+
+    if donation.donation_type == "MATERIAL":
+        est = _format_money(donation.estimated_value)
+        return (
+            f"{action_verb} material donation: {donation.material_name or 'N/A'} "
+            f"(Qty: {donation.quantity or 'N/A'}, Est: {est}) from {donor} for {proj}"
+        )
+
+    if donation.donation_type == "LABOUR":
+        days = f"{donation.number_of_days} day(s)" if donation.number_of_days else "N/A"
+        return (
+            f"{action_verb} labour donation: {donation.labour_type or 'N/A'} "
+            f"({days}) from {donor} for {proj}"
+        )
+
+    # Fallback for any future types
+    return f"{action_verb} donation: {_format_money(donation.amount)} from {donor} for {proj}"
+
+
 # ============================================================
 # OUTSIDE DONORS
 # ============================================================
@@ -340,10 +373,7 @@ def donation_create(request):
                 object_type="Donation",
                 object_id=donation.id,
                 ip_address=getattr(request, "client_ip", ""),
-                description=(
-                    f"Recorded donation: ₦{donation.amount:,.2f} "
-                    f"for {donation.project.title}"
-                )
+                description=_donation_log_description(donation, "Recorded"),
             )
             messages.success(request, "Donation recorded successfully.")
             return redirect("project_donations:donation_list")
@@ -380,10 +410,7 @@ def donation_update(request, pk):
                 object_type="Donation",
                 object_id=donation.id,
                 ip_address=getattr(request, "client_ip", ""),
-                description=(
-                    f"Updated donation: ₦{donation.amount:,.2f} "
-                    f"for {donation.project.title}"
-                )
+                description=_donation_log_description(donation, "Updated"),
             )
             messages.success(request, "Donation updated successfully.")
             return redirect("project_donations:donation_list")
@@ -412,8 +439,8 @@ def donation_delete(request, pk):
     donation = get_object_or_404(Donation, pk=pk)
 
     if request.method == "POST":
-        project_title = donation.project.title
-        amount = donation.amount
+        project_title = donation.project.title if donation.project else "Unknown Project"
+        desc = _donation_log_description(donation, "Deleted")
         donation.delete()
         log_action(
             user=request.user,
@@ -421,7 +448,7 @@ def donation_delete(request, pk):
             object_type="Donation",
             object_id=pk,
             ip_address=getattr(request, "client_ip", ""),
-            description=f"Deleted donation: ₦{amount:,.2f} for {project_title}"
+            description=desc,
         )
         messages.success(request, "Donation deleted.")
         return redirect("project_donations:donation_list")
