@@ -72,22 +72,38 @@ def _executives_queryset():
 
 def _build_administration_base(election, executives):
     """Build the parts of an administration summary that don't depend on
-    other administrations: identity, members, and tenure_start (always
-    derivable from the executives' own start_date). tenure_end and
-    is_current/status are filled in afterwards by list_administrations(),
-    which is the only place with enough context (every other
-    administration's tenure_start) to compute them correctly."""
+    other administrations: identity, members, and tenure_start. tenure_end
+    and is_current/status are filled in afterwards by
+    list_administrations(), which is the only place with enough context
+    (every other administration's tenure_start) to compute them
+    correctly."""
     executives = list(executives)
     start_dates = [e.start_date for e in executives if e.start_date]
 
-    # Tenure start is always derived from the Executive records themselves
-    # — the single source of truth for when this administration actually
-    # took office (Executive.start_date, stamped the moment
-    # process_election_results() ran). Election.start_date/end_date are
-    # independently editable voting-period fields that are not guaranteed
-    # to line up with that date, so they're only used as a last-resort
-    # fallback when there are no executives to derive a start date from.
-    if start_dates:
+    # Tenure start, in priority order:
+    #
+    # 1. Election.results_applied_at — stamped once, the moment
+    #    process_election_results() ran (see elections/models.py). This is
+    #    the authoritative anchor for when this administration actually
+    #    took office. It deliberately does NOT come from
+    #    Executive.start_date: a re-elected officer (same member, same
+    #    post) keeps their pre-existing start_date untouched so their own
+    #    tenure-in-post reads as continuous, which means min(start_dates)
+    #    across the cohort can be stale — even older than the
+    #    administration it's supposed to have replaced — whenever at
+    #    least one contested post is won by its existing holder. Relying
+    #    on that stale date previously caused a completed election whose
+    #    winners include a re-elected incumbent to be sorted as "Past"
+    #    while an older cohort (e.g. Founding) was wrongly shown as
+    #    "Current".
+    # 2. min(start_dates) — fallback for elections that predate this field
+    #    (results_applied_at is null) and for the Founding administration,
+    #    which has no election to anchor to at all.
+    # 3. Election.end_date — last resort when there are no executives to
+    #    derive a start date from.
+    if election is not None and election.results_applied_at:
+        tenure_start = election.results_applied_at.date()
+    elif start_dates:
         tenure_start = min(start_dates)
     elif election is not None and election.end_date:
         tenure_start = election.end_date.date()

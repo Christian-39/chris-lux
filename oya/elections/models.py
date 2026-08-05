@@ -29,6 +29,21 @@ class Election(BaseModel):
         verbose_name="Status"
     )
     description = models.TextField(blank=True, verbose_name="Description")
+    results_applied_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Results Applied At",
+        help_text=(
+            "Timestamp when process_election_results() ran. This is the "
+            "authoritative anchor for this administration's tenure_start in "
+            "elections.administrations — independent of any individual "
+            "officer's Executive.start_date (which is deliberately left "
+            "untouched on re-election, so it can be stale relative to when "
+            "this election's results actually took effect) and independent "
+            "of the editable start_date/end_date fields above (which are "
+            "voting-period fields, not office-holding dates)."
+        ),
+    )
 
     class Meta:
         db_table = "elections_election"
@@ -153,6 +168,17 @@ class Election(BaseModel):
                 # held, non-consecutive post) must not roll back or block
                 # every other post's results.
                 errors[post] = str(exc)
+
+        # Stamp the moment results were actually applied — this is the
+        # authoritative tenure_start anchor used by
+        # elections.administrations._build_administration_base(), since
+        # individual Executive.start_date values are NOT reliable for this
+        # (a re-elected officer keeps their pre-existing start_date, see
+        # above). Safe to save here: this re-save keeps status COMPLETED,
+        # so the post_save signal's "previous_status == COMPLETED" guard
+        # prevents this from re-triggering result processing.
+        self.results_applied_at = timezone.now()
+        self.save(update_fields=["results_applied_at", "updated_at"])
 
         return {
             "winners": winners,
