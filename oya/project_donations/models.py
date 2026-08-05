@@ -527,8 +527,16 @@ class Pledge(BaseModel):
         pledges created via the Donation form) are fulfilled as a single
         step when their linked Donation is marked Confirmed — see
         signals.sync_donation_pledge — so this is a no-op for those."""
-        if self.status == "CANCELLED" or self.donation_type != "MONEY" or self.source_donation_id:
+        if self.status == "CANCELLED" or self.donation_type != "MONEY":
             return
+
+        # Skip recalculation for pledges that were created from a Donation record
+        try:
+            if self.source_donation:
+                return
+        except Donation.DoesNotExist:
+            pass
+
         total = self.total_paid
         if total <= 0:
             new_status = "PENDING"
