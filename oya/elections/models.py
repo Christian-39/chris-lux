@@ -286,7 +286,7 @@ class HandoverLedger(BaseModel):
         related_name="handovers",
         verbose_name="Outgoing Executive"
     )
-    
+
     # Tenure period for auto-calculation — nullable for backward-compatible migration
     tenure_start = models.DateField(
         verbose_name="Tenure Start Date",
@@ -309,60 +309,60 @@ class HandoverLedger(BaseModel):
     bank_balance = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        default=0.00,
+        default=Decimal("0.00"),
         verbose_name="Bank Balance (Legacy)",
         help_text="Deprecated — superseded by Physical Cash at Hand. Retained for historical records only."
     )
     cash_balance = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        default=0.00,
+        default=Decimal("0.00"),
         verbose_name="Cash Balance (Legacy)",
         help_text="Deprecated — superseded by Physical Cash at Hand. Retained for historical records only."
     )
-    
+
     # Finance aggregates (auto-calculated during save)
     total_income = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        default=0.00,
+        default=Decimal("0.00"),
         verbose_name="Other Income (Contributions)",
         help_text="All non-dues, non-donation, non-case-fine income recorded during the tenure period. Auto-calculated."
     )
     total_dues = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        default=0.00,
+        default=Decimal("0.00"),
         verbose_name="Yearly Dues Collected",
         help_text="Dues payments recorded during the tenure period. Auto-calculated."
     )
     total_donations = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        default=0.00,
+        default=Decimal("0.00"),
         verbose_name="Total Project Donations",
         help_text="Confirmed project donations received during the tenure period. Auto-calculated."
     )
     taskforce_revenue = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        default=0.00,
+        default=Decimal("0.00"),
         verbose_name="Case Fines Revenue",
         help_text="Fines from resolved case files during the tenure period. Auto-calculated."
     )
     total_expenses = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        default=0.00,
+        default=Decimal("0.00"),
         verbose_name="Total Expenses",
         help_text="Expenses recorded during the tenure period. Auto-calculated."
     )
-    
+
     # Operations aggregates
     taskforce_total = models.PositiveIntegerField(default=0, verbose_name="Taskforce Total")
     taskforce_active = models.PositiveIntegerField(default=0, verbose_name="Taskforce Active")
     taskforce_inactive = models.PositiveIntegerField(default=0, verbose_name="Taskforce Inactive")
-    
+
     motorcycle_total = models.PositiveIntegerField(default=0, verbose_name="Motorcycles Total")
     motorcycle_excellent = models.PositiveIntegerField(default=0, verbose_name="Motorcycles Excellent")
     motorcycle_needs_service = models.PositiveIntegerField(default=0, verbose_name="Motorcycles Needs Service")
@@ -396,7 +396,7 @@ class HandoverLedger(BaseModel):
     pledge_total_value = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        default=0.00,
+        default=Decimal("0.00"),
         verbose_name="Total Pledge Value",
         help_text="Total pledged value of Money pledges made during the tenure period. Auto-calculated."
     )
@@ -435,17 +435,24 @@ class HandoverLedger(BaseModel):
         deprecated legacy fields (kept only so historical records entered
         before this reform aren't lost) — cash_remaining ("Physical Cash
         at Hand") is the only balance entered by hand going forward."""
-        return self.bank_balance + self.cash_balance + self.cash_remaining
+        return Decimal(str(self.bank_balance or 0)) + Decimal(str(self.cash_balance or 0)) + Decimal(str(self.cash_remaining or 0))
 
     @property
     def closing_balance(self):
         """Alias of total_balance — the administration's closing balance."""
         return self.total_balance
-    
+
     @property
     def net_financial_position(self):
         """Net position: all revenue - expenses + physical balance."""
-        return self.total_income + self.total_dues + self.total_donations + self.taskforce_revenue - self.total_expenses + self.total_balance
+        return (
+            Decimal(str(self.total_income or 0)) +
+            Decimal(str(self.total_dues or 0)) +
+            Decimal(str(self.total_donations or 0)) +
+            Decimal(str(self.taskforce_revenue or 0)) -
+            Decimal(str(self.total_expenses or 0)) +
+            self.total_balance
+        )
 
     @property
     def net_balance(self):
@@ -457,8 +464,13 @@ class HandoverLedger(BaseModel):
     @property
     def total_revenue(self):
         """Total revenue realized during tenure."""
-        return self.total_income + self.total_dues + self.total_donations + self.taskforce_revenue
-    
+        return (
+            Decimal(str(self.total_income or 0)) +
+            Decimal(str(self.total_dues or 0)) +
+            Decimal(str(self.total_donations or 0)) +
+            Decimal(str(self.taskforce_revenue or 0))
+        )
+
     def recalculate_aggregates(self):
         """
         Recalculate every auto-aggregated figure on this ledger from
@@ -498,11 +510,11 @@ class HandoverLedger(BaseModel):
 
         # ─── FINANCE ───
         finance = _finance_section(start, end)
-        self.total_income = finance["total_income"]
-        self.total_dues = finance["total_dues"]
-        self.total_donations = finance["total_donations"]
-        self.taskforce_revenue = finance["taskforce_revenue"]
-        self.total_expenses = finance["total_expenses"]
+        self.total_income = Decimal(str(finance.get("total_income", 0) or 0))
+        self.total_dues = Decimal(str(finance.get("total_dues", 0) or 0))
+        self.total_donations = Decimal(str(finance.get("total_donations", 0) or 0))
+        self.taskforce_revenue = Decimal(str(finance.get("taskforce_revenue", 0) or 0))
+        self.total_expenses = Decimal(str(finance.get("total_expenses", 0) or 0))
 
         # ─── PROJECTS ───
         projects = _projects_section(start, end, limit=1)
@@ -521,7 +533,7 @@ class HandoverLedger(BaseModel):
         # ─── PLEDGES ───
         pledges = _pledges_section(start, end, limit=1)
         self.pledges_made = pledges["counts"]["created_in_tenure"]
-        self.pledge_total_value = pledges["total_pledged_value"]
+        self.pledge_total_value = Decimal(str(pledges.get("total_pledged_value", 0) or 0))
 
         # ─── TASK FORCE ───
         taskforce = _taskforce_section(start, end, limit=1)
