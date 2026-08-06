@@ -3,7 +3,7 @@ Forms for OYA operations.
 """
 from django import forms
 from members.models import Member
-from core.utils import exclude_removed_members
+from core.utils import exclude_removed_members, exclude_admin_members
 from .models import TaskForceMember, Motorcycle, CaseFile
 
 
@@ -29,8 +29,8 @@ class TaskForceMemberForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Removed members and members who are currently serving as an
-        # executive must never be newly selectable for task force
+        # Removed members, Admins, and members who are currently serving as
+        # an executive must never be newly selectable for task force
         # assignment, but keep an already-assigned member selectable when
         # editing an existing assignment, even if they were removed or
         # became an executive after being assigned (so the record can
@@ -40,7 +40,7 @@ class TaskForceMemberForm(forms.ModelForm):
         current_executive_ids = Executive.objects.filter(
             is_current=True
         ).values_list("member_id", flat=True)
-        qs = exclude_removed_members(Member.objects.all()).exclude(
+        qs = exclude_admin_members(exclude_removed_members(Member.objects.all())).exclude(
             id__in=current_executive_ids
         )
         if self.instance and self.instance.pk and self.instance.member_id:
@@ -78,11 +78,11 @@ class MotorcycleForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Removed members must never be newly assignable to an asset, but
-        # keep an already-assigned member selectable when editing an
-        # existing record, even if they were removed afterward.
+        # Removed members and Admins must never be newly assignable to an
+        # asset, but keep an already-assigned member selectable when
+        # editing an existing record, even if they were removed afterward.
         from django.db.models import Q
-        qs = exclude_removed_members(Member.objects.all())
+        qs = exclude_admin_members(exclude_removed_members(Member.objects.all()))
         if self.instance and self.instance.pk and self.instance.assigned_to_id:
             qs = Member.objects.filter(Q(pk=self.instance.assigned_to_id) | Q(pk__in=qs.values_list("pk", flat=True)))
         self.fields["assigned_to"].queryset = qs.order_by("full_name")
