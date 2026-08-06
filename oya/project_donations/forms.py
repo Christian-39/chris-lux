@@ -7,6 +7,7 @@ from decimal import Decimal
 from .models import OutsideDonor, Donation, Pledge, PledgePayment
 from members.models import Member
 from core.widgets import AutocompleteSelectWidget
+from core.utils import exclude_admin_members
 
 
 class OutsideDonorForm(forms.ModelForm):
@@ -55,9 +56,9 @@ class OutsideDonorForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["invited_by"].queryset = Member.objects.filter(
+        self.fields["invited_by"].queryset = exclude_admin_members(Member.objects.filter(
             status="ACTIVE"
-        ).order_by("full_name")
+        )).order_by("full_name")
         self.fields["invited_by"].widget.display_queryset = self.fields["invited_by"].queryset
         self.fields["invited_by"].required = True
 
@@ -153,9 +154,9 @@ class DonationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["member"].queryset = Member.objects.filter(
+        self.fields["member"].queryset = exclude_admin_members(Member.objects.filter(
             status="ACTIVE"
-        ).order_by("full_name")
+        )).order_by("full_name")
         self.fields["member"].widget.display_queryset = self.fields["member"].queryset
         self.fields["member"].required = False
 
@@ -165,9 +166,9 @@ class DonationForm(forms.ModelForm):
         self.fields["outside_donor"].empty_label = "-- Select Outside Donor --"
         self.fields["outside_donor"].required = False
 
-        self.fields["invited_by"].queryset = Member.objects.filter(
+        self.fields["invited_by"].queryset = exclude_admin_members(Member.objects.filter(
             status="ACTIVE"
-        ).order_by("full_name")
+        )).order_by("full_name")
         self.fields["invited_by"].widget.display_queryset = self.fields["invited_by"].queryset
         self.fields["invited_by"].required = False
 
@@ -303,9 +304,9 @@ class PledgeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields["member"].queryset = Member.objects.filter(
+        self.fields["member"].queryset = exclude_admin_members(Member.objects.filter(
             status="ACTIVE"
-        ).order_by("full_name")
+        )).order_by("full_name")
         self.fields["member"].widget.display_queryset = self.fields[
             "member"
         ].queryset
