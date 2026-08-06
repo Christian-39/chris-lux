@@ -13,7 +13,7 @@ from django.db.models import Q, Sum, Value, DecimalField
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from core.exceptions import ValidationError, DuplicateRecordError
-from core.utils import exclude_removed_users
+from core.utils import exclude_removed_users, exclude_admin_users
 from auditlogs.services import log_request_action
 from .models import User
 from .forms import (
@@ -550,8 +550,10 @@ def user_search_ajax(request):
     )
     # A user account can stay is_active=True even after the linked Member
     # record is marked Removed — exclude those so removed members never
-    # appear in this shared picker (finance income, dues, etc.).
-    users = exclude_removed_users(users).order_by("full_name")[:15]
+    # appear in this shared picker (finance income, dues, etc.). Admins
+    # never appear here either — they manage/monitor, they don't pay dues,
+    # donate, or otherwise act as members.
+    users = exclude_admin_users(exclude_removed_users(users)).order_by("full_name")[:15]
 
     results = [
         {
