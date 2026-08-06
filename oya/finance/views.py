@@ -14,6 +14,7 @@ from django.http import JsonResponse
 from django.db import transaction
 from auditlogs.services import log_action
 from accounts.models import User
+from core.utils import exclude_admin_users
 from .models import Income, Expense, DuesPayment, DuesPaymentTransaction
 from project_donations.models import Donation as ProjectDonation, OutsideDonor
 from .forms import IncomeForm, ExpenseForm, DuesPaymentAllocationForm
@@ -137,16 +138,15 @@ def dues_tracker(request):
     years = list(range(PLATFORM_START_YEAR, current_year + 1))
 
     # Include all registered members in dues tracking.
-    # Exclude staff and superuser accounts — only real members should appear.
+    # Exclude Admin accounts — only real members (Floor Members and
+    # Executives) should appear; Admins manage/monitor, they don't pay dues.
     members = list(
-        User.objects.filter(
-            serial_number__isnull=False
-        ).exclude(
-            serial_number=""
-        ).exclude(
-            is_staff=True
-        ).exclude(
-            is_superuser=True
+        exclude_admin_users(
+            User.objects.filter(
+                serial_number__isnull=False
+            ).exclude(
+                serial_number=""
+            )
         ).order_by("full_name")
     )
 
@@ -977,48 +977,20 @@ def finance_summary(request):
     total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or 0
     treasury_balance = total_income - total_expenses
 
-    # FIX Issue 3: Count only registered members (exclude admins, staff, system users)
-    members_qs = User.objects.filter(
-        is_active=True,
-        serial_number__isnull=False
-    ).exclude(
-        serial_number=""
-    ).exclude(
-        is_staff=True
-    ).exclude(
-        is_superuser=True
-    )
-    active_members = members_qs.count()
+    # Count only registered members (Admins manage/monitor — excluded;
+    # Executives are still members and remain counted).
+    active_members = exclude_admin_users(
+        User.objects.filter(
+            is_active=True,
+            serial_number__isnull=False
+        ).exclude(
+            serial_number=""
+        )
+    ).count()
 
-    # Sum all dues payments for current/past years (same logic as dues_tracker)
-    total_dues = DuesPayment.objects.filter(
-        year__lte=current_year
-    ).aggregate(
-        total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
-    )["total"] or Decimal("0")
-
-    # Add prepaid dues (future years fully paid)
-    total_prepaid = DuesPayment.objects.filter(
-        year__gt=current_year,
-        amount_paid__gte=YEARLY_DUES,
-    ).aggregate(
-        total=Coalesce(Sum("amount_paid"), Value(0, output_field=DecimalField()))
-    )["total"] or Decimal("0")
-    total_dues = total_dues + total_prepaid
-
-    # ============================================================
-    # FIX: total_dues_possible must respect each member's join year
-    # ============================================================
-    total_dues_possible = Decimal("0")
-    for member in members_qs:
-        join_year = DuesPayment.get_member_join_year(member)
-        start_year = max(join_year, PLATFORM_START_YEAR)
-        expected_years = current_year - start_year + 1
-        total_dues_possible += expected_years * YEARLY_DUES
-
-    dues_collection_rate = round(
-        (total_dues / total_dues_possible * 100), 1
-    ) if total_dues_possible > 0 else 0
+    years_count = current_year - PLATFORM_START_YEAR + 1
+    total_dues_possible = active_members * years_count * YEARLY_DUES
+    dues_collection_rate = round((total_dues / total_dues_possible * 100), 1) if total_dues_possible > 0 else 0
 
     this_year_dues_paid = DuesPayment.objects.filter(
         year=current_year,
@@ -1160,16 +1132,15 @@ def finance_summary(request):
     recent_transactions = recent_transactions[:5]
 
 
-    # FIX: Only include actual members (not staff/superusers) in debtor list
-    members = User.objects.filter(
-        is_active=True,
-        serial_number__isnull=False
-    ).exclude(
-        serial_number=""
-    ).exclude(
-        is_staff=True
-    ).exclude(
-        is_superuser=True
+    # Only include actual members in debtor list — Admins don't pay dues;
+    # Executives are still members and remain included.
+    members = exclude_admin_users(
+        User.objects.filter(
+            is_active=True,
+            serial_number__isnull=False
+        ).exclude(
+            serial_number=""
+        )
     )
 
     debtor_list = []
@@ -1276,11 +1247,8 @@ def search_members(request):
         serial_number__isnull=False
     ).exclude(
         serial_number=""
-    ).exclude(
-        is_staff=True
-    ).exclude(
-        is_superuser=True
-    ).distinct()[:10]
+    )
+    users = exclude_admin_users(users).distinct()[:10]
 
     results = []
     for u in users:
@@ -1453,7 +1421,8 @@ def dues_debtors_list(request):
 
     members_qs = User.objects.filter(
         serial_number__isnull=False
-    ).exclude(serial_number="").exclude(is_staff=True).exclude(is_superuser=True)
+    ).exclude(serial_number="")
+    members_qs = exclude_admin_users(members_qs)
 
     if search_term:
         members_qs = members_qs.filter(
