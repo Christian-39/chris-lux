@@ -6,7 +6,7 @@ from decimal import Decimal
 from .models import Income, Expense, DuesPayment, DuesPaymentTransaction
 from accounts.models import User  # Ensure this import matches your user model path
 from core.widgets import AutocompleteSelectWidget
-from core.utils import exclude_removed_users
+from core.utils import exclude_removed_users, exclude_admin_users
 
 
 class IncomeForm(forms.ModelForm):
@@ -45,8 +45,10 @@ class IncomeForm(forms.ModelForm):
         choices = [c for c in Income.INCOME_TYPE_CHOICES if c[0] != "DUES"]
         self.fields["income_type"].choices = choices
 
-        # Member dropdown — Removed members must never be selectable.
-        member_qs = User.objects.filter(serial_number__isnull=False).exclude(serial_number="").exclude(is_staff=True).exclude(is_superuser=True)
+        # Member dropdown — Admins don't donate; Removed members must never
+        # be selectable either.
+        member_qs = User.objects.filter(serial_number__isnull=False).exclude(serial_number="")
+        member_qs = exclude_admin_users(member_qs)
         self.fields["member"].queryset = exclude_removed_users(member_qs).order_by("full_name")
         self.fields["member"].widget.display_queryset = self.fields["member"].queryset
         self.fields["member"].required = False
@@ -152,17 +154,15 @@ class DuesPaymentAllocationForm(forms.ModelForm):
         self.recorded_by = kwargs.pop("recorded_by", None)
         super().__init__(*args, **kwargs)
         self.fields["payment_date"].initial = timezone.now().date()
-        # FIX Issue 2: Ensure only registered members appear in dues allocation form
-        # Removed members must never be selectable for new dues payments.
+        # Ensure only registered members appear in dues allocation form —
+        # Admins don't pay dues; Removed members must never be selectable
+        # for new dues payments either.
         member_qs = User.objects.filter(
             serial_number__isnull=False
         ).exclude(
             serial_number=""
-        ).exclude(
-            is_staff=True
-        ).exclude(
-            is_superuser=True
         )
+        member_qs = exclude_admin_users(member_qs)
         self.fields["member"].queryset = exclude_removed_users(member_qs).order_by("full_name")
         self.fields["member"].widget.display_queryset = self.fields["member"].queryset
 
