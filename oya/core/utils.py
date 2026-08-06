@@ -87,6 +87,44 @@ def exclude_removed_members(queryset):
     return queryset.exclude(status="REMOVED")
 
 
+def exclude_admin_users(queryset):
+    """
+    Exclude true Admin accounts (role="ADMIN" or is_superuser) from a User
+    queryset — Admins manage and monitor the platform; they don't pay dues,
+    make donations/pledges, or otherwise act as members.
+
+    Deliberately keyed on `role`/`is_superuser`, NOT `is_staff` — is_staff
+    is also set True for Executives (see accounts.forms.UserUpdateForm),
+    so filtering on is_staff alone incorrectly sweeps Executives out of
+    member-facing features too. Use this on every queryset that powers a
+    "member" selection input or member-facing statistic — dues tracking,
+    donation/pledge "member" pickers, autocomplete/search endpoints,
+    leaderboards, and so on — so only genuine members (Floor Members and
+    Executives) are ever counted or selectable.
+    """
+    return queryset.exclude(role="ADMIN").exclude(is_superuser=True)
+
+
+def exclude_admin_members(queryset):
+    """
+    Exclude Member records whose linked User account (matched by
+    serial_number) is a true Admin (role="ADMIN" or is_superuser).
+
+    Member and User are linked by serial_number rather than a direct
+    foreign key (same as exclude_removed_users below), so Member-based
+    selection endpoints — the shared member-autocomplete search, donation/
+    pledge "member" pickers, task force assignment, and so on — need this
+    explicit exclusion. Admins manage and monitor the platform; they don't
+    donate, pledge, get assigned tasks, or otherwise act as members.
+    """
+    from django.db.models import Q
+    from accounts.models import User
+    admin_serials = User.objects.filter(
+        Q(role="ADMIN") | Q(is_superuser=True)
+    ).exclude(serial_number="").values_list("serial_number", flat=True)
+    return queryset.exclude(serial_number__in=admin_serials)
+
+
 def exclude_removed_users(queryset):
     """
     Exclude User accounts linked (by matching serial_number) to a Member
