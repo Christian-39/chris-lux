@@ -554,11 +554,13 @@ def _get_yearly_dues_debtors_count():
     """Get count of distinct members with any outstanding yearly dues (Feature 14)."""
     try:
         from accounts.models import User
+        from core.utils import exclude_admin_users
         current_year = datetime.now().year
 
         members = list(
-            User.objects.filter(serial_number__isnull=False)
-            .exclude(serial_number="").exclude(is_staff=True).exclude(is_superuser=True)
+            exclude_admin_users(
+                User.objects.filter(serial_number__isnull=False).exclude(serial_number="")
+            )
         )
         # One query for all fully-paid (member, year) pairs instead of N queries.
         paid_pairs = set(
@@ -586,11 +588,13 @@ def _get_outstanding_dues_amount():
     """Get total outstanding yearly dues amount across all active members (Feature 14)."""
     try:
         from accounts.models import User
+        from core.utils import exclude_admin_users
         current_year = datetime.now().year
 
         members = list(
-            User.objects.filter(serial_number__isnull=False)
-            .exclude(serial_number="").exclude(is_staff=True).exclude(is_superuser=True)
+            exclude_admin_users(
+                User.objects.filter(serial_number__isnull=False).exclude(serial_number="")
+            )
         )
         # One query for total paid per member instead of N queries.
         paid_by_member = {
