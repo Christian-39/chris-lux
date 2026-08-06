@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from .models import Election, Candidate, HandoverLedger
 from executives.models import Executive
 from members.models import Member
-from core.utils import exclude_removed_members
+from core.utils import exclude_removed_members, exclude_admin_members
 
 
 class ElectionForm(forms.ModelForm):
@@ -63,17 +63,17 @@ class CandidateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Removed members and members who are currently active on the task
-        # force must never be newly nominable as election candidates, but
-        # keep an already-nominated candidate's member selectable when
-        # editing an existing record, even if they were removed or joined
-        # the task force afterward.
+        # Removed members, Admins, and members who are currently active on
+        # the task force must never be newly nominable as election
+        # candidates, but keep an already-nominated candidate's member
+        # selectable when editing an existing record, even if they were
+        # removed or joined the task force afterward.
         from django.db.models import Q
         from operations.models import TaskForceMember
         active_taskforce_ids = TaskForceMember.objects.filter(
             is_active=True
         ).values_list("member_id", flat=True)
-        qs = exclude_removed_members(Member.objects.all()).exclude(
+        qs = exclude_admin_members(exclude_removed_members(Member.objects.all())).exclude(
             id__in=active_taskforce_ids
         )
         if self.instance and self.instance.pk and self.instance.member_id:
