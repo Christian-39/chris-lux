@@ -4,6 +4,7 @@ Forms for OYA system settings.
 from django import forms
 from .models import SystemSettings, DonationGroup, DonationGroupMembership
 from core.widgets import AutocompleteSelectWidget
+from core.utils import exclude_admin_members
 from members.models import Member
 
 
@@ -134,7 +135,7 @@ class DonationGroupMemberAssignForm(forms.Form):
     """Form for assigning a member to a donation group via the shared autocomplete."""
 
     member = forms.ModelChoiceField(
-        queryset=Member.objects.filter(status="ACTIVE").order_by("full_name"),
+        queryset=exclude_admin_members(Member.objects.filter(status="ACTIVE")).order_by("full_name"),
         widget=AutocompleteSelectWidget(
             search_url_name="members:member_autocomplete_search",
             placeholder="Search member by name, no. or phone…",
