@@ -13,7 +13,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from auditlogs.services import log_action
 from accounts.permissions import AdminRequiredMixin, ExecutiveRequiredMixin
-from core.utils import paginate_queryset, build_search_query
+from core.utils import paginate_queryset, build_search_query, exclude_admin_members
 from .models import Member, Clan
 from .forms import MemberForm, MemberUpdateForm, MemberRemoveForm, ClanForm
 
@@ -384,8 +384,11 @@ def member_autocomplete_search(request):
     if status_filter:
         members = members.filter(status=status_filter)
     # Defense-in-depth: no matter what status filter (or lack of one) is
-    # requested, a Removed member must never be selectable here.
+    # requested, a Removed member must never be selectable here — and
+    # Admins never appear here either (they manage/monitor; they don't
+    # get selected for donations, pledges, task force, etc.).
     members = members.exclude(status="REMOVED")
+    members = exclude_admin_members(members)
 
     members = members.filter(
         Q(full_name__icontains=q) |
