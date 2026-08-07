@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}Handover Ledgers{% endblock %}
 {% block page_title %}Handover Ledgers{% endblock %}
@@ -35,11 +36,11 @@
   </div>
   <div class="card" style="padding:1rem;">
     <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-bottom:0.25rem;">Total Physical Cash at Hand</div>
-    <div style="font-size:1.5rem;font-weight:700;color:var(--oya-success);">₦{{ stats.total_cash_remaining|floatformat:0 }}</div>
+    <div style="font-size:1.5rem;font-weight:700;color:var(--oya-success);">₦{{ stats.total_cash_remaining|floatformat:0|intcomma }}</div>
   </div>
   <div class="card" style="padding:1rem;">
     <div style="font-size:0.75rem;color:var(--oya-text-muted);margin-bottom:0.25rem;">Total Revenue Recorded</div>
-    <div style="font-size:1.5rem;font-weight:700;color:var(--oya-primary);">₦{{ stats.total_revenue|floatformat:0 }}</div>
+    <div style="font-size:1.5rem;font-weight:700;color:var(--oya-primary);">₦{{ stats.total_revenue|floatformat:0|intcomma }}</div>
   </div>
 </div>
 
@@ -84,19 +85,19 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.8125rem;">
           <div>
             <span style="color:var(--oya-text-muted);display:block;">Revenue</span>
-            <strong style="color:var(--oya-success);">₦{{ handover.total_revenue|floatformat:0 }}</strong>
+            <strong style="color:var(--oya-success);">₦{{ handover.total_revenue|floatformat:0|intcomma }}</strong>
           </div>
           <div>
             <span style="color:var(--oya-text-muted);display:block;">Expenses</span>
-            <strong style="color:var(--oya-danger);">₦{{ handover.total_expenses|floatformat:0 }}</strong>
+            <strong style="color:var(--oya-danger);">₦{{ handover.total_expenses|floatformat:0|intcomma }}</strong>
           </div>
           <div>
             <span style="color:var(--oya-text-muted);display:block;">Physical Balance</span>
-            <strong style="color:var(--oya-text-primary);">₦{{ handover.total_balance|floatformat:0 }}</strong>
+            <strong style="color:var(--oya-text-primary);">₦{{ handover.total_balance|floatformat:0|intcomma }}</strong>
           </div>
           <div>
             <span style="color:var(--oya-text-muted);display:block;">Net Position</span>
-            <strong style="color:var(--oya-primary);">₦{{ handover.net_financial_position|floatformat:0 }}</strong>
+            <strong style="color:var(--oya-primary);">₦{{ handover.net_financial_position|floatformat:0|intcomma }}</strong>
           </div>
         </div>
       </div>
